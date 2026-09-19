@@ -66,6 +66,9 @@ namespace Palimpseste.Game.Bootstrap
             records = store.LoadAll();
             libraryBackdrop = Resources.Load<Texture2D>("LibraryBackdrop");
             serviceUrl = PlayerPrefs.GetString("palimpseste.lab_url", "http://127.0.0.1:8080");
+            if (WindowsCredentialStore.TryRead(serviceUrl, out token, out _))
+                Debug.Log("PALIMPSESTE_CREDENTIAL_READ_OK");
+            if (token == null) token = "";
             SceneManager.sceneLoaded += OnSceneLoaded;
             if (SceneManager.GetActiveScene().name == "SpellLab") page = Page.Lab;
         }
@@ -154,11 +157,29 @@ namespace Palimpseste.Game.Bootstrap
             GUI.DrawTexture(new Rect(x + 20, 157, 115, 3), goldBar);
             GUI.Label(new Rect(x + 20, 122, width - 40, 32), "Bibliothèque des parchemins", titleStyle);
             GUI.Label(new Rect(x + 20, 174, 110, 30), "Service", textStyle);
-            serviceUrl = GUI.TextField(new Rect(x + 130, 174, width - 470, 32), serviceUrl);
+            var editedUrl = GUI.TextField(new Rect(x + 130, 174, width - 470, 32), serviceUrl);
+            if (editedUrl != serviceUrl)
+            {
+                serviceUrl = editedUrl;
+                api.Clear();
+                WindowsCredentialStore.TryRead(serviceUrl, out token, out _);
+                if (token == null) token = "";
+            }
             GUI.Label(new Rect(x + 20, 214, 110, 30), "Jeton privé", textStyle);
             token = GUI.PasswordField(new Rect(x + 130, 214, width - 470, 32), token, '•');
             if (GUI.Button(new Rect(x + width - 310, 174, 280, 72), busy ? "Connexion…" : "Connecter", buttonStyle) && !busy) StartCoroutine(Connect());
             if (GUI.Button(new Rect(x + 20, 272, 280, 42), "Nouveau parchemin", buttonStyle) && !busy) StartCoroutine(NewParchment());
+            if (GUI.Button(new Rect(x + 315, 272, 185, 42), "Oublier le jeton", buttonStyle) && !busy)
+            {
+                if (WindowsCredentialStore.TryDelete(serviceUrl, out var deleteError))
+                {
+                    token = "";
+                    api.Clear();
+                    notice = "Jeton protégé effacé. Les sorts locaux restent accessibles.";
+                    Debug.Log("PALIMPSESTE_CREDENTIAL_DELETE_OK");
+                }
+                else notice = "Effacement du jeton impossible : " + deleteError;
+            }
             GUI.Label(new Rect(x + 20, 327, width - 40, 26), "Créations locales", textStyle);
             var guideX = x + width * .59f;
             var guideWidth = width * .38f;
@@ -382,7 +403,12 @@ namespace Palimpseste.Game.Bootstrap
             if (reference != null) Destroy(reference);
             reference = image;
             referenceBytes = bytes;
-            notice = "Laboratoire connecté. Génération par le service privé uniquement.";
+            if (WindowsCredentialStore.TryWrite(serviceUrl, token, out var credentialError))
+            {
+                notice = "Laboratoire connecté. Jeton conservé dans le coffre Windows.";
+                Debug.Log("PALIMPSESTE_CREDENTIAL_WRITE_OK");
+            }
+            else notice = "Laboratoire connecté pour cette session. Jeton non conservé : " + credentialError;
             busy = false;
             foreach (var item in records) if (item.needs_capture && item.state != "capture_corrupted") StartCoroutine(Sync(item));
         }

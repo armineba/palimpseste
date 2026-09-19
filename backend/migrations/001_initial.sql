@@ -175,6 +175,18 @@ CREATE TABLE IF NOT EXISTS spells (
 );
 ALTER TABLE jobs ADD CONSTRAINT jobs_spell_fk FOREIGN KEY (spell_id) REFERENCES spells(id) DEFERRABLE INITIALLY DEFERRED;
 
+-- A creator may delegate one exact case of one owned spell to another creator.
+-- There is deliberately no wildcard grant and no grant to a player account.
+CREATE TABLE IF NOT EXISTS spell_review_grants (
+    spell_id uuid NOT NULL REFERENCES spells(id) ON DELETE CASCADE,
+    reviewer_id uuid NOT NULL REFERENCES lab_principals(id) ON DELETE CASCADE,
+    case_id text NOT NULL CHECK (case_id ~ '^[a-z][a-z0-9_.-]{0,63}$'),
+    granted_by uuid NOT NULL REFERENCES lab_principals(id),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (spell_id, reviewer_id, case_id)
+);
+CREATE INDEX IF NOT EXISTS spell_review_grants_reviewer_idx ON spell_review_grants(reviewer_id, spell_id);
+
 CREATE TABLE IF NOT EXISTS reviews (
     id uuid PRIMARY KEY,
     owner_id uuid NOT NULL REFERENCES lab_principals(id),

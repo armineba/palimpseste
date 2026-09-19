@@ -93,6 +93,8 @@ app.MapPost("/v1/jobs/{id}/resume", ApiHandlers.ResumeJob);
 app.MapGet("/v1/spells/{id}", ApiHandlers.GetSpell);
 app.MapGet("/v1/artifacts/{id}", ApiHandlers.GetArtifact);
 app.MapPost("/v1/reviews", ApiHandlers.SubmitReview);
+app.MapPost("/v1/spells/{id}/reviewers", ApiHandlers.GrantSpellReviewAccess);
+app.MapDelete("/v1/spells/{id}/reviewers/{reviewerId}", ApiHandlers.RevokeSpellReviewAccess);
 app.MapPost("/v1/authoring/plan", ApiHandlers.AuthoringPlan);
 app.MapGet("/v1/authoring/jobs/{id}/plan", ApiHandlers.GetAuthoringPlan);
 

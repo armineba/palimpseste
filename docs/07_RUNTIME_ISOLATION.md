@@ -1,66 +1,53 @@
-﻿# Preuve dâ€™isolation runtime
+# Isolation du worker de génération
 
-Le worker joueur et lâ€™agent de dÃ©veloppement sont deux profils distincts.
-`CodexProcessRunner` reÃ§oit uniquement un prompt et des chemins produits par le
-backend; aucun champ HTTP ne devient un argument de processus. Les chemins de
-schÃ©ma et dâ€™image doivent Ãªtre sous les racines approuvÃ©es, sans point de
-jonction/reparse point. Chaque tentative reÃ§oit un dossier neuf sous
-`PALIMPSESTE_ATTEMPT_ROOT`.
+Le worker joueur et l'agent de développement utilisent des identités, des
+répertoires et des fonctions distincts. L'API ne transmet au worker que des
+données de capture et des identifiants de tâche. `CodexProcessRunner` construit
+les arguments de `codex exec` sans shell interactif ; les chemins d'image et de
+schéma sont limités aux racines approuvées et les jonctions NTFS sont refusées.
+Chaque tentative reçoit un dossier neuf sous `PALIMPSESTE_ATTEMPT_ROOT`.
 
-Avant lancement, la configuration bloque :
+Le processus enfant reçoit un environnement reconstruit, un `CODEX_HOME`
+dédié, un `TEMP` de tentative et un `PATH` minimal. Il utilise
+`--ignore-user-config`, `--ignore-rules`, `--sandbox read-only`, `--ephemeral`,
+`approval_policy="never"` et les désactivations d'outils demandées. Le worker
+refuse un modèle différent de `gpt-5.6-luna`, un effort inférieur à `max`
+(`effort_below_documented_max`), le repli de modèle, une baisse d'effort et
+l'activation des outils d'exécution.
 
-- un `CODEX_HOME` personnel ou inclus dans le profil utilisateur courant;
-- une racine runtime placÃ©e dans lâ€™arbre de dÃ©veloppement;
-- une spÃ©cification restÃ©e dans lâ€™arbre de dÃ©veloppement ou modifiable par le
-  compte de service;
-- un arbre de dÃ©veloppement auquel le compte de service conserve la lecture;
-- lâ€™hÃ©ritage dâ€™un outil dâ€™exÃ©cution, dâ€™un fallback de modÃ¨le ou dâ€™une baisse de
-  raisonnement;
-- une identitÃ© Windows diffÃ©rente du compte de service;
-- un modÃ¨le autre que `gpt-5.6-luna` ou un effort non documentÃ©;
-- un schÃ©ma hors de la spÃ©cification dÃ©ployÃ©e et une image hors de lâ€™espace
-  dâ€™entrÃ©es contrÃ´lÃ©.
+La copie runtime de `spec` est en lecture seule pour le compte de service. Le
+dépôt de développement porte un refus héritable de lecture, exécution, création,
+écriture, suppression et modification d'ACL pour ce compte, tout en laissant
+`READ_CONTROL` disponible pour l'audit. Avant chaque lancement, la porte
+production exige cette ACE complète sur la racine, un refus effectif de lister
+la racine et un refus d'ouvrir en lecture **et** écriture quatre fichiers
+sources connus. Ces ouvertures n'écrivent aucun octet. Le contrôle effectif a
+été exécuté sous `PalRuntimeSvc` : liste, lecture et écriture ont été refusées.
+Il couvre la racine et ces sentinelles ; il ne constitue pas une énumération
+exhaustive de chaque enfant ni une protection contre un administrateur qui
+modifierait l'ACL après le contrôle.
 
-Lâ€™environnement du processus est vidÃ© puis reconstruit avec le `CODEX_HOME`
-dÃ©diÃ©, le rÃ©pertoire de tentative comme `TEMP`, un `PATH` minimal et les
-contrÃ´les Git sans fichier utilisateur. Les options `--ignore-user-config`,
-`--ignore-rules`, `--sandbox read-only`, `--ephemeral`, `--config approval_policy="never"`
-et les dÃ©sactivations dâ€™outils sont passÃ©es sans shell interactif. Le compte de
-service et les ACL du rÃ©pertoire runtime restent une condition de dÃ©ploiement;
-`read-only` seul ne constitue pas une preuve de confidentialitÃ©. Le
-provisionnement applique RX Ã  la copie `spec` et au binaire Codex, puis un deny
-explicite au compte de service sur lâ€™arbre de dÃ©veloppement.
+`ProviderDoctor local` inspecte le binaire sans appel modèle : version, aide,
+parseur des options, `features list` et statut d'authentification expurgé.
+Les capacités exposées demandées sont observées à `false` ; `unified_exec`
+reste signalé comme mécanisme interne PTY et n'est pas compté comme outil
+exposé. La preuve locale inclut le SHA-256 du binaire Codex réellement inspecté.
+`CodexSettings.Check(true)` recalcule ce SHA-256 et exige le même dans la preuve
+features hashée. Il applique la même liaison à la preuve du doctor actif pour
+l'effort, avec le modèle, l'effort retourné aux étapes A/B et l'identité de
+service. Une preuve produite pour un autre binaire est rejetée.
 
-La commande `ProviderDoctor local` nâ€™appelle jamais le modÃ¨le. Elle conserve la
-version, lâ€™aide de `exec`, les options prÃ©sentes, lâ€™Ã©tat dâ€™authentification
-redactÃ© et les erreurs de configuration. `ProviderDoctor active` doit Ãªtre
-lancÃ©e volontairement avec deux images et un JSON de gÃ©omÃ©trie; elle effectue
-A puis B et produit des preuves datees. Dans cette livraison, le doctor actif
-a ete lance sous PalRuntimeSvc mais a ete bloque avant A/B par
-`dedicated_auth_not_confirmed`; `model_calls_executed=false`.
-Le profil local a observe les capacites exposees desactivees et le seul
-blocage de production restant est `effort_not_verified`. En production, le
-booleen `PALIMPSESTE_EFFORT_VERIFIED` doit etre accompagne du chemin et du
-SHA-256 de sa preuve active; le worker revalide le JSON A/B, le modele,
-l'effort rapporte et l'identite du service avant de lancer un sort.
+Le nouveau doctor local a réussi sous `PalRuntimeSvc`, sans appel modèle.
+Après mise à jour de la preuve features dans la configuration privée, sa seconde
+exécution ne rapporte que `effort_not_verified` comme blocage de production.
+L'authentification Codex du compte dédié reste absente. L'ancien doctor actif
+a été arrêté avant A/B avec `dedicated_auth_not_confirmed` et
+`model_calls_executed=false` ; sa preuve précède la liaison au SHA-256 du CLI
+et reste historique. Le doctor actif avec le nouveau binaire et une requête
+Luna réelle n'a pas été exécuté. Les hashes et limites figurent dans
+[la preuve publique](../evidence/public/backend/provider-doctor-runtime-2026-09-19.md).
 
-## Observation des capacites du CLI
-
-Le doctor local execute aussi `codex --disable ... features list` sans modele.
-Il compare les capacites exposees (`shell_tool`, navigateur, ordinateur,
-applications, plugins, agents, `view_image` et autres entrees de la liste) a
-`false` et conserve l observation complete dans le JSON. `unified_exec` et
-`unified_exec_tty` sont enregistres comme implementation PTY observee; ils ne
-sont pas comptes comme une preuve d outil expose desactive. Une valeur `true`
-pour une capacite exposee, une ligne manquante ou un parseur non confirme fait
-echouer le preflight. La cle legacy `web_search` est liee seulement a la ligne
-explicitement observee `standalone_web_search=false`; cette correspondance est
-conservee dans le JSON hashable.
-
-Pour ouvrir la porte features, l operateur examine puis hash le JSON local
-produit sous le compte de service. Il renseigne le chemin et le SHA-256 dans
-`PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_PATH` et
-`PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_SHA256`, puis
-`PALIMPSESTE_RUNTIME_FEATURES_VERIFIED=true`. `CodexSettings.Check(true)`
-recalcule le hash, verifie le compte, le modele, l effort et chaque valeur de
-la table avant d autoriser le worker; un booleen isole ne suffit pas.
+Un identifiant fort du compte Windows a été renouvelé pour permettre la sonde
+locale. La `PSCredential` est protégée par DPAPI et par une ACL privée hors du
+dépôt ; elle dépend du profil Windows de l'opérateur courant. Aucun mot de
+passe, jeton fournisseur ou fichier d'authentification n'est publié.

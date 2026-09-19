@@ -91,11 +91,21 @@ public sealed record CodexSettings(
 
         if (Model != "gpt-5.6-luna") issues.Add("model_mismatch");
         if (Effort is not ("low" or "medium" or "high" or "xhigh" or "max")) issues.Add("invalid_effort");
+        else if (Effort != "max") issues.Add("effort_below_documented_max");
         if (production && !EffortCompatibilityVerified) issues.Add("effort_not_verified");
         if (production && !RuntimeFeaturesCompatibilityVerified) issues.Add("runtime_feature_disable_not_verified");
-        if (production && RuntimeFeaturesCompatibilityVerified && !TryVerifyRuntimeFeatureEvidence(out var featureEvidenceIssue))
+        string? executableHash = null;
+        if (production && (RuntimeFeaturesCompatibilityVerified || EffortCompatibilityVerified))
+        {
+            try { executableHash = ComputeExecutableSha256(Executable); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+            { issues.Add("codex_executable_hash_unavailable"); }
+        }
+        if (production && RuntimeFeaturesCompatibilityVerified && executableHash is not null &&
+            !TryVerifyRuntimeFeatureEvidence(executableHash, out var featureEvidenceIssue))
             issues.Add(featureEvidenceIssue ?? "runtime_feature_evidence_invalid");
-        if (production && EffortCompatibilityVerified && !TryVerifyCompatibilityEvidence(out var evidenceIssue))
+        if (production && EffortCompatibilityVerified && executableHash is not null &&
+            !TryVerifyCompatibilityEvidence(executableHash, out var evidenceIssue))
             issues.Add(evidenceIssue ?? "effort_evidence_invalid");
         if (AttemptTimeout <= TimeSpan.Zero || AttemptTimeout > TimeSpan.FromHours(2)) issues.Add("invalid_timeout");
         if (MaxOutputBytes < 100_000 || MaxOutputBytes > 10_000_000) issues.Add("invalid_output_limit");
@@ -159,6 +169,13 @@ public sealed record CodexSettings(
     }
 
     public bool IsTrustedSpecificationFile(string path) => IsTrustedFile(path, TrustedSpecificationRoot);
+
+    public static string ComputeExecutableSha256(string path)
+    {
+        if (!IsFullyQualified(path) || HasReparsePoint(path)) throw new ArgumentException("Untrusted Codex executable path", nameof(path));
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024, FileOptions.SequentialScan);
+        return Convert.ToHexStringLower(SHA256.HashData(stream));
+    }
 
     public bool IsTrustedInputFile(string path) => IsTrustedFile(path, TrustedInputRoot);
 
@@ -295,24 +312,85 @@ public sealed record CodexSettings(
                 return false;
             }
             var security = new DirectoryInfo(DevelopmentRoot).GetAccessControl(AccessControlSections.Access);
+            const FileSystemRights requiredDeny = FileSystemRights.ReadData | FileSystemRights.ReadAttributes |
+                FileSystemRights.ReadExtendedAttributes | FileSystemRights.ExecuteFile |
+                FileSystemRights.WriteData | FileSystemRights.AppendData | FileSystemRights.WriteAttributes |
+                FileSystemRights.WriteExtendedAttributes | FileSystemRights.Delete |
+                FileSystemRights.DeleteSubdirectoriesAndFiles | FileSystemRights.ChangePermissions |
+                FileSystemRights.TakeOwnership;
+            const InheritanceFlags children = InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit;
+            var inheritedDenyIsComplete = false;
             foreach (FileSystemAccessRule rule in security.GetAccessRules(true, true, typeof(SecurityIdentifier)))
             {
                 if (rule.AccessControlType == AccessControlType.Deny && rule.IdentityReference is SecurityIdentifier sid &&
-                    sid.Equals(expectedSid) && (rule.FileSystemRights & (FileSystemRights.ReadData | FileSystemRights.ListDirectory |
-                        FileSystemRights.ReadAttributes | FileSystemRights.ReadExtendedAttributes | FileSystemRights.ExecuteFile)) != 0)
-                    return true;
+                    sid.Equals(expectedSid) && !rule.IsInherited && (rule.FileSystemRights & requiredDeny) == requiredDeny &&
+                    (rule.InheritanceFlags & children) == children && rule.PropagationFlags == PropagationFlags.None)
+                    inheritedDenyIsComplete = true;
             }
-            issue = "development_root_service_access_not_denied";
-            return false;
+            if (!inheritedDenyIsComplete)
+            {
+                issue = "development_root_deny_incomplete_or_not_inherited";
+                return false;
+            }
+
+            // The same service identity that will spawn Codex must actually be
+            // unable to list the root and open representative source files.
+            // No file contents are changed by these probes.
+            try
+            {
+                using var enumerator = Directory.EnumerateFileSystemEntries(DevelopmentRoot).GetEnumerator();
+                enumerator.MoveNext();
+                issue = "development_root_listable_by_service";
+                return false;
+            }
+            catch (UnauthorizedAccessException) { }
+
+            string[] sentinels =
+            [
+                "prompts/00_AGENT_BUILD.md",
+                "backend/Palimpseste.Worker/Program.cs",
+                "game/Assets/Palimpseste/Bootstrap/PalimpsesteApp.cs",
+                "ops/provision-runtime.ps1"
+            ];
+            foreach (var relative in sentinels)
+            {
+                var path = Path.GetFullPath(Path.Combine(DevelopmentRoot, relative.Replace('/', Path.DirectorySeparatorChar)));
+                if (!IsPathInside(path, DevelopmentRoot, allowEqual: false) || HasReparsePoint(path))
+                {
+                    issue = "development_probe_path_untrusted";
+                    return false;
+                }
+                if (!OpenIsDenied(path, FileAccess.Read))
+                {
+                    issue = "development_source_readable_or_missing";
+                    return false;
+                }
+                if (!OpenIsDenied(path, FileAccess.Write))
+                {
+                    issue = "development_source_writable_or_missing";
+                    return false;
+                }
+            }
+            return true;
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or IdentityNotMappedException or InvalidOperationException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or IdentityNotMappedException or InvalidOperationException or ArgumentException)
         {
             issue = "development_root_acl_unverifiable";
             return false;
         }
     }
 
-    private bool TryVerifyCompatibilityEvidence(out string? issue)
+    private static bool OpenIsDenied(string path, FileAccess access)
+    {
+        try
+        {
+            using var stream = new FileStream(path, FileMode.Open, access, FileShare.ReadWrite | FileShare.Delete);
+            return false;
+        }
+        catch (UnauthorizedAccessException) { return true; }
+    }
+
+    private bool TryVerifyCompatibilityEvidence(string executableHash, out string? issue)
     {
         issue = null;
         if (!IsFullyQualified(CompatibilityEvidencePath) || !File.Exists(CompatibilityEvidencePath))
@@ -346,6 +424,7 @@ public sealed record CodexSettings(
                 !StringProperty(root, "active_result", "success") ||
                 !StringProperty(root, "requested_model", Model) ||
                 !StringProperty(root, "requested_effort", Effort) ||
+                !StringProperty(root, "cli_executable_sha256", executableHash) ||
                 !StringProperty(root, "expected_service_identity", ExpectedServiceUser) ||
                 !StringProperty(root, "service_identity", ExpectedServiceUser) ||
                 !StageMetadata(root, "stage_a", Model, Effort) ||
@@ -363,7 +442,7 @@ public sealed record CodexSettings(
         }
     }
 
-    private bool TryVerifyRuntimeFeatureEvidence(out string? issue)
+    private bool TryVerifyRuntimeFeatureEvidence(string executableHash, out string? issue)
     {
         issue = null;
         if (!IsFullyQualified(RuntimeFeaturesEvidencePath) || !File.Exists(RuntimeFeaturesEvidencePath))
@@ -386,7 +465,9 @@ public sealed record CodexSettings(
             }
             using var json = JsonDocument.Parse(File.ReadAllText(RuntimeFeaturesEvidencePath), new JsonDocumentOptions { MaxDepth = 32 });
             var root = json.RootElement;
-            if (root.ValueKind != JsonValueKind.Object || !RuntimeFeatureEvidenceContentIsValid(root))
+            if (root.ValueKind != JsonValueKind.Object ||
+                !StringProperty(root, "cli_executable_sha256", executableHash) ||
+                !RuntimeFeatureEvidenceContentIsValid(root))
             {
                 issue = "runtime_feature_evidence_content_invalid";
                 return false;

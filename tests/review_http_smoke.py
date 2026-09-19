@@ -56,7 +56,7 @@ owner = query("SELECT p.id || '|' || p.role FROM lab_principals p JOIN lab_token
               "','hex') AND t.revoked_at IS NULL")
 if not owner.endswith("|creator"):
     raise RuntimeError("The supplied token must belong to a creator")
-owner_id = owner.split("|", 1)[0]
+owner_id = owner.split("|", 1)[0].replace("-", "")
 parchment, capture, job, artifact, spell = [uuid.uuid4().hex for _ in range(5)]
 key = uuid.uuid4().hex
 sha = "a" * 64
@@ -97,7 +97,7 @@ COMMIT;
 
 review = {
     "schema_version": "sp.review/1.0", "case_id": "synthetic.review-smoke",
-    "spell_id": spell, "reviewer_id": "smoke-fixture", "submitted_by_human": True,
+    "spell_id": spell, "reviewer_id": owner_id, "submitted_by_human": True,
     "verdict": "changes_requested", "build_commit": "synthetic-test-only",
     "capture_sha256": sha, "description_sha256": sha, "plan_sha256": sha,
     "compiled_sha256": sha,

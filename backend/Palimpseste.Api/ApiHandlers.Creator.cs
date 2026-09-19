@@ -8,6 +8,82 @@ namespace Palimpseste.Api;
 
 public static partial class ApiHandlers
 {
+    public static async Task<IResult> GrantSpellReviewAccess(HttpContext context, string id, NpgsqlDataSource db, CancellationToken ct)
+    {
+        var principal = Owner(context);
+        if (principal.Role != "creator") return ApiProblem.Result(context, 403, "creator_required", "Rôle créateur requis.");
+        if (!Id(id, out var spellId)) return ApiProblem.Result(context, 400, "invalid_id", "Identifiant invalide.");
+        var key = Key(context);
+        if (key is null) return ApiProblem.Result(context, 400, "idempotency_key_required", "Clé d'idempotence invalide.");
+        using var body = await ReadJsonAsync(context.Request, 8192, ct);
+        if (body is null || body.RootElement.ValueKind != JsonValueKind.Object || body.RootElement.EnumerateObject().Count() != 2 ||
+            !body.RootElement.TryGetProperty("reviewer_principal_id", out var reviewerElement) || reviewerElement.ValueKind != JsonValueKind.String ||
+            !Id(reviewerElement.GetString() ?? "", out var reviewerId) ||
+            !body.RootElement.TryGetProperty("case_id", out var caseElement) || caseElement.ValueKind != JsonValueKind.String ||
+            !CaseId(caseElement.GetString()))
+            return ApiProblem.Result(context, 422, "review_access_invalid", "Délégation de revue invalide.");
+        if (reviewerId == principal.Id) return ApiProblem.Result(context, 422, "reviewer_must_be_distinct", "Le second créateur doit utiliser un compte distinct.");
+        var caseId = caseElement.GetString()!;
+        var requestHash = ApiJson.Sha256(Encoding.UTF8.GetBytes(ApiJson.Canonicalize(body.RootElement)));
+        const string operation = "spell_review_access";
+        await using var connection = await db.OpenConnectionAsync(ct);
+        await using var transaction = await connection.BeginTransactionAsync(ct);
+        await LockKeyAsync(connection, transaction, principal.Id, $"{operation}:{spellId:N}", key, ct);
+        var saved = await ExistingAsync(connection, transaction, principal.Id, $"{operation}:{spellId:N}", key, ct);
+        if (saved is not null) return ReplayOrConflict(context, saved, requestHash);
+        await using (var check = new NpgsqlCommand("SELECT p.role FROM spells s JOIN lab_principals p ON p.id=@reviewer WHERE s.id=@spell AND s.owner_id=@owner", connection, transaction))
+        {
+            check.Parameters.AddWithValue("spell", spellId);
+            check.Parameters.AddWithValue("owner", principal.Id);
+            check.Parameters.AddWithValue("reviewer", reviewerId);
+            var role = await check.ExecuteScalarAsync(ct) as string;
+            if (role is null) return ApiProblem.Result(context, 404, "not_found", "Sort ou créateur introuvable.");
+            if (role != "creator") return ApiProblem.Result(context, 422, "reviewer_creator_required", "Le relecteur doit être un créateur.");
+        }
+        await using (var grant = new NpgsqlCommand("INSERT INTO spell_review_grants(spell_id,reviewer_id,case_id,granted_by) VALUES (@spell,@reviewer,@case,@owner) ON CONFLICT DO NOTHING", connection, transaction))
+        {
+            grant.Parameters.AddWithValue("spell", spellId);
+            grant.Parameters.AddWithValue("reviewer", reviewerId);
+            grant.Parameters.AddWithValue("case", caseId);
+            grant.Parameters.AddWithValue("owner", principal.Id);
+            await grant.ExecuteNonQueryAsync(ct);
+        }
+        var response = Json(new { spell_id = spellId.ToString("N"), reviewer_principal_id = reviewerId.ToString("N"), case_id = caseId, granted = true });
+        await SaveResponseAsync(connection, transaction, principal.Id, $"{operation}:{spellId:N}", key, requestHash, 201, response, ct);
+        await transaction.CommitAsync(ct);
+        return Results.Content(response, "application/json", Encoding.UTF8, 201);
+    }
+
+    public static async Task<IResult> RevokeSpellReviewAccess(HttpContext context, string id, string reviewerId, NpgsqlDataSource db, CancellationToken ct)
+    {
+        var principal = Owner(context);
+        if (principal.Role != "creator") return ApiProblem.Result(context, 403, "creator_required", "Rôle créateur requis.");
+        if (!Id(id, out var spellId) || !Id(reviewerId, out var reviewerPrincipalId)) return ApiProblem.Result(context, 400, "invalid_id", "Identifiant invalide.");
+        var caseId = context.Request.Query["case_id"].ToString();
+        if (!CaseId(caseId)) return ApiProblem.Result(context, 400, "invalid_case_id", "Cas de revue invalide.");
+        var key = Key(context);
+        if (key is null) return ApiProblem.Result(context, 400, "idempotency_key_required", "Clé d'idempotence invalide.");
+        var operation = $"spell_review_access_revoke:{spellId:N}:{reviewerPrincipalId:N}:{caseId}";
+        var requestHash = ApiJson.Sha256(Encoding.UTF8.GetBytes(operation));
+        await using var connection = await db.OpenConnectionAsync(ct);
+        await using var transaction = await connection.BeginTransactionAsync(ct);
+        await LockKeyAsync(connection, transaction, principal.Id, operation, key, ct);
+        var saved = await ExistingAsync(connection, transaction, principal.Id, operation, key, ct);
+        if (saved is not null) return ReplayOrConflict(context, saved, requestHash);
+        await using (var revoke = new NpgsqlCommand("DELETE FROM spell_review_grants g USING spells s WHERE g.spell_id=s.id AND s.id=@spell AND s.owner_id=@owner AND g.reviewer_id=@reviewer AND g.case_id=@case", connection, transaction))
+        {
+            revoke.Parameters.AddWithValue("spell", spellId);
+            revoke.Parameters.AddWithValue("owner", principal.Id);
+            revoke.Parameters.AddWithValue("reviewer", reviewerPrincipalId);
+            revoke.Parameters.AddWithValue("case", caseId);
+            if (await revoke.ExecuteNonQueryAsync(ct) != 1) return ApiProblem.Result(context, 404, "not_found", "Délégation de revue introuvable.");
+        }
+        var response = Json(new { spell_id = spellId.ToString("N"), reviewer_principal_id = reviewerPrincipalId.ToString("N"), case_id = caseId, revoked = true });
+        await SaveResponseAsync(connection, transaction, principal.Id, operation, key, requestHash, 200, response, ct);
+        await transaction.CommitAsync(ct);
+        return Results.Content(response, "application/json", Encoding.UTF8, 200);
+    }
+
     public static async Task<IResult> SubmitReview(HttpContext context, NpgsqlDataSource db, CancellationToken ct)
     {
         var principal = Owner(context);
@@ -15,7 +91,10 @@ public static partial class ApiHandlers
         var key = Key(context);
         if (key is null) return ApiProblem.Result(context, 400, "idempotency_key_required", "Clé d'idempotence invalide.");
         using var body = await ReadJsonAsync(context.Request, 64 * 1024, ct);
-        if (body is null || !ValidReview(body.RootElement, out var spellId)) return ApiProblem.Result(context, 422, "review_invalid", "Revue invalide.");
+        if (body is null || !ValidReview(body.RootElement, out var spellId, out var caseId)) return ApiProblem.Result(context, 422, "review_invalid", "Revue invalide.");
+        var reviewerId = body.RootElement.GetProperty("reviewer_id").GetString();
+        if (!string.Equals(reviewerId, principal.Id.ToString("N"), StringComparison.Ordinal))
+            return ApiProblem.Result(context, 403, "reviewer_identity_mismatch", "Le relecteur déclaré doit être le compte authentifié.");
         var jsonBody = ApiJson.Canonicalize(body.RootElement);
         var hash = ApiJson.Sha256(Encoding.UTF8.GetBytes(jsonBody));
         await using var connection = await db.OpenConnectionAsync(ct);
@@ -23,10 +102,16 @@ public static partial class ApiHandlers
         await LockKeyAsync(connection, transaction, principal.Id, "submit_review", key, ct);
         var saved = await ExistingAsync(connection, transaction, principal.Id, "submit_review", key, ct);
         if (saved is not null) return ReplayOrConflict(context, saved, hash);
-        await using (var check = new NpgsqlCommand("SELECT 1 FROM spells WHERE id=@id AND owner_id=@owner", connection, transaction))
+        await using (var check = new NpgsqlCommand("""
+            SELECT 1 FROM spells s
+            WHERE s.id=@id AND (s.owner_id=@owner OR EXISTS (
+                SELECT 1 FROM spell_review_grants g
+                WHERE g.spell_id=s.id AND g.reviewer_id=@owner AND g.case_id=@case_id))
+            """, connection, transaction))
         {
             check.Parameters.AddWithValue("id", spellId);
             check.Parameters.AddWithValue("owner", principal.Id);
+            check.Parameters.AddWithValue("case_id", caseId);
             if (await check.ExecuteScalarAsync(ct) is null) return ApiProblem.Result(context, 404, "not_found", "Sort introuvable.");
         }
         var id = Guid.NewGuid();
@@ -129,17 +214,18 @@ public static partial class ApiHandlers
         return Results.Bytes(bytes, "application/json");
     }
 
-    private static bool ValidReview(JsonElement root, out Guid spellId)
+    private static bool ValidReview(JsonElement root, out Guid spellId, out string caseId)
     {
         spellId = default;
+        caseId = "";
         try
         {
             if (root.ValueKind != JsonValueKind.Object) return false;
             string[] fields = ["schema_version", "case_id", "spell_id", "reviewer_id", "submitted_by_human", "verdict", "build_commit", "capture_sha256", "description_sha256", "plan_sha256", "compiled_sha256", "judgements", "comment", "evidence_files", "created_at"];
             if (root.EnumerateObject().Count() != fields.Length || fields.Any(x => !root.TryGetProperty(x, out _))) return false;
             if (root.GetProperty("schema_version").GetString() != "sp.review/1.0" || root.GetProperty("submitted_by_human").ValueKind != JsonValueKind.True || !Id(root.GetProperty("spell_id").GetString() ?? "", out spellId)) return false;
-            var caseId = root.GetProperty("case_id").GetString() ?? "";
-            if (!System.Text.RegularExpressions.Regex.IsMatch(caseId, "^[a-z][a-z0-9_.-]{0,63}$")) return false;
+            caseId = root.GetProperty("case_id").GetString() ?? "";
+            if (!CaseId(caseId)) return false;
             foreach (var field in new[] { "reviewer_id", "build_commit" }) if (root.GetProperty(field).GetString() is not { Length: >= 1 and <= 120 }) return false;
             if (root.GetProperty("verdict").GetString() is not ("accepted" or "changes_requested" or "rejected")) return false;
             foreach (var field in new[] { "capture_sha256", "description_sha256", "plan_sha256", "compiled_sha256" }) if (!Hash(root.GetProperty(field).GetString())) return false;

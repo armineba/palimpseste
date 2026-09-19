@@ -200,7 +200,7 @@ def api_structure():
         elif isinstance(node,list):
             for val in node: visit(val)
     visit(data)
-    ensure(len(ids)==14, 'Nombre d’opérations API modifié ; mettre à jour le contrôle explicite')
+    ensure(len(ids)==16, 'Nombre d’opérations API modifié ; mettre à jour le contrôle explicite')
 
 D=load(E/'01_description_illustrative.json');P=load(E/'02_plan_illustratif.json');PACK=load(E/'03_paquet_illustratif.json')
 for name,schema in SCHEMAS.items():

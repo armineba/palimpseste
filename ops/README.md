@@ -203,8 +203,9 @@ le deplacement du staging valide.
 Pour activer la porte features apres revue du doctor local :
 
 ```powershell
-$evidence = 'E:\PalimpsesteRuntime\evidence\doctor-local-service-final.json'
+$evidence = 'E:\PalimpsesteRuntime\evidence\doctor-local-sha-service.json'
 $hash = (Get-FileHash -LiteralPath $evidence -Algorithm SHA256).Hash.ToLowerInvariant()
+# Verifier aussi que cli_executable_sha256 egale le hash du codex.exe deploye.
 # Reporter ces trois valeurs dans runtime.env hors du depot.
 PALIMPSESTE_RUNTIME_FEATURES_VERIFIED=true
 PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_PATH=$evidence

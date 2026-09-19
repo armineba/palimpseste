@@ -10,6 +10,8 @@ public static partial class ApiHandlers
     private static Principal Owner(HttpContext context) => (Principal)context.Items["principal"]!;
     private static bool Id(string value, out Guid id) => Guid.TryParseExact(value, "N", out id);
     private static bool Hash(string? value) => value is { Length: 64 } && value.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f');
+    private static bool CaseId(string? value) => value is { Length: >= 1 and <= 64 } &&
+        System.Text.RegularExpressions.Regex.IsMatch(value, "^[a-z][a-z0-9_.-]{0,63}$");
 
     private static string? Key(HttpContext context)
     {

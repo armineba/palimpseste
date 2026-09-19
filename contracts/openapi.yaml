@@ -397,6 +397,124 @@ paths:
         description: Clé conservée pour toutes les reprises du même contenu.
       description: Rôle creator obligatoire. Diagnostic et revue uniquement ; ne remplace
         jamais le dessin d’un support engagé.
+  /v1/spells/{id}/reviewers:
+    post:
+      operationId: grantSpellReviewAccess
+      summary: Déléguer un cas de revue à un second compte creator
+      tags:
+      - Concepteur
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9a-f]{32}$'
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reviewer_principal_id
+              - case_id
+              properties:
+                reviewer_principal_id:
+                  type: string
+                  pattern: '^[0-9a-f]{32}$'
+                case_id:
+                  type: string
+                  pattern: '^[a-z][a-z0-9_.-]{0,63}$'
+              additionalProperties: false
+      responses:
+        '201':
+          description: Délégation créée ou déjà présente
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - spell_id
+                - reviewer_principal_id
+                - case_id
+                - granted
+                properties:
+                  spell_id: { type: string }
+                  reviewer_principal_id: { type: string }
+                  case_id: { type: string }
+                  granted: { const: true }
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      description: Seul le créateur propriétaire peut déléguer un cas exact à un autre créateur.
+        Aucun droit de lecture général n’est accordé.
+  /v1/spells/{id}/reviewers/{reviewerId}:
+    delete:
+      operationId: revokeSpellReviewAccess
+      summary: Retirer une délégation de revue pour un cas exact
+      tags:
+      - Concepteur
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9a-f]{32}$'
+      - name: reviewerId
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9a-f]{32}$'
+      - name: case_id
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-z][a-z0-9_.-]{0,63}$'
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+      responses:
+        '200':
+          description: Délégation retirée
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - spell_id
+                - reviewer_principal_id
+                - case_id
+                - revoked
+                properties:
+                  spell_id: { type: string }
+                  reviewer_principal_id: { type: string }
+                  case_id: { type: string }
+                  revoked: { const: true }
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      description: Seul le créateur propriétaire peut retirer la délégation du cas exact.
   /v1/authoring/plan:
     post:
       operationId: planFromAuthoredDescription

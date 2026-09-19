@@ -1,4 +1,8 @@
 using System.Text;
+using System.Text.Json;
+using System.Security.Cryptography;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using Palimpseste.Provider;
 
 if (args.Length > 0 && string.Equals(args[0], "exec", StringComparison.Ordinal))
@@ -56,7 +60,77 @@ try
     var productionIssues = settings.Check(true);
     Assert(productionIssues.Contains("spec_tree_service_is_owner") || productionIssues.Contains("spec_tree_service_write_access"),
         "an insecure fixture must be refused by the production ACL gate");
+    Assert(productionIssues.Contains("development_root_deny_incomplete_or_not_inherited"),
+        "a development tree without a complete inherited deny must be refused");
+    if (OperatingSystem.IsWindows())
+    {
+        var serviceSid = WindowsIdentity.GetCurrent().User ?? throw new InvalidOperationException("Current SID unavailable.");
+        var isolatedDevelopment = new DirectoryInfo(development);
+        var access = isolatedDevelopment.GetAccessControl(AccessControlSections.Access);
+        var partialRule = new FileSystemAccessRule(serviceSid, FileSystemRights.ReadData,
+            InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+            PropagationFlags.None, AccessControlType.Deny);
+        access.AddAccessRule(partialRule);
+        isolatedDevelopment.SetAccessControl(access);
+        try
+        {
+            Assert(settings.Check(true).Contains("development_root_deny_incomplete_or_not_inherited"),
+                "a read-only partial deny must not prove source isolation");
+        }
+        finally
+        {
+            access.RemoveAccessRuleSpecific(partialRule);
+            isolatedDevelopment.SetAccessControl(access);
+        }
+    }
+
+    var featureEvidence = Path.Combine(root, "feature-evidence.json");
+    var validFeatureJson = JsonSerializer.Serialize(new
+    {
+        kind = "provider_feature_doctor", service_identity = Environment.UserName,
+        model = "gpt-5.6-luna", effort = "max", disable_flag_parser_status = "ok",
+        effective_disable_observed = true,
+        cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand)
+    });
+    await File.WriteAllTextAsync(featureEvidence, validFeatureJson);
+    var featureSettings = settings with
+    {
+        RuntimeFeaturesCompatibilityVerified = true,
+        RuntimeFeaturesEvidencePath = featureEvidence,
+        RuntimeFeaturesEvidenceSha256 = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(featureEvidence)))
+    };
+    Assert(!featureSettings.Check(true).Contains("runtime_feature_evidence_content_invalid"),
+        "a doctor evidence hash must bind to the configured executable");
+    var otherExecutable = Path.Combine(root, "other-codex.exe");
+    await File.WriteAllTextAsync(otherExecutable, "different executable bytes");
+    Assert((featureSettings with { Executable = otherExecutable }).Check(true).Contains("runtime_feature_evidence_content_invalid"),
+        "a replaced CLI must invalidate its previous doctor evidence");
+    var effortEvidence = Path.Combine(root, "effort-evidence.json");
+    var stage = new
+    {
+        outcome = "Success", requested_model = "gpt-5.6-luna", requested_effort = "max",
+        reported_model = "gpt-5.6-luna", reported_effort = "max"
+    };
+    await File.WriteAllTextAsync(effortEvidence, JsonSerializer.Serialize(new
+    {
+        kind = "provider_doctor", mode = "active", active_result = "success",
+        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
+        expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
+        stage_a = stage, stage_b = stage
+    }));
+    var effortSettings = settings with
+    {
+        CompatibilityEvidencePath = effortEvidence,
+        CompatibilityEvidenceSha256 = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(effortEvidence)))
+    };
+    Assert(!effortSettings.Check(true).Contains("effort_evidence_content_invalid"),
+        "an active doctor evidence hash must bind to the configured executable");
+    Assert((effortSettings with { Executable = otherExecutable }).Check(true).Contains("effort_evidence_content_invalid"),
+        "a replaced CLI must invalidate its previous active effort evidence");
     Assert(settings.Check(false).Count == 0, "transport fixture must pass non-production isolation check: " + string.Join(',', settings.Check(false)));
+    Assert((settings with { Effort = "xhigh" }).Check(false).Contains("effort_below_documented_max"),
+        "the worker must reject a configured effort below the documented maximum");
     var overlap = settings with { TrustedInputRoot = attempts };
     Assert(overlap.Check(false).Contains("attempt_root_and_input_root_overlap"),
         "attempt state and trusted input must not share a root");

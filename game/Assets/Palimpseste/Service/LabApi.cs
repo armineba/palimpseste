@@ -42,6 +42,12 @@ namespace Palimpseste.Game.Service
         public string Token { get; private set; }
         public bool Configured => !string.IsNullOrWhiteSpace(BaseUrl) && !string.IsNullOrWhiteSpace(Token);
 
+        public void Clear()
+        {
+            BaseUrl = null;
+            Token = null;
+        }
+
         public void Configure(string baseUrl, string token)
         {
             if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri) ||

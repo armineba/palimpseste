@@ -253,10 +253,11 @@ if ($ApplyAcl) {
     # The worker must run from the staged deployment, while the Codex child
     # receives an explicit deny on the development tree. This deny remains
     # effective even if broad Users/Authenticated Users grants are inherited.
-    # Keep READ_CONTROL available so the worker can audit this deny ACL while
-    # denying data, attributes and traversal to the Codex child.
+    # Keep READ_CONTROL available so the worker can audit this deny ACL. Deny
+    # read, execute, create, modify, delete and ACL/owner changes to the child.
     & icacls.exe $DevelopmentRoot /remove:d ('*{0}' -f $principal) /C | Out-Null
-    & icacls.exe $DevelopmentRoot /deny ('*{0}:(OI)(CI)(RD,RA,REA,X)' -f $principal) /C | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "icacls development deny removal failed: $DevelopmentRoot" }
+    & icacls.exe $DevelopmentRoot /deny ('*{0}:(OI)(CI)(RD,RA,REA,X,WD,AD,WA,WEA,D,DC,WDAC,WO)' -f $principal) /C | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "icacls development deny failed: $DevelopmentRoot" }
 }
 

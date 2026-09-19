@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-19 18:58:22Z" end-time="2026-09-19 18:58:23Z" duration="0,5160771">
-  <test-suite type="TestSuite" id="1012" name="Palimpseste Spell Lab" fullname="Palimpseste Spell Lab" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 18:58:22Z" end-time="2026-09-19 18:58:23Z" duration="0.516077" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0,5020925">
+  <test-suite type="TestSuite" id="1012" name="Palimpseste Spell Lab" fullname="Palimpseste Spell Lab" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.502093" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
     <properties>
       <property name="platform" value="PlayMode" />
     </properties>
-    <test-suite type="Assembly" id="1005" name="Palimpseste.Game.PlayModeTests.dll" fullname="E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Library/ScriptAssemblies/Palimpseste.Game.PlayModeTests.dll" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 18:58:22Z" end-time="2026-09-19 18:58:23Z" duration="0.509519" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <test-suite type="Assembly" id="1005" name="Palimpseste.Game.PlayModeTests.dll" fullname="E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Library/ScriptAssemblies/Palimpseste.Game.PlayModeTests.dll" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.495532" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
       <properties>
-        <property name="_PID" value="11512" />
+        <property name="_PID" value="13228" />
         <property name="_APPDOMAIN" value="Unity Child Domain" />
         <property name="platform" value="PlayMode" />
         <property name="EditorOnly" value="False" />
       </properties>
-      <test-suite type="TestSuite" id="1006" name="Palimpseste" fullname="Palimpseste" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 18:58:22Z" end-time="2026-09-19 18:58:23Z" duration="0.509171" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestSuite" id="1006" name="Palimpseste" fullname="Palimpseste" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.495184" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-suite type="TestSuite" id="1007" name="Game" fullname="Palimpseste.Game" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 18:58:22Z" end-time="2026-09-19 18:58:23Z" duration="0.508978" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="TestSuite" id="1007" name="Game" fullname="Palimpseste.Game" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.494983" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties />
-          <test-suite type="TestSuite" id="1008" name="PlayModeTests" fullname="Palimpseste.Game.PlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 18:58:22Z" end-time="2026-09-19 18:58:23Z" duration="0.508754" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <test-suite type="TestSuite" id="1008" name="PlayModeTests" fullname="Palimpseste.Game.PlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.494762" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
             <properties />
-            <test-suite type="TestFixture" id="1001" name="FocusInterruptionTests" fullname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" classname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 18:58:22Z" end-time="2026-09-19 18:58:23Z" duration="0.087988" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1001" name="FocusInterruptionTests" fullname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" classname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.086597" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1002" name="LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" fullname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests.LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" methodname="LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" classname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" runstate="Runnable" seed="1176626755" result="Passed" start-time="2026-09-19 18:58:22Z" end-time="2026-09-19 18:58:23Z" duration="0.078264" asserts="0">
+              <test-case id="1002" name="LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" fullname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests.LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" methodname="LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" classname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" runstate="Runnable" seed="855431131" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.076468" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -27,9 +27,9 @@
                 </properties>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1003" name="SpellLabFixtureTests" fullname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" classname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 18:58:23Z" end-time="2026-09-19 18:58:23Z" duration="0.419894" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1003" name="SpellLabFixtureTests" fullname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" classname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.407290" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1004" name="SixCarriersCastFromIsolatedManualFixtures" fullname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests.SixCarriersCastFromIsolatedManualFixtures" methodname="SixCarriersCastFromIsolatedManualFixtures" classname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" runstate="Runnable" seed="1417615266" result="Passed" start-time="2026-09-19 18:58:23Z" end-time="2026-09-19 18:58:23Z" duration="0.419266" asserts="0">
+              <test-case id="1004" name="SixCarriersCastFromIsolatedManualFixtures" fullname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests.SixCarriersCastFromIsolatedManualFixtures" methodname="SixCarriersCastFromIsolatedManualFixtures" classname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" runstate="Runnable" seed="846361540" result="Passed" start-time="2026-09-19 19:24:56Z" end-time="2026-09-19 19:24:56Z" duration="0.406729" asserts="0">
                 <properties>
                   <property name="_JOINTYPE" value="UnityCombinatorial" />
                   <property name="retryIteration" value="0" />
@@ -60,12 +60,11 @@ There are no audio listeners in the scene. Please ensure there is always one aud
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 barrier: hits=0 damage_milli=0 impulses=0 active=0 wet_until=0 slow_until=0 ally_health_milli=50000
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
-trap: hits=1 damage_milli=0 impulses=0 active=1 wet_until=0 slow_until=176 ally_health_milli=50000
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+trap: hits=1 damage_milli=0 impulses=0 active=1 wet_until=0 slow_until=176 ally_health_milli=50000
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
 compiled_curve: hits=3 damage_milli=12000
 There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene

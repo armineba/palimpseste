@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test-run id="2" testcasecount="7" result="Passed" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:53Z" duration="3,9838528">
-  <test-suite type="TestSuite" id="1000" name="Palimpseste Spell Lab" fullname="Palimpseste Spell Lab" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:53Z" duration="3.983853" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+<test-run id="2" testcasecount="8" result="Passed" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:14Z" duration="4,077425">
+  <test-suite type="TestSuite" id="1000" name="Palimpseste Spell Lab" fullname="Palimpseste Spell Lab" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:14Z" duration="4.077425" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
     <properties>
       <property name="platform" value="EditMode" />
     </properties>
-    <test-suite type="Assembly" id="1011" name="Palimpseste.Game.Tests.dll" fullname="E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Library/ScriptAssemblies/Palimpseste.Game.Tests.dll" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:53Z" duration="3.978475" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <test-suite type="Assembly" id="1013" name="Palimpseste.Game.Tests.dll" fullname="E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Library/ScriptAssemblies/Palimpseste.Game.Tests.dll" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:14Z" duration="4.071947" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
       <properties>
-        <property name="_PID" value="16916" />
+        <property name="_PID" value="11532" />
         <property name="_APPDOMAIN" value="Unity Child Domain" />
         <property name="platform" value="EditMode" />
         <property name="EditorOnly" value="True" />
       </properties>
-      <test-suite type="TestSuite" id="1012" name="Palimpseste" fullname="Palimpseste" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:53Z" duration="3.978173" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestSuite" id="1014" name="Palimpseste" fullname="Palimpseste" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:14Z" duration="4.071634" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-suite type="TestSuite" id="1013" name="Game" fullname="Palimpseste.Game" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:53Z" duration="3.977999" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="TestSuite" id="1015" name="Game" fullname="Palimpseste.Game" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:14Z" duration="4.071443" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties />
-          <test-suite type="TestSuite" id="1014" name="Tests" fullname="Palimpseste.Game.Tests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:53Z" duration="3.977797" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <test-suite type="TestSuite" id="1016" name="Tests" fullname="Palimpseste.Game.Tests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:14Z" duration="4.071216" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
             <properties />
-            <test-suite type="TestFixture" id="1001" name="CachedSpellVerifierTests" fullname="Palimpseste.Game.Tests.CachedSpellVerifierTests" classname="Palimpseste.Game.Tests.CachedSpellVerifierTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:49Z" duration="0.086037" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1001" name="CachedSpellVerifierTests" fullname="Palimpseste.Game.Tests.CachedSpellVerifierTests" classname="Palimpseste.Game.Tests.CachedSpellVerifierTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:10Z" duration="0.080001" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1002" name="CompleteOfflinePacketOpensButPartialOrAlteredPacketDoesNot" fullname="Palimpseste.Game.Tests.CachedSpellVerifierTests.CompleteOfflinePacketOpensButPartialOrAlteredPacketDoesNot" methodname="CompleteOfflinePacketOpensButPartialOrAlteredPacketDoesNot" classname="Palimpseste.Game.Tests.CachedSpellVerifierTests" runstate="Runnable" seed="1670376317" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:49Z" duration="0.075552" asserts="0">
+              <test-case id="1002" name="CompleteOfflinePacketOpensButPartialOrAlteredPacketDoesNot" fullname="Palimpseste.Game.Tests.CachedSpellVerifierTests.CompleteOfflinePacketOpensButPartialOrAlteredPacketDoesNot" methodname="CompleteOfflinePacketOpensButPartialOrAlteredPacketDoesNot" classname="Palimpseste.Game.Tests.CachedSpellVerifierTests" runstate="Runnable" seed="696224405" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:10Z" duration="0.069717" asserts="0">
                 <properties>
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1003" name="DrawingCanvasTests" fullname="Palimpseste.Game.Tests.DrawingCanvasTests" classname="Palimpseste.Game.Tests.DrawingCanvasTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:53Z" duration="3.661935" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1003" name="DrawingCanvasTests" fullname="Palimpseste.Game.Tests.DrawingCanvasTests" classname="Palimpseste.Game.Tests.DrawingCanvasTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:14Z" duration="3.697424" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1004" name="AStrokeCrossingAllRegionsLocksEachActuallyInkedRegion" fullname="Palimpseste.Game.Tests.DrawingCanvasTests.AStrokeCrossingAllRegionsLocksEachActuallyInkedRegion" methodname="AStrokeCrossingAllRegionsLocksEachActuallyInkedRegion" classname="Palimpseste.Game.Tests.DrawingCanvasTests" runstate="Runnable" seed="891383765" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:49Z" duration="0.013878" asserts="0">
+              <test-case id="1004" name="AStrokeCrossingAllRegionsLocksEachActuallyInkedRegion" fullname="Palimpseste.Game.Tests.DrawingCanvasTests.AStrokeCrossingAllRegionsLocksEachActuallyInkedRegion" methodname="AStrokeCrossingAllRegionsLocksEachActuallyInkedRegion" classname="Palimpseste.Game.Tests.DrawingCanvasTests" runstate="Runnable" seed="847355323" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:10Z" duration="0.013365" asserts="0">
                 <properties>
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
               </test-case>
-              <test-case id="1005" name="OutsideClickDoesNotSpendInkOrEngageSupport" fullname="Palimpseste.Game.Tests.DrawingCanvasTests.OutsideClickDoesNotSpendInkOrEngageSupport" methodname="OutsideClickDoesNotSpendInkOrEngageSupport" classname="Palimpseste.Game.Tests.DrawingCanvasTests" runstate="Runnable" seed="633517093" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:49Z" duration="0.013137" asserts="0">
+              <test-case id="1005" name="OutsideClickDoesNotSpendInkOrEngageSupport" fullname="Palimpseste.Game.Tests.DrawingCanvasTests.OutsideClickDoesNotSpendInkOrEngageSupport" methodname="OutsideClickDoesNotSpendInkOrEngageSupport" classname="Palimpseste.Game.Tests.DrawingCanvasTests" runstate="Runnable" seed="2107760552" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:10Z" duration="0.012264" asserts="0">
                 <properties>
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
               </test-case>
-              <test-case id="1006" name="SamePathAtDifferentPointerRatesYieldsSamePixelsAndInkCost" fullname="Palimpseste.Game.Tests.DrawingCanvasTests.SamePathAtDifferentPointerRatesYieldsSamePixelsAndInkCost" methodname="SamePathAtDifferentPointerRatesYieldsSamePixelsAndInkCost" classname="Palimpseste.Game.Tests.DrawingCanvasTests" runstate="Runnable" seed="51990137" result="Passed" start-time="2026-09-19 18:51:49Z" end-time="2026-09-19 18:51:53Z" duration="3.633667" asserts="0">
+              <test-case id="1006" name="SamePathAtDifferentPointerRatesYieldsSamePixelsAndInkCost" fullname="Palimpseste.Game.Tests.DrawingCanvasTests.SamePathAtDifferentPointerRatesYieldsSamePixelsAndInkCost" methodname="SamePathAtDifferentPointerRatesYieldsSamePixelsAndInkCost" classname="Palimpseste.Game.Tests.DrawingCanvasTests" runstate="Runnable" seed="102012095" result="Passed" start-time="2026-09-19 19:24:10Z" end-time="2026-09-19 19:24:14Z" duration="3.670653" asserts="0">
                 <properties>
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
               </test-case>
             </test-suite>
-            <test-suite type="TestFixture" id="1007" name="ParchmentRecoveryTests" fullname="Palimpseste.Game.Tests.ParchmentRecoveryTests" classname="Palimpseste.Game.Tests.ParchmentRecoveryTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-19 18:51:53Z" end-time="2026-09-19 18:51:53Z" duration="0.228831" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <test-suite type="TestFixture" id="1007" name="ParchmentRecoveryTests" fullname="Palimpseste.Game.Tests.ParchmentRecoveryTests" classname="Palimpseste.Game.Tests.ParchmentRecoveryTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-19 19:24:14Z" end-time="2026-09-19 19:24:14Z" duration="0.251779" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
               <properties />
-              <test-case id="1010" name="CompleteTamperedEventBlocksFurtherWriting" fullname="Palimpseste.Game.Tests.ParchmentRecoveryTests.CompleteTamperedEventBlocksFurtherWriting" methodname="CompleteTamperedEventBlocksFurtherWriting" classname="Palimpseste.Game.Tests.ParchmentRecoveryTests" runstate="Runnable" seed="2083844989" result="Passed" start-time="2026-09-19 18:51:53Z" end-time="2026-09-19 18:51:53Z" duration="0.068287" asserts="0">
+              <test-case id="1010" name="CompleteTamperedEventBlocksFurtherWriting" fullname="Palimpseste.Game.Tests.ParchmentRecoveryTests.CompleteTamperedEventBlocksFurtherWriting" methodname="CompleteTamperedEventBlocksFurtherWriting" classname="Palimpseste.Game.Tests.ParchmentRecoveryTests" runstate="Runnable" seed="905435710" result="Passed" start-time="2026-09-19 19:24:14Z" end-time="2026-09-19 19:24:14Z" duration="0.065049" asserts="0">
                 <properties>
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
@@ -58,13 +58,22 @@
   at Palimpseste.Game.Library.ParchmentStore.Replay (Palimpseste.Game.Library.ParchmentRecord record) [0x00105] in E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Assets\Palimpseste\Library\ParchmentStore.cs:167 
 ]]></output>
               </test-case>
-              <test-case id="1008" name="DurableJournalAheadOfCheckpointClosesOnceAfterRestart" fullname="Palimpseste.Game.Tests.ParchmentRecoveryTests.DurableJournalAheadOfCheckpointClosesOnceAfterRestart" methodname="DurableJournalAheadOfCheckpointClosesOnceAfterRestart" classname="Palimpseste.Game.Tests.ParchmentRecoveryTests" runstate="Runnable" seed="134490431" result="Passed" start-time="2026-09-19 18:51:53Z" end-time="2026-09-19 18:51:53Z" duration="0.084709" asserts="0">
+              <test-case id="1008" name="DurableJournalAheadOfCheckpointClosesOnceAfterRestart" fullname="Palimpseste.Game.Tests.ParchmentRecoveryTests.DurableJournalAheadOfCheckpointClosesOnceAfterRestart" methodname="DurableJournalAheadOfCheckpointClosesOnceAfterRestart" classname="Palimpseste.Game.Tests.ParchmentRecoveryTests" runstate="Runnable" seed="145255629" result="Passed" start-time="2026-09-19 19:24:14Z" end-time="2026-09-19 19:24:14Z" duration="0.109227" asserts="0">
                 <properties>
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />
                 </properties>
               </test-case>
-              <test-case id="1009" name="TornFinalLineIsDiscardedOnlyForAnOpenDrawing" fullname="Palimpseste.Game.Tests.ParchmentRecoveryTests.TornFinalLineIsDiscardedOnlyForAnOpenDrawing" methodname="TornFinalLineIsDiscardedOnlyForAnOpenDrawing" classname="Palimpseste.Game.Tests.ParchmentRecoveryTests" runstate="Runnable" seed="824353974" result="Passed" start-time="2026-09-19 18:51:53Z" end-time="2026-09-19 18:51:53Z" duration="0.074783" asserts="0">
+              <test-case id="1009" name="TornFinalLineIsDiscardedOnlyForAnOpenDrawing" fullname="Palimpseste.Game.Tests.ParchmentRecoveryTests.TornFinalLineIsDiscardedOnlyForAnOpenDrawing" methodname="TornFinalLineIsDiscardedOnlyForAnOpenDrawing" classname="Palimpseste.Game.Tests.ParchmentRecoveryTests" runstate="Runnable" seed="1805952687" result="Passed" start-time="2026-09-19 19:24:14Z" end-time="2026-09-19 19:24:14Z" duration="0.076424" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1011" name="WindowsCredentialStoreTests" fullname="Palimpseste.Game.Tests.WindowsCredentialStoreTests" classname="Palimpseste.Game.Tests.WindowsCredentialStoreTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 19:24:14Z" end-time="2026-09-19 19:24:14Z" duration="0.040954" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1012" name="CredentialSurvivesReadIsScopedToServiceAndCanBeDeleted" fullname="Palimpseste.Game.Tests.WindowsCredentialStoreTests.CredentialSurvivesReadIsScopedToServiceAndCanBeDeleted" methodname="CredentialSurvivesReadIsScopedToServiceAndCanBeDeleted" classname="Palimpseste.Game.Tests.WindowsCredentialStoreTests" runstate="Runnable" seed="110389636" result="Passed" start-time="2026-09-19 19:24:14Z" end-time="2026-09-19 19:24:14Z" duration="0.040305" asserts="0">
                 <properties>
                   <property name="retryIteration" value="0" />
                   <property name="repeatIteration" value="0" />

@@ -23,6 +23,10 @@
 /.local-artifacts/
 *.pfx
 *.key
+auth.json
+*.pem
+*.pgdump
+*.dump
 *.env
 !/ops/*.env.example
 # Generated evidence only when explicitly reviewed

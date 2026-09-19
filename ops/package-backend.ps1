@@ -32,7 +32,9 @@ foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_
     Copy-Item -LiteralPath (Join-Path (Join-Path $projectRoot 'prompts') $name) -Destination (Join-Path $runtimePrompts $name)
 }
 New-Item -ItemType Directory -Force -Path (Join-Path $stage 'migrations') | Out-Null
-Copy-Item -LiteralPath (Join-Path $projectRoot 'backend/migrations/001_initial.sql') -Destination (Join-Path $stage 'migrations/001_initial.sql')
+Get-ChildItem -LiteralPath (Join-Path $projectRoot 'backend/migrations') -Filter '*.sql' -File |
+    Sort-Object Name |
+    ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path (Join-Path $stage 'migrations') $_.Name) }
 New-Item -ItemType Directory -Force -Path (Join-Path $stage 'ops') | Out-Null
 Get-ChildItem -LiteralPath (Join-Path $projectRoot 'ops') -File |
     Where-Object { $_.Name.EndsWith('.ps1') -or $_.Name.EndsWith('.env.example') -or $_.Name -eq 'README.md' } |

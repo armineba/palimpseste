@@ -33,6 +33,7 @@ public static class AdminCommands
                 await credential.ExecuteNonQueryAsync();
             }
             await transaction.CommitAsync();
+            Console.WriteLine($"principal_id={principalId:N}");
             Console.WriteLine($"token_id={tokenId:N}");
             Console.WriteLine($"token={token}");
             return 0;

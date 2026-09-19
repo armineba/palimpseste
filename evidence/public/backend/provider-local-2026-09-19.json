@@ -1,26 +1,26 @@
-﻿{
-    "kind":  "provider_doctor_local_public_summary",
-    "observed_at":  "2026-09-19T18:35:06.6193305+00:00",
-    "full_evidence_sha256":  "cbcac15a6fcd55eb73f244bb225bf443c836469f7f2da1f1a003366ab00ffa93",
-    "service_identity":  "PalRuntimeSvc",
-    "expected_service_identity":  "PalRuntimeSvc",
-    "cli_version":  "codex-cli 0.154.0-alpha.6.2",
-    "cli_version_status":  "ok",
-    "exec_help_status":  "ok",
-    "disable_flag_parser_status":  "ok",
-    "feature_list_status":  "ok",
-    "exposed_tools_disabled_observed":  true,
-    "active_internal_features":  [
-                                     "unified_exec"
-                                 ],
-    "dedicated_auth":  "not_authenticated",
-    "requested_model":  "gpt-5.6-luna",
-    "requested_effort":  "max",
-    "active_test_issues":  [
-
-                           ],
-    "production_issues":  [
-                              "effort_not_verified"
-                          ],
-    "model_calls_executed":  false
+{
+  "kind": "provider_doctor_local_public_summary",
+  "observed_at": "2026-09-19T19:47:35.7165288+00:00",
+  "service_identity": "PalRuntimeSvc",
+  "expected_service_identity": "PalRuntimeSvc",
+  "cli_version": "codex-cli 0.154.0-alpha.6.2",
+  "cli_executable_sha256": "2271526227b06ca13ab2b975b88546460fc61b2a29225b6dda0fdc803024ccc9",
+  "feature_evidence_sha256": "32341ca51c9bc7c2db959f81700a939ecf184cdbe3a765a5947da61f346b2f8f",
+  "final_local_check_sha256": "30c85771fb9237c75908e234210c5c0a61fe1b90f6690039822455705dc6edc1",
+  "doctor_exit_code": 0,
+  "cli_version_status": "ok",
+  "exec_help_status": "ok",
+  "disable_flag_parser_status": "ok",
+  "feature_list_status": "ok",
+  "exposed_tools_disabled_observed": true,
+  "active_internal_features": ["unified_exec"],
+  "source_root_listing": "denied",
+  "source_sentinel_read": "denied",
+  "source_sentinel_write": "denied",
+  "dedicated_auth": "not_authenticated",
+  "requested_model": "gpt-5.6-luna",
+  "requested_effort": "max",
+  "active_test_issues": [],
+  "production_issues": ["effort_not_verified"],
+  "model_calls_executed": false
 }

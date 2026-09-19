@@ -1,42 +1,53 @@
-﻿# Provider doctor and runtime feature gate — 2026-09-19
+# Doctor fournisseur et liaison au binaire — 19 septembre 2026
 
-## Local observation
+## Doctor local sous le compte de service
 
-The published `ProviderDoctor.exe` was executed as `PalRuntimeSvc` with the
-runtime `CODEX_HOME` and the copied Codex CLI (`codex-cli 0.154.0-alpha.6.2`).
-The local doctor completed with exit code 0. It executed `--version`,
-`exec --help`, the complete `--disable` parser check, `features list`, and
-`login status`; it did not execute a model request.
+Le `ProviderDoctor.exe` reconstruit a été lancé par un processus Windows dont
+l'identité observée est `PalRuntimeSvc`. Il a terminé avec le code 0, sans
+requête modèle. `codex --version`, `exec --help`, le parseur des options de
+désactivation, `features list` et `login status` ont répondu. Le CLI observé
+est `codex-cli 0.154.0-alpha.6.2` ; son SHA-256 est :
 
-The requested model was `gpt-5.6-luna` and the requested reasoning effort was
-`max`. Every exposed capability in the runtime gate was observed `false`,
-including shell, computer, browser, apps, plugins, agents, image view and the
-network search aliases. The CLI reported `unified_exec=true`; this is retained
-as an internal PTY implementation observation and is not treated as an exposed
-worker tool. The legacy `web_search` key was absent from the CLI table and was
-bound only to the explicitly observed `standalone_web_search=false` row; the
-mapping is recorded in the hashed doctor JSON.
+`2271526227b06ca13ab2b975b88546460fc61b2a29225b6dda0fdc803024ccc9`
 
-The reviewed JSON is stored outside the repository at
-`E:\PalimpsesteRuntime\evidence\doctor-local-service-final.json` with SHA-256:
+Le modèle demandé est `gpt-5.6-luna` et l'effort demandé est `max`. Les
+capacités exposées exigées par la porte runtime ont été observées à `false`,
+dont shell, ordinateur, navigateur, applications, plugins, agents, recherche
+réseau et vue d'image. `unified_exec=true` est conservé comme observation du
+mécanisme interne PTY ; cette observation n'établit pas à elle seule l'absence
+d'outil utilisable par un modèle. La clé `web_search` est liée uniquement à la
+ligne observée `standalone_web_search=false`, et cette correspondance est
+consignée dans le JSON privé.
 
-`c50647f63efda97ea989374bef7b6b3a6e3bdce6e00d0446758be6db99968b51`
+Le premier JSON local, revu puis conservé immuable hors Git comme preuve
+features, a le SHA-256 :
 
-The runtime environment enables `PALIMPSESTE_RUNTIME_FEATURES_VERIFIED` only
-with this path and hash. A later no-write doctor check under `PalRuntimeSvc`
-reported `runtime_features_compatibility_verified=true` and the only remaining
-production issue was `effort_not_verified`.
+`32341ca51c9bc7c2db959f81700a939ecf184cdbe3a765a5947da61f346b2f8f`
 
-## Active doctor gate
+La configuration runtime privée pointe vers ce fichier et ce hash. Une seconde
+exécution du doctor, sous la même identité et sur le même CLI SHA-256, a le
+SHA-256 `30c85771fb9237c75908e234210c5c0a61fe1b90f6690039822455705dc6edc1`.
+Elle indique `runtime_features_compatibility_verified=true`, aucune erreur
+locale et `production_issues=["effort_not_verified"]`. Son statut d'authentification
+est `not_authenticated` et `model_calls_executed=false`. Le
+[résumé expurgé](provider-local-2026-09-19.json) reprend ces valeurs.
 
-The final active doctor was invoked under `PalRuntimeSvc` with the prepared
-reference, drawing and geometry inputs. It exited 2 before A/B because the
-dedicated Codex home had no authenticated account. Its result is stored at
-`E:\PalimpsesteRuntime\evidence\doctor-active-service-final.json` with SHA-256:
+La preuve locale antérieure `c50647f63efda97ea989374bef7b6b3a6e3bdce6e00d0446758be6db99968b51`
+ne contenait pas le SHA-256 du binaire. Elle est historique et ne satisfait
+plus la nouvelle porte `Check(true)`.
 
-`5cf4bc017a8a111cdadc4055d736fc6486eb702262b113af9532e65e0912297e`
+## Doctor actif
 
-The result has `active_blocked=dedicated_auth_not_confirmed`,
-`model_calls_executed=false`, `runtime_features_compatibility_verified=true`
-and `production_issues=[effort_not_verified]`. No personal `auth.json` or
-token was copied, and no Luna model call is claimed.
+Le doctor actif antérieur a été invoqué sous `PalRuntimeSvc` avec les entrées
+préparées, puis arrêté avant A/B par `dedicated_auth_not_confirmed` ;
+`model_calls_executed=false`. Son ancien JSON est conservé comme historique
+dans [le résumé de blocage](provider-active-blocked-2026-09-19.json). Aucun
+doctor actif avec liaison SHA-256 du CLI et aucun appel Luna A/B n'ont été
+exécutés. L'acceptation du modèle et de l'effort `max` par le compte dédié
+reste à établir. Le worker refuse la génération tant que la preuve active
+hashée et `PALIMPSESTE_EFFORT_VERIFIED=true` ne sont pas présents.
+
+Le secret du compte Windows utilisé pour relancer le doctor local est conservé
+hors dépôt dans une `PSCredential` protégée par DPAPI et une ACL privée. Il
+dépend du profil de l'opérateur Windows actuel. Aucun secret ni chemin du
+fichier de credential ne figure dans cette preuve.

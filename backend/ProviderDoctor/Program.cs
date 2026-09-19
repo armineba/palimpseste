@@ -13,6 +13,9 @@ if (args.Length == 0 || args[0] is not ("local" or "active"))
 
 var mode = args[0];
 var writePath = ReadOption(args, "--write");
+string? executableHash = null;
+try { executableHash = CodexSettings.ComputeExecutableSha256(settings.Executable); }
+catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException) { }
 var version = await RunCommandAsync(settings, "--version");
 var help = await RunCommandAsync(settings, "exec", "--help");
 var featureSyntax = await RunCommandAsync(settings, DoctorConstants.DisabledHelpArguments());
@@ -53,6 +56,8 @@ var local = new Dictionary<string, object?>
     ["mode"] = mode,
     ["checked_at"] = DateTimeOffset.UtcNow,
     ["executable"] = settings.Executable,
+    ["cli_executable_sha256"] = executableHash,
+    ["cli_executable_hash_status"] = executableHash is null ? "unavailable" : "ok",
     ["cli_version"] = version.Output.Trim(),
     ["cli_version_status"] = version.Status,
     ["exec_help_status"] = help.Status,
@@ -112,7 +117,7 @@ var local = new Dictionary<string, object?>
     }
 };
 
-var localExit = settings.Check(false).Count == 0 && version.Status == "ok" && help.Status == "ok" &&
+var localExit = executableHash is not null && settings.Check(false).Count == 0 && version.Status == "ok" && help.Status == "ok" &&
     featureSyntax.Status == "ok" && featureList.Status == "ok" && optionIssues.Length == 0 &&
     featureObservationComplete && effectiveDisableObserved ? 0 : 1;
 if (mode == "local")
