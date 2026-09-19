@@ -2,6 +2,25 @@
 
 Mis à jour le 20 septembre 2026 après la passe UI dessin → texte → sort, la connexion Codex dédiée et le diagnostic A lancé. Ce fichier est un journal de travail, pas une attestation de livraison.
 
+**Point de reprise du 20 septembre, après la question de consommation.** Le
+lecteur IL2CPP brut s'ouvre hors ligne, mais la boucle Luna complète n'est pas
+livrée. Le worker demeure arrêté. Le nouveau binaire Codex devant attester
+modèle et effort effectifs est en construction et n'a pas été installé ; aucun
+appel modèle supplémentaire n'a été lancé. Un lanceur opérateur a exécuté le
+doctor local sous `PalRuntimeSvc` avec succès et sans appel modèle, voir
+`evidence/public/backend/doctor-service-launcher-2026-09-20.md`. L'API
+contient un plafond transactionnel de 3 nouveaux jobs par joueur et 12 au
+total sur 24 h, dont le test PostgreSQL concurrent est réussi ; voir
+`docs/GENERATION_QUOTA.md`. L'exécutable API mis à jour est publié dans le
+staging opérateur avec SHA-256
+`66B253C16D695F06658C96DE38F53F69C26EAB13911FCD55C531B55B185C39EB`.
+Les migrations 003 et 004 ont été appliquées à `palimpseste_lab` après
+sauvegarde vérifiée ; l'API actualisée n'y est pas installée. Voir
+`evidence/public/backend/lab-migrations-2026-09-20.md`. La capture de compte montre l'écran
+d'activation de la recharge automatique, sans preuve exploitable dans le
+service de son état réel. Aucun achat ni recharge n'a été déclenché par le
+projet. Ce plafond applicatif n'est pas un plafond monétaire OpenAI.
+
 **Révision en cours :** le compte Codex partagé a été connecté à `PalRuntimeSvc` par code d'appareil dans son `CODEX_HOME` isolé. Le doctor local gratuit et `codex login status` sont réussis. Le premier doctor actif s'est arrêté avant `codex exec` sur `effort_evidence_missing` ; son champ `model_calls_executed=true` était un faux positif, corrigé par `ProbeAsync`. Deux passes suivantes ont lancé A et quitté sur `codex_exit_nonzero`. Une troisième a identifié HTTP 400 `invalid_json_schema` ; les 17 `const` sans `type` des schémas A/B ont été corrigés. Une quatrième passe a réellement obtenu **A JSON conforme**, 2 225 octets, SHA-256 `5e938a495f7199d58c7460ebcd734b0490d099f0bac7afd93ff821d02ce5afad`, avec usage rapporté de 13 662 jetons d'entrée et 3 648 de sortie (dont 3 106 de raisonnement). Le doctor l'a refusé sur `reported_model_missing` : le CLI n'a pas rapporté modèle et effort effectifs ; B n'a pas démarré. Aucun sort Luna n'est prouvé et aucun nouvel appel n'a suivi. L'API expose la description A validée au propriétaire (`description_artifact_id`), un échange d'invitation à usage unique et `principal_id` dans les capacités ; tests HTTP 18/18 et 4/4 sur la base de test avant le dernier champ, compilation Release 0/0 et QA documentaire 61/61 après. Unity a passé EditMode 11/11, PlayMode 2/2 et reconstruit le Player IL2CPP après filtrage du cache par joueur ; le Player brut a été lancé hors ligne 41,3 s, avec invitation et bibliothèque vide visibles. Les ZIPs et hash cités plus bas concernent **la version précédente**. La création du nouveau ZIP et un démarrage supplémentaire d'API test avec environnement privé ont été refusés avant exécution par la revue automatique de l'outil (`blocked by policy`) ; aucun smoke du Player nouveau connecté à cette API n'est revendiqué.
 
 ## Échelle employée
@@ -18,7 +37,7 @@ Mis à jour le 20 septembre 2026 après la passe UI dessin → texte → sort, l
 - Unity 6000.3.24f1 complet, module Windows IL2CPP et UnityPackageManager présents à `C:\ProgramData\6000.3.24f1-x86_64\Editor\Unity.exe`. Une installation incomplète reste à `C:\ProgramData\6000.3.24f1\Editor\Unity.exe` ; ne pas l'utiliser.
 - Licence Unity Personal observée. Import Unity réussi ; après filtrage du cache par propriétaire, EditMode 11/11, PlayMode 2/2 et Player Windows IL2CPP brut lancé hors ligne avec le sélecteur d'invitation. Le code natif courant `GameAssembly.dll` a le SHA-256 `0a2235c36ce4fc2788f787301b66dea93c92f74bed47ec8150d9808c4d51e4dd`. Les essais de l'archive précédente couvrent six porteurs, reprise du journal, intégrité du cache, focus et coffre Windows ; cette archive de 44 000 288 octets, SHA-256 `343a585873220c1511c53c30d37412208fdbc5ad29845f6060c817e4833791c2`, est **historique**. Voir `docs/UNITY_TEST_PROOF.md`.
 - Jeton client protégé dans Windows Credential Manager, associé à l'URL du service ; écriture/lecture/suppression et redémarrage du Player IL2CPP final testés sur ce compte Windows. `PlayerPrefs` ne conserve que l'URL. Autre compte/poste et coffre indisponible non testés.
-- PostgreSQL 17 local tourne. Migrations 001–002 appliquées à `palimpseste_lab` et `palimpseste_test`; migration 003 d'invitation appliquée à `palimpseste_test` seulement. Compte de base dédié. Le worker de production n'a pas été exécuté après connexion Codex, et l'effort Luna actif reste non vérifié.
+- PostgreSQL 17 local tourne. Migrations 001–002 appliquées à `palimpseste_lab` et `palimpseste_test`; migration 003 appliquée aux deux bases, migration 004 appliquée à `palimpseste_lab` et testée dans un schéma isolé de `palimpseste_test`. Compte de base dédié. Le worker de production n'a pas été exécuté après connexion Codex, et l'effort Luna actif reste non vérifié.
 
 ## Matrice exigences → sources → preuve → état
 

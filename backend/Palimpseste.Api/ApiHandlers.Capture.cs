@@ -66,7 +66,7 @@ public static partial class ApiHandlers
             { return ApiProblem.Result(context, 422, "capture_incompatible", "Capture endommagée ou incompatible."); }
 
             await using var dbConnection = await db.OpenConnectionAsync(ct);
-            await using var transaction = await dbConnection.BeginTransactionAsync(ct);
+            await using var transaction = await dbConnection.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, ct);
             await LockKeyAsync(dbConnection, transaction, principal.Id, $"capture:{id}", key, ct);
             var saved = await ExistingAsync(dbConnection, transaction, principal.Id, $"capture:{id}", key, ct);
             if (saved is not null) return ReplayOrConflict(context, saved, manifest.RequestHash);
@@ -106,6 +106,12 @@ public static partial class ApiHandlers
                 await transaction.CommitAsync(ct);
                 return Results.Content(existingBody, "application/json", Encoding.UTF8, 202);
             }
+            var admission = await GenerationQuota.CheckAsync(dbConnection, transaction, principal.Id, config, ct);
+            if (admission != GenerationQuotaDecision.Allowed)
+                return ApiProblem.Result(context, 429, "generation_quota_exceeded",
+                    admission == GenerationQuotaDecision.GlobalExceeded
+                        ? "Capacité quotidienne du laboratoire atteinte. Réessayez plus tard."
+                        : "Votre quota quotidien de générations est atteint. Réessayez plus tard.", true);
             // The files become durable before their DB rows are attached. Holding the
             // parchment row lock avoids writing orphan files on ordinary duplicate uploads.
             var drawingArtifact = await store.PutAsync(drawing, "png", "image/png", ct);
@@ -129,7 +135,7 @@ public static partial class ApiHandlers
                 await insertCapture.ExecuteNonQueryAsync(ct);
             }
             var jobId = Guid.NewGuid();
-            await using (var insertJob = new NpgsqlCommand("INSERT INTO jobs(id,owner_id,parchment_id,capture_id,kind,state,message) VALUES (@id,@owner,@parchment,@capture,'production','queued','Capture reçue')", dbConnection, transaction))
+            await using (var insertJob = new NpgsqlCommand("INSERT INTO jobs(id,owner_id,parchment_id,capture_id,kind,state,message,created_at) VALUES (@id,@owner,@parchment,@capture,'production','queued','Capture reçue',clock_timestamp())", dbConnection, transaction))
             {
                 insertJob.Parameters.AddWithValue("id", jobId);
                 insertJob.Parameters.AddWithValue("owner", principal.Id);

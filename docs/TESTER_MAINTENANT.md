@@ -18,7 +18,7 @@ connecté n'ont pas été exécutés.
 
 ## Parcours à vérifier après ouverture contrôlée du laboratoire
 
-L'opérateur déploie l'API HTTPS et le worker isolé, applique la migration 003,
+L'opérateur déploie l'API HTTPS et le worker isolé après contrôle des migrations 003 et 004,
 inscrit l'adresse du service dans chaque fichier d'invitation privé et le remet
 au joueur. Dans le jeu, le joueur choisit ce fichier une seule fois,
 dessine sur le parchemin, termine la capture, lit l'interprétation textuelle de

@@ -129,7 +129,7 @@ public static partial class ApiHandlers
         return Results.Content(response, "application/json", Encoding.UTF8, 201);
     }
 
-    public static async Task<IResult> AuthoringPlan(HttpContext context, NpgsqlDataSource db, IArtifactStore store, CancellationToken ct)
+    public static async Task<IResult> AuthoringPlan(HttpContext context, NpgsqlDataSource db, IArtifactStore store, ApiConfig config, CancellationToken ct)
     {
         var principal = Owner(context);
         if (principal.Role != "creator") return ApiProblem.Result(context, 403, "creator_required", "Rôle créateur requis.");
@@ -151,7 +151,7 @@ public static partial class ApiHandlers
             return ApiProblem.Result(context, 422, "description_invalid", "Description non conforme au contrat.");
         var descriptionHash = ApiJson.Sha256(descriptionBytes);
         await using var connection = await db.OpenConnectionAsync(ct);
-        await using var transaction = await connection.BeginTransactionAsync(ct);
+        await using var transaction = await connection.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted, ct);
         await LockKeyAsync(connection, transaction, principal.Id, "authoring_plan", key, ct);
         var saved = await ExistingAsync(connection, transaction, principal.Id, "authoring_plan", key, ct);
         if (saved is not null) return ReplayOrConflict(context, saved, requestHash);
@@ -171,10 +171,16 @@ public static partial class ApiHandlers
             while (await reader.ReadAsync(ct)) allIds.Add(reader.GetGuid(0));
         }
         if (!allIds.SetEquals(requestedIds)) return ApiProblem.Result(context, 422, "geometry_incomplete", "Le diagnostic exige tous les JSON géométriques d'une seule banque appartenant au créateur.");
+        var admission = await GenerationQuota.CheckAsync(connection, transaction, principal.Id, config, ct);
+        if (admission != GenerationQuotaDecision.Allowed)
+            return ApiProblem.Result(context, 429, "generation_quota_exceeded",
+                admission == GenerationQuotaDecision.GlobalExceeded
+                    ? "Capacité quotidienne du laboratoire atteinte. Réessayez plus tard."
+                    : "Votre quota quotidien de générations est atteint. Réessayez plus tard.", true);
         var descriptionArtifact = await store.PutAsync(descriptionBytes, "json", "application/json", ct);
         await InsertArtifact(connection, transaction, principal.Id, "authored_description", descriptionArtifact, ct);
         var jobId = Guid.NewGuid();
-        await using (var job = new NpgsqlCommand("INSERT INTO jobs(id,owner_id,kind,state,resume_stage,message) VALUES (@id,@owner,'authoring','queued','planning','Description de diagnostic reçue')", connection, transaction))
+        await using (var job = new NpgsqlCommand("INSERT INTO jobs(id,owner_id,kind,state,resume_stage,message,created_at) VALUES (@id,@owner,'authoring','queued','planning','Description de diagnostic reçue',clock_timestamp())", connection, transaction))
         {
             job.Parameters.AddWithValue("id", jobId);
             job.Parameters.AddWithValue("owner", principal.Id);
