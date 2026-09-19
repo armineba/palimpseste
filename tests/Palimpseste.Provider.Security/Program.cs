@@ -32,6 +32,11 @@ var invalidJsonSchema = Path.Combine(spec, "model-a-invalid-json.output-schema.j
 var exitStderrSchema = Path.Combine(spec, "model-a-exit-stderr.output-schema.json");
 var exitJsonlSchema = Path.Combine(spec, "model-a-exit-jsonl.output-schema.json");
 var creditsExhaustedSchema = Path.Combine(spec, "model-a-credits-exhausted.output-schema.json");
+var missingAttestationSchema = Path.Combine(spec, "model-a-missing-attestation.output-schema.json");
+var duplicateAttestationSchema = Path.Combine(spec, "model-a-duplicate-attestation.output-schema.json");
+var outOfOrderAttestationSchema = Path.Combine(spec, "model-a-out-of-order-attestation.output-schema.json");
+var arbitraryMetadataSchema = Path.Combine(spec, "model-a-arbitrary-metadata.output-schema.json");
+var invalidAttestationSchema = Path.Combine(spec, "model-a-invalid-attestation.output-schema.json");
 await File.WriteAllTextAsync(divergentModelSchema, "{\"type\":\"object\",\"x-test\":\"divergent-model\"}");
 await File.WriteAllTextAsync(divergentEffortSchema, "{\"type\":\"object\",\"x-test\":\"divergent-effort\"}");
 await File.WriteAllTextAsync(missingModelSchema, "{\"type\":\"object\",\"x-test\":\"missing-model\"}");
@@ -40,6 +45,11 @@ await File.WriteAllTextAsync(invalidJsonSchema, "{\"type\":\"object\",\"x-test\"
 await File.WriteAllTextAsync(exitStderrSchema, "{\"type\":\"object\",\"x-test\":\"exit-stderr\"}");
 await File.WriteAllTextAsync(exitJsonlSchema, "{\"type\":\"object\",\"x-test\":\"exit-jsonl\"}");
 await File.WriteAllTextAsync(creditsExhaustedSchema, "{\"type\":\"object\",\"x-test\":\"credits-exhausted\"}");
+await File.WriteAllTextAsync(missingAttestationSchema, "{\"type\":\"object\",\"x-test\":\"missing-attestation\"}");
+await File.WriteAllTextAsync(duplicateAttestationSchema, "{\"type\":\"object\",\"x-test\":\"duplicate-attestation\"}");
+await File.WriteAllTextAsync(outOfOrderAttestationSchema, "{\"type\":\"object\",\"x-test\":\"out-of-order-attestation\"}");
+await File.WriteAllTextAsync(arbitraryMetadataSchema, "{\"type\":\"object\",\"x-test\":\"arbitrary-metadata\"}");
+await File.WriteAllTextAsync(invalidAttestationSchema, "{\"type\":\"object\",\"x-test\":\"invalid-attestation\"}");
 var reference = Path.Combine(input, "reference.png");
 var drawing = Path.Combine(input, "drawing.png");
 await File.WriteAllBytesAsync(reference, SecurityFixtures.Png1024);
@@ -52,10 +62,12 @@ var previousDowngrade = Environment.GetEnvironmentVariable("PALIMPSESTE_ALLOW_RE
 var previousTools = Environment.GetEnvironmentVariable("PALIMPSESTE_RUNTIME_EXECUTION_TOOLS");
 var previousCodexHome = Environment.GetEnvironmentVariable("CODEX_HOME");
 var previousApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+var previousCodexApiKey = Environment.GetEnvironmentVariable("CODEX_API_KEY");
 Environment.SetEnvironmentVariable("PALIMPSESTE_ALLOW_MODEL_FALLBACK", "false");
 Environment.SetEnvironmentVariable("PALIMPSESTE_ALLOW_REASONING_DOWNGRADE", "false");
 Environment.SetEnvironmentVariable("PALIMPSESTE_RUNTIME_EXECUTION_TOOLS", "false");
 Environment.SetEnvironmentVariable("OPENAI_API_KEY", "personal-secret-sentinel");
+Environment.SetEnvironmentVariable("CODEX_API_KEY", "personal-codex-api-key-sentinel");
 Environment.SetEnvironmentVariable("CODEX_HOME", "E:\\PersonalCodexSentinel");
 
 try
@@ -182,6 +194,8 @@ try
     Assert(!File.Exists(Path.Combine(valid.AttemptDirectory!, "pwned.txt")), "prompt metacharacters must not execute locally");
     Assert((await File.ReadAllTextAsync(Path.Combine(valid.AttemptDirectory!, "inherited-openai-key.txt"))).Length == 0,
         "personal API key must not be inherited by the runtime process");
+    Assert((await File.ReadAllTextAsync(Path.Combine(valid.AttemptDirectory!, "inherited-codex-api-key.txt"))).Length == 0,
+        "personal Codex API key must not be inherited by the runtime process");
     Assert((await File.ReadAllTextAsync(Path.Combine(valid.AttemptDirectory!, "runtime-codex-home.txt"))).Equals(home, StringComparison.OrdinalIgnoreCase),
         "personal CODEX_HOME must be replaced by the dedicated runtime home");
 
@@ -241,13 +255,39 @@ try
 
     var missingModel = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", missingModelSchema, [reference, drawing], "job-security"), CancellationToken.None);
-    Assert(missingModel.Outcome == ProviderOutcome.ModelUnavailable && missingModel.ErrorCode == "reported_model_missing",
-        "a successful turn without reported model metadata must fail closed");
+    Assert(missingModel.Outcome == ProviderOutcome.IsolationViolation && missingModel.ErrorCode == "provider_attestation_invalid",
+        "a provider attestation without a model must fail closed");
 
     var missingEffort = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", missingEffortSchema, [reference, drawing], "job-security"), CancellationToken.None);
-    Assert(missingEffort.Outcome == ProviderOutcome.EffortUnsupported && missingEffort.ErrorCode == "reported_effort_missing",
-        "a successful turn without reported reasoning effort must fail closed");
+    Assert(missingEffort.Outcome == ProviderOutcome.IsolationViolation && missingEffort.ErrorCode == "provider_attestation_invalid",
+        "a provider attestation without reasoning effort must fail closed");
+
+    var invalidAttestation = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "safe", invalidAttestationSchema, [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(invalidAttestation.Outcome == ProviderOutcome.IsolationViolation && invalidAttestation.ErrorCode == "provider_attestation_invalid",
+        "a provider attestation with the wrong source or response count must fail closed");
+
+    var missingAttestation = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "safe", missingAttestationSchema, [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(missingAttestation.Outcome == ProviderOutcome.IsolationViolation && missingAttestation.ErrorCode == "provider_attestation_missing",
+        "a successful turn without the server attestation must fail closed");
+
+    var duplicateAttestation = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "safe", duplicateAttestationSchema, [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(duplicateAttestation.Outcome == ProviderOutcome.IsolationViolation && duplicateAttestation.ErrorCode == "provider_attestation_duplicate",
+        "duplicate server attestations must fail closed");
+
+    var outOfOrderAttestation = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "safe", outOfOrderAttestationSchema, [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(outOfOrderAttestation.Outcome == ProviderOutcome.IsolationViolation && outOfOrderAttestation.ErrorCode == "provider_attestation_order",
+        "a server attestation not adjacent to turn.completed must fail closed");
+
+    var arbitraryMetadata = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "safe", arbitraryMetadataSchema, [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(arbitraryMetadata.Outcome == ProviderOutcome.Success &&
+        arbitraryMetadata.ReportedModel == "gpt-5.6-luna" && arbitraryMetadata.ReportedEffort == "max",
+        "model and effort fields on ordinary JSONL events must not be trusted");
 
     var invalidJson = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", invalidJsonSchema, [reference, drawing], "job-security"), CancellationToken.None);
@@ -278,6 +318,7 @@ finally
     Environment.SetEnvironmentVariable("PALIMPSESTE_ALLOW_REASONING_DOWNGRADE", previousDowngrade);
     Environment.SetEnvironmentVariable("PALIMPSESTE_RUNTIME_EXECUTION_TOOLS", previousTools);
     Environment.SetEnvironmentVariable("OPENAI_API_KEY", previousApiKey);
+    Environment.SetEnvironmentVariable("CODEX_API_KEY", previousCodexApiKey);
     Environment.SetEnvironmentVariable("CODEX_HOME", previousCodexHome);
     if (Environment.GetEnvironmentVariable("PALIMPSESTE_KEEP_SECURITY_FIXTURE") != "1")
     {
@@ -308,6 +349,8 @@ static async Task RunFakeProviderAsync(string[] arguments)
     await File.WriteAllTextAsync(argsFile, string.Join('\n', arguments), new UTF8Encoding(false));
     var keyFile = Path.Combine(Environment.CurrentDirectory, "inherited-openai-key.txt");
     await File.WriteAllTextAsync(keyFile, Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "", new UTF8Encoding(false));
+    var codexKeyFile = Path.Combine(Environment.CurrentDirectory, "inherited-codex-api-key.txt");
+    await File.WriteAllTextAsync(codexKeyFile, Environment.GetEnvironmentVariable("CODEX_API_KEY") ?? "", new UTF8Encoding(false));
     var homeFile = Path.Combine(Environment.CurrentDirectory, "runtime-codex-home.txt");
     await File.WriteAllTextAsync(homeFile, Environment.GetEnvironmentVariable("CODEX_HOME") ?? "", new UTF8Encoding(false));
     string? output = null;
@@ -346,14 +389,41 @@ static async Task RunFakeProviderAsync(string[] arguments)
             : $"{{\"schema_version\":\"{version}\"}}", new UTF8Encoding(false));
         var model = schemaText.Contains("divergent-model", StringComparison.OrdinalIgnoreCase) ? "other-model" : "gpt-5.6-luna";
         var effort = schemaText.Contains("divergent-effort", StringComparison.OrdinalIgnoreCase) ? "high" : "max";
-        var reportedModel = schemaText.Contains("missing-model", StringComparison.OrdinalIgnoreCase) ? null : model;
-        var reportedEffort = schemaText.Contains("missing-effort", StringComparison.OrdinalIgnoreCase) ? null : effort;
-        Console.WriteLine(reportedModel is null
-            ? "{\"type\":\"thread.started\",\"thread_id\":\"fake-thread\"}"
-            : $"{{\"type\":\"thread.started\",\"thread_id\":\"fake-thread\",\"model\":\"{reportedModel}\"}}");
-        Console.WriteLine(reportedEffort is null
-            ? "{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":1,\"output_tokens\":1}}"
-            : $"{{\"type\":\"turn.completed\",\"usage\":{{\"input_tokens\":1,\"output_tokens\":1}},\"reasoning_effort\":\"{reportedEffort}\"}}");
+        var missingModel = schemaText.Contains("missing-model", StringComparison.OrdinalIgnoreCase);
+        var missingEffort = schemaText.Contains("missing-effort", StringComparison.OrdinalIgnoreCase);
+        var missingAttestation = schemaText.Contains("missing-attestation", StringComparison.OrdinalIgnoreCase);
+        var duplicateAttestation = schemaText.Contains("duplicate-attestation", StringComparison.OrdinalIgnoreCase);
+        var outOfOrderAttestation = schemaText.Contains("out-of-order-attestation", StringComparison.OrdinalIgnoreCase);
+        var arbitraryMetadata = schemaText.Contains("arbitrary-metadata", StringComparison.OrdinalIgnoreCase);
+        var invalidAttestation = schemaText.Contains("invalid-attestation", StringComparison.OrdinalIgnoreCase);
+        Console.WriteLine(arbitraryMetadata
+            ? "{\"type\":\"thread.started\",\"thread_id\":\"fake-thread\",\"model\":\"spoofed-model\",\"reasoning_effort\":\"low\"}"
+            : "{\"type\":\"thread.started\",\"thread_id\":\"fake-thread\"}");
+        var attestation = missingModel
+            ? "{\"type\":\"provider.attested\",\"source\":\"server_response\",\"reasoning_effort\":\"max\",\"response_count\":1}"
+            : missingEffort
+                ? "{\"type\":\"provider.attested\",\"source\":\"server_response\",\"model\":\"gpt-5.6-luna\",\"response_count\":1}"
+                : invalidAttestation
+                    ? "{\"type\":\"provider.attested\",\"source\":\"client\",\"model\":\"gpt-5.6-luna\",\"reasoning_effort\":\"max\",\"response_count\":0}"
+                : $"{{\"type\":\"provider.attested\",\"source\":\"server_response\",\"model\":\"{model}\",\"reasoning_effort\":\"{effort}\",\"response_count\":1}}";
+        var completion = arbitraryMetadata
+            ? "{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":1,\"output_tokens\":1},\"model\":\"spoofed-model\",\"reasoning_effort\":\"low\"}"
+            : "{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":1,\"output_tokens\":1}}";
+        if (outOfOrderAttestation)
+        {
+            Console.WriteLine(completion);
+            Console.WriteLine(attestation);
+        }
+        else if (missingAttestation)
+        {
+            Console.WriteLine(completion);
+        }
+        else
+        {
+            Console.WriteLine(attestation);
+            if (duplicateAttestation) Console.WriteLine(attestation);
+            Console.WriteLine(completion);
+        }
     }
 }
 

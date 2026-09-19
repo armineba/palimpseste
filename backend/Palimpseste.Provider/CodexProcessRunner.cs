@@ -190,6 +190,8 @@ public sealed class CodexProcessRunner
             }
             if (!events.Completed || events.Failed || !File.Exists(outputPath))
                 return await PersistFailureAsync(Failure(ProviderOutcome.Incomplete, "missing_completed_turn_or_final", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
+            if (events.AttestationError is not null)
+                return await PersistFailureAsync(Failure(ProviderOutcome.IsolationViolation, events.AttestationError, started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (events.ReportedModel is null)
                 return await PersistFailureAsync(Failure(ProviderOutcome.ModelUnavailable, "reported_model_missing", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (!string.Equals(events.ReportedModel, settings.Model, StringComparison.Ordinal))
@@ -350,10 +352,11 @@ public sealed class CodexProcessRunner
         }
     }
 
-    private static (bool Completed, bool Failed, string? Error, string? SessionId, string? UsageJson, string? ReportedModel, string? ReportedEffort) ParseEvents(string jsonl)
+    private static (bool Completed, bool Failed, string? Error, string? SessionId, string? UsageJson, string? ReportedModel, string? ReportedEffort, string? AttestationError) ParseEvents(string jsonl)
     {
         var completed = false; var failed = false; string? error = null; string? session = null; string? usage = null;
         string? reportedModel = null; string? reportedEffort = null;
+        string? attestationError = null; var attestationSeen = false; string? previousType = null;
         foreach (var line in jsonl.Split('\n', StringSplitOptions.RemoveEmptyEntries))
         {
             try
@@ -363,12 +366,47 @@ public sealed class CodexProcessRunner
                 if (!root.TryGetProperty("type", out var typeElement)) continue;
                 var type = typeElement.GetString();
                 if (type == "thread.started" && root.TryGetProperty("thread_id", out var id)) session = id.GetString();
-                if (root.TryGetProperty("model", out var model) && model.ValueKind == JsonValueKind.String) reportedModel = model.GetString();
-                if (root.TryGetProperty("reasoning_effort", out var effort) && effort.ValueKind == JsonValueKind.String) reportedEffort = effort.GetString();
+                if (type == "provider.attested")
+                {
+                    if (attestationSeen)
+                        attestationError ??= "provider_attestation_duplicate";
+                    attestationSeen = true;
+                    if (completed)
+                        attestationError = "provider_attestation_order";
+
+                    var source = root.TryGetProperty("source", out var sourceElement) &&
+                        sourceElement.ValueKind == JsonValueKind.String
+                        ? sourceElement.GetString()
+                        : null;
+                    var model = root.TryGetProperty("model", out var modelElement) &&
+                        modelElement.ValueKind == JsonValueKind.String
+                        ? modelElement.GetString()
+                        : null;
+                    var effort = root.TryGetProperty("reasoning_effort", out var effortElement) &&
+                        effortElement.ValueKind == JsonValueKind.String
+                        ? effortElement.GetString()
+                        : null;
+                    var responseCountValid = root.TryGetProperty("response_count", out var countElement) &&
+                        countElement.ValueKind == JsonValueKind.Number &&
+                        countElement.TryGetInt32(out var responseCount) && responseCount >= 1;
+                    if (!string.Equals(source, "server_response", StringComparison.Ordinal) ||
+                        string.IsNullOrWhiteSpace(model) || string.IsNullOrWhiteSpace(effort) || !responseCountValid)
+                        attestationError ??= "provider_attestation_invalid";
+                    reportedModel = model;
+                    reportedEffort = effort;
+                }
                 if (type == "turn.completed")
                 {
                     completed = true;
                     if (root.TryGetProperty("usage", out var value)) usage = value.GetRawText();
+                    if (!attestationSeen)
+                        attestationError ??= "provider_attestation_missing";
+                    else if (!string.Equals(previousType, "provider.attested", StringComparison.Ordinal))
+                        attestationError ??= "provider_attestation_order";
+                }
+                else if (attestationSeen && string.Equals(previousType, "provider.attested", StringComparison.Ordinal))
+                {
+                    attestationError ??= "provider_attestation_order";
                 }
                 if (type is "turn.failed" or "error")
                 {
@@ -376,10 +414,12 @@ public sealed class CodexProcessRunner
                     if (root.TryGetProperty("error", out var value)) error = value.ToString();
                     else if (root.TryGetProperty("message", out value)) error = value.ToString();
                 }
+                previousType = type;
             }
             catch (JsonException) { failed = true; error = "invalid_jsonl_event"; }
         }
-        return (completed, failed, error, session, usage, reportedModel, reportedEffort);
+        if (error is null && attestationError is not null) error = attestationError;
+        return (completed, failed, error, session, usage, reportedModel, reportedEffort, attestationError);
     }
 
     private static ProviderOutcome Classify(string message)

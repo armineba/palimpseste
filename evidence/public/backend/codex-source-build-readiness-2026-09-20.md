@@ -1,0 +1,21 @@
+# Préparation de la compilation Codex Windows
+
+Audit et installations effectués les 19–20 septembre 2026 sur Windows 11 x64, **sans lancer de compilation ni remplacer la CLI du runtime**.
+
+## Source exacte et outils
+
+Le clone de développement hors dépôt est `E:\Palimpseste\.runtime\codex-source-attestation`. Son HEAD est `b5bffd3ec4db487e7e3dec59663875b0ef7b72ca`, pointé par le tag `rust-v0.154.0-alpha.6.2`. Des fichiers Rust y portent un correctif local en cours ; le résultat futur devra donc être attesté comme *tag plus patch*, et non comme binaire officiel inchangé. `cargo +1.95.0 metadata --locked --offline --no-deps` a réussi : workspace de 150 packages, package `codex-cli` version `0.154.0-alpha.6.2`, exécutable `codex`.
+
+Le tag [fixe Rust 1.95.0 et les composants clippy, rustfmt, rust-src](https://raw.githubusercontent.com/openai/codex/rust-v0.154.0-alpha.6.2/codex-rs/rust-toolchain.toml). Rust 1.95.0 a été installé pour le développement sans changer la toolchain par défaut; `rustc +1.95.0 --version` et `cargo +1.95.0 --version` ont réussi. SHA-256 de `rustc.exe` 1.95.0 : `e3ebbd547ea7b73c034d588ba569602b379f3b05ad1a3b5f8dcfab9d4478d74a`.
+
+MSVC 14.51 (compilateur et éditeur de liens x64) et Windows SDK 10.0.22621 sont présents. CMake 3.26.4-msvc4 et Ninja 1.11.0 sont fournis par Visual Studio 2022 BuildTools, mais hors du `PATH` initial. LLVM/Clang 23.1.1 a été installé via le paquet officiel `LLVM.LLVM` de winget; winget a vérifié le hachage de son installateur. `clang.exe`, `lld-link.exe` et `libclang.dll` existent sous `C:\Program Files\LLVM\bin`; SHA-256 respectifs : `e0601ed480316cdebda88426b5b87f90229a7395f11819cab5098a79ee7687b9`, `2926a57ad9e5855cf08f9adb388cd7e16ec79e1e231e46d5ba87461205bda92f`, `15440fbe33e2bca259c282976d9633d23b344ab187a2848fb78f0b77ceef7344`. Le [script Windows du tag](https://github.com/openai/codex/blob/rust-v0.154.0-alpha.6.2/codex-rs/scripts/setup-windows.ps1) prévoit Rust, MSVC, CMake et LLVM/Clang.
+
+## Séparation et ressources
+
+Le clone et le répertoire de sortie réservé `E:\Palimpseste\.runtime\codex-target-rust-v0.154.0-alpha.6.2` ont chacun une règle Deny héritable pour `PalRuntimeSvc`. Un essai sous ce compte a confirmé le refus de lecture, écriture et énumération du clone, ainsi que le refus d'écriture et d'énumération de la cible. La preuve brute du contrôle ACL reste hors dépôt dans `E:\PalimpsesteRuntime\evidence\codex-build-acl-probe-service.json`.
+
+Après installation, espace libre observé : **1 554,4 Go sur E:** et **179,3 Go sur C:**; 16 processeurs logiques et 32 Go de RAM. Réserver les sorties Cargo sur E: évite de charger le disque système. La première compilation Release pourrait prendre **de l'ordre de 1 à 3 heures** avec téléchargement des dépendances; c'est une estimation, pas une durée mesurée. La [CI Windows du même tag](https://raw.githubusercontent.com/openai/codex/rust-v0.154.0-alpha.6.2/.github/workflows/rust-release-windows.yml) prévoit un délai maximal de 90 minutes et note qu'une compilation Release peut dépasser une heure. La suffisance de CMake 3.26.4 pour ce graphe de dépendances reste à vérifier au premier build.
+
+## Route de compilation préparée
+
+Dans une session de développement x64, charger `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat`, ajouter `C:\Program Files\LLVM\bin`, les dossiers CMake et Ninja de Visual Studio 2022 BuildTools au `PATH`, puis définir `LIBCLANG_PATH=C:\Program Files\LLVM\bin`, `CC=C:\Program Files\LLVM\bin\clang.exe`, `CXX=C:\Program Files\LLVM\bin\clang++.exe`, `CARGO_TARGET_DIR=E:\Palimpseste\.runtime\codex-target-rust-v0.154.0-alpha.6.2` et `LIBSQLITE3_FLAGS=SQLITE_DISABLE_INTRINSIC` (ce dernier figure dans la [CI x64 officielle](https://raw.githubusercontent.com/openai/codex/rust-v0.154.0-alpha.6.2/.github/workflows/rust-release-windows.yml)). Le [script Windows officiel](https://github.com/openai/codex/blob/rust-v0.154.0-alpha.6.2/codex-rs/scripts/setup-windows.ps1) définit aussi `CC` et `CXX` vers Clang. Depuis `codex-rs` du clone, la commande ciblée est `cargo +1.95.0 build -p codex-cli --bin codex --release --locked`. Aucune de ces commandes de compilation n'a été exécutée pendant cet audit.

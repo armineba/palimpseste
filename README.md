@@ -6,7 +6,7 @@
 
 Pour reprendre la réalisation, commence par [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md), puis lis `prompts/00_AGENT_BUILD.md` et l'avenant `docs/05_OVERRIDE_LUNA_CODEX.md`. Pour ouvrir le jeu, utilise le projet [`game/`](game/) avec Unity 6000.3.24f1 et URP 17. Le Player Windows IL2CPP le plus récent est sous `game/Build/WindowsPlayerFlowOwnerFinal/` ; les ZIPs de [`deliverables/`](deliverables/) sont historiques et ne contiennent pas le parcours d'invitation et description A actuel.
 
-L'installation vérifiée, l'usage du lecteur, la provenance des assets, la recette humaine à remplir et les hashes des archives sont décrits dans [`docs/SETUP.md`](docs/SETUP.md), [`docs/MANUEL_JOUEUR.md`](docs/MANUEL_JOUEUR.md), [`docs/ASSETS_ET_LICENCES.md`](docs/ASSETS_ET_LICENCES.md), [`docs/RECETTE_FINALE.md`](docs/RECETTE_FINALE.md) et [`evidence/public/release-2026-09-19.md`](evidence/public/release-2026-09-19.md).
+Le [test possible maintenant](docs/TESTER_MAINTENANT.md), l'installation vérifiée, l'usage du lecteur, la provenance des assets, la recette humaine à remplir et les hashes des archives sont décrits dans [`docs/SETUP.md`](docs/SETUP.md), [`docs/MANUEL_JOUEUR.md`](docs/MANUEL_JOUEUR.md), [`docs/ASSETS_ET_LICENCES.md`](docs/ASSETS_ET_LICENCES.md), [`docs/RECETTE_FINALE.md`](docs/RECETTE_FINALE.md) et [`evidence/public/release-2026-09-19.md`](evidence/public/release-2026-09-19.md).
 
 Le transport a changé : Unity → API métier du jeu → worker → Codex non interactif sur le serveur, utilisant Luna → données validées → Unity. Ne construis pas l'ancien branchement Responses direct comme chemin principal.
 
