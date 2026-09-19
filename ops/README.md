@@ -28,6 +28,10 @@ une ACL propre au compte API. Garder l'archive extraite et tous les scripts
 `ops` inaccessibles au compte worker. La spécification du ZIP sert uniquement
 de source au provisionneur, qui installe sa copie contrôlée sous runtime.
 
+Avant de lancer le provisionneur avec -ApplyAcl, arreter le worker joueur.
+Le script ecrit runtime.env, copie la specification et pose ensuite les ACL;
+il ne doit pas courir en parallele d'une generation.
+
 ## Provisionner un profil dÃ©diÃ©
 
 Depuis une console dâ€™administration, aprÃ¨s avoir crÃ©Ã© le compte Windows de
@@ -48,13 +52,30 @@ service :
 Ãªtre le rÃ©pertoire du ZIP dÃ©ployÃ©. `SourceSpecRoot` peut Ãªtre `spec` dans ce
 ZIP ou les trois dossiers de spÃ©cification du dÃ©pÃ´t pendant un staging local.
 La commande Ã©crit `runtime.env`, un `codex-home` dÃ©diÃ©, les dossiers
-`attempts`, `inputs`, `evidence` et `logs`, ainsi quâ€™un manifeste. Si `SpecRoot`
+`attempts`, `inputs`, `evidence/pending`, `approved-evidence` et `logs`, ainsi quâ€™un manifeste. Si `SpecRoot`
 est la valeur runtime par defaut, elle copie seulement `contracts`, `prompts` et `reference` depuis `SourceSpecRoot` vers la racine deployee.
 Le service recoit
 RX sur la specification et le binaire Codex; l ACL lui refuse l arbre de
 dÃ©veloppement. Le fichier env ne contient aucun secret. Lâ€™authentification doit
 Ãªtre rÃ©alisÃ©e par lâ€™opÃ©rateur dans ce `CODEX_HOME` dÃ©diÃ©, sous le compte de
 service.
+
+La racine runtime, `runtime.env`, `provisioning-manifest.json`,
+`evidence` et `approved-evidence` sont en lecture seule pour le compte worker.
+Seul `evidence/pending` recoit ses sorties doctor. Apres revue, l'operateur
+copie la preuve approuvee dans `approved-evidence`, calcule le SHA-256 de
+cette copie, puis met a jour `runtime.env` en tant qu'administrateur. Le compte
+worker ne doit pouvoir supprimer aucun parent des fichiers approuves.
+
+Le provisionneur exige aussi que SPEC_ROOT et ARTIFACT_ROOT soient sous cette
+racine, dans deux dossiers distincts des dossiers reserves, et que le binaire
+Codex soit dans runtime/bin. Il reconstruit
+les ACL de chaque fichier runtime avec exactement SYSTEM, Administrateurs
+et le compte worker, afin qu'une ancienne autorisation de groupe ne rende
+pas la configuration ou une preuve modifiable par le service.
+Avant toute ecriture, le script refuse les reparses sur les chemins d'entree,
+la specification source/cible et les DACL protegees sous DevelopmentRoot, car
+un deny herite sur le depot ne couvrirait pas ces enfants.
 
 La racine runtime doit rester hors du dÃ©pÃ´t et hors des rÃ©pertoires utilisateur.
 Le worker doit Ãªtre lancÃ© avec le mÃªme compte que `PALIMPSESTE_SERVICE_USER`.
@@ -70,7 +91,7 @@ Le diagnostic local est gratuit et ne lance pas de tour modÃ¨le :
   -Mode local `
   -EnvFile 'E:\PalimpsesteRuntime\runtime.env' `
   -DoctorExecutable 'E:\PalimpsesteRuntime\bin\ProviderDoctor.exe' `
-  -EvidencePath 'E:\PalimpsesteRuntime\evidence\doctor-local.json'
+  -EvidencePath 'E:\PalimpsesteRuntime\evidence\pending\doctor-local.json'
 ```
 
 Le backend doit Ãªtre publiÃ© avant cette commande; elle appelle un exÃ©cutable
@@ -95,7 +116,7 @@ normaux :
   -ReferencePng 'E:\PalimpsesteRuntime\artifacts\reference.png' `
   -DrawingPng 'E:\PalimpsesteRuntime\artifacts\drawing.png' `
   -GeometryJson 'E:\PalimpsesteRuntime\artifacts\geometry.json' `
-  -EvidencePath 'E:\PalimpsesteRuntime\evidence\doctor-active.json'
+  -EvidencePath 'E:\PalimpsesteRuntime\evidence\pending\doctor-active.json'
 ```
 
 Le mode actif exige que les fichiers soient sous les racines dÃ©clarÃ©es, envoie
@@ -103,7 +124,8 @@ les deux images Ã  A puis la description figÃ©e Ã  B, valide les versions 
 schÃ©ma et archive les rÃ©pertoires de tentative. Il nâ€™est jamais appelÃ© par les
 routes `/health`.
 
-AprÃ¨s un actif rÃ©ussi, lâ€™opÃ©rateur calcule le SHA-256 du JSON dâ€™Ã©vidence et
+Apres un actif reussi, l'operateur examine les preuves A/B et l'attestation
+fournisseur, copie le JSON dans `approved-evidence`, calcule le SHA-256 de la copie et
 inscrit son chemin, ce hash et `PALIMPSESTE_EFFORT_VERIFIED=true` dans le
 fichier env externe. Le worker exige alors que le JSON contienne A et B rÃ©ussis,
 le compte de service attendu, le modÃ¨le demandÃ© et `reported_effort=max`; un
@@ -203,7 +225,7 @@ le deplacement du staging valide.
 Pour activer la porte features apres revue du doctor local :
 
 ```powershell
-$evidence = 'E:\PalimpsesteRuntime\evidence\doctor-local-sha-service.json'
+$evidence = 'E:\PalimpsesteRuntime\approved-evidence\doctor-local-sha-service.json'
 $hash = (Get-FileHash -LiteralPath $evidence -Algorithm SHA256).Hash.ToLowerInvariant()
 # Verifier aussi que cli_executable_sha256 egale le hash du codex.exe deploye.
 # Reporter ces trois valeurs dans runtime.env hors du depot.

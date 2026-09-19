@@ -26,6 +26,31 @@ function Test-PathInside([string]$Candidate, [string]$Root) {
     return $candidateFull.StartsWith($rootFull + '\', [StringComparison]::OrdinalIgnoreCase)
 }
 
+function Assert-NoReparsePath([string]$PathValue) {
+    $current = Resolve-FullPath $PathValue
+    $driveRoot = [IO.Path]::GetPathRoot($current)
+    while ($true) {
+        if (Test-Path -LiteralPath $current) {
+            $item = Get-Item -LiteralPath $current -Force
+            if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                throw "Reparse point interdit avant provisionnement : $current"
+            }
+        }
+        if ([string]::Equals($current, $driveRoot, [StringComparison]::OrdinalIgnoreCase)) { break }
+        $current = [IO.Path]::GetDirectoryName($current.TrimEnd('\', '/'))
+        if ([string]::IsNullOrWhiteSpace($current)) { break }
+    }
+}
+
+function Assert-NoReparseTree([string]$RootPath) {
+    if (-not (Test-Path -LiteralPath $RootPath -PathType Container)) { return }
+    foreach ($item in Get-ChildItem -LiteralPath $RootPath -Force -Recurse) {
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Reparse point interdit dans l'arbre à copier/protéger : $($item.FullName)"
+        }
+    }
+}
+
 if (-not [string]::IsNullOrWhiteSpace($ProjectRoot) -and -not [string]::IsNullOrWhiteSpace($DevelopmentRoot) -and
     -not [string]::Equals((Resolve-FullPath $ProjectRoot), (Resolve-FullPath $DevelopmentRoot), [StringComparison]::OrdinalIgnoreCase)) {
     throw 'ProjectRoot et DevelopmentRoot désignent deux arbres différents.'
@@ -56,15 +81,25 @@ foreach ($directory in @('contracts', 'prompts', 'reference')) {
         throw "SourceSpecRoot incomplet : $(Join-Path $SourceSpecRoot $directory)"
     }
 }
+if ((Test-PathInside $SourceSpecRoot $RuntimeRoot) -or (Test-PathInside $RuntimeRoot $SourceSpecRoot)) {
+    throw 'SourceSpecRoot ne doit pas recouvrir la racine runtime.'
+}
 if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
     $ArtifactRoot = Join-Path $RuntimeRoot 'artifacts'
 } else {
     $ArtifactRoot = Resolve-FullPath $ArtifactRoot
 }
 if (Test-PathInside $ArtifactRoot $ProjectRoot) { throw "ARTIFACT_ROOT doit être hors du dépôt : $ArtifactRoot" }
+if (-not (Test-PathInside $ArtifactRoot $RuntimeRoot)) {
+    throw "ARTIFACT_ROOT doit être sous la racine runtime pour recevoir son ACL dédiée : $ArtifactRoot"
+}
+if ([string]::Equals($ArtifactRoot.TrimEnd('\', '/'), $RuntimeRoot.TrimEnd('\', '/'),
+        [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'ARTIFACT_ROOT ne peut pas être la racine runtime : celle-ci doit rester en lecture seule pour le worker.'
+}
 
-if (Test-PathInside $RuntimeRoot $ProjectRoot) {
-    throw "La racine runtime doit être hors du dépôt : $RuntimeRoot"
+if ((Test-PathInside $RuntimeRoot $ProjectRoot) -or (Test-PathInside $ProjectRoot $RuntimeRoot)) {
+    throw "La racine runtime et l'arbre de développement ne doivent pas se contenir : $RuntimeRoot"
 }
 
 if ([string]::IsNullOrWhiteSpace($SpecRoot)) {
@@ -74,6 +109,9 @@ if ([string]::IsNullOrWhiteSpace($SpecRoot)) {
 }
 if (Test-PathInside $SpecRoot $ProjectRoot) {
     throw "SPEC_ROOT must be deployed outside the development tree: $SpecRoot"
+}
+if (-not (Test-PathInside $SpecRoot $RuntimeRoot)) {
+    throw "SPEC_ROOT doit être sous la racine runtime pour recevoir son ACL dédiée : $SpecRoot"
 }
 if ((Test-PathInside $SpecRoot $RuntimeRoot) -and -not (Test-PathInside $RuntimeRoot $SpecRoot)) {
     # A runtime-local specification is staged from known non-secret contract
@@ -94,17 +132,75 @@ $CodexExecutable = Resolve-FullPath $CodexExecutable
 if (-not (Test-Path -LiteralPath $CodexExecutable -PathType Leaf)) {
     throw "Exécutable Codex absent : $CodexExecutable"
 }
+if (-not (Test-PathInside $CodexExecutable (Join-Path $RuntimeRoot 'bin'))) {
+    throw "Le binaire Codex doit être dans runtime/bin pour recevoir une ACL en lecture seule : $CodexExecutable"
+}
 
 $codexHome = Join-Path $RuntimeRoot 'codex-home'
 $attemptRoot = Join-Path $RuntimeRoot 'attempts'
 $evidenceRoot = Join-Path $RuntimeRoot 'evidence'
+$pendingEvidenceRoot = Join-Path $evidenceRoot 'pending'
+$approvedEvidenceRoot = Join-Path $RuntimeRoot 'approved-evidence'
 $inputRoot = Join-Path $RuntimeRoot 'inputs'
 $logsRoot = Join-Path $RuntimeRoot 'logs'
 $configPath = Join-Path $codexHome 'config.toml'
 $envPath = Join-Path $RuntimeRoot 'runtime.env'
 $manifestPath = Join-Path $RuntimeRoot 'provisioning-manifest.json'
 
-foreach ($directory in @($RuntimeRoot, $codexHome, $attemptRoot, $evidenceRoot, $inputRoot, $logsRoot, $ArtifactRoot)) {
+if (Test-PathInside $SpecRoot $RuntimeRoot) {
+    if ([string]::Equals($SpecRoot.TrimEnd('\', '/'), $RuntimeRoot.TrimEnd('\', '/'),
+            [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'SPEC_ROOT ne peut pas être la racine runtime.'
+    }
+    foreach ($reserved in @($codexHome, $attemptRoot, $evidenceRoot, $approvedEvidenceRoot, $inputRoot, $logsRoot, $ArtifactRoot, (Join-Path $RuntimeRoot 'bin'))) {
+        if ((Test-PathInside $SpecRoot $reserved) -or (Test-PathInside $reserved $SpecRoot)) {
+            throw "SPEC_ROOT recouvre un dossier runtime réservé : $reserved"
+        }
+    }
+}
+if (Test-PathInside $ArtifactRoot $RuntimeRoot) {
+    foreach ($reserved in @($codexHome, $attemptRoot, $evidenceRoot, $approvedEvidenceRoot, $inputRoot, $logsRoot, (Join-Path $RuntimeRoot 'bin'))) {
+        if ((Test-PathInside $ArtifactRoot $reserved) -or (Test-PathInside $reserved $ArtifactRoot)) {
+            throw "ARTIFACT_ROOT recouvre un dossier runtime réservé : $reserved"
+        }
+    }
+}
+$codexDirectory = Split-Path -Parent $CodexExecutable
+if (Test-PathInside $codexDirectory $RuntimeRoot) {
+    if ([string]::Equals($codexDirectory.TrimEnd('\', '/'), $RuntimeRoot.TrimEnd('\', '/'),
+            [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Le binaire Codex doit être dans un sous-dossier runtime en lecture seule.'
+    }
+    foreach ($writable in @($codexHome, $attemptRoot, $pendingEvidenceRoot, $logsRoot, $ArtifactRoot)) {
+        if ((Test-PathInside $codexDirectory $writable) -or (Test-PathInside $writable $codexDirectory)) {
+            throw "Le dossier du binaire Codex recouvre un dossier runtime inscriptible : $writable"
+        }
+    }
+}
+
+# Reject junctions and symlinks before creating directories, copying the
+# specification or writing runtime.env. These paths are operator inputs, not
+# player data, but following one could overwrite a file outside runtime.
+foreach ($pathToCheck in @($RuntimeRoot, $DevelopmentRoot, $SourceSpecRoot,
+        $SpecRoot, $ArtifactRoot, $CodexExecutable, $codexHome, $attemptRoot,
+        $evidenceRoot, $pendingEvidenceRoot, $approvedEvidenceRoot, $inputRoot,
+        $logsRoot, $configPath, $envPath, $manifestPath)) {
+    Assert-NoReparsePath $pathToCheck
+}
+foreach ($directory in @('contracts', 'prompts', 'reference')) {
+    Assert-NoReparseTree (Join-Path $SourceSpecRoot $directory)
+}
+Assert-NoReparseTree $SpecRoot
+foreach ($child in Get-ChildItem -LiteralPath $DevelopmentRoot -Force -Recurse) {
+    if (($child.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Reparse point interdit sous DevelopmentRoot : $($child.FullName)"
+    }
+    if ((Get-Acl -LiteralPath $child.FullName).AreAccessRulesProtected) {
+        throw "DACL protégée sous DevelopmentRoot : le deny hérité n'atteindrait pas $($child.FullName)"
+    }
+}
+
+foreach ($directory in @($RuntimeRoot, $codexHome, $attemptRoot, $evidenceRoot, $pendingEvidenceRoot, $approvedEvidenceRoot, $inputRoot, $logsRoot, $ArtifactRoot)) {
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
 }
 
@@ -221,11 +317,49 @@ if ($ApplyAcl) {
     } catch {
         throw "Le compte de service '$ServiceUser' n'est pas résolu. Créer/provisionner ce compte avant -ApplyAcl."
     }
-    # Prefix a raw SID with '*' so icacls does not try to resolve it as a
-    # localized account name.
-    $serviceGrant = '*{0}:(OI)(CI)(M)' -f $principal
-    & icacls.exe $RuntimeRoot /inheritance:r /grant:r $serviceGrant '*S-1-5-18:(OI)(CI)(F)' '*S-1-5-32-544:(OI)(CI)(F)' | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw "icacls a échoué avec le code $LASTEXITCODE" }
+    function Set-StrictRuntimeAcl([string]$PathValue, [string]$ServiceSid, [string]$ServiceMode) {
+        $item = Get-Item -LiteralPath $PathValue -Force
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Refus ACL: reparse point at $PathValue"
+        }
+        $acl = Get-Acl -LiteralPath $item.FullName
+        $acl.SetAccessRuleProtection($true, $false)
+        # /grant:r replaces only the named principal; another explicit group
+        # grant could still give the service write access. Rebuild this DACL
+        # from exactly three SIDs instead.
+        foreach ($rule in @($acl.Access)) {
+            $acl.PurgeAccessRules($rule.IdentityReference)
+        }
+        $inheritance = if ($item.PSIsContainer) {
+            [Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [Security.AccessControl.InheritanceFlags]::ObjectInherit
+        } else { [Security.AccessControl.InheritanceFlags]::None }
+        $rights = switch ($ServiceMode) {
+            'read' { [Security.AccessControl.FileSystemRights]::ReadAndExecute }
+            'write' { [Security.AccessControl.FileSystemRights]::Modify }
+            default { throw "Unknown service ACL mode: $ServiceMode" }
+        }
+        foreach ($entry in @(
+            @('S-1-5-18', [Security.AccessControl.FileSystemRights]::FullControl),
+            @('S-1-5-32-544', [Security.AccessControl.FileSystemRights]::FullControl),
+            @($ServiceSid, $rights)
+        )) {
+            $sid = [Security.Principal.SecurityIdentifier]::new([string]$entry[0])
+            $accessRule = [Security.AccessControl.FileSystemAccessRule]::new(
+                $sid, [Security.AccessControl.FileSystemRights]$entry[1], $inheritance,
+                [Security.AccessControl.PropagationFlags]::None,
+                [Security.AccessControl.AccessControlType]::Allow)
+            $acl.AddAccessRule($accessRule)
+        }
+        if ($ServiceMode -eq 'read') {
+            # An owner can normally rewrite the DACL even without WRITE_DAC.
+            $acl.SetOwner([Security.Principal.SecurityIdentifier]::new('S-1-5-32-544'))
+        }
+        Set-Acl -LiteralPath $item.FullName -AclObject $acl
+    }
+    # The top-level directory must not grant Modify/DeleteChild: otherwise a
+    # worker could replace runtime.env or an operator-approved evidence file
+    # even when that individual file has a read-only ACL.
+    Set-StrictRuntimeAcl $RuntimeRoot $principal 'read'
 
     function Set-ReadOnlyRuntimeTree([string]$RootPath, [string]$ServiceSid) {
         $rootItem = Get-Item -LiteralPath $RootPath -Force
@@ -238,15 +372,53 @@ if ($ApplyAcl) {
                 ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
                 throw "Refus ACL read-only: path outside tree or reparse point at $($item.FullName)"
             }
-            $serviceRead = if ($item.PSIsContainer) { '*{0}:(OI)(CI)(RX)' -f $ServiceSid } else { '*{0}:(RX)' -f $ServiceSid }
-            $adminFull = if ($item.PSIsContainer) { '*S-1-5-32-544:(OI)(CI)(F)' } else { '*S-1-5-32-544:F' }
-            $systemFull = if ($item.PSIsContainer) { '*S-1-5-18:(OI)(CI)(F)' } else { '*S-1-5-18:F' }
-            & icacls.exe $item.FullName /inheritance:r /grant:r $systemFull $adminFull $serviceRead /C | Out-Null
-            if ($LASTEXITCODE -ne 0) { throw "icacls read-only setup failed: $($item.FullName)" }
+            Set-StrictRuntimeAcl $item.FullName $ServiceSid 'read'
         }
     }
+    function Set-WritableRuntimeTree([string]$RootPath, [string]$ServiceSid) {
+        if (-not (Test-PathInside $RootPath $RuntimeRoot) -or
+            [string]::Equals((Resolve-FullPath $RootPath), $RuntimeRoot, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refus ACL writable: outside runtime or runtime root at $RootPath"
+        }
+        $rootItem = Get-Item -LiteralPath $RootPath -Force
+        if (($rootItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Refus ACL writable: reparse point at $RootPath"
+        }
+        $items = @($rootItem) + @(Get-ChildItem -LiteralPath $rootItem.FullName -Force -Recurse)
+        foreach ($item in $items) {
+            if (-not (Test-PathInside $item.FullName $rootItem.FullName) -or
+                ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                throw "Refus ACL writable: path outside tree or reparse point at $($item.FullName)"
+            }
+            Set-StrictRuntimeAcl $item.FullName $ServiceSid 'write'
+        }
+    }
+    function Set-ReadOnlyRuntimeFile([string]$FilePath, [string]$ServiceSid) {
+        $full = Resolve-FullPath $FilePath
+        if (-not (Test-PathInside $full $RuntimeRoot) -or
+            -not (Test-Path -LiteralPath $full -PathType Leaf)) {
+            throw "Refus ACL read-only: file outside runtime or absent at $full"
+        }
+        $item = Get-Item -LiteralPath $full -Force
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Refus ACL read-only: reparse point at $full"
+        }
+        Set-StrictRuntimeAcl $full $ServiceSid 'read'
+    }
+    # Seal every pre-existing child, including an unexpected file at the
+    # runtime root, before reopening only the named working subtrees.
+    Set-ReadOnlyRuntimeTree $RuntimeRoot $principal
     Set-ReadOnlyRuntimeTree $SpecRoot $principal
-    $codexDirectory = Split-Path -Parent $CodexExecutable
+    Set-ReadOnlyRuntimeTree $approvedEvidenceRoot $principal
+    Set-ReadOnlyRuntimeTree $evidenceRoot $principal
+    Set-ReadOnlyRuntimeTree $inputRoot $principal
+    foreach ($writableRoot in @($codexHome, $attemptRoot, $pendingEvidenceRoot, $logsRoot)) {
+        Set-WritableRuntimeTree $writableRoot $principal
+    }
+    if (Test-PathInside $ArtifactRoot $RuntimeRoot) {
+        Set-WritableRuntimeTree $ArtifactRoot $principal
+    }
+    Set-ReadOnlyRuntimeFile $envPath $principal
     if (Test-PathInside $codexDirectory $RuntimeRoot) {
         Set-ReadOnlyRuntimeTree $codexDirectory $principal
     }
@@ -270,6 +442,8 @@ $manifest = [ordered]@{
     codex_home = $codexHome
     attempt_root = $attemptRoot
     evidence_root = $evidenceRoot
+    pending_evidence_root = $pendingEvidenceRoot
+    approved_evidence_root = $approvedEvidenceRoot
     operator_input_root = $inputRoot
     artifact_root = $ArtifactRoot
     specification_root = $SpecRoot
@@ -283,6 +457,9 @@ $manifest = [ordered]@{
     runtime_execution_tools = $false
     acl_applied = [bool]$ApplyAcl
     specification_service_write_access = -not [bool]$ApplyAcl
+    runtime_root_service_read_only = [bool]$ApplyAcl
+    approved_evidence_service_read_only = [bool]$ApplyAcl
+    pending_evidence_service_writable = [bool]$ApplyAcl
     runtime_codex_binary_read_only = [bool]($ApplyAcl -and (Test-PathInside (Split-Path -Parent $CodexExecutable) $RuntimeRoot))
     development_tree_denied_to_service = [bool]$ApplyAcl
     auth_provisioning = 'operator_action_required_in_dedicated_CODEX_HOME'
@@ -295,6 +472,7 @@ $manifest = [ordered]@{
     )
 }
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+if ($ApplyAcl) { Set-ReadOnlyRuntimeFile $manifestPath $principal }
 
 Write-Output ("Runtime provisionné dans {0}. Env sans secret : {1}." -f $RuntimeRoot, $envPath)
 if (-not $ApplyAcl) {
