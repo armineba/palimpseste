@@ -1,0 +1,130 @@
+{
+  "schema_version": "sp.description/1.0",
+  "title": "Braise en sillage",
+  "summary": "Une braise suit une courbe et frappe un adversaire. Son premier impact laisse une empreinte qui entretient une brûlure sur les adversaires présents.",
+  "observations": [
+    {
+      "id": "o1",
+      "region": "core",
+      "visible_feature": "Marque rouge anguleuse dans le noyau.",
+      "interpretation": "Matière de braise et contact offensif."
+    },
+    {
+      "id": "o2",
+      "region": "ring",
+      "visible_feature": "Arc courbe dans la couronne.",
+      "interpretation": "Déplacement courbe du porteur."
+    },
+    {
+      "id": "o3",
+      "region": "outer",
+      "visible_feature": "Motif périphérique étendu.",
+      "interpretation": "Persistance localisée après le contact."
+    }
+  ],
+  "clauses": [
+    {
+      "id": "c1",
+      "subject_id": "s0",
+      "kind": "mechanical",
+      "text": "Un projectile de braise se déplace sur une courbe et inflige des dégâts à un adversaire au contact.",
+      "observation_ids": [
+        "o1",
+        "o2"
+      ],
+      "facts": [
+        {
+          "dimension": "carrier",
+          "value": "projectile"
+        },
+        {
+          "dimension": "effect",
+          "value": "damage"
+        },
+        {
+          "dimension": "target",
+          "value": "hostile"
+        },
+        {
+          "dimension": "motion",
+          "value": "curve"
+        },
+        {
+          "dimension": "event",
+          "value": "hit"
+        },
+        {
+          "dimension": "affinity",
+          "value": "fire"
+        },
+        {
+          "dimension": "pattern",
+          "value": "solid"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "subject_id": "s1",
+      "kind": "mechanical",
+      "text": "Le premier contact du projectile crée un champ immobile qui brûle périodiquement les adversaires présents.",
+      "observation_ids": [
+        "o1",
+        "o3"
+      ],
+      "facts": [
+        {
+          "dimension": "carrier",
+          "value": "field"
+        },
+        {
+          "dimension": "effect",
+          "value": "burn"
+        },
+        {
+          "dimension": "target",
+          "value": "hostile"
+        },
+        {
+          "dimension": "motion",
+          "value": "stationary"
+        },
+        {
+          "dimension": "event",
+          "value": "tick"
+        },
+        {
+          "dimension": "affinity",
+          "value": "fire"
+        },
+        {
+          "dimension": "pattern",
+          "value": "solid"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source_subject_id": "s0",
+      "event": "hit",
+      "target_subject_id": "s1",
+      "max_activations": 1,
+      "clause_ids": [
+        "c2"
+      ]
+    }
+  ],
+  "shape_requests": [
+    {
+      "subject_id": "s0",
+      "region": "ring",
+      "role": "path"
+    },
+    {
+      "subject_id": "s1",
+      "region": "outer",
+      "role": "footprint"
+    }
+  ]
+}

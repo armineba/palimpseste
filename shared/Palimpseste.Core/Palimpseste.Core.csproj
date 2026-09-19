@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Palimpseste.Contracts/Palimpseste.Contracts.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <EmbeddedResource Include="../../contracts/spell-description.schema.json" LogicalName="Palimpseste.Core.Schemas.spell-description.schema.json" />
+    <EmbeddedResource Include="../../contracts/spell-plan.schema.json" LogicalName="Palimpseste.Core.Schemas.spell-plan.schema.json" />
+    <EmbeddedResource Include="../../contracts/geometry.schema.json" LogicalName="Palimpseste.Core.Schemas.geometry.schema.json" />
+    <EmbeddedResource Include="../../contracts/compiled-spell.schema.json" LogicalName="Palimpseste.Core.Schemas.compiled-spell.schema.json" />
+  </ItemGroup>
+</Project>

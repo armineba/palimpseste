@@ -1,0 +1,20 @@
+{
+  "kind": "synthetic_review_http_smoke",
+  "date_utc": "2026-09-19",
+  "database": "palimpseste_test",
+  "api_url": "http://127.0.0.1:18104",
+  "script": "tests/review_http_smoke.py",
+  "script_sha256": "159ff461e18a4c7f17ed4d82c1fe1d2540da5d0ea0e764fae9fdb84e0586d168",
+  "result": "passed",
+  "checks": [
+    "submitted_by_human_false_rejected_422",
+    "unknown_spell_rejected_404",
+    "synthetic_review_created_201",
+    "identical_request_replayed_201_same_id",
+    "same_idempotency_key_changed_payload_rejected_409",
+    "exactly_one_row_then_cleanup_zero_rows"
+  ],
+  "model_calls_executed": false,
+  "human_review_performed": false,
+  "fixture_data_removed": true
+}

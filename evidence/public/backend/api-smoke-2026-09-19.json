@@ -1,0 +1,15 @@
+{
+  "script": "tests/api_http_smoke.py",
+  "target_database": "palimpseste_test",
+  "result": "passed",
+  "checks": 16,
+  "cleanup": "completed",
+  "parchment_id": "17dc6198c65346b889d200e56b56e56d",
+  "job_id": "7f3e0f6e4faf4038a7ac7f0abc802d7a",
+  "post_cleanup_counts": {
+    "jobs": 0,
+    "captures": 0,
+    "parchments": 0,
+    "artifacts": 1
+  }
+}

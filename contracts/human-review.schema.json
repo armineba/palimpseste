@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://palimpseste.invalid/contracts/human-review.schema.json",
+  "title": "human-review",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "sp.review/1.0"
+    },
+    "case_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+    },
+    "spell_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "reviewer_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "submitted_by_human": {
+      "const": true
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "changes_requested",
+        "rejected"
+      ]
+    },
+    "build_commit": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "capture_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "description_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "plan_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "compiled_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "judgements": {
+      "type": "object",
+      "properties": {
+        "drawing_fidelity": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "uncertain"
+          ]
+        },
+        "mechanical_coherence": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "uncertain"
+          ]
+        },
+        "visual_identity": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "uncertain"
+          ]
+        },
+        "presentation": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "uncertain"
+          ]
+        }
+      },
+      "required": [
+        "drawing_fidelity",
+        "mechanical_coherence",
+        "visual_identity",
+        "presentation"
+      ],
+      "additionalProperties": false
+    },
+    "comment": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "evidence_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "minItems": 1,
+      "maxItems": 32
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema_version",
+    "case_id",
+    "spell_id",
+    "reviewer_id",
+    "submitted_by_human",
+    "verdict",
+    "build_commit",
+    "capture_sha256",
+    "description_sha256",
+    "plan_sha256",
+    "compiled_sha256",
+    "judgements",
+    "comment",
+    "evidence_files",
+    "created_at"
+  ],
+  "additionalProperties": false
+}

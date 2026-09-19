@@ -1,0 +1,102 @@
+{
+  "schema_version": "sp.plan/1.0",
+  "description_sha256": "8f4907183f6ed4e1edfe43f49b9bc2021abd8943cf87b111993d52c4cd62296a",
+  "catalog_version": "sp.capabilities/1.0",
+  "rules_profile": "lab_v1",
+  "nodes": [
+    {
+      "node_id": "p0",
+      "subject_id": "s0",
+      "clause_ids": [
+        "c1"
+      ],
+      "carrier": "projectile",
+      "activation": {
+        "parent_id": null,
+        "event": "cast",
+        "delay_ticks": 0,
+        "max_activations": 1,
+        "copies": 1,
+        "spread_mdeg": 0
+      },
+      "anchor": "caster",
+      "geometry_id": "ring.path.0",
+      "scale_cm": 400,
+      "rotation_mdeg": 0,
+      "appearance": {
+        "affinity": "fire",
+        "pattern": "solid",
+        "signature_geometry_id": "full.silhouette.0"
+      },
+      "effects": [
+        {
+          "id": "e0",
+          "clause_ids": [
+            "c1"
+          ],
+          "event": "hit",
+          "kind": "damage",
+          "target_filter": "hostile",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ],
+      "options": {
+        "lifetime_ticks": 125,
+        "range_cm": 2000,
+        "speed_cm_s": 1200,
+        "radius_cm": 15,
+        "motion": "curve",
+        "turn_mdeg_s": 0,
+        "contact_filter": "hostile",
+        "bounces": 0,
+        "pierces": 0
+      }
+    },
+    {
+      "node_id": "f1",
+      "subject_id": "s1",
+      "clause_ids": [
+        "c2"
+      ],
+      "carrier": "field",
+      "activation": {
+        "parent_id": "p0",
+        "event": "hit",
+        "delay_ticks": 0,
+        "max_activations": 1,
+        "copies": 1,
+        "spread_mdeg": 0
+      },
+      "anchor": "parent_event",
+      "geometry_id": "outer.footprint.0",
+      "scale_cm": 350,
+      "rotation_mdeg": 0,
+      "appearance": {
+        "affinity": "fire",
+        "pattern": "solid",
+        "signature_geometry_id": "full.silhouette.0"
+      },
+      "effects": [
+        {
+          "id": "e1",
+          "clause_ids": [
+            "c2"
+          ],
+          "event": "tick",
+          "kind": "burn",
+          "target_filter": "hostile",
+          "amount": 2000,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ],
+      "options": {
+        "lifetime_ticks": 200,
+        "height_cm": 180,
+        "tick_interval": 25
+      }
+    }
+  ]
+}

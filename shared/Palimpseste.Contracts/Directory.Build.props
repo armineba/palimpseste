@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)..\..\.runtime\contracts-bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\..\.runtime\contracts-obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

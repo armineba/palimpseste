@@ -1,0 +1,10 @@
+{
+  "name": "Palimpseste.Game.Editor",
+  "rootNamespace": "Palimpseste.Game.Editor",
+  "references": ["Palimpseste.Game"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "allowUnsafeCode": false
+}

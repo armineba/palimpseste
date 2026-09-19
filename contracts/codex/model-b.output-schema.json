@@ -1,0 +1,1090 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "sp.plan/1.0"
+    },
+    "description_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "catalog_version": {
+      "const": "sp.capabilities/1.0"
+    },
+    "rules_profile": {
+      "const": "lab_v1"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/node_projectile"
+          },
+          {
+            "$ref": "#/$defs/node_beam"
+          },
+          {
+            "$ref": "#/$defs/node_field"
+          },
+          {
+            "$ref": "#/$defs/node_pulse"
+          },
+          {
+            "$ref": "#/$defs/node_barrier"
+          },
+          {
+            "$ref": "#/$defs/node_trap"
+          }
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 16
+    }
+  },
+  "required": [
+    "schema_version",
+    "description_sha256",
+    "catalog_version",
+    "rules_profile",
+    "nodes"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "activation": {
+      "type": "object",
+      "properties": {
+        "parent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 64
+        },
+        "event": {
+          "type": "string",
+          "enum": [
+            "cast",
+            "hit",
+            "expire",
+            "trigger",
+            "tick",
+            "block",
+            "enter"
+          ]
+        },
+        "delay_ticks": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 250
+        },
+        "max_activations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "copies": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "spread_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 180000
+        }
+      },
+      "required": [
+        "parent_id",
+        "event",
+        "delay_ticks",
+        "max_activations",
+        "copies",
+        "spread_mdeg"
+      ],
+      "additionalProperties": false
+    },
+    "effect": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "event": {
+          "type": "string",
+          "enum": [
+            "spawn",
+            "hit",
+            "enter",
+            "tick",
+            "trigger",
+            "block",
+            "expire"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "damage",
+            "heal",
+            "impulse",
+            "burn",
+            "wet",
+            "slow"
+          ]
+        },
+        "target_filter": {
+          "type": "string",
+          "enum": [
+            "hostile",
+            "ally",
+            "self",
+            "all_actors",
+            "environment"
+          ]
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500000
+        },
+        "duration_ticks": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "none",
+            "outward",
+            "inward",
+            "forward",
+            "up"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "clause_ids",
+        "event",
+        "kind",
+        "target_filter",
+        "amount",
+        "duration_ticks",
+        "direction"
+      ],
+      "additionalProperties": false
+    },
+    "node_projectile": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "projectile"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "signature_geometry_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "range_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3000
+            },
+            "speed_cm_s": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 6000
+            },
+            "radius_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "motion": {
+              "type": "string",
+              "enum": [
+                "straight",
+                "curve",
+                "homing"
+              ]
+            },
+            "turn_mdeg_s": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 360000
+            },
+            "contact_filter": {
+              "type": "string",
+              "enum": [
+                "hostile",
+                "ally",
+                "self",
+                "all_actors",
+                "environment"
+              ]
+            },
+            "bounces": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "pierces": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "range_cm",
+            "speed_cm_s",
+            "radius_cm",
+            "motion",
+            "turn_mdeg_s",
+            "contact_filter",
+            "bounces",
+            "pierces"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "node_beam": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "beam"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "signature_geometry_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "range_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3000
+            },
+            "width_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "tick_interval": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "chain_hops": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "chain_radius_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 600
+            },
+            "chain_filter": {
+              "type": "string",
+              "enum": [
+                "hostile",
+                "ally",
+                "self",
+                "all_actors",
+                "environment"
+              ]
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "range_cm",
+            "width_cm",
+            "tick_interval",
+            "chain_hops",
+            "chain_radius_cm",
+            "chain_filter"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "node_field": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "field"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "signature_geometry_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "height_cm": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 300
+            },
+            "tick_interval": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 50
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "height_cm",
+            "tick_interval"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "node_pulse": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "pulse"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "signature_geometry_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 250
+            },
+            "radius_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1200
+            },
+            "front_width_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "radius_cm",
+            "front_width_cm"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "node_barrier": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "barrier"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "signature_geometry_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "height_cm": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 400
+            },
+            "thickness_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "structure_milli": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500000
+            },
+            "block_limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "height_cm",
+            "thickness_cm",
+            "structure_milli",
+            "block_limit"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "node_trap": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "trap"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "signature_geometry_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "arm_ticks": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 250
+            },
+            "trigger_limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            },
+            "rearm_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 250
+            },
+            "trigger_filter": {
+              "type": "string",
+              "enum": [
+                "hostile",
+                "ally",
+                "self",
+                "all_actors",
+                "environment"
+              ]
+            },
+            "height_cm": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 300
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "arm_ticks",
+            "trigger_limit",
+            "rearm_ticks",
+            "trigger_filter",
+            "height_cm"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,26 @@
+﻿{
+    "kind":  "provider_doctor_local_public_summary",
+    "observed_at":  "2026-09-19T18:35:06.6193305+00:00",
+    "full_evidence_sha256":  "cbcac15a6fcd55eb73f244bb225bf443c836469f7f2da1f1a003366ab00ffa93",
+    "service_identity":  "PalRuntimeSvc",
+    "expected_service_identity":  "PalRuntimeSvc",
+    "cli_version":  "codex-cli 0.154.0-alpha.6.2",
+    "cli_version_status":  "ok",
+    "exec_help_status":  "ok",
+    "disable_flag_parser_status":  "ok",
+    "feature_list_status":  "ok",
+    "exposed_tools_disabled_observed":  true,
+    "active_internal_features":  [
+                                     "unified_exec"
+                                 ],
+    "dedicated_auth":  "not_authenticated",
+    "requested_model":  "gpt-5.6-luna",
+    "requested_effort":  "max",
+    "active_test_issues":  [
+
+                           ],
+    "production_issues":  [
+                              "effort_not_verified"
+                          ],
+    "model_calls_executed":  false
+}

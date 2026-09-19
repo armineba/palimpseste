@@ -1,0 +1,13 @@
+{
+  "schema_version": "sp.geometry/1.0",
+  "geometry_id": "outer.footprint.0",
+  "source_region": "outer",
+  "kind": "footprint",
+  "points": [],
+  "mask_file": "outer_mask.png",
+  "width_px": 512,
+  "height_px": 512,
+  "source_pixel_sha256": "c0ab8db450d29cc894f3a78e92a88be815d0b49e26380b4c6566759d06fbcd13",
+  "algorithm": "illustrative_fixture_not_extracted",
+  "notes": "Fixture manuelle de contrat. La géométrie n’est pas une sortie mesurée du résolveur et le dessin ne constitue pas un journal de capture de production."
+}

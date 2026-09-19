@@ -1,0 +1,11 @@
+﻿{
+    "schema_version":  "sp.restore-report/1.0",
+    "checked_at_utc":  "2026-09-19T17:37:22.3583092Z",
+    "source_database":  "palimpseste_backup_source",
+    "target_database":  "palimpseste_restore_test",
+    "dump_sha256":  "76d984030ef90bddd402631dbc5173f1451872075b3417c402bfc186f7536c12",
+    "artifacts_in_backup":  10,
+    "artifacts_verified_against_db":  4,
+    "rows_parchments_captures_jobs_spells":  "1|1|1|0",
+    "result":  "passed"
+}

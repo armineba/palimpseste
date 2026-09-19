@@ -1,0 +1,30 @@
+{
+  "id": "three_regions_v1",
+  "width": 1024,
+  "height": 1024,
+  "origin": "top_left",
+  "coordinate_max": 65535,
+  "reference_file": "reference_layout.png",
+  "reference_file_sha256": "54320124ebb110898f5d0337fc2ff128c80a03165dbf414c7d9715f9ad8009e5",
+  "regions": [
+    {
+      "id": "core",
+      "rho_min_inclusive": 0,
+      "rho_max_exclusive": 0.32,
+      "role_hint": "matière et effet"
+    },
+    {
+      "id": "ring",
+      "rho_min_inclusive": 0.32,
+      "rho_max_exclusive": 0.68,
+      "role_hint": "distribution et déploiement"
+    },
+    {
+      "id": "outer",
+      "rho_min_inclusive": 0.68,
+      "rho_max_inclusive": 1,
+      "role_hint": "comportement et déclenchement"
+    }
+  ],
+  "notes": "Proposition P04. Ce guide spatial n’est pas un preset de sort. L’association sémantique est interprétée par le modèle, pas classifiée par le rasteriseur."
+}

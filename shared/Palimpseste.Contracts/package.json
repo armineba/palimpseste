@@ -1,0 +1,7 @@
+{
+  "name": "com.palimpseste.contracts",
+  "version": "1.0.0",
+  "displayName": "Palimpseste Contracts",
+  "description": "Versioned spell data contracts shared with the service",
+  "unity": "6000.3"
+}

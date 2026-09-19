@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://palimpseste.invalid/contracts/drawing-capture.schema.json",
+  "title": "drawing-capture",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "sp.capture/1.0"
+    },
+    "capture_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "parchment_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "layout_version": {
+      "const": "three_regions_v1"
+    },
+    "reference_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "raster_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "drawing_file_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "drawing_pixel_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ink_file_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "journal_file_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "width": {
+      "const": 1024
+    },
+    "height": {
+      "const": 1024
+    },
+    "used_ink_micro_units": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000000
+    },
+    "closed_reason": {
+      "type": "string",
+      "enum": [
+        "all_regions_locked",
+        "window_closed",
+        "ink_exhausted",
+        "crash_recovered"
+      ]
+    },
+    "locked_regions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "core",
+          "ring",
+          "outer"
+        ]
+      },
+      "minItems": 0,
+      "maxItems": 3
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema_version",
+    "capture_id",
+    "parchment_id",
+    "layout_version",
+    "reference_sha256",
+    "raster_version",
+    "drawing_file_sha256",
+    "drawing_pixel_sha256",
+    "ink_file_sha256",
+    "journal_file_sha256",
+    "width",
+    "height",
+    "used_ink_micro_units",
+    "closed_reason",
+    "locked_regions",
+    "created_at"
+  ],
+  "additionalProperties": false
+}

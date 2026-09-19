@@ -1,0 +1,160 @@
+{
+  "schema_version": "sp.capabilities/1.0",
+  "status": "SPECIFICATION_NOT_IMPLEMENTATION",
+  "rules_profile": "lab_v1",
+  "fixed_tick_ms": 20,
+  "carriers": [
+    {
+      "id": "projectile",
+      "emits": [
+        "spawn",
+        "hit",
+        "expire"
+      ],
+      "effect_events": [
+        "hit"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_projectile/properties/options"
+    },
+    {
+      "id": "beam",
+      "emits": [
+        "spawn",
+        "hit",
+        "tick",
+        "expire"
+      ],
+      "effect_events": [
+        "hit"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_beam/properties/options"
+    },
+    {
+      "id": "field",
+      "emits": [
+        "spawn",
+        "enter",
+        "tick",
+        "expire"
+      ],
+      "effect_events": [
+        "enter",
+        "tick"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_field/properties/options"
+    },
+    {
+      "id": "pulse",
+      "emits": [
+        "spawn",
+        "hit",
+        "expire"
+      ],
+      "effect_events": [
+        "hit"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_pulse/properties/options"
+    },
+    {
+      "id": "barrier",
+      "emits": [
+        "spawn",
+        "block",
+        "expire"
+      ],
+      "effect_events": [
+        "block"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_barrier/properties/options"
+    },
+    {
+      "id": "trap",
+      "emits": [
+        "spawn",
+        "trigger",
+        "expire"
+      ],
+      "effect_events": [
+        "trigger"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_trap/properties/options"
+    }
+  ],
+  "effects": [
+    {
+      "id": "damage",
+      "amount_unit": "milli_health",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "zero",
+      "direction_rule": "none"
+    },
+    {
+      "id": "heal",
+      "amount_unit": "milli_health",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "zero",
+      "direction_rule": "none"
+    },
+    {
+      "id": "impulse",
+      "amount_unit": "milli_newton_second",
+      "min_amount": 0,
+      "max_amount": 200000,
+      "duration_rule": "zero",
+      "direction_rule": "non_none"
+    },
+    {
+      "id": "burn",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none"
+    },
+    {
+      "id": "wet",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "positive",
+      "direction_rule": "none"
+    },
+    {
+      "id": "slow",
+      "amount_unit": "per_mille_speed_reduction",
+      "min_amount": 0,
+      "max_amount": 750,
+      "duration_rule": "positive",
+      "direction_rule": "none"
+    }
+  ],
+  "reactions": [
+    {
+      "incoming": "wet",
+      "existing": "burn",
+      "result": "remove_burn_apply_wet"
+    },
+    {
+      "incoming": "burn",
+      "existing": "wet",
+      "result": "remove_wet_discard_incoming_burn"
+    }
+  ],
+  "limits": {
+    "nodes": 16,
+    "copies": 8,
+    "activations": 8,
+    "total_instances": 128,
+    "effect_applications": 8192,
+    "lifetime_ticks": 500,
+    "cast_end_ticks": 1500,
+    "targets_per_instance": 32,
+    "path_points": 128,
+    "barrier_colliders": 64,
+    "range_cm": 3000,
+    "scale_cm": 1200,
+    "concurrent_casts": 8
+  }
+}

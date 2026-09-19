@@ -1,0 +1,10 @@
+{
+  "name": "Palimpseste.Contracts",
+  "rootNamespace": "Palimpseste.Contracts",
+  "references": [],
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "allowUnsafeCode": false,
+  "noEngineReferences": true
+}

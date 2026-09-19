@@ -1,0 +1,664 @@
+openapi: 3.1.0
+info:
+  title: Palimpseste Spell Loop
+  version: 1.1.0
+  description: Contrat de service SP-1.0 avec extension de diagnostic SP-1.1-LUNA.
+    Le client joueur conserve les routes métier SP-1.0.
+servers:
+- url: http://127.0.0.1:8080
+  description: Exemple de développement local ; HTTPS obligatoire à distance.
+security:
+- LabToken: []
+paths:
+  /v1/capabilities:
+    get:
+      operationId: getCapabilities
+      summary: Lire les versions et capacités installées
+      tags:
+      - Boucle de sorts
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capabilities'
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /v1/parchments:
+    get:
+      operationId: listParchments
+      summary: Lister les supports du propriétaire authentifié
+      tags:
+      - Boucle de sorts
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParchmentPage'
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 512
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 50
+    post:
+      operationId: allocateParchment
+      summary: Allouer un support de laboratoire
+      tags:
+      - Boucle de sorts
+      responses:
+        '201':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parchment'
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                layout_version:
+                  const: three_regions_v1
+              required:
+              - layout_version
+              additionalProperties: false
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+        description: Clé conservée pour toutes les reprises du même contenu.
+  /v1/parchments/{id}/begin:
+    post:
+      operationId: beginParchment
+      summary: Enregistrer la première inscription durable
+      tags:
+      - Boucle de sorts
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parchment'
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_sequence:
+                  type: integer
+                  minimum: 1
+                first_block_sha256:
+                  type: string
+                  pattern: ^[0-9a-f]{64}$
+              required:
+              - first_sequence
+              - first_block_sha256
+              additionalProperties: false
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+        description: Clé conservée pour toutes les reprises du même contenu.
+  /v1/parchments/{id}/capture:
+    put:
+      operationId: commitCapture
+      summary: Attacher la capture finale et lancer automatiquement la génération
+      tags:
+      - Boucle de sorts
+      responses:
+        '202':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+        description: Clé conservée pour toutes les reprises du même contenu.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                capture:
+                  $ref: '#/components/schemas/DrawingCapture'
+                drawing:
+                  type: string
+                  format: binary
+                ink:
+                  type: string
+                  format: binary
+                journal:
+                  type: string
+                  format: binary
+              required:
+              - capture
+              - drawing
+              - ink
+              - journal
+              additionalProperties: false
+            encoding:
+              capture:
+                contentType: application/json
+              drawing:
+                contentType: image/png
+              ink:
+                contentType: image/png
+              journal:
+                contentType: application/gzip
+  /v1/jobs/{id}:
+    get:
+      operationId: getJob
+      summary: Retrouver l’état durable du travail
+      tags:
+      - Boucle de sorts
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+  /v1/jobs/{id}/resume:
+    post:
+      operationId: resumeJob
+      summary: Reprendre seulement une erreur technique autorisée
+      tags:
+      - Boucle de sorts
+      responses:
+        '202':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+        description: Clé conservée pour toutes les reprises du même contenu.
+  /v1/spells/{id}:
+    get:
+      operationId: getSpell
+      summary: Lire le paquet immuable publié
+      tags:
+      - Boucle de sorts
+      responses:
+        '200':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompiledSpell'
+          headers:
+            X-Content-SHA256:
+              description: SHA-256 des octets UTF-8 exacts du payload, avant parsing.
+                Pas une signature.
+              schema:
+                type: string
+                pattern: ^[0-9a-f]{64}$
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+  /v1/artifacts/{id}:
+    get:
+      operationId: getArtifact
+      summary: Lire un artefact autorisé
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      responses:
+        '200':
+          description: Octets du fichier autorisé. Hash dans le manifeste et en en-tête.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                type: object
+          headers:
+            X-Content-SHA256:
+              schema:
+                type: string
+                pattern: ^[0-9a-f]{64}$
+        default:
+          description: Erreur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /v1/reviews:
+    post:
+      operationId: submitHumanReview
+      summary: Conserver un verdict explicitement soumis par un créateur humain
+      tags:
+      - Concepteur
+      responses:
+        '201':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  review_id: &id001
+                    type: string
+                required:
+                - review_id
+                additionalProperties: false
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HumanReview'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+        description: Clé conservée pour toutes les reprises du même contenu.
+      description: Rôle creator obligatoire. Diagnostic et revue uniquement ; ne remplace
+        jamais le dessin d’un support engagé.
+  /v1/authoring/plan:
+    post:
+      operationId: planFromAuthoredDescription
+      summary: Tester la description vers le sort hors inventaire
+      tags:
+      - Concepteur
+      responses:
+        '202':
+          description: Succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  $ref: '#/components/schemas/SpellDescription'
+                geometry_artifact_ids:
+                  type: array
+                  items: *id001
+                  minItems: 1
+                  maxItems: 32
+              required:
+              - description
+              - geometry_artifact_ids
+              additionalProperties: false
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+        description: Clé conservée pour toutes les reprises du même contenu.
+      description: Rôle creator obligatoire. Diagnostic et revue uniquement ; ne remplace
+        jamais le dessin d’un support engagé.
+  /v1/authoring/jobs/{id}/plan:
+    get:
+      operationId: getAuthoringPlan
+      summary: Lire les octets du plan B validé d'un diagnostic créateur
+      tags:
+      - Concepteur
+      description: Extension SP-1.1. Rôle creator et propriété du job requis. Le plan est figé ; aucune route de modification.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      responses:
+        '200':
+          description: Plan validé, octets exacts archivés
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpellPlan'
+          headers:
+            X-Content-SHA256:
+              schema:
+                type: string
+                pattern: ^[0-9a-f]{64}$
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /health/live:
+    get:
+      operationId: liveness
+      summary: Processus API actif
+      security: []
+      responses:
+        '200':
+          description: Actif
+  /health/ready:
+    get:
+      operationId: readiness
+      summary: Dépendances internes prêtes ; aucun appel facturé
+      security: []
+      responses:
+        '200':
+          description: Prêt
+        '503':
+          description: Dépendance indisponible
+components:
+  securitySchemes:
+    LabToken:
+      type: http
+      scheme: bearer
+      description: Jeton privé provisionné par l’équipe ; jamais la clé fournisseur.
+  schemas:
+    Problem:
+      type: object
+      properties:
+        code: *id001
+        message: *id001
+        trace_id: *id001
+        retryable:
+          type: boolean
+      required:
+      - code
+      - message
+      - trace_id
+      - retryable
+      additionalProperties: false
+    Job:
+      type: object
+      properties:
+        job_id: *id001
+        parchment_id:
+          type:
+          - string
+          - 'null'
+        state:
+          type: string
+          enum:
+          - queued
+          - interpreting
+          - resolving_geometry
+          - planning
+          - validating
+          - ready
+          - waiting_retry
+          - needs_operator
+        resume_stage:
+          type:
+          - string
+          - 'null'
+        spell_id:
+          type:
+          - string
+          - 'null'
+        attempt_count:
+          type: integer
+          minimum: 0
+          maximum: 10
+        message: *id001
+        error_code:
+          type:
+          - string
+          - 'null'
+        retryable:
+          type: boolean
+        poll_after_ms:
+          type: integer
+          minimum: 1000
+          maximum: 10000
+      required:
+      - job_id
+      - parchment_id
+      - state
+      - resume_stage
+      - spell_id
+      - attempt_count
+      - message
+      - error_code
+      - retryable
+      - poll_after_ms
+      additionalProperties: false
+    Parchment:
+      type: object
+      properties:
+        parchment_id: *id001
+        state:
+          type: string
+          enum:
+          - blank
+          - writing
+          - capture_received
+          - processing
+          - ready
+          - incident
+        layout_version:
+          const: three_regions_v1
+        job_id:
+          type:
+          - string
+          - 'null'
+        spell_id:
+          type:
+          - string
+          - 'null'
+      required:
+      - parchment_id
+      - state
+      - layout_version
+      - job_id
+      - spell_id
+      additionalProperties: false
+    ParchmentPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Parchment'
+          maxItems: 50
+        next_cursor:
+          type:
+          - string
+          - 'null'
+      required:
+      - items
+      - next_cursor
+      additionalProperties: false
+    Capabilities:
+      type: object
+      properties:
+        catalog_version: *id001
+        rules_profile: *id001
+        layout_version: *id001
+        reference_artifact_id: *id001
+        minimum_client_version: *id001
+        carriers:
+          type: array
+          items: *id001
+        inks:
+          type: array
+          items:
+            type: object
+            properties:
+              id: *id001
+              display_name: *id001
+              rgba_hex:
+                type: string
+                pattern: ^[0-9a-fA-F]{8}$
+            required:
+            - id
+            - display_name
+            - rgba_hex
+            additionalProperties: false
+      required:
+      - catalog_version
+      - rules_profile
+      - layout_version
+      - reference_artifact_id
+      - minimum_client_version
+      - carriers
+      - inks
+      additionalProperties: false
+    SpellDescription:
+      $ref: spell-description.schema.json
+    SpellPlan:
+      $ref: spell-plan.schema.json
+    CompiledSpell:
+      $ref: compiled-spell.schema.json
+    HumanReview:
+      $ref: human-review.schema.json
+    DrawingCapture:
+      $ref: drawing-capture.schema.json

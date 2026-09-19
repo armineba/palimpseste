@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://palimpseste.invalid/contracts/geometry.schema.json",
+  "title": "geometry",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "sp.geometry/1.0"
+    },
+    "geometry_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+    },
+    "source_region": {
+      "type": "string",
+      "enum": [
+        "core",
+        "ring",
+        "outer",
+        "full"
+      ]
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "path",
+        "footprint",
+        "silhouette",
+        "distribution"
+      ]
+    },
+    "source_pixel_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "algorithm": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "integer",
+            "minimum": -10000,
+            "maximum": 10000
+          },
+          "z": {
+            "type": "integer",
+            "minimum": -10000,
+            "maximum": 10000
+          }
+        },
+        "required": [
+          "x",
+          "z"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 128
+    },
+    "mask_file": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 120
+    },
+    "width_px": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1024
+    },
+    "height_px": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1024
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    }
+  },
+  "required": [
+    "schema_version",
+    "geometry_id",
+    "source_region",
+    "kind",
+    "source_pixel_sha256",
+    "algorithm",
+    "points",
+    "mask_file",
+    "width_px",
+    "height_px",
+    "notes"
+  ],
+  "additionalProperties": false
+}

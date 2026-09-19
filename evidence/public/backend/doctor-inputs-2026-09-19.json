@@ -1,0 +1,15 @@
+﻿{
+    "kind":  "doctor_inputs_public_summary",
+    "observed_at":  "2026-09-19T18:23:00.0939893Z",
+    "private_report_sha256":  "c6e735b87a1bda16757ec83ccb34231093d27f9d762139ad8b7e08da94250566",
+    "source_job_id":  "df5b9540775d4ba489f2524c307a8a21",
+    "verified_png_dimensions":  "1024x1024",
+    "drawing_sha256":  "36ae7e09e8b1abfb2107bc75a3db9318e02f143a8e69610e4d698790ff68759c",
+    "ink_sha256":  "18cda98d1ef7e2a6f2148cfb81998d0b4494ea1e46bc288477459e33f1482afc",
+    "reference_sha256":  "54320124ebb110898f5d0337fc2ff128c80a03165dbf414c7d9715f9ad8009e5",
+    "diagnostic_geometry_sha256":  "e256a14cb96b38fa5159cad9388459ed5eaddac51f257c0998f36d8e73bc76c7",
+    "geometry_count":  5,
+    "mask_count":  3,
+    "geometry_for_production":  false,
+    "model_calls_executed":  0
+}

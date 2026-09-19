@@ -1,0 +1,184 @@
+{
+  "schema_version": "sp.compiled/1.0",
+  "spell_id": "fixture-spell-braise",
+  "parchment_id": "fixture-parchment-001",
+  "created_at": "2026-09-19T18:00:00+02:00",
+  "versions": {
+    "catalog": "sp.capabilities/1.0",
+    "compiler": "sp.compiler/1.0",
+    "geometry": "sp.geometry/1.0",
+    "rules_profile": "lab_v1",
+    "min_client": "1.0.0"
+  },
+  "provenance": {
+    "mode": "fixture",
+    "capture_sha256": null,
+    "reference_sha256": "54320124ebb110898f5d0337fc2ff128c80a03165dbf414c7d9715f9ad8009e5",
+    "model_a": null,
+    "model_b": null,
+    "prompt_a_version": "fixture.manual",
+    "prompt_b_version": "fixture.manual",
+    "response_a_id": null,
+    "response_b_id": null
+  },
+  "signature_seed_hex": "e10a330a765bc981",
+  "description_sha256": "8f4907183f6ed4e1edfe43f49b9bc2021abd8943cf87b111993d52c4cd62296a",
+  "plan": {
+    "schema_version": "sp.plan/1.0",
+    "description_sha256": "8f4907183f6ed4e1edfe43f49b9bc2021abd8943cf87b111993d52c4cd62296a",
+    "catalog_version": "sp.capabilities/1.0",
+    "rules_profile": "lab_v1",
+    "nodes": [
+      {
+        "node_id": "p0",
+        "subject_id": "s0",
+        "clause_ids": [
+          "c1"
+        ],
+        "carrier": "projectile",
+        "activation": {
+          "parent_id": null,
+          "event": "cast",
+          "delay_ticks": 0,
+          "max_activations": 1,
+          "copies": 1,
+          "spread_mdeg": 0
+        },
+        "anchor": "caster",
+        "geometry_id": "ring.path.0",
+        "scale_cm": 400,
+        "rotation_mdeg": 0,
+        "appearance": {
+          "affinity": "fire",
+          "pattern": "solid",
+          "signature_geometry_id": "full.silhouette.0"
+        },
+        "effects": [
+          {
+            "id": "e0",
+            "clause_ids": [
+              "c1"
+            ],
+            "event": "hit",
+            "kind": "damage",
+            "target_filter": "hostile",
+            "amount": 12000,
+            "duration_ticks": 0,
+            "direction": "none"
+          }
+        ],
+        "options": {
+          "lifetime_ticks": 125,
+          "range_cm": 2000,
+          "speed_cm_s": 1200,
+          "radius_cm": 15,
+          "motion": "curve",
+          "turn_mdeg_s": 0,
+          "contact_filter": "hostile",
+          "bounces": 0,
+          "pierces": 0
+        }
+      },
+      {
+        "node_id": "f1",
+        "subject_id": "s1",
+        "clause_ids": [
+          "c2"
+        ],
+        "carrier": "field",
+        "activation": {
+          "parent_id": "p0",
+          "event": "hit",
+          "delay_ticks": 0,
+          "max_activations": 1,
+          "copies": 1,
+          "spread_mdeg": 0
+        },
+        "anchor": "parent_event",
+        "geometry_id": "outer.footprint.0",
+        "scale_cm": 350,
+        "rotation_mdeg": 0,
+        "appearance": {
+          "affinity": "fire",
+          "pattern": "solid",
+          "signature_geometry_id": "full.silhouette.0"
+        },
+        "effects": [
+          {
+            "id": "e1",
+            "clause_ids": [
+              "c2"
+            ],
+            "event": "tick",
+            "kind": "burn",
+            "target_filter": "hostile",
+            "amount": 2000,
+            "duration_ticks": 150,
+            "direction": "none"
+          }
+        ],
+        "options": {
+          "lifetime_ticks": 200,
+          "height_cm": 180,
+          "tick_interval": 25
+        }
+      }
+    ]
+  },
+  "geometry_manifest": [
+    {
+      "id": "ring.path.0",
+      "kind": "path",
+      "artifact_id": "fixture.ring.path.0",
+      "sha256": "f199183161578c9f89e7b53d881f9ba3a45c7d03243ee968d84a2ea7c764543b",
+      "size_bytes": 2031
+    },
+    {
+      "id": "outer.footprint.0",
+      "kind": "footprint",
+      "artifact_id": "fixture.outer.footprint.0",
+      "sha256": "e47237dac104630b6b1c1121cdb1a2bc38e2a2e436482598dca994cc32d02ca0",
+      "size_bytes": 536
+    },
+    {
+      "id": "full.silhouette.0",
+      "kind": "silhouette",
+      "artifact_id": "fixture.full.silhouette.0",
+      "sha256": "8526c3075fde9ed0f6f7fa76994f1d36ee29f733614e66a4e106681fa046c64b",
+      "size_bytes": 535
+    }
+  ],
+  "binary_assets": [
+    {
+      "file_name": "full_mask.png",
+      "artifact_id": "fixture.mask.full_mask",
+      "sha256": "d6aeb47336ae7757465295d6411520bb45394ca6a736f6277a0703041b05534c",
+      "size_bytes": 5201,
+      "media_type": "image/png"
+    },
+    {
+      "file_name": "outer_mask.png",
+      "artifact_id": "fixture.mask.outer_mask",
+      "sha256": "a2e32cdf339ee77fe030aefc981d6c3c7e18ed3d4634a11a1d73776a60df9f97",
+      "size_bytes": 3083,
+      "media_type": "image/png"
+    }
+  ],
+  "resource_bounds": {
+    "max_instances": 2,
+    "max_effect_applications": 2049,
+    "max_end_tick": 476,
+    "geometry_bytes": 11386,
+    "max_colliders": 0
+  },
+  "display": {
+    "title": "Braise en sillage",
+    "factual_description": "Un projectile courbe inflige 12 points à un adversaire au contact. Son premier contact déclenche une zone de 3,5 m, active 4 secondes. Toutes les 0,5 seconde, elle applique une brûlure de 2 points par seconde pendant 3 secondes aux adversaires présents. Les brûlures ne s’additionnent pas.",
+    "mechanical_lines": [
+      "Projectile : vitesse 12 m/s, portée maximale 20 m, durée maximale 2,5 s ; le premier terme atteint l’arrête.",
+      "Champ : empreinte issue de la périphérie, hauteur 1,8 m, maximum 32 cibles distinctes.",
+      "Un allié ou un mur solide arrête le projectile sans créer le champ ; seul un contact hostile le déclenche.",
+      "Mouiller la cible éteint sa brûlure ; les nombres sont des valeurs de test."
+    ]
+  }
+}

@@ -1,0 +1,314 @@
+{
+  "scope": "DOCUMENT_CONTRACTS_ONLY_NOT_UNITY_NOT_PROVIDER_NOT_HUMAN_ACCEPTANCE",
+  "generated_at": "2026-09-19T19:09:56.416772+00:00",
+  "total": 59,
+  "passed": 59,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Schéma valide : compiled-spell.schema.json",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Schéma valide : drawing-capture.schema.json",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Schéma valide : geometry.schema.json",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Schéma valide : human-review.schema.json",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Schéma valide : spell-description.schema.json",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Schéma valide : spell-plan.schema.json",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Description : forme et références",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Plan : forme, domaines et traçabilité",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Fixture porteur : fixture_barrier",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Fixture porteur : fixture_beam",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Fixture porteur : fixture_field",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Fixture porteur : fixture_projectile",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Fixture porteur : fixture_pulse",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Fixture porteur : fixture_trap",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Géométrie : full.silhouette.0",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Géométrie : outer.footprint.0",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Géométrie : ring.path.0",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Paquet : schéma, intégrité, masques et bornes illustratives",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "OpenAPI : références résolubles et opérations uniques",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Format local fournisseur : model-a",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Exemple conforme au format local : model-a",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Format local fournisseur : model-b",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Exemple conforme au format local : model-b",
+      "passed": true,
+      "detail": "Accepté"
+    },
+    {
+      "name": "Rejet : Champ code arbitraire",
+      "passed": true,
+      "detail": "Rejet attendu : Additional properties are not allowed ('code' was unexpected)\n\nFailed validating 'additionalProperties' in schema:\n    {'$schema': 'https://json-schema.org/draft/2020-12/schema',\n     '$id': 'https://palimpseste.invalid/contracts/spell-plan.schema.json',\n     'title': 'spell-plan',\n     'type': 'object',\n     'properties': {'schema_version': {'const': 'sp.plan/1.0'},\n                    'description_sha256': {'type': 'string',\n                                           'pattern': '^[0-9a-f]{64}$'},\n                    'catalog_version': {'const': 'sp.capabilities/1.0'},\n                    'rules_profile': {'const': 'lab_v1'},\n                    'nodes': {'type': 'array',\n  "
+    },
+    {
+      "name": "Rejet : Porteur inconnu",
+      "passed": true,
+      "detail": "Rejet attendu : {'node_id': 'p0', 'subject_id': 's0', 'clause_ids': ['c1'], 'carrier': 'summon_dragon', 'activation': {'parent_id': None, 'event': 'cast', 'delay_ticks': 0, 'max_activations': 1, 'copies': 1, 'spread_mdeg': 0}, 'anchor': 'caster', 'geometry_id': 'ring.path.0', 'scale_cm': 400, 'rotation_mdeg': 0, 'appearance': {'affinity': 'fire', 'pattern': 'solid', 'signature_geometry_id': 'full.silhouette.0'}, 'effects': [{'id': 'e0', 'clause_ids': ['c1'], 'event': 'hit', 'kind': 'damage', 'target_filter': 'hostile', 'amount': 12000, 'duration_ticks': 0, 'direction': 'none'}], 'options': {'lifetime_ticks': 125, 'range_cm': 2000, 'speed_cm_s': 1200, 'radius_cm': 15, 'motion': 'curve', 'turn"
+    },
+    {
+      "name": "Rejet : Vitesse nulle",
+      "passed": true,
+      "detail": "Rejet attendu : {'node_id': 'p0', 'subject_id': 's0', 'clause_ids': ['c1'], 'carrier': 'projectile', 'activation': {'parent_id': None, 'event': 'cast', 'delay_ticks': 0, 'max_activations': 1, 'copies': 1, 'spread_mdeg': 0}, 'anchor': 'caster', 'geometry_id': 'ring.path.0', 'scale_cm': 400, 'rotation_mdeg': 0, 'appearance': {'affinity': 'fire', 'pattern': 'solid', 'signature_geometry_id': 'full.silhouette.0'}, 'effects': [{'id': 'e0', 'clause_ids': ['c1'], 'event': 'hit', 'kind': 'damage', 'target_filter': 'hostile', 'amount': 12000, 'duration_ticks': 0, 'direction': 'none'}], 'options': {'lifetime_ticks': 125, 'range_cm': 2000, 'speed_cm_s': 0, 'radius_cm': 15, 'motion': 'curve', 'turn_mdeg_"
+    },
+    {
+      "name": "Rejet : Valeur NaN",
+      "passed": true,
+      "detail": "Rejet attendu : {'node_id': 'p0', 'subject_id': 's0', 'clause_ids': ['c1'], 'carrier': 'projectile', 'activation': {'parent_id': None, 'event': 'cast', 'delay_ticks': 0, 'max_activations': 1, 'copies': 1, 'spread_mdeg': 0}, 'anchor': 'caster', 'geometry_id': 'ring.path.0', 'scale_cm': 400, 'rotation_mdeg': 0, 'appearance': {'affinity': 'fire', 'pattern': 'solid', 'signature_geometry_id': 'full.silhouette.0'}, 'effects': [{'id': 'e0', 'clause_ids': ['c1'], 'event': 'hit', 'kind': 'damage', 'target_filter': 'hostile', 'amount': 12000, 'duration_ticks': 0, 'direction': 'none'}], 'options': {'lifetime_ticks': 125, 'range_cm': 2000, 'speed_cm_s': nan, 'radius_cm': 15, 'motion': 'curve', 'turn_mde"
+    },
+    {
+      "name": "Rejet : Dégât excessif",
+      "passed": true,
+      "detail": "Rejet attendu : Quantité hors profil"
+    },
+    {
+      "name": "Rejet : Événement direct impossible",
+      "passed": true,
+      "detail": "Rejet attendu : Événement d’effet incompatible"
+    },
+    {
+      "name": "Rejet : Durée sur dommage direct",
+      "passed": true,
+      "detail": "Rejet attendu : Durée d’un effet instantané"
+    },
+    {
+      "name": "Rejet : Brûlure sans durée",
+      "passed": true,
+      "detail": "Rejet attendu : Statut sans durée"
+    },
+    {
+      "name": "Rejet : Brûlure fractionnée",
+      "passed": true,
+      "detail": "Rejet attendu : Cadence de brûlure invalide"
+    },
+    {
+      "name": "Rejet : Direction sur dommage",
+      "passed": true,
+      "detail": "Rejet attendu : Direction incompatible"
+    },
+    {
+      "name": "Rejet : Parent inexistant",
+      "passed": true,
+      "detail": "Rejet attendu : Parent inconnu"
+    },
+    {
+      "name": "Rejet : Auto-cycle",
+      "passed": true,
+      "detail": "Rejet attendu : Événement non émis par le parent"
+    },
+    {
+      "name": "Rejet : Copie unique avec éventail",
+      "passed": true,
+      "detail": "Rejet attendu : Éventail sur copie unique"
+    },
+    {
+      "name": "Rejet : Racine répétée",
+      "passed": true,
+      "detail": "Rejet attendu : Racine invalide"
+    },
+    {
+      "name": "Rejet : Guidage sur mouvement courbe",
+      "passed": true,
+      "detail": "Rejet attendu : Guidage sans mode guidé"
+    },
+    {
+      "name": "Rejet : Géométrie absente",
+      "passed": true,
+      "detail": "Rejet attendu : Géométrie inconnue"
+    },
+    {
+      "name": "Rejet : Courbe sans chemin",
+      "passed": true,
+      "detail": "Rejet attendu : Chemin requis"
+    },
+    {
+      "name": "Rejet : Fait remplacé sans autorisation",
+      "passed": true,
+      "detail": "Rejet attendu : Effet ajouté ou supprimé"
+    },
+    {
+      "name": "Rejet : Cible remplacée sans autorisation",
+      "passed": true,
+      "detail": "Rejet attendu : Fait non conservé : target=hostile"
+    },
+    {
+      "name": "Rejet : Relation modifiée",
+      "passed": true,
+      "detail": "Rejet attendu : Relation non conservée"
+    },
+    {
+      "name": "Rejet : Observation inconnue",
+      "passed": true,
+      "detail": "Rejet attendu : Observation inconnue"
+    },
+    {
+      "name": "Rejet : Observation dupliquée",
+      "passed": true,
+      "detail": "Rejet attendu : Observation dupliquée"
+    },
+    {
+      "name": "Rejet : Relation vers sujet absent",
+      "passed": true,
+      "detail": "Rejet attendu : Sujet de relation inconnu"
+    },
+    {
+      "name": "Rejet : Chemin dégénéré",
+      "passed": true,
+      "detail": "Rejet attendu : Chemin dégénéré"
+    },
+    {
+      "name": "Rejet : Chemin de fichier dangereux",
+      "passed": true,
+      "detail": "Rejet attendu : Nom de masque dangereux"
+    },
+    {
+      "name": "Rejet : Empreinte sans masque",
+      "passed": true,
+      "detail": "Rejet attendu : Masque d’empreinte manquant"
+    },
+    {
+      "name": "Rejet : Masque absent du manifeste",
+      "passed": true,
+      "detail": "Rejet attendu : Masque non manifesté"
+    },
+    {
+      "name": "Rejet : Empreinte JSON corrompue",
+      "passed": true,
+      "detail": "Rejet attendu : Intégrité JSON géométrique"
+    },
+    {
+      "name": "Rejet : Empreinte PNG corrompue",
+      "passed": true,
+      "detail": "Rejet attendu : Intégrité masque binaire"
+    },
+    {
+      "name": "Rejet : Durée oubliant les statuts",
+      "passed": true,
+      "detail": "Rejet attendu : Statut résiduel oublié dans la fixture"
+    },
+    {
+      "name": "Rejet : Piège armé après extinction",
+      "passed": true,
+      "detail": "Rejet attendu : {'node_id': 'n0', 'subject_id': 's0', 'clause_ids': ['c0'], 'carrier': 'trap', 'activation': {'parent_id': None, 'event': 'cast', 'delay_ticks': 0, 'max_activations': 1, 'copies': 1, 'spread_mdeg': 0}, 'anchor': 'caster', 'geometry_id': 'outer.footprint.0', 'scale_cm': 400, 'rotation_mdeg': 0, 'appearance': {'affinity': 'stone', 'pattern': 'solid', 'signature_geometry_id': 'full.silhouette.0'}, 'effects': [{'id': 'e0', 'clause_ids': ['c0'], 'event': 'trigger', 'kind': 'slow', 'target_filter': 'hostile', 'amount': 300, 'duration_ticks': 150, 'direction': 'none'}], 'options': {'lifetime_ticks': 300, 'arm_ticks': 300, 'trigger_limit': 2, 'rearm_ticks': 50, 'trigger_filter': 'hos"
+    },
+    {
+      "name": "Rejet : Chaîne sans rayon",
+      "passed": true,
+      "detail": "Rejet attendu : Rayon de chaîne incohérent"
+    },
+    {
+      "name": "Rejet : Cadence faisceau trop courte",
+      "passed": true,
+      "detail": "Rejet attendu : Cadence faisceau trop courte"
+    },
+    {
+      "name": "Rejet : Front plus large que portée",
+      "passed": true,
+      "detail": "Rejet attendu : Front plus large que rayon"
+    },
+    {
+      "name": "Rejet : Mouillé avec quantité",
+      "passed": true,
+      "detail": "Rejet attendu : Quantité hors profil"
+    },
+    {
+      "name": "Rejet : Impulsion sans direction",
+      "passed": true,
+      "detail": "Rejet attendu : Direction incompatible"
+    }
+  ],
+  "not_tested": [
+    "Appels API réels",
+    "Compatibilité fournisseur du schéma strict",
+    "Compilation C# / IL2CPP",
+    "Résolveur raster réel",
+    "Calcul pessimiste complet",
+    "Physics Unity",
+    "Rendu et audio",
+    "Avis humain"
+  ]
+}

@@ -1,0 +1,108 @@
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Initialize engine version: 6000.3.24f1 (4e7b9b5b6244)
+[Subsystems] Discovering subsystems at path E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/.runtime/release-smoke-effects-final/Palimpseste_Data/UnitySubsystems
+[D3D12 Device Filter] Vendor Name: NVIDIA
+[D3D12 Device Filter] Device Name: NVIDIA GeForce RTX 3070
+[D3D12 Device Filter] Driver Version: 32.0.15.9186
+[D3D12 Device Filter] Feature Level: 12.2
+[D3D12 Device Filter] Graphics Memory: 8018 MB
+[D3D12 Device Filter] Processor Count: 16
+[D3D12 Device Filter] Device Type: Discrete
+GfxDevice: creating device client; kGfxThreadingModeSplitJobs
+d3d12: failed to query info queue interface (0x80004002).
+Direct3D:
+    Version:         Direct3D 12 [level 12.2]
+    Renderer:        NVIDIA GeForce RTX 3070 (ID=0x2484)
+    Vendor:          NVIDIA
+    VRAM:            8018 MB
+    App VRAM Budget: 7250 MB
+    Driver:          32.0.15.9186
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+<RI> Initializing input.
+Using Windows.Gaming.Input
+<RI> Input initialized.
+UnloadTime: 0.257800 ms
+Unloading 6 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.260000 ms
+Unloading 8 unused Assets to reduce memory usage. Loaded Objects now: 2949.
+Total: 3.443100 ms (FindLiveObjects: 0.092600 ms CreateObjectMapping: 0.043400 ms MarkObjects: 3.285400 ms  DeleteObjects: 0.021600 ms)
+
+PALIMPSESTE_B28 begin resolution=1280x720
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Start()
+
+PALIMPSESTE_B28 elapsed_s=10,0 frames=14625 window_s=10,00 fps=1462,5 active=0 hits=0 managed_bytes=9396224
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=20,0 frames=15283 window_s=10,00 fps=1528,3 active=0 hits=0 managed_bytes=9228288
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=30,0 frames=15576 window_s=10,00 fps=1557,5 active=1 hits=0 managed_bytes=9220096
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=40,0 frames=15326 window_s=10,00 fps=1532,6 active=0 hits=10 managed_bytes=9334784
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=50,0 frames=15185 window_s=10,00 fps=1518,4 active=0 hits=20 managed_bytes=9658368
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=60,0 frames=15231 window_s=10,00 fps=1523,1 active=1 hits=27 managed_bytes=9617408
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=70,0 frames=15411 window_s=10,00 fps=1541,1 active=0 hits=30 managed_bytes=9261056
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=80,0 frames=15435 window_s=10,00 fps=1543,5 active=0 hits=40 managed_bytes=8904704
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=90,0 frames=15364 window_s=10,00 fps=1536,3 active=0 hits=41 managed_bytes=9551872
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=100,0 frames=15398 window_s=10,00 fps=1539,7 active=0 hits=41 managed_bytes=9060352
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+
+PALIMPSESTE_B28 elapsed_s=110,0 frames=15512 window_s=10,00 fps=1551,1 active=0 hits=41 managed_bytes=9338880
+UnityEngine.DebugLogHandler:Internal_Log(LogType, LogOption, String, Object)
+UnityEngine.Logger:Log(LogType, Object)
+UnityEngine.Debug:Log(Object)
+Palimpseste.Game.SpellRuntime.LabPerformanceProbe:Update()
+

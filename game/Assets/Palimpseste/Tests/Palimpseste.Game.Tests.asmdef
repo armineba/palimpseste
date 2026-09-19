@@ -1,0 +1,12 @@
+{
+  "name": "Palimpseste.Game.Tests",
+  "rootNamespace": "Palimpseste.Game.Tests",
+  "references": ["Palimpseste.Game", "Palimpseste.Contracts"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": false,
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "allowUnsafeCode": false
+}

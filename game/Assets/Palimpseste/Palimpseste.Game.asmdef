@@ -1,0 +1,9 @@
+{
+  "name": "Palimpseste.Game",
+  "rootNamespace": "Palimpseste.Game",
+  "references": ["Palimpseste.Contracts", "Unity.Newtonsoft.Json"],
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "allowUnsafeCode": false
+}

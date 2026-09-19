@@ -1,0 +1,123 @@
+{
+  "document_version": "SP-1.1-LUNA",
+  "scope": "Documentation and prompt packaging only; not software implementation.",
+  "passed": 27,
+  "failed": 0,
+  "checks": [
+    {
+      "check": "required_file:DEMARRER_CODEX.md",
+      "passed": true
+    },
+    {
+      "check": "required_file:docs/05_OVERRIDE_LUNA_CODEX.md",
+      "passed": true
+    },
+    {
+      "check": "required_file:docs/06_SOURCES_CODEX.md",
+      "passed": true
+    },
+    {
+      "check": "required_file:ops/luna-provider.env.example",
+      "passed": true
+    },
+    {
+      "check": "master_copy_identical",
+      "passed": true
+    },
+    {
+      "check": "official_model_identifier",
+      "passed": true
+    },
+    {
+      "check": "maximum_is_capability_checked",
+      "passed": true
+    },
+    {
+      "check": "no_silent_model_substitution",
+      "passed": true
+    },
+    {
+      "check": "actual_codex_bridge",
+      "passed": true
+    },
+    {
+      "check": "development_runtime_separated",
+      "passed": true
+    },
+    {
+      "check": "ten_new_tickets",
+      "passed": true
+    },
+    {
+      "check": "source_old_provider_archived",
+      "passed": true
+    },
+    {
+      "check": "source_old_prompt_archived",
+      "passed": true
+    },
+    {
+      "check": "schema_a_extracted_exactly",
+      "passed": true
+    },
+    {
+      "check": "schema_a_valid_meta_schema",
+      "passed": true
+    },
+    {
+      "check": "schema_b_extracted_exactly",
+      "passed": true
+    },
+    {
+      "check": "schema_b_valid_meta_schema",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/capability-catalog.json",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/compiled-spell.schema.json",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/drawing-capture.schema.json",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/geometry.schema.json",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/human-review.schema.json",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/model-a.response-format.json",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/model-b.response-format.json",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/openapi.yaml",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/spell-description.schema.json",
+      "passed": true
+    },
+    {
+      "check": "unchanged_domain_contract:contracts/spell-plan.schema.json",
+      "passed": true
+    }
+  ],
+  "not_executed": [
+    "Codex CLI preflight on user server",
+    "Luna API/model calls",
+    "Unity build",
+    "Unity gameplay and rendering",
+    "Human acceptance"
+  ]
+}

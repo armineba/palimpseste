@@ -1,0 +1,55 @@
+{
+  "schema_version": "sp.plan/1.0",
+  "description_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "catalog_version": "sp.capabilities/1.0",
+  "rules_profile": "lab_v1",
+  "nodes": [
+    {
+      "node_id": "n0",
+      "subject_id": "s0",
+      "clause_ids": [
+        "c0"
+      ],
+      "carrier": "trap",
+      "activation": {
+        "parent_id": null,
+        "event": "cast",
+        "delay_ticks": 0,
+        "max_activations": 1,
+        "copies": 1,
+        "spread_mdeg": 0
+      },
+      "anchor": "caster",
+      "geometry_id": "outer.footprint.0",
+      "scale_cm": 400,
+      "rotation_mdeg": 0,
+      "appearance": {
+        "affinity": "stone",
+        "pattern": "solid",
+        "signature_geometry_id": "full.silhouette.0"
+      },
+      "effects": [
+        {
+          "id": "e0",
+          "clause_ids": [
+            "c0"
+          ],
+          "event": "trigger",
+          "kind": "slow",
+          "target_filter": "hostile",
+          "amount": 300,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ],
+      "options": {
+        "lifetime_ticks": 300,
+        "arm_ticks": 25,
+        "trigger_limit": 2,
+        "rearm_ticks": 50,
+        "trigger_filter": "hostile",
+        "height_cm": 180
+      }
+    }
+  ]
+}

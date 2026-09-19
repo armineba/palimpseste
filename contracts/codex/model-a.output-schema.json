@@ -1,0 +1,377 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "sp.description/1.0"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1800
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "core",
+              "ring",
+              "outer",
+              "full"
+            ]
+          },
+          "visible_feature": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 320
+          },
+          "interpretation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          }
+        },
+        "required": [
+          "id",
+          "region",
+          "visible_feature",
+          "interpretation"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 24
+    },
+    "clauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "mechanical",
+              "visual_only"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "observation_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "facts": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "carrier"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "projectile",
+                        "beam",
+                        "field",
+                        "pulse",
+                        "barrier",
+                        "trap"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "effect"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "damage",
+                        "heal",
+                        "impulse",
+                        "burn",
+                        "wet",
+                        "slow"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "target"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "hostile",
+                        "ally",
+                        "self",
+                        "all_actors",
+                        "environment"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "motion"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "straight",
+                        "curve",
+                        "homing",
+                        "stationary",
+                        "expanding"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "event"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "spawn",
+                        "hit",
+                        "enter",
+                        "tick",
+                        "trigger",
+                        "block",
+                        "expire"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "affinity"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "fire",
+                        "water",
+                        "stone",
+                        "air"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "pattern"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "solid",
+                        "double",
+                        "dotted",
+                        "irregular"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 16
+          }
+        },
+        "required": [
+          "id",
+          "subject_id",
+          "kind",
+          "text",
+          "observation_ids",
+          "facts"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 16
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source_subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "event": {
+            "type": "string",
+            "enum": [
+              "hit",
+              "expire",
+              "trigger",
+              "tick",
+              "block",
+              "enter"
+            ]
+          },
+          "target_subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "max_activations": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "clause_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "minItems": 1,
+            "maxItems": 8
+          }
+        },
+        "required": [
+          "source_subject_id",
+          "event",
+          "target_subject_id",
+          "max_activations",
+          "clause_ids"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 16
+    },
+    "shape_requests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "core",
+              "ring",
+              "outer",
+              "full"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "path",
+              "footprint",
+              "silhouette",
+              "distribution"
+            ]
+          }
+        },
+        "required": [
+          "subject_id",
+          "region",
+          "role"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 16
+    }
+  },
+  "required": [
+    "schema_version",
+    "title",
+    "summary",
+    "observations",
+    "clauses",
+    "relations",
+    "shape_requests"
+  ],
+  "additionalProperties": false
+}

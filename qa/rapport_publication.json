@@ -1,0 +1,99 @@
+{
+  "scope": "publication_HTML_loaded_in_memory_PDF_only_local_file_navigation_unavailable",
+  "html_sections": 29,
+  "pdf_pages": 61,
+  "total": 18,
+  "passed": 18,
+  "checks": [
+    {
+      "name": "HTML : 29 sections",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "HTML : couverture visible",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Navigation architecture",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Recherche dans contenu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Recherche sans résultat",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Saisie de note",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Export notes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Dialogue sources",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Export source",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Lecture continue",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Mobile 390px : sans débordement couverture",
+      "passed": true,
+      "detail": "{'width': 390, 'scroll': 390}"
+    },
+    {
+      "name": "Mobile 390px : tableau contenu dans écran",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Mobile 360px : sans débordement couverture",
+      "passed": true,
+      "detail": "{'width': 360, 'scroll': 360}"
+    },
+    {
+      "name": "Mobile 360px : tableau contenu dans écran",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "JavaScript : aucune erreur",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "PDF : pas de page vide",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "PDF : texte dans la page",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "PDF : 29 destinations de chapitres au moins",
+      "passed": true,
+      "detail": "149"
+    }
+  ]
+}
