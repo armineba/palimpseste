@@ -36,16 +36,28 @@ La preuve locale antérieure `c50647f63efda97ea989374bef7b6b3a6e3bdce6e00d044675
 ne contenait pas le SHA-256 du binaire. Elle est historique et ne satisfait
 plus la nouvelle porte `Check(true)`.
 
-## Doctor actif
+## Doctor actif bloqué avant A/B
 
-Le doctor actif antérieur a été invoqué sous `PalRuntimeSvc` avec les entrées
-préparées, puis arrêté avant A/B par `dedicated_auth_not_confirmed` ;
-`model_calls_executed=false`. Son ancien JSON est conservé comme historique
-dans [le résumé de blocage](provider-active-blocked-2026-09-19.json). Aucun
-doctor actif avec liaison SHA-256 du CLI et aucun appel Luna A/B n'ont été
-exécutés. L'acceptation du modèle et de l'effort `max` par le compte dédié
-reste à établir. Le worker refuse la génération tant que la preuve active
-hashée et `PALIMPSESTE_EFFORT_VERIFIED=true` ne sont pas présents.
+Le **nouveau** doctor a été invoqué en mode actif sous `PalRuntimeSvc` avec
+les entrées privées préparées. Un doctor local exécuté juste avant a confirmé
+`not_authenticated` et `model_calls_executed=false`. L'invocation active a
+terminé avec le code 2 et `dedicated_auth_not_confirmed`. Son JSON porte le
+même SHA-256 du CLI que la preuve features ; il ne contient ni `stage_a` ni
+`stage_b` et indique `model_calls_executed=false`. Son SHA-256 est :
+
+`151421d02c71833c3978dce3103dbccfd53efa0a989395c58ee9f03f6015fc24`
+
+Le JSON du pré contrôle local a le SHA-256
+`fd884703dcc9d296f709362e05b91759fe5ee94dd7d1b17ef428ca00e9a02f8a`.
+Le [résumé expurgé](provider-active-blocked-2026-09-19.json) contient les
+états observés. L'ancien doctor actif, antérieur à la liaison du CLI, était
+également bloqué ; son SHA-256 historique est
+`5cf4bc017a8a111cdadc4055d736fc6486eb702262b113af9532e65e0912297e`.
+
+Aucun appel Luna A/B n'a été exécuté. L'acceptation du modèle et de l'effort
+`max` par le compte dédié reste à établir. Le worker refuse la génération
+tant que la preuve active **réussie** et hashée, ainsi que
+`PALIMPSESTE_EFFORT_VERIFIED=true`, ne sont pas présents.
 
 Le secret du compte Windows utilisé pour relancer le doctor local est conservé
 hors dépôt dans une `PSCredential` protégée par DPAPI et une ACL privée. Il

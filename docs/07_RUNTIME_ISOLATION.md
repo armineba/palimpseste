@@ -40,11 +40,12 @@ service. Une preuve produite pour un autre binaire est rejetée.
 Le nouveau doctor local a réussi sous `PalRuntimeSvc`, sans appel modèle.
 Après mise à jour de la preuve features dans la configuration privée, sa seconde
 exécution ne rapporte que `effort_not_verified` comme blocage de production.
-L'authentification Codex du compte dédié reste absente. L'ancien doctor actif
-a été arrêté avant A/B avec `dedicated_auth_not_confirmed` et
-`model_calls_executed=false` ; sa preuve précède la liaison au SHA-256 du CLI
-et reste historique. Le doctor actif avec le nouveau binaire et une requête
-Luna réelle n'a pas été exécuté. Les hashes et limites figurent dans
+L'authentification Codex du compte dédié reste absente. Le nouveau doctor a
+été invoqué en mode actif avec les entrées préparées et le même SHA-256 du
+CLI ; il s'est arrêté avant A/B avec `dedicated_auth_not_confirmed`, sans
+appel modèle. Sa preuve de blocage ne satisfait pas la porte de compatibilité
+de l'effort, qui exige A et B réussis. L'ancienne preuve active reste
+historique. Les hashes et limites figurent dans
 [la preuve publique](../evidence/public/backend/provider-doctor-runtime-2026-09-19.md).
 
 Un identifiant fort du compte Windows a été renouvelé pour permettre la sonde

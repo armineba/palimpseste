@@ -1,15 +1,19 @@
-﻿{
-    "kind":  "provider_doctor_active_public_summary",
-    "observed_at":  "2026-09-19T18:37:51.3821896+00:00",
-    "full_evidence_sha256":  "5cf4bc017a8a111cdadc4055d736fc6486eb702262b113af9532e65e0912297e",
-    "service_identity":  "PalRuntimeSvc",
-    "requested_model":  "gpt-5.6-luna",
-    "requested_effort":  "max",
-    "dedicated_auth":  "not_authenticated",
-    "exposed_tools_disabled_observed":  true,
-    "active_block_reason":  "dedicated_auth_not_confirmed",
-    "production_issues":  [
-                              "effort_not_verified"
-                          ],
-    "model_calls_executed":  false
+{
+  "kind": "provider_doctor_active_public_summary",
+  "observed_at": "2026-09-19T19:57:02.0084376+00:00",
+  "full_evidence_sha256": "151421d02c71833c3978dce3103dbccfd53efa0a989395c58ee9f03f6015fc24",
+  "local_precheck_sha256": "fd884703dcc9d296f709362e05b91759fe5ee94dd7d1b17ef428ca00e9a02f8a",
+  "service_identity": "PalRuntimeSvc",
+  "cli_executable_sha256": "2271526227b06ca13ab2b975b88546460fc61b2a29225b6dda0fdc803024ccc9",
+  "requested_model": "gpt-5.6-luna",
+  "requested_effort": "max",
+  "dedicated_auth": "not_authenticated",
+  "exposed_tools_disabled_observed": true,
+  "active_invoked": true,
+  "active_exit_code": 2,
+  "active_block_reason": "dedicated_auth_not_confirmed",
+  "stage_a_present": false,
+  "stage_b_present": false,
+  "production_issues": ["effort_not_verified"],
+  "model_calls_executed": false
 }

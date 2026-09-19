@@ -30,5 +30,7 @@ le compte de service avec le CLI SHA-256
 `2271526227b06ca13ab2b975b88546460fc61b2a29225b6dda0fdc803024ccc9`.
 Après configuration de la nouvelle preuve features hashée, son seul blocage
 de production est `effort_not_verified`. L'authentification Codex dédiée est
-absente ; aucun appel Luna n'a été exécuté. Le doctor actif antérieur est
-historique, arrêté avant A/B avec `dedicated_auth_not_confirmed`.
+absente. Le nouveau doctor actif, lié au même SHA-256 du CLI, a été invoqué
+avec les entrées préparées et s'est arrêté avant A/B avec
+`dedicated_auth_not_confirmed` ; aucun appel Luna n'a été exécuté. L'ancienne
+preuve de blocage reste historique.
