@@ -31,6 +31,11 @@ app.Use(async (context, next) =>
         await ApiProblem.Result(context, 403, "https_required", "HTTPS est requis hors de localhost.").ExecuteAsync(context);
         return;
     }
+    if (context.Request.Path == "/v1/session/redeem" && HttpMethods.IsPost(context.Request.Method))
+    {
+        await next();
+        return;
+    }
     var authorization = context.Request.Headers.Authorization.ToString();
     if (!authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) || authorization.Length < 40)
     {
@@ -83,6 +88,7 @@ app.MapGet("/health/ready", async (NpgsqlDataSource db, ApiConfig config, Cancel
     catch (Exception) { return Results.StatusCode(503); }
 });
 
+app.MapPost("/v1/session/redeem", PlayerSession.Redeem);
 app.MapGet("/v1/capabilities", ApiHandlers.Capabilities);
 app.MapGet("/v1/parchments", ApiHandlers.ListParchments);
 app.MapPost("/v1/parchments", ApiHandlers.AllocateParchment);

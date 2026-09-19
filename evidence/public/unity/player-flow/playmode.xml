@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:30Z" duration="0,5296325">
+  <test-suite type="TestSuite" id="1012" name="Palimpseste Spell Lab" fullname="Palimpseste Spell Lab" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:30Z" duration="0.529633" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1005" name="Palimpseste.Game.PlayModeTests.dll" fullname="E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Library/ScriptAssemblies/Palimpseste.Game.PlayModeTests.dll" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:30Z" duration="0.521540" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="24360" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1006" name="Palimpseste" fullname="Palimpseste" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:30Z" duration="0.521107" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1007" name="Game" fullname="Palimpseste.Game" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:30Z" duration="0.520897" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1008" name="PlayModeTests" fullname="Palimpseste.Game.PlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:30Z" duration="0.520668" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="FocusInterruptionTests" fullname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" classname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:29Z" duration="0.105626" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1002" name="LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" fullname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests.LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" methodname="LosingFocusEndsAndPersistsTheCurrentStrokeWithoutClosingTheDrawing" classname="Palimpseste.Game.PlayModeTests.FocusInterruptionTests" runstate="Runnable" seed="1713952758" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:29Z" duration="0.095481" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1003" name="SpellLabFixtureTests" fullname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" classname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:30Z" duration="0.414170" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1004" name="SixCarriersCastFromIsolatedManualFixtures" fullname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests.SixCarriersCastFromIsolatedManualFixtures" methodname="SixCarriersCastFromIsolatedManualFixtures" classname="Palimpseste.Game.PlayModeTests.SpellLabFixtureTests" runstate="Runnable" seed="86397882" result="Passed" start-time="2026-09-19 22:00:29Z" end-time="2026-09-19 22:00:30Z" duration="0.413617" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[audio_birth: samples=3969 frequency=22050
+projectile: hits=1 damage_milli=0 impulses=1 active=0 wet_until=0 slow_until=0 ally_health_milli=50000
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+beam: hits=2 damage_milli=6000 impulses=0 active=1 wet_until=0 slow_until=0 ally_health_milli=50000
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+field: hits=1 damage_milli=0 impulses=0 active=1 wet_until=101 slow_until=0 ally_health_milli=50000
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+pulse: hits=1 damage_milli=0 impulses=0 active=1 wet_until=0 slow_until=0 ally_health_milli=47000
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+barrier: hits=0 damage_milli=0 impulses=0 active=0 wet_until=0 slow_until=0 ally_health_milli=50000
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+trap: hits=1 damage_milli=0 impulses=0 active=1 wet_until=0 slow_until=176 ally_health_milli=50000
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+compiled_curve: hits=3 damage_milli=12000
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+Saving results to: USER_PROFILE/AppData/LocalLow/Palimpseste/Palimpseste Spell Lab\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

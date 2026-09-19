@@ -10,6 +10,35 @@ servers:
 security:
 - LabToken: []
 paths:
+  /v1/session/redeem:
+    post:
+      operationId: redeemPlayerInvitation
+      summary: Échanger une invitation joueur à usage unique contre un jeton de session
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlayerInvitationRedeem'
+      responses:
+        '200':
+          description: Jeton opaque de session joueur. Réponse sans cache.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerSession'
+        default:
+          description: Invitation invalide, expirée ou déjà utilisée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /v1/capabilities:
     get:
       operationId: getCapabilities
@@ -635,6 +664,30 @@ components:
       - trace_id
       - retryable
       additionalProperties: false
+    PlayerInvitationRedeem:
+      type: object
+      properties:
+        invitation_code:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{64}$'
+          description: Code base64url à usage unique, valable 24 heures.
+      required:
+      - invitation_code
+      additionalProperties: false
+    PlayerSession:
+      type: object
+      properties:
+        token:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{64}$'
+          description: Jeton opaque de session joueur. Ne jamais l'inclure dans une archive ou un journal.
+        principal_id:
+          type: string
+          pattern: '^[0-9a-f]{32}$'
+      required:
+      - token
+      - principal_id
+      additionalProperties: false
     Job:
       type: object
       properties:
@@ -662,6 +715,12 @@ components:
           type:
           - string
           - 'null'
+        description_artifact_id:
+          type:
+          - string
+          - 'null'
+          pattern: '^a[0-9a-f]{32}$'
+          description: Identifiant public de l'artefact JSON de la description A validée. Nul avant sa persistance, puis stable pendant tout le job.
         attempt_count:
           type: integer
           minimum: 0
@@ -683,6 +742,7 @@ components:
       - state
       - resume_stage
       - spell_id
+      - description_artifact_id
       - attempt_count
       - message
       - error_code
@@ -738,6 +798,9 @@ components:
     Capabilities:
       type: object
       properties:
+        principal_id:
+          type: string
+          pattern: ^[0-9a-f]{32}$
         catalog_version: *id001
         rules_profile: *id001
         layout_version: *id001
@@ -762,6 +825,7 @@ components:
             - rgba_hex
             additionalProperties: false
       required:
+      - principal_id
       - catalog_version
       - rules_profile
       - layout_version

@@ -29,11 +29,17 @@ var divergentEffortSchema = Path.Combine(spec, "model-a-divergent-effort.output-
 var missingModelSchema = Path.Combine(spec, "model-a-missing-model.output-schema.json");
 var missingEffortSchema = Path.Combine(spec, "model-a-missing-effort.output-schema.json");
 var invalidJsonSchema = Path.Combine(spec, "model-a-invalid-json.output-schema.json");
+var exitStderrSchema = Path.Combine(spec, "model-a-exit-stderr.output-schema.json");
+var exitJsonlSchema = Path.Combine(spec, "model-a-exit-jsonl.output-schema.json");
+var creditsExhaustedSchema = Path.Combine(spec, "model-a-credits-exhausted.output-schema.json");
 await File.WriteAllTextAsync(divergentModelSchema, "{\"type\":\"object\",\"x-test\":\"divergent-model\"}");
 await File.WriteAllTextAsync(divergentEffortSchema, "{\"type\":\"object\",\"x-test\":\"divergent-effort\"}");
 await File.WriteAllTextAsync(missingModelSchema, "{\"type\":\"object\",\"x-test\":\"missing-model\"}");
 await File.WriteAllTextAsync(missingEffortSchema, "{\"type\":\"object\",\"x-test\":\"missing-effort\"}");
 await File.WriteAllTextAsync(invalidJsonSchema, "{\"type\":\"object\",\"x-test\":\"invalid-json\"}");
+await File.WriteAllTextAsync(exitStderrSchema, "{\"type\":\"object\",\"x-test\":\"exit-stderr\"}");
+await File.WriteAllTextAsync(exitJsonlSchema, "{\"type\":\"object\",\"x-test\":\"exit-jsonl\"}");
+await File.WriteAllTextAsync(creditsExhaustedSchema, "{\"type\":\"object\",\"x-test\":\"credits-exhausted\"}");
 var reference = Path.Combine(input, "reference.png");
 var drawing = Path.Combine(input, "drawing.png");
 await File.WriteAllBytesAsync(reference, SecurityFixtures.Png1024);
@@ -140,12 +146,28 @@ try
             "a personal profile must not become CODEX_HOME");
 
     var runner = new CodexProcessRunner(settings);
-    // ProbeAsync intentionally exercises transport only; production RunAsync
-    // remains blocked by the deliberately insecure fixture ACL above.
-    var valid = await runner.ProbeAsync(new(
+    // TransportProbeAsync intentionally exercises transport only; production
+    // RunAsync and the active doctor ProbeAsync retain the isolation gate.
+    var productionBlocked = await new CodexProcessRunner(settings with { EffortCompatibilityVerified = false }).RunAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "production must require evidence", schema,
+        [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(productionBlocked.ErrorCode?.Contains("effort_not_verified", StringComparison.Ordinal) == true &&
+        !productionBlocked.ProcessStarted && productionBlocked.AttemptDirectory is null,
+        "RunAsync must retain the production effort evidence gate");
+
+    var preflightBlocked = await new CodexProcessRunner(settings with { Effort = "xhigh" }).ProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "preflight must block before launch", schema,
+        [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(preflightBlocked.ErrorCode?.Contains("effort_below_documented_max", StringComparison.Ordinal) == true &&
+        preflightBlocked.ErrorCode?.Contains("runtime_feature_disable_not_verified", StringComparison.Ordinal) == true &&
+        !preflightBlocked.ProcessStarted && preflightBlocked.AttemptDirectory is null,
+        "ProbeAsync must defer only effort evidence and retain the runtime feature gate");
+
+    var valid = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "prompt contains & whoami and > pwned.txt", schema,
         [reference, drawing], "job-security"), CancellationToken.None);
     Assert(valid.Outcome == ProviderOutcome.Success, "valid fake Codex invocation should succeed: " + valid.ErrorCode + " dir=" + valid.AttemptDirectory);
+    Assert(valid.ProcessStarted, "a successful fake invocation must report that the process started");
     Assert(valid.FinalJson?.Contains("sp.description/1.0", StringComparison.Ordinal) == true, "final JSON must be read from output-last-message");
     Assert(valid.AttemptDirectory is not null && File.Exists(Path.Combine(valid.AttemptDirectory, "attempt.json")), "attempt evidence must be persisted");
 
@@ -163,43 +185,87 @@ try
     Assert((await File.ReadAllTextAsync(Path.Combine(valid.AttemptDirectory!, "runtime-codex-home.txt"))).Equals(home, StringComparison.OrdinalIgnoreCase),
         "personal CODEX_HOME must be replaced by the dedicated runtime home");
 
-    var divergentModel = await runner.ProbeAsync(new(
+    var exitWithStderr = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "safe", exitStderrSchema, [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(exitWithStderr.Outcome == ProviderOutcome.ProcessFailure && exitWithStderr.ErrorCode == "codex_exit_nonzero" &&
+        exitWithStderr.ProcessStarted && exitWithStderr.ExitCode == 23,
+        "a non-zero provider must retain its started and exit-code signals");
+    Assert(exitWithStderr.DiagnosticStderr?.Contains("fake-stderr-sentinel", StringComparison.Ordinal) == true &&
+        exitWithStderr.DiagnosticStderr.Contains("[stderr truncated]", StringComparison.Ordinal) &&
+        exitWithStderr.DiagnosticStderr.Length <= 16_384 + 32,
+        "provider stderr must be bounded before private evidence persistence");
+    Assert(exitWithStderr.AttemptDirectory is not null &&
+        JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(exitWithStderr.AttemptDirectory, "attempt.json"))).RootElement.GetProperty("exit_code").GetInt32() == 23 &&
+        JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(exitWithStderr.AttemptDirectory, "attempt.json"))).RootElement.GetProperty("stderr").GetString()?.Contains("fake-stderr-sentinel", StringComparison.Ordinal) == true,
+        "bounded stderr and exit code must be persisted only in private attempt evidence");
+
+    var exitWithJsonl = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "safe", exitJsonlSchema, [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(exitWithJsonl.Outcome == ProviderOutcome.ModelUnavailable && exitWithJsonl.ErrorCode == "codex_exit_nonzero" &&
+        exitWithJsonl.ProcessStarted && exitWithJsonl.ExitCode == 29 && exitWithJsonl.DiagnosticCategory == "model",
+        "a non-zero provider must classify a model error emitted only on JSONL stdout");
+    Assert(exitWithJsonl.DiagnosticStdoutSha256 is not null && exitWithJsonl.DiagnosticStdoutLength is > 0 &&
+        exitWithJsonl.DiagnosticStdoutTruncated && exitWithJsonl.DiagnosticEventErrorSha256 is not null &&
+        exitWithJsonl.DiagnosticEventErrorLength is > 0 && exitWithJsonl.DiagnosticEventErrorTruncated,
+        "JSONL stdout and event error summaries must be bounded and returned without raw payloads");
+    Assert(exitWithJsonl.AttemptDirectory is not null &&
+        File.Exists(Path.Combine(exitWithJsonl.AttemptDirectory, "stdout.jsonl")),
+        "bounded failing JSONL must be written to the private stdout.jsonl attempt file");
+    var jsonlAttempt = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(exitWithJsonl.AttemptDirectory!, "attempt.json"))).RootElement;
+    var privateJsonlBytes = await File.ReadAllBytesAsync(Path.Combine(exitWithJsonl.AttemptDirectory!, "stdout.jsonl"));
+    var privateJsonl = Encoding.UTF8.GetString(privateJsonlBytes);
+    Assert(privateJsonl.Contains("fake-jsonl-error-sentinel", StringComparison.Ordinal) &&
+        privateJsonl.Contains("[diagnostic truncated]", StringComparison.Ordinal) &&
+        privateJsonl.Length <= 16_384 + 32 &&
+        Convert.ToHexStringLower(SHA256.HashData(privateJsonlBytes)) == exitWithJsonl.DiagnosticStdoutSha256 &&
+        jsonlAttempt.GetProperty("stdout_jsonl_sha256").GetString() == exitWithJsonl.DiagnosticStdoutSha256 &&
+        jsonlAttempt.GetProperty("event_error").GetString()?.Contains("fake-jsonl-error-sentinel", StringComparison.Ordinal) == true &&
+        jsonlAttempt.GetProperty("event_error").GetString()?.Length <= 16_384 + 32,
+        "raw JSONL/event error must remain bounded inside the private attempt only");
+
+    var creditsExhausted = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "A", "safe", creditsExhaustedSchema, [reference, drawing], "job-security"), CancellationToken.None);
+    Assert(creditsExhausted.Outcome == ProviderOutcome.Quota && creditsExhausted.DiagnosticCategory == "quota" &&
+        creditsExhausted.ProcessStarted && creditsExhausted.ExitCode == 30,
+        "an exhausted existing credit balance must be reported as quota without a fallback");
+
+    var divergentModel = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", divergentModelSchema, [reference, drawing], "job-security"), CancellationToken.None);
     Assert(divergentModel.Outcome == ProviderOutcome.ModelUnavailable && divergentModel.ErrorCode == "reported_model_mismatch",
         "a reported model different from the requested model must never be accepted");
 
-    var divergentEffort = await runner.ProbeAsync(new(
+    var divergentEffort = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", divergentEffortSchema, [reference, drawing], "job-security"), CancellationToken.None);
     Assert(divergentEffort.Outcome == ProviderOutcome.EffortUnsupported && divergentEffort.ErrorCode == "reported_effort_mismatch",
         "a reported reasoning effort different from the requested effort must never be accepted");
 
-    var missingModel = await runner.ProbeAsync(new(
+    var missingModel = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", missingModelSchema, [reference, drawing], "job-security"), CancellationToken.None);
     Assert(missingModel.Outcome == ProviderOutcome.ModelUnavailable && missingModel.ErrorCode == "reported_model_missing",
         "a successful turn without reported model metadata must fail closed");
 
-    var missingEffort = await runner.ProbeAsync(new(
+    var missingEffort = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", missingEffortSchema, [reference, drawing], "job-security"), CancellationToken.None);
     Assert(missingEffort.Outcome == ProviderOutcome.EffortUnsupported && missingEffort.ErrorCode == "reported_effort_missing",
         "a successful turn without reported reasoning effort must fail closed");
 
-    var invalidJson = await runner.ProbeAsync(new(
+    var invalidJson = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", invalidJsonSchema, [reference, drawing], "job-security"), CancellationToken.None);
     Assert(invalidJson.Outcome == ProviderOutcome.InvalidSchema && invalidJson.ErrorCode == "final_not_json" &&
         invalidJson.FinalJson == "{not-json",
         "a malformed final must be retained as bounded repair input without being accepted");
 
-    var outsideSchema = await runner.ProbeAsync(new(
+    var outsideSchema = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", outside, [reference, drawing], "job-security"), CancellationToken.None);
     Assert(outsideSchema.Outcome == ProviderOutcome.IsolationViolation && outsideSchema.ErrorCode == "invalid_trusted_input",
         "schema outside the specification root must be rejected before launch");
 
-    var outsideImage = await runner.ProbeAsync(new(
+    var outsideImage = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", schema, [outside, drawing], "job-security"), CancellationToken.None);
     Assert(outsideImage.Outcome == ProviderOutcome.IsolationViolation && outsideImage.ErrorCode == "untrusted_image_path",
         "image outside the declared input root must be rejected before launch");
 
-    var wrongStageImages = await runner.ProbeAsync(new(
+    var wrongStageImages = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "B", "safe", schema, [reference], "job-security"), CancellationToken.None);
     Assert(wrongStageImages.Outcome == ProviderOutcome.IsolationViolation && wrongStageImages.ErrorCode == "stage_image_count",
         "B must not accept image inputs");
@@ -255,6 +321,25 @@ static async Task RunFakeProviderAsync(string[] arguments)
     else
     {
         var schemaText = schema is not null && File.Exists(schema) ? await File.ReadAllTextAsync(schema) : "";
+        if (schemaText.Contains("exit-stderr", StringComparison.OrdinalIgnoreCase))
+        {
+            Console.Error.Write("fake-stderr-sentinel\n" + new string('x', 20_000));
+            Environment.ExitCode = 23;
+            return;
+        }
+        if (schemaText.Contains("exit-jsonl", StringComparison.OrdinalIgnoreCase))
+        {
+            var jsonlMessage = "fake-jsonl-error-sentinel model unsupported " + new string('z', 20_000);
+            Console.WriteLine($"{{\"type\":\"error\",\"error\":{{\"code\":\"model_not_supported\",\"message\":\"{jsonlMessage}\"}}}}");
+            Environment.ExitCode = 29;
+            return;
+        }
+        if (schemaText.Contains("credits-exhausted", StringComparison.OrdinalIgnoreCase))
+        {
+            Console.WriteLine("{\"type\":\"error\",\"error\":{\"code\":\"insufficient_credits\",\"message\":\"Existing credits exhausted\"}}");
+            Environment.ExitCode = 30;
+            return;
+        }
         var version = schema?.Contains("model-b", StringComparison.OrdinalIgnoreCase) == true ? "sp.plan/1.0" : "sp.description/1.0";
         await File.WriteAllTextAsync(output, schemaText.Contains("invalid-json", StringComparison.OrdinalIgnoreCase)
             ? "{not-json"

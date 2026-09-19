@@ -95,6 +95,7 @@ var local = new Dictionary<string, object?>
     ["dedicated_auth"] = auth.Status == "authenticated" ? "authenticated" : auth.Status,
     ["dedicated_auth_detail"] = auth.Status == "authenticated" ? "redacted" : auth.Detail,
     ["runtime_features_disabled"] = DoctorConstants.DisabledFeatures,
+    ["active_provider_execution_mode"] = "probe_async",
     ["runtime_features_effectiveness"] = effectiveDisableObserved
         ? (activeInternalFeatures.Length == 0
             ? "observed_disabled_by_local_features_list_only"
@@ -142,8 +143,10 @@ if (localExit != 0 || auth.Status != "authenticated")
 }
 
 // This branch is deliberately explicit and consumes normal provider usage.
-// The compatibility test itself is allowed to establish the effort flag; the
-// worker still requires PALIMPSESTE_EFFORT_VERIFIED=true afterwards.
+// ProbeAsync is the only path allowed to establish compatibility. It skips
+// only the effort evidence gate while retaining all production path, identity,
+// input, output and tool restrictions. The worker still requires
+// PALIMPSESTE_EFFORT_VERIFIED=true afterwards.
 var root = Path.GetFullPath(args[1]);
 var reference = Path.GetFullPath(args[2]);
 var drawing = Path.GetFullPath(args[3]);
@@ -160,13 +163,12 @@ if (!string.Equals(Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar),
     return 2;
 }
 
-var probeSettings = settings with { EffortCompatibilityVerified = true };
-var provider = new LunaCodexProvider(new CodexProcessRunner(probeSettings), root);
+var provider = new LunaCodexProvider(new CodexProcessRunner(settings), root);
 var layout = await File.ReadAllTextAsync(Path.Combine(root, "reference", "layout-v1.json"));
 var capabilities = await File.ReadAllTextAsync(Path.Combine(root, "contracts", "capability-catalog.json"));
 var geometry = await File.ReadAllTextAsync(geometryPath);
-var a = await provider.InterpretAsync("operator-doctor", Guid.NewGuid().ToString("N"), reference, drawing, layout, capabilities, CancellationToken.None);
-local["model_calls_executed"] = true;
+var a = await provider.ProbeInterpretAsync("operator-doctor", Guid.NewGuid().ToString("N"), reference, drawing, layout, capabilities, CancellationToken.None);
+local["model_calls_executed"] = a.Transport.ProcessStarted;
 local["stage_a"] = StageEvidence(a);
 if (a.Utf8 is null)
 {
@@ -183,7 +185,8 @@ if (!MatchesRequestedMetadata(a.Transport, settings))
     return 1;
 }
 
-var b = await provider.PlanAsync("operator-doctor", Guid.NewGuid().ToString("N"), a.Utf8, geometry, capabilities, CancellationToken.None);
+var b = await provider.ProbePlanAsync("operator-doctor", Guid.NewGuid().ToString("N"), a.Utf8, geometry, capabilities, CancellationToken.None);
+local["model_calls_executed"] = a.Transport.ProcessStarted || b.Transport.ProcessStarted;
 local["stage_b"] = StageEvidence(b);
 if (b.Utf8 is null)
     local["active_result"] = "stage_b_failed";
@@ -209,12 +212,21 @@ static object StageEvidence(ProviderDocument document) => new
 {
     outcome = document.Transport.Outcome.ToString(),
     error_code = document.Transport.ErrorCode,
+    exit_code = document.Transport.ExitCode,
     cli_version = document.Transport.CliVersion,
     requested_model = document.Transport.RequestedModel,
     requested_effort = document.Transport.RequestedEffort,
     reported_model = document.Transport.ReportedModel,
     reported_effort = document.Transport.ReportedEffort,
+    process_started = document.Transport.ProcessStarted,
     usage = document.Transport.UsageJson,
+    diagnostic_category = document.Transport.DiagnosticCategory,
+    diagnostic_stdout_sha256 = document.Transport.DiagnosticStdoutSha256,
+    diagnostic_stdout_length = document.Transport.DiagnosticStdoutLength,
+    diagnostic_stdout_truncated = document.Transport.DiagnosticStdoutTruncated,
+    diagnostic_event_error_sha256 = document.Transport.DiagnosticEventErrorSha256,
+    diagnostic_event_error_length = document.Transport.DiagnosticEventErrorLength,
+    diagnostic_event_error_truncated = document.Transport.DiagnosticEventErrorTruncated,
     final_sha256 = document.Sha256,
     attempt_directory = document.Transport.AttemptDirectory
 };

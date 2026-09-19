@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Npgsql;
+using Palimpseste.Storage;
 
 namespace Palimpseste.Api;
 
@@ -94,6 +95,19 @@ public static partial class ApiHandlers
     private static object Parchment(Guid id, string state, string layout, Guid? jobId, Guid? spellId)
         => new { parchment_id = id.ToString("N"), state, layout_version = layout, job_id = jobId?.ToString("N"), spell_id = spellId?.ToString("N") };
 
-    private static object Job(Guid id, Guid? parchmentId, string state, string? resumeStage, Guid? spellId, int attempts, string message, string? errorCode, bool retryable, int pollAfterMs = 2000)
-        => new { job_id = id.ToString("N"), parchment_id = parchmentId?.ToString("N"), state, resume_stage = resumeStage, spell_id = spellId?.ToString("N"), attempt_count = attempts, message, error_code = errorCode, retryable, poll_after_ms = pollAfterMs };
+    private static object Job(Guid id, Guid? parchmentId, string state, string? resumeStage, Guid? spellId, int attempts, string message, string? errorCode, bool retryable, int pollAfterMs = 2000, Guid? descriptionArtifactId = null)
+        => new
+        {
+            job_id = id.ToString("N"),
+            parchment_id = parchmentId?.ToString("N"),
+            state,
+            resume_stage = resumeStage,
+            spell_id = spellId?.ToString("N"),
+            description_artifact_id = descriptionArtifactId is { } description ? PublicIds.Artifact(description) : null,
+            attempt_count = attempts,
+            message,
+            error_code = errorCode,
+            retryable,
+            poll_after_ms = pollAfterMs
+        };
 }

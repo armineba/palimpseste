@@ -6,6 +6,7 @@
     "type": "object",
     "properties": {
       "schema_version": {
+        "type": "string",
         "const": "sp.plan/1.0"
       },
       "description_sha256": {
@@ -13,9 +14,11 @@
         "pattern": "^[0-9a-f]{64}$"
       },
       "catalog_version": {
+        "type": "string",
         "const": "sp.capabilities/1.0"
       },
       "rules_profile": {
+        "type": "string",
         "const": "lab_v1"
       },
       "nodes": {
@@ -211,6 +214,7 @@
             "maxItems": 8
           },
           "carrier": {
+            "type": "string",
             "const": "projectile"
           },
           "activation": {
@@ -387,6 +391,7 @@
             "maxItems": 8
           },
           "carrier": {
+            "type": "string",
             "const": "beam"
           },
           "activation": {
@@ -548,6 +553,7 @@
             "maxItems": 8
           },
           "carrier": {
+            "type": "string",
             "const": "field"
           },
           "activation": {
@@ -680,6 +686,7 @@
             "maxItems": 8
           },
           "carrier": {
+            "type": "string",
             "const": "pulse"
           },
           "activation": {
@@ -812,6 +819,7 @@
             "maxItems": 8
           },
           "carrier": {
+            "type": "string",
             "const": "barrier"
           },
           "activation": {
@@ -956,6 +964,7 @@
             "maxItems": 8
           },
           "carrier": {
+            "type": "string",
             "const": "trap"
           },
           "activation": {

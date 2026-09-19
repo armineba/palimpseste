@@ -68,6 +68,22 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
         return Parse(result, "sp.description/1.0");
     }
 
+    /// <summary>
+    /// Explicit operator-only compatibility path. It uses ProbeAsync, whose
+    /// preflight omits only the effort evidence gate while retaining the
+    /// production isolation checks. The worker interfaces continue to call
+    /// InterpretAsync and PlanAsync.
+    /// </summary>
+    public async Task<ProviderDocument> ProbeInterpretAsync(string jobId, string attemptId, string referencePng, string drawingPng,
+        string layoutJson, string capabilitiesJson, CancellationToken ct)
+    {
+        var prompt = promptA + "\n\nLAYOUT_CONTEXT\n" + layoutJson + "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson +
+            "\nIMAGE 1 = reference. IMAGE 2 = drawing. Return only the JSON contract.\n";
+        var result = await runner.ProbeAsync(new(attemptId, "A", prompt, schemaA,
+            [referencePng, drawingPng], jobId), ct);
+        return Parse(result, "sp.description/1.0");
+    }
+
     public async Task<ProviderDocument> PlanAsync(string jobId, string attemptId, byte[] frozenDescriptionUtf8, string geometryJson, string capabilitiesJson, CancellationToken ct)
     {
         if (frozenDescriptionUtf8.Length == 0 || frozenDescriptionUtf8.Length > 250_000) throw new ArgumentOutOfRangeException(nameof(frozenDescriptionUtf8));
@@ -77,6 +93,20 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
             "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson + "\nRéponds avec le seul contrat JSON.\n";
         var result = await runner.RunAsync(new(attemptId, "B", prompt, schemaB,
             [], jobId), ct);
+        var document = Parse(result, "sp.plan/1.0");
+        return EnsureDescriptionHash(document, hash);
+    }
+
+    /// <summary>Operator-only counterpart to PlanAsync for active compatibility doctor runs.</summary>
+    public async Task<ProviderDocument> ProbePlanAsync(string jobId, string attemptId, byte[] frozenDescriptionUtf8,
+        string geometryJson, string capabilitiesJson, CancellationToken ct)
+    {
+        if (frozenDescriptionUtf8.Length == 0 || frozenDescriptionUtf8.Length > 250_000) throw new ArgumentOutOfRangeException(nameof(frozenDescriptionUtf8));
+        var hash = Convert.ToHexStringLower(SHA256.HashData(frozenDescriptionUtf8));
+        var prompt = promptB + "\n\nDESCRIPTION_SHA256\n" + hash + "\nSPELL_DESCRIPTION\n" +
+            Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + geometryJson +
+            "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson + "\nReturn only the JSON contract.\n";
+        var result = await runner.ProbeAsync(new(attemptId, "B", prompt, schemaB, [], jobId), ct);
         var document = Parse(result, "sp.plan/1.0");
         return EnsureDescriptionHash(document, hash);
     }

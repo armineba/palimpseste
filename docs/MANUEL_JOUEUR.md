@@ -1,11 +1,38 @@
-# Manuel court du lecteur Palimpseste
+# Manuel du lecteur Palimpseste
 
-Extraire entièrement `deliverables/Palimpseste-Windows-x64-IL2CPP.zip`, puis lancer `Palimpseste.exe` dans le dossier extrait. Le lecteur propose la bibliothèque, l'atelier de dessin et la scène d'épreuve. Sur le profil Windows utilisé pour les essais de ce projet, des sorts de fixture manuelle sont déjà dans le cache local : ouvrir une ligne « Sort disponible », puis « Lancer dans le laboratoire ». Ces fixtures ne sont pas incluses dans le ZIP et ne sont pas des résultats Luna ; la bibliothèque d'un nouveau profil Windows sera vide.
+Pour la passe actuelle, lancer `Palimpseste.exe` depuis
+`game/Build/WindowsPlayerFlowOwnerFinal/` ; l'archive ZIP antérieure ne contient
+pas cette interface. Après installation de l'accès privé remis par l'opérateur du laboratoire, le jeu
+ouvre directement un parchemin à dessiner ou reprend celui qui était en cours.
+Il n'y a ni compte Codex à connecter par joueur, ni champ d'adresse ou de jeton
+dans le jeu : le compte Codex du service est partagé et reste sur le serveur.
 
-Dans l'atelier, le premier contact de pinceau engage le parchemin. Les traits sont enregistrés localement avec le journal et le raster 1024 × 1024. La clôture soumet la capture à l'API privée si celle-ci est configurée. Le lecteur affiche l'état réel de la tâche ; une tâche en file n'est pas un sort publié. La création de sort réel attend actuellement l'activation du worker Luna dédié.
+Le premier contact du pinceau engage le parchemin. Les traits, le dessin et le
+journal sont conservés localement. En fermant le parchemin, la capture est
+transmise au laboratoire. L'écran suivant montre les étapes effectivement
+signalées par le service : lecture du dessin par Luna A, extraction des formes,
+traduction par Luna B, contrôle du sort, puis téléchargement. Il ne présente
+aucun pourcentage inventé. Dès que la description A validée est disponible,
+son texte et les observations du dessin apparaissent dans un panneau que l'on
+peut faire défiler.
 
-La bibliothèque relit les paquets sauvegardés et vérifie leurs versions et leurs empreintes. Les paquets de test peuvent être chargés hors ligne dans la scène d'épreuve pour lancer les porteurs et observer cibles, dégâts et statuts. Dans cette scène, viser puis cliquer pour lancer, maintenir le clic droit pour orbiter, utiliser la molette pour zoomer et « Remise à zéro » pour annuler les effets et remettre les cibles en état. « Bibliothèque » ramène aux parchemins. Le fichier `docs/UNITY_TEST_PROOF.md` distingue précisément ces essais de la recette du parcours Luna complet.
+Seul un sort validé et téléchargé ouvre sa fiche puis le laboratoire d'essai.
+La fiche permet de relire l'interprétation A. Dans le laboratoire, viser puis
+cliquer pour lancer, maintenir le clic droit pour orbiter, utiliser la molette
+pour zoomer et choisir « Remise à zéro » pour annuler les effets. « Bibliothèque »
+ramène aux parchemins. Les vrais sorts déjà téléchargés restent disponibles
+hors ligne ; leurs fichiers et empreintes sont revérifiés avant le lancement.
+La bibliothèque ne montre que les parchemins associés à l'accès de ce joueur.
+Les anciens caches sans propriétaire restent masqués, sans être supprimés.
+Les créations locales de démonstration ne figurent pas dans la bibliothèque du
+joueur.
 
-« Nouveau parchemin » exige une API de laboratoire en service, sa référence et un jeton joueur valide. Sans cette connexion, l'essai disponible immédiatement sur ce PC est le lancement hors ligne des sorts déjà en cache. La génération de nouveaux sorts par Luna reste bloquée tant que le compte Codex dédié du worker n'est pas authentifié et validé par le doctor actif.
-
-Les informations de connexion du laboratoire sont privées. Les jetons ne font pas partie du ZIP ; consulter l'opérateur du laboratoire pour configurer une session. Ne pas placer de jeton dans les assets Unity ou dans le dépôt.
+Sur une nouvelle installation sans accès privé, le jeu affiche « Accès au
+laboratoire nécessaire ». Utiliser « Ouvrir mon invitation » pour choisir le
+fichier d'accès remis par l'opérateur ; son code à usage unique est échangé
+automatiquement et le jeton obtenu est conservé dans le coffre Windows.
+Si le service est temporairement indisponible, la bibliothèque et les sorts
+réels déjà enregistrés restent utilisables hors ligne. La génération de
+nouveaux sorts attend encore un essai actif Luna A/B réel ; la connexion du
+worker au compte Codex du service est faite, mais aucun résultat A/B n'est revendiqué
+dans les preuves actuelles.

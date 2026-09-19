@@ -1,10 +1,10 @@
 # PALIMPSESTE — Dossier de réalisation Unity + Luna/Codex
 
-**SP-1.1-LUNA · 19 septembre 2026.** Le dossier documentaire fourni est conservé. Une implémentation Unity 6.3 URP, un backend .NET/PostgreSQL, un worker et une passerelle `codex exec` ont été ajoutés. L'état exact, les preuves exécutées et le point de reprise figurent dans [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md). La recette finale avec appels Luna A/B sur un compte de service isolé et les validations humaines reste ouverte.
+**SP-1.1-LUNA · état au 20 septembre 2026.** Le dossier documentaire fourni est conservé. Une implémentation Unity 6.3 URP, un backend .NET/PostgreSQL, un worker et une passerelle `codex exec` ont été ajoutés. L'état exact, les preuves exécutées et le point de reprise figurent dans [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md). Un appel A réel a produit un JSON conforme mais a été refusé faute de preuve du modèle et de l'effort effectifs ; B, la boucle dans Unity et les validations humaines restent ouverts.
 
 ## Démarrer
 
-Pour reprendre la réalisation, commence par [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md), puis lis `prompts/00_AGENT_BUILD.md` et l'avenant `docs/05_OVERRIDE_LUNA_CODEX.md`. Pour ouvrir le jeu, utilise le projet [`game/`](game/) avec Unity 6000.3.24f1 et URP 17. Le build Windows IL2CPP, lorsqu'il est reconstruit et vérifié, est sous [`deliverables/`](deliverables/).
+Pour reprendre la réalisation, commence par [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md), puis lis `prompts/00_AGENT_BUILD.md` et l'avenant `docs/05_OVERRIDE_LUNA_CODEX.md`. Pour ouvrir le jeu, utilise le projet [`game/`](game/) avec Unity 6000.3.24f1 et URP 17. Le Player Windows IL2CPP le plus récent est sous `game/Build/WindowsPlayerFlowOwnerFinal/` ; les ZIPs de [`deliverables/`](deliverables/) sont historiques et ne contiennent pas le parcours d'invitation et description A actuel.
 
 L'installation vérifiée, l'usage du lecteur, la provenance des assets, la recette humaine à remplir et les hashes des archives sont décrits dans [`docs/SETUP.md`](docs/SETUP.md), [`docs/MANUEL_JOUEUR.md`](docs/MANUEL_JOUEUR.md), [`docs/ASSETS_ET_LICENCES.md`](docs/ASSETS_ET_LICENCES.md), [`docs/RECETTE_FINALE.md`](docs/RECETTE_FINALE.md) et [`evidence/public/release-2026-09-19.md`](evidence/public/release-2026-09-19.md).
 
@@ -20,12 +20,12 @@ L'avenant ajoute les tickets L01–L10. L'objectif reste M0–M7 : une version f
 
 ## Logiciel et preuves présents
 
-- `game/` : projet Unity 6000.3.24f1 URP et build Windows x64 IL2CPP dans `deliverables/` ; source, dessin, bibliothèque, scène d'épreuve et sorts de données.
-- `backend/` et `shared/` : API ASP.NET, stockage, worker durable, passerelle `codex exec`, doctor et compilateur de contrats ; archive Windows autoportante dans `deliverables/`.
+- `game/` : projet Unity 6000.3.24f1 URP et Player Windows x64 IL2CPP brut dans `game/Build/WindowsPlayerFlowOwnerFinal/` ; source, dessin, bibliothèque, scène d'épreuve et sorts de données.
+- `backend/` et `shared/` : API ASP.NET, stockage, worker durable, passerelle `codex exec`, doctor et compilateur de contrats ; archive Windows autoportante historique dans `deliverables/`.
 - `ops/` : provisionnement du compte runtime, diagnostics, sauvegarde, restauration, statut et packaging. Les fichiers de connexion et d'authentification restent hors Git.
 - `evidence/public/` : résultats de build, API/PostgreSQL et Unity, avec leurs limites. Une sauvegarde privée du dessin capturé dans Unity attend la recette A/B réelle.
 
-La boucle s'arrête actuellement au job en file : le compte Codex dédié doit être authentifié et le doctor actif A/B doit réussir avant que le worker puisse publier un sort issu de Luna. Les essais hors ligne du lecteur utilisent des fixtures manuelles et sont nommés comme tels.
+Le compte Codex partagé est connecté sous le profil du worker isolé, sans clé API ni mécanisme d'achat. Seuls le quota et les crédits déjà présents sont autorisés ; la désactivation de la recharge automatique reste un réglage du compte à vérifier par son titulaire. La boucle s'arrête encore avant la publication d'un sort Luna tant que le doctor actif A/B, l'essai intégré dans Unity et les validations humaines n'ont pas produit leur preuve. Les essais hors ligne du lecteur utilisent des fixtures manuelles et sont nommés comme tels.
 
 ## Ce qui a été ajouté ou remplacé
 

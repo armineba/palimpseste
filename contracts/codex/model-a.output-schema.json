@@ -2,6 +2,7 @@
   "type": "object",
   "properties": {
     "schema_version": {
+      "type": "string",
       "const": "sp.description/1.0"
     },
     "title": {
@@ -96,6 +97,7 @@
                   "type": "object",
                   "properties": {
                     "dimension": {
+                      "type": "string",
                       "const": "carrier"
                     },
                     "value": {
@@ -120,6 +122,7 @@
                   "type": "object",
                   "properties": {
                     "dimension": {
+                      "type": "string",
                       "const": "effect"
                     },
                     "value": {
@@ -144,6 +147,7 @@
                   "type": "object",
                   "properties": {
                     "dimension": {
+                      "type": "string",
                       "const": "target"
                     },
                     "value": {
@@ -167,6 +171,7 @@
                   "type": "object",
                   "properties": {
                     "dimension": {
+                      "type": "string",
                       "const": "motion"
                     },
                     "value": {
@@ -190,6 +195,7 @@
                   "type": "object",
                   "properties": {
                     "dimension": {
+                      "type": "string",
                       "const": "event"
                     },
                     "value": {
@@ -215,6 +221,7 @@
                   "type": "object",
                   "properties": {
                     "dimension": {
+                      "type": "string",
                       "const": "affinity"
                     },
                     "value": {
@@ -237,6 +244,7 @@
                   "type": "object",
                   "properties": {
                     "dimension": {
+                      "type": "string",
                       "const": "pattern"
                     },
                     "value": {

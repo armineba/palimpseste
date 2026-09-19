@@ -15,9 +15,16 @@ namespace Palimpseste.Game.Library
     {
         public string local_id;
         public string parchment_id;
+        public string owner_id;
         public string state = "blank";
         public string job_id;
         public string spell_id;
+        public string description_artifact_id;
+        public string description_sha256;
+        public string resume_stage;
+        public string last_job_message;
+        public bool server_issued;
+        public bool requires_description_before_lab;
         public string closed_reason;
         public string allocation_key;
         public string begin_key;

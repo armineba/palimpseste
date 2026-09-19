@@ -17,6 +17,7 @@ public static partial class ApiHandlers
             var carriers = catalog.RootElement.GetProperty("carriers").EnumerateArray().Select(x => x.GetProperty("id").GetString()).ToArray();
             return Results.Json(new
             {
+                principal_id = Owner(context).Id.ToString("N"),
                 catalog_version = config.CatalogVersion,
                 rules_profile = config.RulesProfile,
                 layout_version = "three_regions_v1",
@@ -156,13 +157,23 @@ public static partial class ApiHandlers
         if (!Id(id, out var jobId)) return ApiProblem.Result(context, 400, "invalid_id", "Identifiant invalide.");
         var principal = Owner(context);
         await using var connection = await db.OpenConnectionAsync(ct);
-        await using var command = new NpgsqlCommand("SELECT parchment_id,state,resume_stage,spell_id,attempt_count,message,error_code,retryable FROM jobs WHERE id=@id AND owner_id=@owner", connection);
+        await using var command = new NpgsqlCommand("""
+            SELECT j.parchment_id,j.state,j.resume_stage,j.spell_id,j.attempt_count,j.message,j.error_code,j.retryable,
+                   da.id
+            FROM jobs j
+            LEFT JOIN interpretations i ON i.job_id=j.id
+            LEFT JOIN artifacts da ON da.id=i.description_artifact_id
+                AND da.owner_id=j.owner_id
+                AND da.kind='description'
+                AND da.content_type='application/json'
+            WHERE j.id=@id AND j.owner_id=@owner
+            """, connection);
         command.Parameters.AddWithValue("id", jobId);
         command.Parameters.AddWithValue("owner", principal.Id);
         await using var reader = await command.ExecuteReaderAsync(ct);
         if (!await reader.ReadAsync(ct)) return ApiProblem.Result(context, 404, "not_found", "Tâche introuvable.");
         var state = reader.GetString(1);
-        return Results.Json(Job(jobId, reader.IsDBNull(0) ? null : reader.GetGuid(0), state, reader.IsDBNull(2) ? null : reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetGuid(3), reader.GetInt32(4), reader.GetString(5), reader.IsDBNull(6) ? null : reader.GetString(6), reader.GetBoolean(7), state == "waiting_retry" ? 10000 : 2000));
+        return Results.Json(Job(jobId, reader.IsDBNull(0) ? null : reader.GetGuid(0), state, reader.IsDBNull(2) ? null : reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetGuid(3), reader.GetInt32(4), reader.GetString(5), reader.IsDBNull(6) ? null : reader.GetString(6), reader.GetBoolean(7), state == "waiting_retry" ? 10000 : 2000, reader.IsDBNull(8) ? null : reader.GetGuid(8)));
     }
 
     public static async Task<IResult> ResumeJob(HttpContext context, string id, NpgsqlDataSource db, CancellationToken ct)
@@ -179,10 +190,19 @@ public static partial class ApiHandlers
         if (saved is not null) return ReplayOrConflict(context, saved, requestHash);
         Guid? parchmentId;
         Guid? spellId;
+        Guid? descriptionArtifactId;
         string state, message;
         int attempts;
         bool retryable;
-        await using (var read = new NpgsqlCommand("SELECT parchment_id,state,spell_id,attempt_count,message,retryable FROM jobs WHERE id=@id AND owner_id=@owner FOR UPDATE", connection, transaction))
+        await using (var read = new NpgsqlCommand("""
+            SELECT j.parchment_id,j.state,j.spell_id,j.attempt_count,j.message,j.retryable,
+                   (SELECT da.id
+                    FROM interpretations i
+                    JOIN artifacts da ON da.id=i.description_artifact_id
+                    WHERE i.job_id=j.id AND da.owner_id=j.owner_id
+                      AND da.kind='description' AND da.content_type='application/json')
+            FROM jobs j WHERE j.id=@id AND j.owner_id=@owner FOR UPDATE
+            """, connection, transaction))
         {
             read.Parameters.AddWithValue("id", jobId);
             read.Parameters.AddWithValue("owner", principal.Id);
@@ -194,6 +214,7 @@ public static partial class ApiHandlers
             attempts = reader.GetInt32(3);
             message = reader.GetString(4);
             retryable = reader.GetBoolean(5);
+            descriptionArtifactId = reader.IsDBNull(6) ? null : reader.GetGuid(6);
         }
         if (state != "ready")
         {
@@ -205,7 +226,7 @@ public static partial class ApiHandlers
             await update.ExecuteNonQueryAsync(ct);
             state = "queued"; message = "Reprise demandée"; retryable = false;
         }
-        var json = Json(Job(jobId, parchmentId, state, null, spellId, attempts, message, null, retryable));
+        var json = Json(Job(jobId, parchmentId, state, null, spellId, attempts, message, null, retryable, descriptionArtifactId: descriptionArtifactId));
         await SaveResponseAsync(connection, transaction, principal.Id, $"resume:{id}", key, requestHash, 202, json, ct);
         await transaction.CommitAsync(ct);
         return Results.Content(json, "application/json", Encoding.UTF8, 202);

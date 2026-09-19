@@ -200,7 +200,31 @@ def api_structure():
         elif isinstance(node,list):
             for val in node: visit(val)
     visit(data)
-    ensure(len(ids)==16, 'Nombre d’opérations API modifié ; mettre à jour le contrôle explicite')
+    ensure(len(ids)==17, 'Nombre d’opérations API modifié ; mettre à jour le contrôle explicite')
+    capabilities = data['components']['schemas']['Capabilities']
+    ensure('principal_id' in capabilities['required'] and
+           capabilities['properties']['principal_id']['pattern'] == '^[0-9a-f]{32}$',
+           'Identité du propriétaire absente des capacités')
+
+def codex_transport_schema(name, envelope):
+    """Static subset of the strict output-schema rules; no provider call."""
+    deployed = load(C / 'codex' / (name + '.output-schema.json'))
+    schema = envelope['schema']
+    ensure(deployed == schema, 'Schéma Codex différent de son enveloppe source')
+    jsonschema.Draft202012Validator.check_schema(deployed)
+    ensure(deployed.get('type') == 'object', 'Racine Codex non objet')
+    def walk(node, path='$'):
+        if isinstance(node, dict):
+            if 'const' in node:
+                ensure('type' in node, 'const sans type : ' + path)
+            if node.get('type') == 'object':
+                fields = set(node.get('properties', {}))
+                ensure(fields == set(node.get('required', [])), 'required incomplet : ' + path)
+                ensure(node.get('additionalProperties') is False, 'additionalProperties absent : ' + path)
+            for key, value in node.items(): walk(value, path + '.' + key)
+        elif isinstance(node, list):
+            for index, value in enumerate(node): walk(value, f'{path}[{index}]')
+    walk(deployed)
 
 D=load(E/'01_description_illustrative.json');P=load(E/'02_plan_illustratif.json');PACK=load(E/'03_paquet_illustratif.json')
 for name,schema in SCHEMAS.items():
@@ -217,6 +241,7 @@ for name, target in [('model-a','spell-description.schema.json'),('model-b','spe
     fmt=load(C/(name+'.response-format.json'))
     check('Format local fournisseur : '+name, lambda f=fmt: jsonschema.Draft202012Validator.check_schema(f['schema']))
     check('Exemple conforme au format local : '+name, lambda f=fmt,d=D if name=='model-a' else P: jsonschema.Draft202012Validator(f['schema']).validate(d))
+    check('Transport Codex strict statique : '+name, lambda n=name,f=fmt: codex_transport_schema(n,f))
 
 # Mutations rejetées : vérification de l’échec, pas seulement des cas heureux.
 def mutation(name, base, edit, validator):

@@ -12,15 +12,17 @@ namespace Palimpseste.Game.Service
     [Serializable] public sealed class ParchmentPageDto { public ParchmentDto[] items; public string next_cursor; }
     [Serializable] public sealed class JobDto
     {
-        public string job_id, parchment_id, state, resume_stage, spell_id, message, error_code;
+        public string job_id, parchment_id, state, resume_stage, spell_id, message, error_code, description_artifact_id;
         public int attempt_count, poll_after_ms;
         public bool retryable;
     }
     [Serializable] public sealed class CapabilitiesDto
     {
-        public string catalog_version, rules_profile, layout_version, reference_artifact_id, minimum_client_version;
+        public string catalog_version, rules_profile, layout_version, reference_artifact_id, minimum_client_version, principal_id;
         public string[] carriers;
     }
+    [Serializable] public sealed class InvitationRequestDto { public string invitation_code; }
+    [Serializable] public sealed class SessionDto { public string token; }
 
     [Serializable]
     public sealed class DrawingCaptureDto
@@ -50,11 +52,40 @@ namespace Palimpseste.Game.Service
 
         public void Configure(string baseUrl, string token)
         {
-            if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri) ||
-                (uri.Scheme != Uri.UriSchemeHttps && !(uri.Scheme == Uri.UriSchemeHttp && uri.IsLoopback)))
+            if (!AllowedServiceUrl(baseUrl))
                 throw new ArgumentException("HTTPS requis hors 127.0.0.1");
             BaseUrl = baseUrl.TrimEnd('/');
             Token = token.Trim();
+        }
+
+        public static bool AllowedServiceUrl(string value)
+        {
+            if (!Uri.TryCreate(value, UriKind.Absolute, out var uri)) return false;
+            if (uri.Scheme != Uri.UriSchemeHttps && !(uri.Scheme == Uri.UriSchemeHttp && uri.IsLoopback)) return false;
+            return string.IsNullOrEmpty(uri.UserInfo) && string.IsNullOrEmpty(uri.Query) &&
+                   string.IsNullOrEmpty(uri.Fragment) && uri.AbsolutePath == "/";
+        }
+
+        public IEnumerator RedeemInvitation(string serviceUrl, string code, Action<string, string> done)
+        {
+            if (!AllowedServiceUrl(serviceUrl) || string.IsNullOrEmpty(code))
+            {
+                done(null, "Invitation ou adresse du laboratoire invalide");
+                yield break;
+            }
+            var body = Json(JsonUtility.ToJson(new InvitationRequestDto { invitation_code = code }));
+            using (var req = new UnityWebRequest(serviceUrl.TrimEnd('/') + "/v1/session/redeem", "POST"))
+            {
+                req.downloadHandler = new DownloadHandlerBuffer();
+                req.uploadHandler = new UploadHandlerRaw(body);
+                req.SetRequestHeader("Content-Type", "application/json");
+                req.timeout = 30;
+                yield return req.SendWebRequest();
+                var response = req.result == UnityWebRequest.Result.Success
+                    ? JsonUtility.FromJson<SessionDto>(req.downloadHandler.text) : null;
+                done(string.IsNullOrEmpty(response?.token) ? null : response.token,
+                    string.IsNullOrEmpty(response?.token) ? Error(req) ?? "Session non créée" : null);
+            }
         }
 
         private UnityWebRequest Request(string method, string path, byte[] body = null, string contentType = null, string key = null)
@@ -73,12 +104,13 @@ namespace Palimpseste.Game.Service
         private static string PathId(string id) => Uri.EscapeDataString(id ?? "");
         private static byte[] Json(string json) => Encoding.UTF8.GetBytes(json);
 
-        public IEnumerator GetCapabilities(Action<CapabilitiesDto, string> done)
+        public IEnumerator GetCapabilities(Action<CapabilitiesDto, string, long> done)
         {
             using (var req = Request("GET", "/v1/capabilities"))
             {
                 yield return req.SendWebRequest();
-                done(req.result == UnityWebRequest.Result.Success ? JsonUtility.FromJson<CapabilitiesDto>(req.downloadHandler.text) : null, Error(req));
+                done(req.result == UnityWebRequest.Result.Success ? JsonUtility.FromJson<CapabilitiesDto>(req.downloadHandler.text) : null,
+                    Error(req), req.responseCode);
             }
         }
 

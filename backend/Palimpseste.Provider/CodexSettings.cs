@@ -68,10 +68,11 @@ public sealed record CodexSettings(
 
     /// <summary>
     /// Performs the checks that must pass before a process can be started.
-    /// When <paramref name="production"/> is false, the operator may use the
-    /// active doctor to establish effort compatibility for the first time.
+    /// The explicit compatibility probe may defer only the effort evidence
+    /// check that the probe itself is about to establish; all other production
+    /// checks remain active.
     /// </summary>
-    public IReadOnlyList<string> Check(bool production)
+    public IReadOnlyList<string> Check(bool production, bool compatibilityProbe = false)
     {
         var issues = new List<string>();
 
@@ -92,7 +93,9 @@ public sealed record CodexSettings(
         if (Model != "gpt-5.6-luna") issues.Add("model_mismatch");
         if (Effort is not ("low" or "medium" or "high" or "xhigh" or "max")) issues.Add("invalid_effort");
         else if (Effort != "max") issues.Add("effort_below_documented_max");
-        if (production && !EffortCompatibilityVerified) issues.Add("effort_not_verified");
+        // The active doctor may establish this one fact. All other production
+        // checks remain enabled for its ProbeAsync path.
+        if (production && !EffortCompatibilityVerified && !compatibilityProbe) issues.Add("effort_not_verified");
         if (production && !RuntimeFeaturesCompatibilityVerified) issues.Add("runtime_feature_disable_not_verified");
         string? executableHash = null;
         if (production && (RuntimeFeaturesCompatibilityVerified || EffortCompatibilityVerified))
@@ -594,4 +597,10 @@ public sealed record CodexResult(
     ProviderOutcome Outcome, string? FinalJson, int? ExitCode, string? SessionId,
     string? ErrorCode, DateTimeOffset StartedAt, DateTimeOffset EndedAt, string CliVersion,
     string RequestedModel, string RequestedEffort, string? ReportedModel, string? ReportedEffort,
-    string? UsageJson, string? AttemptDirectory = null);
+    string? UsageJson, string? AttemptDirectory = null, bool ProcessStarted = false,
+    string? DiagnosticStderr = null,
+    string? DiagnosticStdoutSha256 = null, int? DiagnosticStdoutLength = null,
+    bool DiagnosticStdoutTruncated = false,
+    string? DiagnosticEventErrorSha256 = null, int? DiagnosticEventErrorLength = null,
+    bool DiagnosticEventErrorTruncated = false,
+    string? DiagnosticCategory = null);

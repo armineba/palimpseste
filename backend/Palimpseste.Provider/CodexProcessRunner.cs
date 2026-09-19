@@ -24,15 +24,22 @@ public sealed class CodexProcessRunner
     private readonly CodexSettings settings;
     public CodexProcessRunner(CodexSettings settings) => this.settings = settings;
 
-    public Task<CodexResult> RunAsync(CodexAttempt attempt, CancellationToken cancellationToken) => ExecuteAsync(attempt, true, cancellationToken);
+    public Task<CodexResult> RunAsync(CodexAttempt attempt, CancellationToken cancellationToken) => ExecuteAsync(attempt, production: true, compatibilityProbe: false, cancellationToken: cancellationToken);
 
-    // Only the operator's explicit active doctor uses this path to establish compatibility.
-    public Task<CodexResult> ProbeAsync(CodexAttempt attempt, CancellationToken cancellationToken) => ExecuteAsync(attempt, false, cancellationToken);
+    // Only the operator's explicit active doctor uses this path to establish
+    // effort compatibility. It retains every production isolation check and
+    // skips only the evidence that this call is about to create.
+    public Task<CodexResult> ProbeAsync(CodexAttempt attempt, CancellationToken cancellationToken) => ExecuteAsync(attempt, production: true, compatibilityProbe: true, cancellationToken: cancellationToken);
 
-    private async Task<CodexResult> ExecuteAsync(CodexAttempt attempt, bool production, CancellationToken cancellationToken)
+    // Transport-only fixture hook. ProviderDoctor never calls this method;
+    // security tests use it with a fake executable to test argument and
+    // environment handling without pretending to prove runtime isolation.
+    public Task<CodexResult> TransportProbeAsync(CodexAttempt attempt, CancellationToken cancellationToken) => ExecuteAsync(attempt, production: false, compatibilityProbe: false, cancellationToken: cancellationToken);
+
+    private async Task<CodexResult> ExecuteAsync(CodexAttempt attempt, bool production, bool compatibilityProbe, CancellationToken cancellationToken)
     {
         var started = DateTimeOffset.UtcNow;
-        var issues = settings.Check(production);
+        var issues = settings.Check(production, compatibilityProbe);
         if (issues.Count != 0) return Failure(ProviderOutcome.IsolationViolation, string.Join(',', issues), started);
         if (attempt is null || attempt.Stage is not ("A" or "B") || attempt.Images is null ||
             attempt.Images.Count != (attempt.Stage == "A" ? 2 : 0))
@@ -145,6 +152,7 @@ public sealed class CodexProcessRunner
             return Failure(ProviderOutcome.ProcessFailure, "process_start_failed", started);
         }
 
+        const bool processStarted = true;
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(settings.AttemptTimeout);
         var stdout = ReadBoundedAsync(process.StandardOutput, settings.MaxOutputBytes, timeout.Token);
@@ -156,29 +164,51 @@ public sealed class CodexProcessRunner
             await process.WaitForExitAsync(timeout.Token);
             var outText = await stdout;
             var errText = await stderr;
+            var diagnosticStderr = BoundDiagnostic(errText);
             var events = ParseEvents(outText);
-            if (process.ExitCode != 0) return Failure(Classify(errText + "\n" + events.Error), "codex_exit_nonzero", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort);
+            if (process.ExitCode != 0)
+            {
+                // A failing codex exec can put the useful diagnostic in its
+                // JSONL stdout even when stderr only says that stdin is being
+                // read. Keep the bounded raw JSONL in the private attempt
+                // directory; only its hashes, lengths and category leave the
+                // provider boundary.
+                var stdoutDiagnostic = SnapshotDiagnostic(outText);
+                var eventDiagnostic = SnapshotDiagnostic(events.Error);
+                var diagnosticCategory = ChooseDiagnosticCategory(errText, events.Error, outText);
+                var exitResult = Failure(Classify(errText + "\n" + events.Error + "\n" + outText), "codex_exit_nonzero", started,
+                    process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort,
+                    processStarted: processStarted, diagnosticStderr: diagnosticStderr,
+                    diagnosticStdoutSha256: stdoutDiagnostic?.Sha256,
+                    diagnosticStdoutLength: stdoutDiagnostic?.Length,
+                    diagnosticStdoutTruncated: stdoutDiagnostic?.Truncated ?? false,
+                    diagnosticEventErrorSha256: eventDiagnostic?.Sha256,
+                    diagnosticEventErrorLength: eventDiagnostic?.Length,
+                    diagnosticEventErrorTruncated: eventDiagnostic?.Truncated ?? false,
+                    diagnosticCategory: diagnosticCategory);
+                return await PersistFailureAsync(exitResult, stdoutDiagnostic?.Text, eventDiagnostic?.Text);
+            }
             if (!events.Completed || events.Failed || !File.Exists(outputPath))
-                return Failure(ProviderOutcome.Incomplete, "missing_completed_turn_or_final", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort);
+                return await PersistFailureAsync(Failure(ProviderOutcome.Incomplete, "missing_completed_turn_or_final", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (events.ReportedModel is null)
-                return Failure(ProviderOutcome.ModelUnavailable, "reported_model_missing", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort);
+                return await PersistFailureAsync(Failure(ProviderOutcome.ModelUnavailable, "reported_model_missing", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (!string.Equals(events.ReportedModel, settings.Model, StringComparison.Ordinal))
-                return Failure(ProviderOutcome.ModelUnavailable, "reported_model_mismatch", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort);
+                return await PersistFailureAsync(Failure(ProviderOutcome.ModelUnavailable, "reported_model_mismatch", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (events.ReportedEffort is null)
-                return Failure(ProviderOutcome.EffortUnsupported, "reported_effort_missing", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort);
+                return await PersistFailureAsync(Failure(ProviderOutcome.EffortUnsupported, "reported_effort_missing", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (!string.Equals(events.ReportedEffort, settings.Effort, StringComparison.OrdinalIgnoreCase))
-                return Failure(ProviderOutcome.EffortUnsupported, "reported_effort_mismatch", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort);
+                return await PersistFailureAsync(Failure(ProviderOutcome.EffortUnsupported, "reported_effort_mismatch", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             var info = new FileInfo(outputPath);
             if (info.Length == 0 || info.Length > settings.MaxOutputBytes)
-                return Failure(ProviderOutcome.Incomplete, "empty_or_oversize_final", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort);
+                return await PersistFailureAsync(Failure(ProviderOutcome.Incomplete, "empty_or_oversize_final", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (CodexSettings.HasReparsePoint(outputPath))
-                return Failure(ProviderOutcome.IsolationViolation, "final_output_reparse_point", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort);
+                return await PersistFailureAsync(Failure(ProviderOutcome.IsolationViolation, "final_output_reparse_point", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             var json = await File.ReadAllTextAsync(outputPath, Encoding.UTF8, timeout.Token);
             try { using var parsed = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 64 }); }
-            catch (JsonException) { return Failure(ProviderOutcome.InvalidSchema, "final_not_json", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, json); }
+            catch (JsonException) { return await PersistFailureAsync(Failure(ProviderOutcome.InvalidSchema, "final_not_json", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, finalJson: json, processStarted: processStarted, diagnosticStderr: diagnosticStderr)); }
             var result = new CodexResult(ProviderOutcome.Success, json, process.ExitCode, events.SessionId, null, started,
-                DateTimeOffset.UtcNow, GetCliVersion(), settings.Model, settings.Effort, events.ReportedModel, events.ReportedEffort, events.UsageJson, directory);
-            await TryWriteAttemptOutcomeAsync(directory, result, cancellationToken);
+                DateTimeOffset.UtcNow, GetCliVersion(), settings.Model, settings.Effort, events.ReportedModel, events.ReportedEffort, events.UsageJson, directory, processStarted, diagnosticStderr);
+            await TryWriteAttemptOutcomeAsync(directory, result, null, null, cancellationToken);
             return result;
         }
         catch (OperationCanceledException)
@@ -186,37 +216,93 @@ public sealed class CodexProcessRunner
             try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
             try { await process.WaitForExitAsync(CancellationToken.None); } catch (InvalidOperationException) { }
             return Failure(cancellationToken.IsCancellationRequested ? ProviderOutcome.TransportUncertain : ProviderOutcome.Timeout,
-                cancellationToken.IsCancellationRequested ? "cancelled_after_launch" : "attempt_timeout", started, directory: directory);
+                cancellationToken.IsCancellationRequested ? "cancelled_after_launch" : "attempt_timeout", started, directory: directory, processStarted: processStarted);
         }
         catch (InvalidDataException)
         {
             try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            return Failure(ProviderOutcome.Incomplete, "event_stream_too_large", started, directory: directory);
+            return Failure(ProviderOutcome.Incomplete, "event_stream_too_large", started, directory: directory, processStarted: processStarted);
         }
         catch (IOException)
         {
             try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            return Failure(ProviderOutcome.ProcessFailure, "provider_io_failed", started, directory: directory);
+            return Failure(ProviderOutcome.ProcessFailure, "provider_io_failed", started, directory: directory, processStarted: processStarted);
         }
         catch (UnauthorizedAccessException)
         {
             try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            return Failure(ProviderOutcome.IsolationViolation, "provider_access_denied", started, directory: directory);
+            return Failure(ProviderOutcome.IsolationViolation, "provider_access_denied", started, directory: directory, processStarted: processStarted);
         }
     }
 
     private CodexResult Failure(ProviderOutcome outcome, string code, DateTimeOffset started, int? exitCode = null,
         string? session = null, string? usage = null, string? directory = null,
-        string? reportedModel = null, string? reportedEffort = null, string? finalJson = null) =>
+        string? reportedModel = null, string? reportedEffort = null, string? finalJson = null, bool processStarted = false,
+        string? diagnosticStderr = null, string? diagnosticStdoutSha256 = null,
+        int? diagnosticStdoutLength = null, bool diagnosticStdoutTruncated = false,
+        string? diagnosticEventErrorSha256 = null, int? diagnosticEventErrorLength = null,
+        bool diagnosticEventErrorTruncated = false, string? diagnosticCategory = null) =>
         new(outcome, finalJson, exitCode, session, code, started, DateTimeOffset.UtcNow, GetCliVersion(),
-            settings.Model, settings.Effort, reportedModel, reportedEffort, usage, directory);
+            settings.Model, settings.Effort, reportedModel, reportedEffort, usage, directory, processStarted, diagnosticStderr,
+            diagnosticStdoutSha256, diagnosticStdoutLength, diagnosticStdoutTruncated,
+            diagnosticEventErrorSha256, diagnosticEventErrorLength, diagnosticEventErrorTruncated, diagnosticCategory);
 
-    private static async Task TryWriteAttemptOutcomeAsync(string directory, CodexResult result, CancellationToken cancellationToken)
+    private async Task<CodexResult> PersistFailureAsync(CodexResult result, string? diagnosticStdout = null, string? diagnosticEventError = null)
+    {
+        if (result.AttemptDirectory is not null)
+            await TryWriteAttemptOutcomeAsync(result.AttemptDirectory, result, diagnosticStdout, diagnosticEventError, CancellationToken.None);
+        return result;
+    }
+
+    private sealed record DiagnosticSnapshot(string Text, string Sha256, int Length, bool Truncated);
+
+    private static DiagnosticSnapshot? SnapshotDiagnostic(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        const int limit = 16_384;
+        var truncated = raw.Length > limit;
+        var text = truncated ? raw[..limit] + "\n[diagnostic truncated]" : raw;
+        return new(text, Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text))), text.Length, truncated);
+    }
+
+    private static string? BoundDiagnostic(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        const int limit = 16_384;
+        return raw.Length <= limit ? raw : raw[..limit] + "\n[stderr truncated]";
+    }
+
+    private static string ChooseDiagnosticCategory(params string?[] values)
+    {
+        foreach (var value in values)
+        {
+            if (string.IsNullOrWhiteSpace(value)) continue;
+            var lower = value.ToLowerInvariant();
+            if (lower.Contains("unauthorized") || lower.Contains("authentication") || lower.Contains("login")) return "authentication";
+            if (IsQuotaOrCreditExhaustion(lower)) return "quota";
+            if (lower.Contains("reasoning") && (lower.Contains("unsupported") || lower.Contains("invalid"))) return "effort";
+            if (lower.Contains("model") && (lower.Contains("not found") || lower.Contains("unsupported") || lower.Contains("unavailable"))) return "model";
+            if (lower.Contains("json") || lower.Contains("jsonl")) return "jsonl";
+            if (lower.Contains("permission") || lower.Contains("access denied")) return "permission";
+        }
+        return values.Any(value => !string.IsNullOrWhiteSpace(value)) ? "process" : "none";
+    }
+
+    private static async Task TryWriteAttemptOutcomeAsync(string directory, CodexResult result,
+        string? diagnosticStdout, string? diagnosticEventError, CancellationToken cancellationToken)
     {
         try
         {
             var path = Path.Combine(directory, "attempt.json");
-            if (!File.Exists(path) || CodexSettings.HasReparsePoint(path)) return;
+            if (!CodexSettings.IsPathInside(path, directory, allowEqual: false) ||
+                CodexSettings.HasReparsePoint(directory) || !File.Exists(path) || CodexSettings.HasReparsePoint(path)) return;
+            if (diagnosticStdout is not null)
+            {
+                var stdoutPath = Path.Combine(directory, "stdout.jsonl");
+                if (CodexSettings.IsPathInside(stdoutPath, directory, allowEqual: false) &&
+                    !CodexSettings.HasReparsePoint(stdoutPath))
+                    await File.WriteAllTextAsync(stdoutPath, diagnosticStdout, new UTF8Encoding(false), cancellationToken);
+            }
             var source = await File.ReadAllTextAsync(path, Encoding.UTF8, cancellationToken);
             using var doc = JsonDocument.Parse(source);
             var values = new Dictionary<string, object?>();
@@ -228,6 +314,19 @@ public sealed class CodexProcessRunner
             values["reported_model"] = result.ReportedModel;
             values["reported_effort"] = result.ReportedEffort;
             values["usage"] = result.UsageJson;
+            // This is written only inside the private attempt directory. It is
+            // bounded before reaching this method and is never exposed in API
+            // DTOs or public doctor evidence. stdout JSONL is kept in the
+            // sibling private stdout.jsonl file to avoid duplicating it here.
+            values["stderr"] = result.DiagnosticStderr;
+            values["stdout_jsonl_sha256"] = result.DiagnosticStdoutSha256;
+            values["stdout_jsonl_length"] = result.DiagnosticStdoutLength;
+            values["stdout_jsonl_truncated"] = result.DiagnosticStdoutTruncated;
+            values["event_error"] = diagnosticEventError;
+            values["event_error_sha256"] = result.DiagnosticEventErrorSha256;
+            values["event_error_length"] = result.DiagnosticEventErrorLength;
+            values["event_error_truncated"] = result.DiagnosticEventErrorTruncated;
+            values["diagnostic_category"] = result.DiagnosticCategory;
             values["ended_at"] = result.EndedAt;
             await File.WriteAllTextAsync(path, JsonSerializer.Serialize(values), Encoding.UTF8, cancellationToken);
         }
@@ -286,13 +385,19 @@ public sealed class CodexProcessRunner
     private static ProviderOutcome Classify(string message)
     {
         var lower = message.ToLowerInvariant();
-        if (lower.Contains("quota") || lower.Contains("rate limit")) return ProviderOutcome.Quota;
+        if (IsQuotaOrCreditExhaustion(lower)) return ProviderOutcome.Quota;
         if (lower.Contains("unauthorized") || lower.Contains("authentication") || lower.Contains("login")) return ProviderOutcome.Authentication;
         if (lower.Contains("model") && (lower.Contains("not found") || lower.Contains("unsupported"))) return ProviderOutcome.ModelUnavailable;
         if (lower.Contains("reasoning") && (lower.Contains("unsupported") || lower.Contains("invalid"))) return ProviderOutcome.EffortUnsupported;
         if (lower.Contains("refus")) return ProviderOutcome.Refusal;
         return ProviderOutcome.ProcessFailure;
     }
+
+    private static bool IsQuotaOrCreditExhaustion(string lower) =>
+        lower.Contains("quota") || lower.Contains("rate limit") ||
+        lower.Contains("usage limit") || lower.Contains("usage_limit") ||
+        lower.Contains("insufficient credits") || lower.Contains("insufficient_credits") ||
+        lower.Contains("credits exhausted") || lower.Contains("credit balance");
 
     private string GetCliVersion()
     {

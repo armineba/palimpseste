@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json.Linq;
@@ -14,7 +16,7 @@ namespace Palimpseste.Game.Bootstrap
 {
     public sealed class PalimpsesteApp : MonoBehaviour
     {
-        private enum Page { Library, Drawing, Processing, Card, Lab }
+        private enum Page { Library, Drawing, Processing, Card, Interpretation, Lab }
         private static PalimpsesteApp instance;
         private readonly LabApi api = new LabApi();
         private ParchmentStore store;
@@ -24,8 +26,9 @@ namespace Palimpseste.Game.Bootstrap
         private Texture2D reference;
         private byte[] referenceBytes;
         private string serviceUrl;
+        private string principalId;
         private string token = "";
-        private string notice = "Connectez le laboratoire pour créer un parchemin. Les sorts enregistrés restent disponibles hors ligne.";
+        private string notice = "Ouverture du laboratoire… Les sorts déjà enregistrés restent disponibles hors ligne.";
         private Page page;
         private BrushStyle brush = BrushStyle.Solid;
         private int inkIndex;
@@ -35,6 +38,9 @@ namespace Palimpseste.Game.Bootstrap
         private Rect paperRect;
         private bool busy;
         private string spellJson;
+        private SpellDescriptionView descriptionView;
+        private readonly HashSet<string> pollingJobs = new HashSet<string>(StringComparer.Ordinal);
+        private Vector2 interpretationScroll;
         private SpellLab lab;
         private GUIStyle panelStyle;
         private GUIStyle libraryPanelStyle;
@@ -63,14 +69,35 @@ namespace Palimpseste.Game.Bootstrap
         private void Awake()
         {
             store = new ParchmentStore();
-            records = store.LoadAll();
+            records = new List<ParchmentRecord>();
             libraryBackdrop = Resources.Load<Texture2D>("LibraryBackdrop");
-            serviceUrl = PlayerPrefs.GetString("palimpseste.lab_url", "http://127.0.0.1:8080");
-            if (WindowsCredentialStore.TryRead(serviceUrl, out token, out _))
+            if (!ServiceAccess.TryLoadServiceUrl(Path.Combine(Application.streamingAssetsPath, "service.json"), out serviceUrl))
+                ServiceAccess.TryLoadServiceUrl(LocalServicePath(), out serviceUrl);
+            if (!string.IsNullOrEmpty(serviceUrl) && WindowsCredentialStore.TryRead(serviceUrl, out token, out _))
                 Debug.Log("PALIMPSESTE_CREDENTIAL_READ_OK");
             if (token == null) token = "";
+            if (!File.Exists(Path.Combine(AccessDirectory(), "access.json")) &&
+                ServiceAccess.TryLoadPrincipalId(LocalIdentityPath(), serviceUrl, token, out var rememberedPrincipal))
+            {
+                principalId = rememberedPrincipal;
+                RefreshVisibleRecords();
+            }
             SceneManager.sceneLoaded += OnSceneLoaded;
             if (SceneManager.GetActiveScene().name == "SpellLab") page = Page.Lab;
+        }
+
+        private IEnumerator Start()
+        {
+            if (page != Page.Lab) yield return BootstrapSession(true);
+        }
+
+        private static string AccessDirectory() => Path.Combine(Application.persistentDataPath, "Palimpseste");
+        private static string LocalServicePath() => Path.Combine(AccessDirectory(), "service.json");
+        private static string LocalIdentityPath() => Path.Combine(AccessDirectory(), "identity.json");
+
+        private void RefreshVisibleRecords()
+        {
+            records = store.LoadAll().FindAll(item => PlayerParchmentFilter.IsUserParchment(item, principalId));
         }
 
         private void OnDestroy()
@@ -142,6 +169,7 @@ namespace Palimpseste.Game.Bootstrap
                 case Page.Drawing: DrawDrawing(); break;
                 case Page.Processing: DrawProcessing(); break;
                 case Page.Card: DrawCard(); break;
+                case Page.Interpretation: DrawInterpretation(); break;
                 case Page.Lab: DrawLabHud(); break;
             }
         }
@@ -156,31 +184,18 @@ namespace Palimpseste.Game.Bootstrap
             GUI.Box(new Rect(x, 108, width, Screen.height - 132), GUIContent.none, libraryPanelStyle);
             GUI.DrawTexture(new Rect(x + 20, 157, 115, 3), goldBar);
             GUI.Label(new Rect(x + 20, 122, width - 40, 32), "Bibliothèque des parchemins", titleStyle);
-            GUI.Label(new Rect(x + 20, 174, 110, 30), "Service", textStyle);
-            var editedUrl = GUI.TextField(new Rect(x + 130, 174, width - 470, 32), serviceUrl);
-            if (editedUrl != serviceUrl)
-            {
-                serviceUrl = editedUrl;
-                api.Clear();
-                WindowsCredentialStore.TryRead(serviceUrl, out token, out _);
-                if (token == null) token = "";
-            }
-            GUI.Label(new Rect(x + 20, 214, 110, 30), "Jeton privé", textStyle);
-            token = GUI.PasswordField(new Rect(x + 130, 214, width - 470, 32), token, '•');
-            if (GUI.Button(new Rect(x + width - 310, 174, 280, 72), busy ? "Connexion…" : "Connecter", buttonStyle) && !busy) StartCoroutine(Connect());
-            if (GUI.Button(new Rect(x + 20, 272, 280, 42), "Nouveau parchemin", buttonStyle) && !busy) StartCoroutine(NewParchment());
-            if (GUI.Button(new Rect(x + 315, 272, 185, 42), "Oublier le jeton", buttonStyle) && !busy)
-            {
-                if (WindowsCredentialStore.TryDelete(serviceUrl, out var deleteError))
-                {
-                    token = "";
-                    api.Clear();
-                    notice = "Jeton protégé effacé. Les sorts locaux restent accessibles.";
-                    Debug.Log("PALIMPSESTE_CREDENTIAL_DELETE_OK");
-                }
-                else notice = "Effacement du jeton impossible : " + deleteError;
-            }
-            GUI.Label(new Rect(x + 20, 327, width - 40, 26), "Créations locales", textStyle);
+            GUI.Label(new Rect(x + 20, 179, width - 40, 60), api.Configured ?
+                "Le laboratoire est prêt. Dessinez ou retrouvez un sort enregistré." :
+                "Accès au laboratoire nécessaire. Vos sorts enregistrés restent jouables hors ligne.", textStyle);
+            var previousEnabled = GUI.enabled;
+            GUI.enabled = api.Configured && !busy;
+            if (GUI.Button(new Rect(x + 20, 255, 280, 48), "Dessiner un parchemin", buttonStyle))
+                StartCoroutine(NewParchment());
+            GUI.enabled = previousEnabled;
+            if (!api.Configured && !busy &&
+                GUI.Button(new Rect(x + 315, 255, 198, 48), "Ouvrir mon invitation", buttonStyle))
+                ImportInvitation();
+            GUI.Label(new Rect(x + 20, 327, width - 40, 26), "Mes parchemins", textStyle);
             var guideX = x + width * .59f;
             var guideWidth = width * .38f;
             GUI.Box(new Rect(guideX, 270, guideWidth, Mathf.Min(300, Screen.height - 405)), GUIContent.none);
@@ -188,8 +203,9 @@ namespace Palimpseste.Game.Bootstrap
             GUI.DrawTexture(new Rect(guideX + 18, 325, guideWidth - 36, 2), goldBar);
             GUI.Label(new Rect(guideX + 18, 340, guideWidth - 36, 44), "01  Dessiner sur trois régions", textStyle);
             GUI.Label(new Rect(guideX + 18, 390, guideWidth - 36, 44), "02  Transmettre votre trace", textStyle);
-            GUI.Label(new Rect(guideX + 18, 440, guideWidth - 36, 48), "03  Essayer le sort dans le labo", textStyle);
-            GUI.Label(new Rect(guideX + 18, 510, guideWidth - 36, 50), "Sorts téléchargés : accessibles hors ligne.", textStyle);
+            GUI.Label(new Rect(guideX + 18, 440, guideWidth - 36, 48), "03  Lire l'interprétation de Luna", textStyle);
+            GUI.Label(new Rect(guideX + 18, 485, guideWidth - 36, 48), "04  Essayer le sort dans le labo", textStyle);
+            GUI.Label(new Rect(guideX + 18, 532, guideWidth - 36, 34), "Sorts téléchargés : accessibles hors ligne.", textStyle);
             var listWidth = width * .55f;
             var viewport = new Rect(x + 20, 365, listWidth, Mathf.Max(90, Screen.height - 413));
             var contentWidth = listWidth - 18;
@@ -197,15 +213,15 @@ namespace Palimpseste.Game.Bootstrap
             libraryScroll = GUI.BeginScrollView(viewport, libraryScroll,
                 new Rect(0, 0, contentWidth, contentHeight));
             if (records.Count == 0)
-                GUI.Label(new Rect(4, 5, contentWidth - 8, 72), "La bibliothèque est vide. Créez un parchemin pour tracer votre premier sort.", textStyle);
+                GUI.Label(new Rect(4, 5, contentWidth - 8, 72), "Aucun parchemin enregistré. Une invitation du laboratoire permet de commencer.", textStyle);
             for (var i = 0; i < records.Count; i++)
             {
                 var r = records[i];
                 var top = i * 66f;
                 GUI.Box(new Rect(0, top, contentWidth - 2, 57), GUIContent.none);
                 GUI.DrawTexture(new Rect(0, top + 1, 4, 55), goldBar);
-                var label = (!string.IsNullOrEmpty(r.spell_id) ? "Sort disponible" : r.state == "capture_corrupted" ? "Journal endommagé" : r.state == "capture_pending" ? "En attente de transmission" : r.state == "writing" ? "Encré" : r.state == "blank" ? "Vierge" : "Traitement : " + r.state);
-                GUI.Label(new Rect(14, top + 7, contentWidth - 140, 45), label + "\n" + r.created_at, textStyle);
+                GUI.Label(new Rect(14, top + 7, contentWidth - 140, 45),
+                    LibraryStateLabel(r) + "\n" + LocalDate(r.created_at), textStyle);
                 if (GUI.Button(new Rect(contentWidth - 111, top + 8, 106, 39), "Ouvrir", buttonStyle)) Open(r);
             }
             GUI.EndScrollView();
@@ -282,31 +298,153 @@ namespace Palimpseste.Game.Bootstrap
 
         private void DrawProcessing()
         {
-            var r = new Rect(Screen.width * .2f, 130, Screen.width * .6f, 310);
+            var width = Mathf.Min(Screen.width - 36, 1240);
+            var r = new Rect((Screen.width - width) * .5f, 116, width, Screen.height - 140);
             var cacheUnavailable = selected != null && !string.IsNullOrEmpty(selected.spell_id) && string.IsNullOrEmpty(spellJson);
             GUI.Box(r, GUIContent.none, panelStyle);
-            GUI.Label(new Rect(r.x + 24, r.y + 20, r.width - 48, 40), "Construction du sort", titleStyle);
-            GUI.Label(new Rect(r.x + 24, r.y + 80, r.width - 48, 80), selected == null ? "" :
-                cacheUnavailable ? "État : cache local à restaurer\nLe parchemin est conservé. Reconnectez le service pour retélécharger le sort." :
-                "État : " + selected.state + "\nLe parchemin engagé est conservé. Aucune progression en pourcentage n'est supposée.", textStyle);
-            GUI.Box(new Rect(r.x + 24, r.y + 162, r.width - 48, 48), GUIContent.none);
-            GUI.Label(new Rect(r.x + 36, r.y + 173, r.width - 72, 30),
-                selected == null ? "" : cacheUnavailable ? "01 Trace  ✓      02 Capture  ✓      03 Cache à restaurer" :
-                selected.state == "ready" ? "01 Trace  ✓      02 Capture  ✓      03 Sort disponible  ✓" :
-                selected.needs_capture ? "01 Trace  ✓      02 Capture à transmettre      03 En attente" :
-                "01 Trace  ✓      02 Capture  ✓      03 Génération en attente", textStyle);
-            if (GUI.Button(new Rect(r.x + 24, r.y + 225, 210, 45), "Bibliothèque", buttonStyle)) page = Page.Library;
-            if (selected != null && selected.state == "capture_pending" && api.Configured && GUI.Button(new Rect(r.x + 250, r.y + 225, 235, 45), "Transmettre", buttonStyle)) StartCoroutine(Sync(selected));
+            GUI.Label(new Rect(r.x + 24, r.y + 16, r.width - 48, 40), "Du dessin au sort", titleStyle);
+            GUI.Label(new Rect(r.x + 24, r.y + 59, r.width - 48, 46),
+                cacheUnavailable ? "Paquet local à restaurer. Le dessin et la lecture restent conservés." :
+                selected == null ? "" : JobStateLabel(selected), textStyle);
+            DrawProcessingSteps(new Rect(r.x + 24, r.y + 109, r.width - 48, 57));
+            var previewWidth = Mathf.Min(260, (r.width - 72) * .31f);
+            var bodyY = r.y + 181;
+            var bodyHeight = Mathf.Max(185, r.height - 262);
+            GUI.Box(new Rect(r.x + 24, bodyY, previewWidth, bodyHeight), GUIContent.none);
             var preview = LocalCapturePreview();
             if (preview != null)
             {
-                var lower = new Rect(r.x, r.yMax + 18, r.width, Mathf.Min(210, Screen.height - r.yMax - 32));
-                GUI.Box(lower, GUIContent.none, panelStyle);
-                GUI.DrawTexture(new Rect(lower.x + 18, lower.y + 14, 180, 180), preview, ScaleMode.ScaleToFit);
-                GUI.Label(new Rect(lower.x + 220, lower.y + 25, lower.width - 245, 36), "Trace archivée localement", titleStyle);
-                GUI.Label(new Rect(lower.x + 220, lower.y + 76, lower.width - 245, 105),
-                    "Le dessin, l'encre et le journal restent sur cet appareil. La fabrication suit les étapes du service ; seul un paquet validé devient jouable.", textStyle);
+                var imageSide = Mathf.Min(previewWidth - 26, bodyHeight - 85);
+                GUI.DrawTexture(new Rect(r.x + 37, bodyY + 12, imageSide, imageSide), preview, ScaleMode.ScaleToFit);
             }
+            GUI.Label(new Rect(r.x + 37, bodyY + bodyHeight - 64, previewWidth - 26, 58),
+                "Votre trace conservée\nsur cet appareil", textStyle);
+            DrawInterpretationPanel(new Rect(r.x + 36 + previewWidth, bodyY,
+                r.width - previewWidth - 60, bodyHeight));
+            if (GUI.Button(new Rect(r.x + 24, r.yMax - 66, 170, 42), "Bibliothèque", buttonStyle)) page = Page.Library;
+            if (selected != null && selected.needs_capture && api.Configured && !busy &&
+                GUI.Button(new Rect(r.x + 211, r.yMax - 66, 188, 42), "Transmettre", buttonStyle))
+                StartCoroutine(Sync(selected));
+            else if (selected != null && !string.IsNullOrEmpty(selected.job_id) && api.Configured &&
+                     !pollingJobs.Contains(selected.job_id) &&
+                     GUI.Button(new Rect(r.x + 211, r.yMax - 66, 188, 42), "Actualiser", buttonStyle))
+                StartCoroutine(Poll(selected));
+            if (spellJson != null && descriptionView != null &&
+                GUI.Button(new Rect(r.xMax - 211, r.yMax - 66, 187, 42), "Voir le sort", buttonStyle))
+                page = Page.Card;
+        }
+
+        private void DrawProcessingSteps(Rect area)
+        {
+            var names = new[] { "Trace", "Lecture A", "Formes", "Traduction B", "Sort" };
+            var current = ProcessingStep(selected);
+            var gap = 7f;
+            var itemWidth = (area.width - gap * (names.Length - 1)) / names.Length;
+            for (var i = 0; i < names.Length; i++)
+            {
+                var x = area.x + i * (itemWidth + gap);
+                GUI.Box(new Rect(x, area.y, itemWidth, area.height), GUIContent.none);
+                GUI.DrawTexture(new Rect(x, area.y, itemWidth, 3), i <= current ? goldBar : labHudBackground);
+                var mark = i < current || (i == 4 && spellJson != null) ? "✓ " : i == current ? "… " : "· ";
+                GUI.Label(new Rect(x + 7, area.y + 15, itemWidth - 12, 32), mark + names[i], textStyle);
+            }
+        }
+
+        private int ProcessingStep(ParchmentRecord record)
+        {
+            if (record == null || record.needs_capture || string.IsNullOrEmpty(record.job_id)) return 0;
+            if (spellJson != null && selected == record) return 4;
+            var state = record.state is "needs_operator" or "waiting_retry" ? record.resume_stage : record.state;
+            return state switch
+            {
+                "resolving_geometry" => 2,
+                "planning" => 3,
+                "validating" or "ready" => 4,
+                _ => descriptionView != null && selected == record ? 2 : 1
+            };
+        }
+
+        private static string JobStateLabel(ParchmentRecord record)
+        {
+            if (record.needs_capture) return "Trace fermée · transmission de la capture en attente";
+            var state = record.state switch
+            {
+                "queued" => "En file d'attente pour la lecture du dessin",
+                "interpreting" => "Luna lit les formes du dessin",
+                "resolving_geometry" => "Lecture A reçue · extraction des formes",
+                "planning" => "Luna traduit la lecture en règles de sort",
+                "validating" => "Règles et ressources contrôlées avant publication",
+                "ready" => "Sort validé · téléchargement et contrôle local",
+                "waiting_retry" => "Nouvel essai technique prévu par le service",
+                "needs_operator" => "Intervention technique requise",
+                _ => "Traitement du sort en cours"
+            };
+            return string.IsNullOrEmpty(record.last_job_message) ? state : state + " · " + record.last_job_message;
+        }
+
+        private void DrawInterpretationPanel(Rect area)
+        {
+            GUI.Box(area, GUIContent.none);
+            GUI.Label(new Rect(area.x + 15, area.y + 12, area.width - 30, 35), "Interprétation de Luna A", titleStyle);
+            GUI.DrawTexture(new Rect(area.x + 15, area.y + 52, area.width - 30, 2), goldBar);
+            if (descriptionView == null)
+            {
+                GUI.Label(new Rect(area.x + 15, area.y + 70, area.width - 30, area.height - 82),
+                    "La lecture textuelle apparaît ici dès qu'elle est validée par le service. Votre dessin est conservé pendant l'attente.", textStyle);
+                return;
+            }
+            var content = new StringBuilder();
+            content.AppendLine(descriptionView.Title).AppendLine().AppendLine(descriptionView.Summary)
+                .AppendLine().AppendLine("Ce que Luna voit dans le dessin");
+            foreach (var line in descriptionView.Observations) content.Append("• ").AppendLine(line).AppendLine();
+            content.AppendLine("Règles et apparence proposées");
+            foreach (var line in descriptionView.Clauses) content.Append("• ").AppendLine(line).AppendLine();
+            var text = content.ToString();
+            var viewport = new Rect(area.x + 13, area.y + 68, area.width - 26, area.height - 81);
+            var contentWidth = Mathf.Max(160, viewport.width - 22);
+            var contentHeight = Mathf.Max(viewport.height, textStyle.CalcHeight(new GUIContent(text), contentWidth) + 18);
+            interpretationScroll = GUI.BeginScrollView(viewport, interpretationScroll,
+                new Rect(0, 0, contentWidth, contentHeight));
+            GUI.Label(new Rect(0, 0, contentWidth, contentHeight), text, textStyle);
+            GUI.EndScrollView();
+        }
+
+        private static string LibraryStateLabel(ParchmentRecord record)
+        {
+            if (!string.IsNullOrEmpty(record.spell_id)) return "Sort disponible";
+            if (record.needs_capture) return "En attente de transmission";
+            return record.state switch
+            {
+                "blank" => "Parchemin vierge",
+                "writing" => "Encrage en cours",
+                "capture_pending" => "En attente de transmission",
+                "capture_corrupted" => "Journal endommagé",
+                "queued" => "Lecture en attente",
+                "interpreting" => "Lecture du dessin",
+                "resolving_geometry" => "Formes en préparation",
+                "planning" => "Traduction du sort",
+                "validating" => "Vérification du sort",
+                "ready" => "Sort à récupérer",
+                "waiting_retry" => "Nouvel essai prévu",
+                "needs_operator" => "Assistance nécessaire",
+                _ => "Traitement en cours"
+            };
+        }
+
+        private static string LocalDate(string isoUtc)
+        {
+            return DateTimeOffset.TryParse(isoUtc, CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date)
+                ? date.ToLocalTime().ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
+                : "Date inconnue";
+        }
+
+        private void DrawInterpretation()
+        {
+            if (selected == null) { page = Page.Library; return; }
+            var area = new Rect(Screen.width * .12f, 120, Screen.width * .76f, Screen.height - 202);
+            DrawInterpretationPanel(area);
+            if (GUI.Button(new Rect(area.x + 15, area.yMax + 14, 190, 42), "Retour au sort", buttonStyle)) page = Page.Card;
         }
 
         private Texture2D LocalCapturePreview()
@@ -351,6 +489,9 @@ namespace Palimpseste.Game.Bootstrap
                 }
             }
             catch (Exception ex) { notice = "Paquet local illisible : " + ex.Message; }
+            if (descriptionView != null &&
+                GUI.Button(new Rect(r.x + 25, r.yMax - 119, 260, 39), "Lire l'interprétation Luna", buttonStyle))
+                page = Page.Interpretation;
             if (GUI.Button(new Rect(r.x + 25, r.yMax - 70, 260, 45), "Lancer dans le laboratoire", buttonStyle)) EnterLab();
             if (GUI.Button(new Rect(r.x + 300, r.yMax - 70, 180, 45), "Bibliothèque", buttonStyle)) page = Page.Library;
         }
@@ -381,41 +522,164 @@ namespace Palimpseste.Game.Bootstrap
             GUI.Label(new Rect(legendX + 116, 173, 58, 25), "Objet", textStyle);
         }
 
-        private IEnumerator Connect()
+        private IEnumerator BootstrapSession(bool openDrawing)
         {
+            if (busy) yield break;
             busy = true;
-            try { api.Configure(serviceUrl, token); PlayerPrefs.SetString("palimpseste.lab_url", serviceUrl); }
-            catch (Exception ex) { notice = ex.Message; busy = false; yield break; }
+            notice = "Ouverture du laboratoire…";
+            if (string.IsNullOrEmpty(serviceUrl) &&
+                !ServiceAccess.TryLoadServiceUrl(Path.Combine(Application.streamingAssetsPath, "service.json"), out serviceUrl))
+                ServiceAccess.TryLoadServiceUrl(LocalServicePath(), out serviceUrl);
+            var accessPath = Path.Combine(AccessDirectory(), "access.json");
+            var pendingInvitation = File.Exists(accessPath);
+            var hasInvitation = ServiceAccess.TryLoadInvitation(accessPath, serviceUrl,
+                out var invitationUrl, out var invitationCode);
+            if (pendingInvitation)
+            {
+                // A newly installed invitation may belong to another player on this PC.
+                // Hide the previous player's library before any network request.
+                principalId = null;
+                records.Clear();
+                selected = null;
+                spellJson = null;
+                descriptionView = null;
+                api.Clear();
+                token = "";
+                page = Page.Library;
+                if (!hasInvitation)
+                {
+                    notice = "Invitation invalide ou destinée à un autre laboratoire.";
+                    busy = false;
+                    yield break;
+                }
+            }
+            if (string.IsNullOrEmpty(serviceUrl) && hasInvitation) serviceUrl = invitationUrl;
+            if (!LabApi.AllowedServiceUrl(serviceUrl))
+            {
+                notice = "Accès au laboratoire nécessaire. Installez l'invitation remise avec le jeu.";
+                busy = false;
+                yield break;
+            }
+            if (string.IsNullOrEmpty(token) && !hasInvitation)
+                WindowsCredentialStore.TryRead(serviceUrl, out token, out _);
+            if (string.IsNullOrEmpty(token) && hasInvitation)
+            {
+                var redeemed = false;
+                yield return RedeemAccess(accessPath, invitationCode, success => redeemed = success);
+                invitationCode = null;
+                hasInvitation = false;
+                if (!redeemed)
+                {
+                    notice = "Invitation non acceptée. Vérifiez l'accès remis avec le jeu.";
+                    busy = false;
+                    yield break;
+                }
+            }
+            if (string.IsNullOrEmpty(token))
+            {
+                notice = "Accès au laboratoire nécessaire. Les sorts déjà enregistrés restent jouables hors ligne.";
+                busy = false;
+                yield break;
+            }
+            try { api.Configure(serviceUrl, token); }
+            catch (Exception) { notice = "Configuration du laboratoire invalide."; busy = false; yield break; }
             CapabilitiesDto caps = null;
             string error = null;
-            yield return api.GetCapabilities((c, e) => { caps = c; error = e; });
-            if (error != null || caps == null || caps.layout_version != "three_regions_v1")
+            long status = 0;
+            yield return api.GetCapabilities((c, e, s) => { caps = c; error = e; status = s; });
+            if (status == 401)
             {
-                notice = "Connexion impossible : " + (error ?? "layout incompatible"); busy = false; yield break;
+                WindowsCredentialStore.TryDelete(serviceUrl, out _);
+                token = "";
+                principalId = null;
+                records.Clear();
+                api.Clear();
+                if (hasInvitation)
+                {
+                    var redeemed = false;
+                    yield return RedeemAccess(accessPath, invitationCode, success => redeemed = success);
+                    invitationCode = null;
+                    if (redeemed)
+                    {
+                        api.Configure(serviceUrl, token);
+                        caps = null; error = null; status = 0;
+                        yield return api.GetCapabilities((c, e, s) => { caps = c; error = e; status = s; });
+                    }
+                }
+                if (status == 401 || string.IsNullOrEmpty(token))
+                {
+                    notice = "Accès au laboratoire à renouveler. Ouvrez une nouvelle invitation.";
+                    busy = false;
+                    yield break;
+                }
             }
+            if (error != null || caps == null || caps.layout_version != "three_regions_v1" ||
+                !Guid.TryParseExact(caps.principal_id, "N", out _))
+            {
+                api.Clear();
+                notice = "Laboratoire indisponible ou incompatible. Les sorts de ce lecteur restent hors ligne si l'identité est connue.";
+                busy = false;
+                yield break;
+            }
+            principalId = caps.principal_id;
+            RefreshVisibleRecords();
+            try { ServiceAccess.SavePrincipalId(LocalIdentityPath(), serviceUrl, token, principalId); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            { Debug.LogWarning("PALIMPSESTE_IDENTITY_CACHE_UNAVAILABLE"); }
             byte[] bytes = null;
             string hash = null;
             yield return api.GetArtifact(caps.reference_artifact_id, (b, h, e) => { bytes = b; hash = h; error = e; });
-            if (error != null || bytes == null) { notice = "Référence indisponible : " + error; busy = false; yield break; }
+            if (error != null || bytes == null)
+            { api.Clear(); notice = "Référence du laboratoire indisponible."; busy = false; yield break; }
             var image = new Texture2D(2, 2, TextureFormat.RGBA32, false, false);
             if (!image.LoadImage(bytes, false) || image.width != DrawingCanvas.Size || image.height != DrawingCanvas.Size)
-            { notice = "Image de référence incompatible"; Destroy(image); busy = false; yield break; }
+            { api.Clear(); notice = "Image de référence incompatible"; Destroy(image); busy = false; yield break; }
             if (reference != null) Destroy(reference);
             reference = image;
             referenceBytes = bytes;
-            if (WindowsCredentialStore.TryWrite(serviceUrl, token, out var credentialError))
+            notice = "Laboratoire prêt. Votre dessin peut commencer.";
+            busy = false;
+            if (openDrawing)
             {
-                notice = "Laboratoire connecté. Jeton conservé dans le coffre Windows.";
+                var ongoing = records.Find(item => item.state == "blank" || item.state == "writing" ||
+                    item.needs_capture || (!string.IsNullOrEmpty(item.job_id) && item.state != "ready" &&
+                                           item.state != "capture_corrupted"));
+                if (ongoing != null) Open(ongoing);
+                else yield return NewParchment();
+            }
+        }
+
+        private IEnumerator RedeemAccess(string accessPath, string invitationCode, Action<bool> done)
+        {
+            string redeemedToken = null;
+            string error = null;
+            yield return api.RedeemInvitation(serviceUrl, invitationCode,
+                (value, failure) => { redeemedToken = value; error = failure; });
+            if (error != null || string.IsNullOrEmpty(redeemedToken))
+            {
+                done(false);
+                yield break;
+            }
+            token = redeemedToken;
+            if (WindowsCredentialStore.TryWrite(serviceUrl, token, out _))
+            {
+                try
+                {
+                    ServiceAccess.SaveServiceUrl(LocalServicePath(), serviceUrl);
+                    File.Delete(accessPath);
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+                { notice = "Accès ouvert, mais nettoyage local à vérifier."; }
                 Debug.Log("PALIMPSESTE_CREDENTIAL_WRITE_OK");
             }
-            else notice = "Laboratoire connecté pour cette session. Jeton non conservé : " + credentialError;
-            busy = false;
-            foreach (var item in records) if (item.needs_capture && item.state != "capture_corrupted") StartCoroutine(Sync(item));
+            else notice = "Accès temporaire ouvert ; conservation locale indisponible.";
+            done(true);
         }
 
         private IEnumerator NewParchment()
         {
-            if (!api.Configured || referenceBytes == null) { notice = "Connectez d'abord le laboratoire et chargez sa référence."; yield break; }
+            if (!api.Configured || string.IsNullOrEmpty(principalId) || referenceBytes == null)
+            { notice = "Accès au laboratoire nécessaire avant de dessiner."; yield break; }
             busy = true;
             ParchmentDto remote = null;
             string error = null;
@@ -423,6 +687,9 @@ namespace Palimpseste.Game.Bootstrap
             busy = false;
             if (error != null || remote == null) { notice = "Allocation impossible : " + error; yield break; }
             var record = store.Create(remote.parchment_id);
+            record.owner_id = principalId;
+            record.server_issued = true;
+            record.requires_description_before_lab = true;
             record.reference_artifact_id = "server";
             record.reference_sha256 = ParchmentStore.Hash(referenceBytes);
             File.WriteAllBytes(Path.Combine(store.DirectoryFor(record), "reference.png"), referenceBytes);
@@ -433,7 +700,12 @@ namespace Palimpseste.Game.Bootstrap
 
         private void Open(ParchmentRecord record)
         {
+            if (!PlayerParchmentFilter.IsUserParchment(record, principalId)) return;
             selected = record;
+            interpretationScroll = Vector2.zero;
+            descriptionView = null;
+            if (record.server_issued || !string.IsNullOrEmpty(record.job_id))
+                DescriptionCache.TryLoad(record, store.DirectoryFor(record), out descriptionView);
             canvas = store.Replay(record);
             var refPath = Path.Combine(store.DirectoryFor(record), "reference.png");
             if (File.Exists(refPath))
@@ -448,7 +720,13 @@ namespace Palimpseste.Game.Bootstrap
                 }
             }
             var cachedSpellMissing = !string.IsNullOrEmpty(record.spell_id) && !TryOpenCached(record);
-            if (!string.IsNullOrEmpty(record.spell_id) && !cachedSpellMissing) page = Page.Card;
+            if (!string.IsNullOrEmpty(record.spell_id) && !cachedSpellMissing)
+            {
+                page = record.requires_description_before_lab && descriptionView == null
+                    ? Page.Processing : Page.Card;
+                if (page == Page.Processing && api.Configured && !string.IsNullOrEmpty(record.job_id))
+                    StartCoroutine(Poll(record));
+            }
             else if (record.state == "blank" && reference != null) page = Page.Drawing;
             else
             {
@@ -467,6 +745,37 @@ namespace Palimpseste.Game.Bootstrap
                 return false;
             spellJson = cached;
             return true;
+        }
+
+        private void ImportInvitation()
+        {
+            if (!WindowsInvitationPicker.TryChoose(out var source)) return;
+            if (!ServiceAccess.TryLoadInvitation(source, serviceUrl, out var invitationUrl, out _))
+            {
+                notice = "Invitation invalide ou destinée à un autre laboratoire.";
+                return;
+            }
+            var destination = Path.Combine(AccessDirectory(), "access.json");
+            var temp = destination + ".tmp";
+            try
+            {
+                Directory.CreateDirectory(AccessDirectory());
+                File.Copy(source, temp, true);
+                if (File.Exists(destination)) File.Replace(temp, destination, null);
+                else File.Move(temp, destination);
+                if (string.IsNullOrEmpty(serviceUrl)) serviceUrl = invitationUrl;
+                api.Clear();
+                token = "";
+                principalId = null;
+                records.Clear();
+                selected = null;
+                spellJson = null;
+                descriptionView = null;
+                page = Page.Library;
+                StartCoroutine(BootstrapSession(true));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            { notice = "Invitation non installée. Réessayez ou contactez le laboratoire."; }
         }
 
         private void FinalizeDrawing(string reason)
@@ -585,20 +894,72 @@ namespace Palimpseste.Game.Bootstrap
 
         private IEnumerator Poll(ParchmentRecord record)
         {
-            while (record != null && !string.IsNullOrEmpty(record.job_id))
+            if (record == null || string.IsNullOrEmpty(record.job_id) || !pollingJobs.Add(record.job_id)) yield break;
+            var jobId = record.job_id;
+            try
             {
-                JobDto job = null;
-                string error = null;
-                yield return api.GetJob(record.job_id, (j, e) => { job = j; error = e; });
-                if (error != null) { notice = "Lecture de tâche interrompue : " + error; yield break; }
-                record.state = job.state;
-                if (!string.IsNullOrEmpty(job.spell_id)) record.spell_id = job.spell_id;
-                store.Save(record);
-                notice = job.message;
-                if (job.state == "ready") { yield return Download(record); yield break; }
-                if (job.state == "needs_operator") { notice = "Intervention technique requise : " + job.message; yield break; }
-                yield return new WaitForSecondsRealtime(Mathf.Clamp(job.poll_after_ms / 1000f, 1f, 10f));
+                while (record.job_id == jobId && api.Configured)
+                {
+                    JobDto job = null;
+                    string error = null;
+                    yield return api.GetJob(jobId, (j, e) => { job = j; error = e; });
+                    if (error != null || job == null)
+                    {
+                        if (selected == record) notice = "Suivi interrompu. Votre trace reste enregistrée ; rouvrez le parchemin pour réessayer.";
+                        yield break;
+                    }
+                    if (!string.IsNullOrEmpty(job.parchment_id) && job.parchment_id != record.parchment_id)
+                    {
+                        if (selected == record) notice = "Identité de la tâche incohérente ; suivi interrompu.";
+                        yield break;
+                    }
+                    record.state = job.state;
+                    record.resume_stage = job.resume_stage;
+                    record.last_job_message = job.message;
+                    if (!string.IsNullOrEmpty(job.spell_id)) record.spell_id = job.spell_id;
+                    store.Save(record);
+                    if (selected == record && !string.IsNullOrEmpty(job.message)) notice = job.message;
+                    if (!string.IsNullOrEmpty(job.description_artifact_id) &&
+                        (record.description_artifact_id != job.description_artifact_id ||
+                         !DescriptionCache.TryLoad(record, store.DirectoryFor(record), out _)))
+                        yield return FetchDescription(record, job.description_artifact_id);
+                    else if (selected == record && descriptionView == null)
+                        DescriptionCache.TryLoad(record, store.DirectoryFor(record), out descriptionView);
+                    if (job.state == "ready")
+                    {
+                        if (string.IsNullOrEmpty(record.spell_id))
+                        {
+                            if (selected == record) notice = "Sort annoncé sans identifiant ; suivi interrompu.";
+                            yield break;
+                        }
+                        yield return Download(record);
+                        yield break;
+                    }
+                    if (job.state == "needs_operator")
+                    {
+                        if (selected == record) notice = "Intervention technique requise : " + job.message;
+                        yield break;
+                    }
+                    yield return new WaitForSecondsRealtime(Mathf.Clamp(job.poll_after_ms / 1000f, 1f, 10f));
+                }
             }
+            finally { pollingJobs.Remove(jobId); }
+        }
+
+        private IEnumerator FetchDescription(ParchmentRecord record, string artifactId)
+        {
+            byte[] bytes = null;
+            string hash = null;
+            string error = null;
+            yield return api.GetArtifact(artifactId, (b, h, e) => { bytes = b; hash = h; error = e; });
+            if (error != null || bytes == null ||
+                !DescriptionCache.TrySave(record, store.DirectoryFor(record), artifactId, hash, bytes, out var parsed))
+            {
+                if (selected == record) notice = "Lecture de Luna A indisponible ou invalide ; le suivi du sort continue.";
+                yield break;
+            }
+            store.Save(record);
+            if (selected == record) { descriptionView = parsed; interpretationScroll = Vector2.zero; }
         }
 
         private IEnumerator Download(ParchmentRecord record)
@@ -634,13 +995,20 @@ namespace Palimpseste.Game.Bootstrap
             File.WriteAllText(spellPath + ".sha256", ParchmentStore.Hash(bytes), Encoding.ASCII);
             record.state = "ready";
             store.Save(record);
-            if (selected == record) { spellJson = Encoding.UTF8.GetString(bytes); page = Page.Card; }
-            notice = "Sort téléchargé et vérifié. Il est disponible hors ligne.";
+            if (selected == record)
+            {
+                spellJson = Encoding.UTF8.GetString(bytes);
+                page = descriptionView == null ? Page.Processing : Page.Card;
+            }
+            notice = descriptionView == null && selected == record
+                ? "Sort vérifié. Lecture A encore indisponible ; actualisez pour l'afficher avant le laboratoire."
+                : "Sort téléchargé et vérifié. Il est disponible hors ligne.";
         }
 
         private void EnterLab()
         {
-            if (string.IsNullOrEmpty(spellJson)) return;
+            if (string.IsNullOrEmpty(spellJson) ||
+                (selected != null && selected.requires_description_before_lab && descriptionView == null)) return;
             page = Page.Lab;
             SceneManager.LoadScene("SpellLab");
         }
