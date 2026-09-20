@@ -1,6 +1,24 @@
 # État de réalisation et point de reprise
 
-## État courant — D13 livré localement, image générée puis reconstruction
+## État courant — D14 / 1.4.0 déployé localement et ouvert pour le créateur
+
+La description définit désormais **quatre phases par sujet : apparition, activité, réaction au contact et disparition naturelle sans contact**. L'image générée reste la cible du moment actif. A `sp.prompt.a/2.3` décrit ce cycle ; B `sp.prompt.b/2.2` le traduit en profils d'animation et de VFX bornés. Le renderer Unity, fixé et compilé par le développement, exécute ces données sans produire de code depuis les dessins.
+
+La nouvelle boucle de revue associe le plan compilé à **quatre captures réelles du Player de rendu précompilé**, puis les transmet avec l'image cible à une **nouvelle session critique J**, prompt `sp.prompt.j/1.0`. B peut ensuite reprendre les seuls profils `construction`, `vfx` et `lifecycle` ; les mécaniques doivent rester identiques. La boucle est bornée, conserve les verdicts et choisit le meilleur candidat effectivement évalué. Cette implémentation ne garantit pas un score parfait ni une fidélité artistique acceptée. Les captures et appels de cette boucle sont des actions runtime prévues lors de la génération demandée par le joueur ; aucun modèle n'obtient de commande de capture, d'outil de code ou de build.
+
+| Élément D14 | État effectivement établi |
+| --- | --- |
+| Sources | Contrats de cycle de vie, prompts A/B/G/J, profils du renderer, critique indépendante et persistance de revue implémentés. Migration `009_visual_review.sql` appliquée au runtime local. |
+| Build Unity | **Player `1.4.0`, Unity 6000.3.24f1 / URP / Windows IL2CPP construit avec le code 0**. Journal local `game/Logs/lifecycle-build.log` : `Build Finished, Result: Success`, marqueur `PALIMPSESTE_BUILD_OK`, retour 0. Sortie `game/Build/WindowsLifecycleRelease/`. |
+| CoreSmoke | Une exécution a réussi **avant** la dernière demande d'arrêter les tests. Ce résultat ne valide pas les ajouts ultérieurs de critique ou un parcours joueur D14. |
+| Exécution D14 | **Aucun appel modèle, capture de validation, essai de jeu ni verdict visuel D14 effectué par le développement pour cette livraison.** Le créateur demande à tester lui-même ; ne pas relancer une campagne. |
+| Packaging et lancement Player | Packaging réussi, code 0 : **29 fichiers, 122 857 102 octets**, ZIP **44 366 062 octets**, SHA-256 `98a3dd7315ea6f1c327ab7bba38b5464923e65ed19dd4a7ee4da8efe7895da36`. [Manifeste du packaging](../evidence/public/unity/lifecycle-delivery.json). Raccourci Bureau actualisé, puis **Player `1.4.0` ouvert sous le PID `36512`** depuis `WindowsLifecyclePlayable` ; ancien Player `1.3.0` fermé proprement. Le lancement distinct figure dans la [preuve D14](../evidence/public/backend/lifecycle-2026-09-20.json), sans essai de jeu. |
+| Déploiement backend | **Réussi, code 0**, via `ops/deploy-lifecycle.ps1` : migration `009` appliquée, renderer précompilé installé avec protections, API PID `16768` et worker PID `26260` démarrés. Démarrage prêt ; aucun diagnostic, appel modèle ou essai de génération exécuté. [Preuve publique](../evidence/public/backend/lifecycle-2026-09-20.json). Archive backend publiée et actualisée : [empreinte finale](../evidence/public/backend/lifecycle-delivery.json). |
+| Bibliothèque locale | **21 dossiers de sorts supprimés**, puis leur sauvegarde définitivement supprimée conformément à la demande du créateur. Bibliothèque vide lors de l'observation. Aucun historique serveur purgé. |
+
+**Point de reprise : laisser le créateur dessiner et juger dans le jeu ouvert.** Le parcours A → G → B → captures → J → éventuelle reprise B, sa latence, la fluidité, les impacts, le son, la sauvegarde/relecture et la fidélité à l'image restent à observer dans cette version. Toutes les validations humaines demeurent ouvertes. Les preuves D13 ci-dessous sont historiques et ne valident pas D14.
+
+## Historique — D13 livré localement, image générée puis reconstruction
 
 **La nouvelle cible est dessin → description → vraie image générée → composition 3D/VFX depuis l'image → laboratoire.** [D13](DECISIONS.md) remplace l'interdiction D10–D12 d'une image générée par joueur. Les choix A/B restent ceux de D10 : Sol/high pour A, Astra/high pour B ; G ajoute Astra/high avec l'outil natif `image_generation` de Codex et l'abonnement connecté, sans clé API. L'audit a trouvé `apply_patch` encore exposé dans l'ancien CLI via `code_mode_only` malgré les flags désactivés. Le nouveau binaire `codex-image.exe` doit servir **A/B/G**, avec un filtre du registre natif : aucun outil A/B, seulement l'image native en G. L'ancien fichier `codex.exe` et ses preuves restent archivés ; de nouvelles preuves liées au SHA durci sont obligatoires. **D13 est désormais déployé sur le service local et le Player `1.3.0` est ouvert pour l'essai du créateur.**
 

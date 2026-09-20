@@ -18,7 +18,7 @@ namespace Palimpseste.Game.SpellRuntime
         public float pathAlong;
         public readonly HashSet<int> visited = new HashSet<int>();
         public readonly HashSet<int> inside = new HashSet<int>();
-        public bool expired;
+        public bool expired, endedByContact;
     }
 
     internal sealed class ScheduledCarrier
@@ -109,7 +109,21 @@ namespace Palimpseste.Game.SpellRuntime
                     var visual = active[i].visual;
                     if (visual != null)
                     {
-                        if (active[i].node.carrier == "beam" && Option(active[i].node.options.lifetime_ticks, 1) == 1)
+                        var constructed = visual.GetComponent<ImageConstructedSpellVisual>();
+                        if (constructed != null && constructed.HasLifecycle)
+                        {
+                            // Collisions end on this tick. Only bounded artwork
+                            // survives, using the actual reason for retirement.
+                            foreach (var collider in visual.GetComponentsInChildren<Collider>()) collider.enabled = false;
+                            var finishEntrance = active[i].node.carrier == "beam" && Option(active[i].node.options.lifetime_ticks,1) == 1;
+                            var delay = finishEntrance ? constructed.RemainingEntrance : 0;
+                            var duration = finishEntrance ? constructed.FinishEntranceThenRetire(active[i].endedByContact)
+                                : constructed.RetireForCause(active[i].endedByContact);
+                            visual.GetComponent<SpellVfxComposition>()?.DissolveWake(duration - delay,delay);
+                            UnityEngine.Object.Destroy(visual,duration + .03f);
+                            retiredVisuals.Add(visual);
+                        }
+                        else if (active[i].node.carrier == "beam" && Option(active[i].node.options.lifetime_ticks, 1) == 1)
                         {
                             CarrierVisual.KeepOneTickBeamVisible(visual);
                             retiredVisuals.Add(visual);
@@ -192,7 +206,11 @@ namespace Palimpseste.Game.SpellRuntime
             if (state.expired && kind != "expire") return;
             if (receiver != null) Hits++;
             if (kind == "hit" || kind == "block" || kind == "trigger") Play(position, impactClip, .22f);
-            if (kind == "hit" && receiver != null) CarrierVisual.ProjectileHit(state, position);
+            if (kind == "hit" && receiver != null)
+            {
+                var contactVisual = CarrierVisual.ProjectileHit(state,position);
+                if (contactVisual != null) retiredVisuals.Add(contactVisual);
+            }
             if (state.node.effects != null)
             {
                 var damageFromEvent = 0;
@@ -277,11 +295,12 @@ namespace Palimpseste.Game.SpellRuntime
             return appliedDamage;
         }
 
-        private void Expire(CarrierState state)
+        private void Expire(CarrierState state, bool contact = false)
         {
             if (state.expired) return;
             Emit(state, "expire", null, state.position, Vector3.up);
             state.expired = true;
+            state.endedByContact = contact;
             Play(state.position, expireClip, .1f);
             if (state.node.carrier == "barrier" && state.visual != null)
                 foreach (var collider in state.visual.GetComponentsInChildren<Collider>()) collider.enabled = false;
@@ -371,14 +390,14 @@ namespace Palimpseste.Game.SpellRuntime
                         if (owner != null) Emit(owner, "block", null, hit.point, hit.normal);
                         state.position = hit.point;
                         if (barrier.BlocksLeft <= 0) barrier.StructureMilli = 0;
-                        Expire(state); break;
+                        Expire(state,true); break;
                     }
                     if (receiver != null && Matches(opts.contact_filter, receiver))
                     {
                         state.position = hit.point;
                         Emit(state, "hit", receiver, hit.point, hit.normal);
                         if (state.piercesLeft-- > 0) continue;
-                        Expire(state); break;
+                        Expire(state,true); break;
                     }
                     // A filtered actor is still a physical obstacle. A wall may bounce.
                     if (state.bouncesLeft-- > 0 && receiver == null)
@@ -388,7 +407,7 @@ namespace Palimpseste.Game.SpellRuntime
                         break;
                     }
                     state.position = hit.point;
-                    Expire(state); break;
+                    Expire(state,true); break;
                 }
             }
             if (state.visual != null) { state.visual.transform.position = state.position; state.visual.transform.rotation = Quaternion.LookRotation(state.direction); }
@@ -610,7 +629,7 @@ namespace Palimpseste.Game.SpellRuntime
         {
             if (state.visual == null) return;
             var receiver = state.visual.GetComponent<BarrierReceiver>();
-            if (receiver != null && (receiver.StructureMilli <= 0 || receiver.BlocksLeft <= 0)) Expire(state);
+            if (receiver != null && (receiver.StructureMilli <= 0 || receiver.BlocksLeft <= 0)) Expire(state,true);
         }
 
         private void StepTrap(CarrierState state, int age)
@@ -627,7 +646,7 @@ namespace Palimpseste.Game.SpellRuntime
                 Emit(state, "trigger", target, target.transform.position, Vector3.up);
                 state.triggersLeft--;
                 state.nextTick = TickCount + Option(opts.rearm_ticks, 1);
-                if (state.triggersLeft <= 0) Expire(state);
+                if (state.triggersLeft <= 0) Expire(state,true);
                 break;
             }
         }

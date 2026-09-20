@@ -46,16 +46,16 @@ public sealed record RepairAttempt(
 
 public sealed record ProviderDocument(CodexResult Transport, byte[]? Utf8, string? Sha256);
 
-public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlanner, ITechnicalRepairProvider, IVisualReferenceGenerator
+public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlanner, ITechnicalRepairProvider, IVisualReferenceGenerator
 {
     private static readonly JsonSerializerOptions PromptJsonOptions = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
     public const string InterpreterModel = "gpt-5.6-sol";
     public const string PlannerModel = "gpt-6-astra";
     public const string InterpreterEffort = "high";
     public const string PlannerEffort = "high";
-    public const string PromptAVersion = "sp.prompt.a/2.2";
-    public const string PromptBVersion = "sp.prompt.b/2.1";
-    public const string PromptGVersion = "sp.prompt.g/1.0";
+    public const string PromptAVersion = "sp.prompt.a/2.3";
+    public const string PromptBVersion = "sp.prompt.b/2.2";
+    public const string PromptGVersion = "sp.prompt.g/1.1";
     private readonly CodexProcessRunner runner;
     private readonly string promptA;
     private readonly string promptB;
@@ -75,6 +75,7 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
     public LunaCodexProvider(CodexProcessRunner runner, string trustedSpecificationRoot)
     {
         this.runner = runner;
+        visualReviewSpecRoot = trustedSpecificationRoot;
         promptA = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "01_MODEL_A_INTERPRETE.md"), Encoding.UTF8);
         if (!promptA.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + PromptAVersion, StringComparison.Ordinal))
             throw new InvalidDataException("prompt_a_version_mismatch");

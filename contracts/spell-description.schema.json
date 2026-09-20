@@ -610,6 +610,55 @@
       },
       "minItems": 0,
       "maxItems": 16
+    },
+    "lifecycle": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "appearance": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800,
+            "pattern": "\\S"
+          },
+          "active": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800,
+            "pattern": "\\S"
+          },
+          "contact": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800,
+            "pattern": "\\S"
+          },
+          "expiration": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "subject_id",
+          "appearance",
+          "active",
+          "contact",
+          "expiration"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 16
     }
   },
   "required": [

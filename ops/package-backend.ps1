@@ -21,6 +21,7 @@ function Publish-App([string]$Project, [string]$Folder) {
 Publish-App 'backend/Palimpseste.Api/Palimpseste.Api.csproj' 'api'
 Publish-App 'backend/Palimpseste.Worker/Palimpseste.Worker.csproj' 'worker'
 Publish-App 'backend/ProviderDoctor/ProviderDoctor.csproj' 'doctor'
+Publish-App 'backend/SpellVisualDoctor/SpellVisualDoctor.csproj' 'visual-doctor'
 Get-ChildItem -LiteralPath $stage -Filter '*.pdb' -File -Recurse | Remove-Item -Force
 
 $spec = Join-Path $stage 'spec'
@@ -30,7 +31,7 @@ foreach ($directory in @('contracts', 'reference')) {
 }
 $runtimePrompts = Join-Path $spec 'prompts'
 New-Item -ItemType Directory -Force -Path $runtimePrompts | Out-Null
-foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_REPARATION_TECHNIQUE.md', '04_IMAGE_REFERENCE.md')) {
+foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_REPARATION_TECHNIQUE.md', '04_IMAGE_REFERENCE.md', '05_VISUAL_CRITIC.md')) {
     Copy-Item -LiteralPath (Join-Path (Join-Path $projectRoot 'prompts') $name) -Destination (Join-Path $runtimePrompts $name)
 }
 New-Item -ItemType Directory -Force -Path (Join-Path $stage 'migrations') | Out-Null
@@ -56,7 +57,7 @@ if (-not [string]::IsNullOrWhiteSpace($CodexExecutable)) {
         sha256=$CodexSha256.ToLowerInvariant();
         patches=@('ops/codex-attestation.patch','ops/codex-image-generation.patch');
         runtime_guard='PALIMPSESTE_IMAGEGEN_TEXT_ONLY=1';
-        tools='A/B: empty native registry. G: only image_gen.imagegen.'
+        tools='A/B/J: empty native registry. G: only image_gen.imagegen.'
     } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $native 'BUILD.json') -Encoding UTF8
 }
 
@@ -89,14 +90,16 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Desti
 
 @"
 Palimpseste backend Windows x64. API, worker et doctor sont des exécutables .NET autoportants.
-La chaîne privée est : dessin libre -> Sol high (description) -> image native Codex -> Astra high (construction depuis l'image et plan déclaratif) -> compilateur contrôlé -> paquet de sort Unity 1.3.
+La chaîne privée est : dessin libre -> Sol high (description et cycle complet) -> image native Codex -> Astra high (construction depuis la description, image cible) -> compilateur contrôlé -> rendu Unity précompilé -> critique visuelle indépendante J -> ajustements bornés -> paquet Unity 1.4.
 Le worker utilise codex exec sous un compte Windows de service isolé. Il n'exécute ni C# issu d'un dessin, ni build Unity.
 L'archive contient les contrats, références, prompts A/G/B et migrations, mais aucun auth.json, jeton joueur, secret DB ou clé API. Le binaire durci A/B/G et son attestation native sont décrits dans ops/codex-image-generation.md. Si codex/ est présent, son exécutable a été inclus avec un SHA vérifié et les notices amont ; sinon le construire à partir des correctifs fournis. Dans les deux cas, établir les preuves sur le compte de service avant activation.
 Lire IMPLEMENTATION_STATUS.md puis ops/provision-runtime.ps1 avant toute installation.
 Extraire l'archive dans un dossier opérateur inaccessible au compte worker : elle contient des scripts ops d'administration.
 Copier api, worker et doctor publiés vers leurs emplacements de service avec ACL minimales ; ne pas lancer le worker depuis le dossier extrait.
 L'API attend DATABASE_URL, ARTIFACT_ROOT et PALIMPSESTE_SPEC_ROOT pointant vers la copie runtime de spec.
-Le worker attend en plus le compte Windows dédié, CODEX_HOME isolé et la preuve du doctor actif.
+Le worker attend en plus le compte Windows dédié, CODEX_HOME isolé et la preuve du doctor actif. D14 conserve le binaire natif D13 et ses preuves ; les nouveaux prompts et le rendu D14 restent à essayer par le propriétaire.
+Le rendu de critique demande PALIMPSESTE_VISUAL_RENDERER_EXE et PALIMPSESTE_VISUAL_RENDERER_MANIFEST_SHA256. Installer une copie du Player 1.4 livré, avec manifeste SHA de tous les fichiers, hors sources et dossiers modifiables du worker. ops/deploy-lifecycle.ps1 effectue cette installation sur le PC existant, applique migration009 et relance les services, sans génération ni diagnostic. Ne pas exposer les scripts ops au worker.
+Le programme visual-doctor est un diagnostic manuel facultatif, non exécuté pour cette livraison. Les captures automatiques de la génération joueur comparent quatre phases décoratives ; elles ne prouvent pas le gameplay ni une fidélité visuelle parfaite.
 La génération reste bloquée tant que le compte de service Codex et le doctor actif ne sont pas validés.
 Le service local actuel emploie 127.0.0.1 ; cette archive ne configure pas une URL HTTPS publique ni les identités des joueurs.
 "@ | Set-Content -LiteralPath (Join-Path $stage 'README.txt') -Encoding UTF8

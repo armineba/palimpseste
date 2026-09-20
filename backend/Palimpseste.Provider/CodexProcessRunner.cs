@@ -55,9 +55,13 @@ public sealed class CodexProcessRunner
                 diagnosticEventErrorSha256, diagnosticEventErrorLength, diagnosticEventErrorTruncated, diagnosticCategory);
         var issues = settings.Check(production, compatibilityProbe, attempt?.Stage ?? "B");
         if (issues.Count != 0) return Failure(ProviderOutcome.IsolationViolation, string.Join(',', issues), started);
-        if (attempt is null || attempt.Stage is not ("A" or "B" or "G") || attempt.Images is null ||
-            attempt.Images.Count != (attempt.Stage == "A" ? 2 : attempt.Stage == "B" && attempt.VisualReference is not null ? 1 : 0) ||
-            attempt.Stage != "B" && attempt.VisualReference is not null)
+        if (attempt is null || attempt.Stage is not ("A" or "B" or "G" or "J") || attempt.Images is null ||
+            (attempt.ImageSha256 is null
+                ? attempt.Stage == "J" || attempt.Images.Count != (attempt.Stage == "A" ? 2 : attempt.Stage == "B" && attempt.VisualReference is not null ? 1 : 0)
+                : attempt.Stage is not ("B" or "J") || attempt.Images.Count is < 2 or > 5 ||
+                  attempt.ImageSha256.Count != attempt.Images.Count || attempt.ImageSha256.Any(h => h.Length != 64 || h.Any(c => !char.IsAsciiHexDigitLower(c)))) ||
+            attempt.Stage is not ("B" or "J") && attempt.VisualReference is not null ||
+            attempt.Stage == "J" && attempt.VisualReference is null)
             return Failure(ProviderOutcome.IsolationViolation, "stage_image_count", started);
         if (attempt.VisualReference is { } visualReference &&
             (!string.Equals(attempt.Images[0], visualReference.PngPath, StringComparison.OrdinalIgnoreCase) ||
@@ -101,6 +105,7 @@ public sealed class CodexProcessRunner
                 prompt_utf8_bytes = Encoding.UTF8.GetByteCount(attempt.Prompt),
                 schema_utf8_bytes = new FileInfo(schemaPath).Length,
                 visual_reference_sha256 = attempt.VisualReference?.Sha256,
+                image_sha256 = attempt.ImageSha256,
                 prompt_sha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(attempt.Prompt)))
             }), Encoding.UTF8, cancellationToken);
         }
@@ -123,12 +128,14 @@ public sealed class CodexProcessRunner
             {
                 return Failure(ProviderOutcome.IsolationViolation, "image_read_failed", started, directory: directory);
             }
-            if (attempt.Stage == "B")
+            if (attempt.Stage is "B" or "J")
             {
                 try
                 {
                     VisualReferencePng.Validate(bytes);
-                    if (Convert.ToHexStringLower(SHA256.HashData(bytes)) != attempt.VisualReference!.Sha256)
+                    var expectedHash = attempt.ImageSha256 is null ? attempt.VisualReference!.Sha256 : attempt.ImageSha256[i];
+                    if (Convert.ToHexStringLower(SHA256.HashData(bytes)) != expectedHash ||
+                        i == 0 && expectedHash != attempt.VisualReference!.Sha256)
                         return Failure(ProviderOutcome.IsolationViolation, "visual_reference_input_hash_mismatch", started);
                 }
                 catch (IOException) { return Failure(ProviderOutcome.IsolationViolation, "invalid_visual_reference_png", started); }
@@ -137,7 +144,7 @@ public sealed class CodexProcessRunner
                      BinaryPrimitives.ReadUInt32BigEndian(bytes.AsSpan(16, 4)) != 1024 ||
                      BinaryPrimitives.ReadUInt32BigEndian(bytes.AsSpan(20, 4)) != 1024)
                 return Failure(ProviderOutcome.IsolationViolation, "invalid_png_input", started);
-            var local = Path.Combine(directory, attempt.Stage == "B" ? "visual-reference.png" : i == 0 ? "reference.png" : "drawing.png");
+            var local = Path.Combine(directory, attempt.Stage is "B" or "J" ? i == 0 ? "visual-reference.png" : "render-" + i + ".png" : i == 0 ? "reference.png" : "drawing.png");
             try { await File.WriteAllBytesAsync(local, bytes, cancellationToken); }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
             {

@@ -1,6 +1,16 @@
 # Point de reprise immédiat
 
-## Priorité actuelle — essayer D13 dans le jeu ouvert
+## Priorité actuelle — laisser le créateur tester D14 dans le jeu ouvert
+
+**Le Player `1.4.0` est ouvert, PID `36512` ; le service D14 est déployé localement.** Build et packaging réussis, code 0 ; le [manifeste Player](../evidence/public/unity/lifecycle-delivery.json) atteste 29 fichiers, 122 857 102 octets et un ZIP de 44 366 062 octets, SHA-256 `98a3dd7315ea6f1c327ab7bba38b5464923e65ed19dd4a7ee4da8efe7895da36`. Migration `009` appliquée, renderer protégé installé, API `16768` et worker `26260` démarrés. [Preuve D14](../evidence/public/backend/lifecycle-2026-09-20.json). Le CoreSmoke déjà réussi précède la dernière consigne du créateur : **plus de tests, appels modèle ni captures de validation par le développement pour cette livraison**.
+
+1. Laisser le créateur effectuer **Dessiner un parchemin → Dessin terminé → génération → laboratoire**, puis recueillir ses corrections. La description pilote apparition, activité, contact et expiration ; l'image sert de cible. Lors de cette génération runtime, le service doit produire les captures avec le renderer fixe et les soumettre à une nouvelle session J pour corriger uniquement les données visuelles bornées.
+2. Partir d'un nouveau dessin : la bibliothèque locale a été vidée, **21 dossiers supprimés et sauvegarde définitivement supprimée sur demande** ; aucun historique serveur purgé.
+3. Pour transmettre le projet, utiliser les archives actualisées de `deliverables/` et leur [manifeste backend](../evidence/public/backend/lifecycle-delivery.json). Les exécutables publiés sont ceux installés ; les documents et scripts opérateur ont été actualisés sans nouvelle génération.
+
+**Aucun parcours joueur, appel modèle, capture ni validation artistique D14 n'est déjà acquis.** La revue J implémentée ne remplace ni l'observation de la fluidité et du son, ni le verdict humain. Voir [l'état D14](IMPLEMENTATION_STATUS.md). Les sections suivantes décrivent les livraisons précédentes.
+
+## Historique — essayer D13 dans le jeu ouvert
 
 **Le Player `1.3.0` est ouvert**, PID `39012`, fenêtre réactive, raccourci Bureau actualisé. Le backend D13 est déployé localement : API `30084`, worker `15760`, `/health/ready` prêt et diagnostic local sans issues de production A/B/G. [Preuve du déploiement](../evidence/public/backend/image-reference-deployment-2026-09-20.json).
 

@@ -96,7 +96,7 @@ public sealed record CodexSettings(
     public IReadOnlyList<string> Check(bool production, bool compatibilityProbe = false, string stage = "B")
     {
         var issues = new List<string>();
-        if (stage is not ("A" or "B" or "G" or "repair_A" or "repair_B"))
+        if (stage is not ("A" or "B" or "G" or "J" or "repair_A" or "repair_B"))
             issues.Add("invalid_provider_stage");
 
         CheckDirectoryOrFile(Executable, file: true, "codex_executable_missing", issues);
@@ -960,7 +960,7 @@ public enum ProviderOutcome
 
 public sealed record CodexAttempt(
     string AttemptId, string Stage, string Prompt, string SchemaPath, IReadOnlyList<string> Images,
-    string JobId, SpellVisualReference? VisualReference = null);
+    string JobId, SpellVisualReference? VisualReference = null, IReadOnlyList<string>? ImageSha256 = null);
 
 public sealed record CodexResult(
     ProviderOutcome Outcome, string? FinalJson, int? ExitCode, string? SessionId,

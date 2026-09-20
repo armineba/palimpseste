@@ -32,3 +32,4 @@ auth.json
 # Generated evidence only when explicitly reviewed
 /evidence/private/
 /deliverables/.stage-backend/
+/.dream-loop/

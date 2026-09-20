@@ -28,7 +28,9 @@ namespace Palimpseste.Game.SpellRuntime
         private Transform energyRoot, groundRoot, seal, corona, skirt, atmosphere, charge, chargeCorona, shockwave, secondWave, pillar, contactFlash;
         private Material contactFlashMaterial;
         private bool dissolving;
-        private float dissolveStarted;
+        private float dissolveStarted, dissolveDuration = .62f, pendingDissolve = -1;
+        private float[] retiringOpacities;
+        private SpellVisualLifecycle lifecycle;
         private Material chargeMaterial, chargeCoronaMaterial;
         private Light localLight;
         private Mesh quad;
@@ -52,6 +54,7 @@ namespace Palimpseste.Game.SpellRuntime
         public void Initialize(SpellNode node, Color fallback, Vector3 center, float physicalSize)
         {
             Configure(node.appearance, fallback);
+            lifecycle = node.appearance?.lifecycle;
             carrier = node.carrier;
             born = Time.time;
             lifetime = Mathf.Max(.1f, (node.options?.lifetime_ticks ?? 150) * Time.fixedDeltaTime);
@@ -64,7 +67,8 @@ namespace Palimpseste.Game.SpellRuntime
             span = Mathf.Max(span, Mathf.Min(physicalSize * .72f, 2.4f));
             if (groundComposition)
                 span = Mathf.Clamp(node.scale_cm / 200f, .45f, 5f);
-            chargeSeconds = Mathf.Clamp((profile?.charge_ms ?? 420) / 1000f, .1f, .8f);
+            chargeSeconds = lifecycle == null ? Mathf.Clamp((profile?.charge_ms ?? 420) / 1000f, .1f, .8f)
+                : Mathf.Clamp((lifecycle.intro?.duration_ms ?? 420) / 1000f,.1f,3f);
             energyRoot = Child("Composed energy", transform);
             energyRoot.localPosition = center;
             quad = Own(Quad());
@@ -562,18 +566,38 @@ namespace Palimpseste.Game.SpellRuntime
         public void SetPulseRadius(float radius) { pulseRadius = Mathf.Max(.01f,radius); }
         public void Arm() { armed = true; }
 
-        public void DissolveWake()
+        public void DissolveWake(float duration = .62f, float delay = 0)
         {
             if (dissolving) return;
+            dissolveDuration = Mathf.Clamp(duration,.1f,3f);
+            if (delay > 0)
+            {
+                pendingDissolve = Time.time + Mathf.Clamp(delay,0,3f);
+                return;
+            }
             dissolving = true;
             dissolveStarted = Time.time;
+            if (lifecycle != null)
+            {
+                retiringOpacities = new float[materials.Count];
+                for (var i = 0; i < materials.Count; i++)
+                    retiringOpacities[i] = materials[i].GetFloat("_Opacity");
+            }
             if (charge != null) charge.gameObject.SetActive(false);
             if (chargeCorona != null) chargeCorona.gameObject.SetActive(false);
             foreach (var particles in particleLayers)
                 particles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
         }
 
-        private void Update() { TickVisuals(Time.time-born); }
+        private void Update()
+        {
+            if (pendingDissolve >= 0 && Time.time >= pendingDissolve)
+            {
+                pendingDissolve = -1;
+                DissolveWake(dissolveDuration);
+            }
+            TickVisuals(Time.time-born);
+        }
 
         private void TickVisuals(float age)
         {
@@ -582,10 +606,10 @@ namespace Palimpseste.Game.SpellRuntime
             {
                 // The mechanical carrier has already retired. Its existing
                 // cloth keeps billowing while the hit flash and fragments fire.
-                var t = Mathf.Clamp01((Time.time - dissolveStarted) / .62f);
+                var t = Mathf.Clamp01((Time.time - dissolveStarted) / dissolveDuration);
                 var envelope = 1 - Mathf.SmoothStep(0, 1, t);
                 for (var i = 0; i < materials.Count; i++)
-                    materials[i].SetFloat("_Opacity", opacities[i] * envelope);
+                    materials[i].SetFloat("_Opacity", (retiringOpacities == null ? opacities[i] : retiringOpacities[i]) * envelope);
                 if (localLight != null) localLight.intensity = envelope * .7f;
                 if (t >= 1) Destroy(gameObject);
                 return;
@@ -609,9 +633,20 @@ namespace Palimpseste.Game.SpellRuntime
                 if (localLight!=null) localLight.intensity=(3.4f+3f*Mathf.Exp(-age*24))*envelope;
                 return;
             }
-            var birth=Mathf.SmoothStep(.08f,1,Mathf.Clamp01(age/.2f));
-            var fade = lifetime > .65f ? Mathf.SmoothStep(0, 1, Mathf.Clamp01((lifetime-age)/.35f)) : 1;
+            var birth = lifecycle == null ? Mathf.SmoothStep(.08f,1,Mathf.Clamp01(age/.2f))
+                : Mathf.Lerp(Mathf.Clamp01((lifecycle.intro?.opacity_start_milli ?? 0) / 1000f),1,
+                    Mathf.SmoothStep(0,1,Mathf.Clamp01(age / chargeSeconds)));
+            var fade = lifecycle == null && lifetime > .65f ? Mathf.SmoothStep(0, 1, Mathf.Clamp01((lifetime-age)/.35f)) : 1;
             var breathing = 1 + Mathf.Sin(age * (restorative ? 2.4f : 4.1f)) * .045f;
+            if (lifecycle != null)
+            {
+                var live = lifecycle.active;
+                var wave = Mathf.Sin(Mathf.Max(0,age - chargeSeconds) * Mathf.PI * 2 /
+                    Mathf.Clamp((live?.period_ms ?? 1000) / 1000f,.1f,6f));
+                var amount = Mathf.Clamp((live?.amplitude_milli ?? 0) / 1000f,0,.5f);
+                breathing = live?.kind == "breathe" ? 1 - amount * .2f + wave * amount * .2f
+                    : live?.kind == "pulse" || live?.kind == "surge" ? 1 + Mathf.Max(0,wave) * amount : 1;
+            }
             for (var i=0;i<materials.Count;i++)
                 if (materials[i]!=chargeMaterial && materials[i]!=chargeCoronaMaterial)
                     materials[i].SetFloat("_Opacity",opacities[i]*birth*fade*breathing*(armed ? 1.1f : 1));

@@ -861,3 +861,127 @@ Require(((JArray)plannerSchema["required"]).Values<string>().Contains("visual_re
     ((JArray)plannerSchema["properties"]["visual_reference_sha256"]["type"]).Values<string>().Contains("null"),
     "B transport must require an explicitly nullable reference hash for legacy calls");
 Console.WriteLine("Image-guided contract passed with synthetic metadata: strict bounded parts, reference/description provenance, all-node construction, expanded budget, unchanged mechanics, client 1.3, and legacy omission. No image provider was called.");
+
+// D14 fixtures exercise description-to-animation contracts only; they do not
+// claim model interpretation, visual fidelity, playback, or human acceptance.
+var narratedDescription = (JObject)wholeDescription.DeepClone();
+narratedDescription["lifecycle"] = new JArray(((JArray)narratedDescription["clauses"])
+    .Select(clause => (string)clause["subject_id"]).Distinct().Select(subject => new JObject {
+        ["subject_id"] = subject,
+        ["appearance"] = "Des fragments lumineux s'assemblent progressivement autour du noyau.",
+        ["active"] = "Le volume reste lisible, animé par une respiration douce et des filaments souples.",
+        ["contact"] = "Au contact réel, des éclats se dispersent autour du point touché.",
+        ["expiration"] = "Sans contact terminal, le volume se dissout et ses dernières lueurs s'effacent."
+    }));
+var narratedDescriptionBytes = JsonBytes(narratedDescription);
+Require(SpellCompiler.ValidateWholeImageDescriptionJson(narratedDescriptionBytes, false,
+    requireLifecycle: true).Count == 0, "Complete lifecycle description rejected");
+Require(SpellCompiler.ValidateWholeImageDescriptionJson(wholeDescriptionBytes, false,
+    requireLifecycle: true).Any(issue => issue.Code == "lifecycle_required"),
+    "New-description gate accepted a legacy description without lifecycle");
+var interpreterLifecycleSchema = JObject.Parse(Encoding.UTF8.GetString(Read("contracts/codex/model-a.output-schema.json")));
+Require(((JArray)interpreterLifecycleSchema["required"]).Values<string>().Contains("lifecycle") &&
+    (string)interpreterLifecycleSchema["properties"]["lifecycle"]["type"] == "array",
+    "New interpreter transport does not require non-null lifecycle");
+var duplicateNarration = (JObject)narratedDescription.DeepClone();
+((JArray)duplicateNarration["lifecycle"]).Add(duplicateNarration["lifecycle"][0].DeepClone());
+Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(duplicateNarration))
+    .Any(issue => issue.Code == "lifecycle_duplicate"), "Duplicate lifecycle subject accepted");
+var missingNarration = (JObject)narratedDescription.DeepClone();
+((JArray)missingNarration["lifecycle"])[0].Remove();
+Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(missingNarration))
+    .Any(issue => issue.Code == "lifecycle_subjects"), "Incomplete lifecycle subject set accepted");
+var unknownNarration = (JObject)narratedDescription.DeepClone();
+unknownNarration["lifecycle"][0]["subject_id"] = "unknown_subject";
+Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(unknownNarration))
+    .Any(issue => issue.Code == "lifecycle_subject"), "Unknown lifecycle subject accepted");
+foreach (var phase in new[] { "appearance", "active", "contact", "expiration" })
+{
+    var emptyNarration = (JObject)narratedDescription.DeepClone();
+    emptyNarration["lifecycle"][0][phase] = " \t ";
+    Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(emptyNarration)).Count > 0,
+        "Blank lifecycle phase accepted: " + phase);
+    ((JObject)emptyNarration["lifecycle"][0]).Property(phase).Remove();
+    Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(emptyNarration)).Count > 0,
+        "Missing lifecycle phase accepted: " + phase);
+}
+var lifecycleProfile = JObject.Parse(@"{
+    'intro': {'kind':'assemble','duration_ms':400,'scale_start_milli':50,'opacity_start_milli':0,'emission_start_milli':300},
+    'active': {'kind':'breathe','period_ms':1400,'amplitude_milli':80},
+    'contact': {'kind':'shatter','duration_ms':700,'spread_cm':250,'scale_end_milli':1200},
+    'expiration': {'kind':'dissolve','duration_ms':1200,'spread_cm':60,'scale_end_milli':300}
+}");
+var narratedPlan = (JObject)wholePlan.DeepClone();
+narratedPlan["description_sha256"] = SpellCompiler.Sha256(narratedDescriptionBytes);
+foreach (var node in (JArray)narratedPlan["nodes"])
+    node["appearance"]["lifecycle"] = lifecycleProfile.DeepClone();
+var narratedInput = new CompilationInput {
+    DescriptionJson = narratedDescriptionBytes, PlanJson = JsonBytes(narratedPlan),
+    GeometryJson = wholeGeometry.GeometryJson, MaskPng = wholeGeometry.MaskPng,
+    GeometryArtifactIds = wholeInput.GeometryArtifactIds, MaskArtifactIds = wholeInput.MaskArtifactIds,
+    SpellId = "lifecycle-smoke", ParchmentId = "lifecycle-support", SignatureSeedHex = "e10a330a765bc981",
+    Provenance = input.Provenance
+};
+var narratedCompiled = SpellCompiler.Compile(narratedInput);
+Require(narratedCompiled.Success, "Complete lifecycle plan rejected: " + string.Join("; ", narratedCompiled.Issues));
+Require(narratedCompiled.Spell.versions.min_client == "1.4.0" &&
+    narratedCompiled.Spell.plan.nodes.All(node => node.appearance.lifecycle != null) &&
+    JToken.DeepEquals(JToken.FromObject(narratedCompiled.Spell.resource_bounds),
+        JToken.FromObject(SpellCompiler.Compile(wholeInput).Spell.resource_bounds)),
+    "Lifecycle lost phases, permitted an old client, or changed mechanical bounds");
+for (var index = 0; index < narratedCompiled.Spell.plan.nodes.Count; index++)
+    Require(JToken.DeepEquals(JToken.FromObject(narratedCompiled.Spell.plan.nodes[index].effects), wholePlan["nodes"][index]["effects"]) &&
+        JToken.DeepEquals(JToken.FromObject(narratedCompiled.Spell.plan.nodes[index].activation), wholePlan["nodes"][index]["activation"]),
+        "Decorative lifecycle altered effects or activation");
+var omittedLifecyclePlan = (JObject)narratedPlan.DeepClone();
+omittedLifecyclePlan["nodes"][0]["appearance"]["lifecycle"] = JValue.CreateNull();
+Require(SpellCompiler.ValidatePlanJson(narratedDescriptionBytes, JsonBytes(omittedLifecyclePlan),
+    wholeGeometry.GeometryJson, wholeGeometry.MaskPng).Any(issue => issue.Code == "lifecycle_required"),
+    "Planner discarded a described lifecycle");
+var inventedLifecyclePlan = (JObject)narratedPlan.DeepClone();
+inventedLifecyclePlan["description_sha256"] = SpellCompiler.Sha256(wholeDescriptionBytes);
+Require(SpellCompiler.ValidatePlanJson(wholeDescriptionBytes, JsonBytes(inventedLifecyclePlan),
+    wholeGeometry.GeometryJson, wholeGeometry.MaskPng).Any(issue => issue.Code == "lifecycle_trace"),
+    "Planner invented a lifecycle absent from the frozen description");
+foreach (var change in new[] {
+    ("intro", "kind", (JToken)"execute_code"), ("intro", "duration_ms", (JToken)99),
+    ("intro", "duration_ms", (JToken)3001), ("intro", "scale_start_milli", (JToken)1001),
+    ("intro", "opacity_start_milli", (JToken)(-1)), ("intro", "emission_start_milli", (JToken)6001),
+    ("active", "kind", (JToken)"teleport"), ("active", "period_ms", (JToken)99),
+    ("active", "period_ms", (JToken)6001), ("active", "amplitude_milli", (JToken)501),
+    ("contact", "kind", (JToken)"damage"), ("contact", "duration_ms", (JToken)3001),
+    ("contact", "spread_cm", (JToken)601), ("contact", "scale_end_milli", (JToken)3001),
+    ("expiration", "kind", (JToken)"execute_code"), ("expiration", "duration_ms", (JToken)99),
+    ("expiration", "spread_cm", (JToken)(-1)), ("expiration", "scale_end_milli", (JToken)(-1)) })
+{
+    var altered = (JObject)narratedPlan.DeepClone();
+    altered["nodes"][0]["appearance"]["lifecycle"][change.Item1][change.Item2] = change.Item3;
+    Require(SpellCompiler.ValidatePlanJson(narratedDescriptionBytes, JsonBytes(altered),
+        wholeGeometry.GeometryJson, wholeGeometry.MaskPng).Any(issue => issue.Code == "plan_json"),
+        "Lifecycle vocabulary/boundary escaped strict validation: " + change.Item1 + "." + change.Item2);
+}
+foreach (var phase in new[] { "intro", "active", "contact", "expiration" })
+{
+    var incomplete = (JObject)narratedPlan.DeepClone();
+    ((JObject)incomplete["nodes"][0]["appearance"]["lifecycle"]).Property(phase).Remove();
+    Require(SpellCompiler.ValidatePlanJson(narratedDescriptionBytes, JsonBytes(incomplete),
+        wholeGeometry.GeometryJson, wholeGeometry.MaskPng).Count > 0, "Incomplete lifecycle plan accepted: " + phase);
+}
+var oldSemanticToken = JObject.FromObject(semanticTyped);
+oldSemanticToken.Property("lifecycle")?.Remove();
+Require(GeometryResolver.SemanticDescriptionSha256(semanticTyped) == SpellCompiler.Sha256(JsonBytes(oldSemanticToken)),
+    "Null lifecycle changed the normalized description hash of existing semantic geometry");
+var nullableLifecycleDescription = (JObject)wholeDescription.DeepClone();
+nullableLifecycleDescription["lifecycle"] = JValue.CreateNull();
+Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(nullableLifecycleDescription)).Count == 0,
+    "Legacy null lifecycle description rejected");
+var nullableLifecyclePlan = (JObject)wholePlan.DeepClone();
+foreach (var node in (JArray)nullableLifecyclePlan["nodes"])
+    node["appearance"]["lifecycle"] = JValue.CreateNull();
+wholeInput.PlanJson = JsonBytes(nullableLifecyclePlan);
+var oldLifecycleCompiled = SpellCompiler.Compile(wholeInput);
+Require(oldLifecycleCompiled.Success && oldLifecycleCompiled.Spell.versions.min_client == "1.0.0" &&
+    ((JObject)ContractJson.ParseStrict(oldLifecycleCompiled.PayloadUtf8)["plan"]["nodes"][0]["appearance"]).Property("lifecycle") == null,
+    "Legacy null lifecycle changed the published packet or minimum client");
+wholeInput.PlanJson = wholePlanBytes;
+Console.WriteLine("Lifecycle contract fixtures passed: complete per-subject narration, description trace, four bounded animation phases, client 1.4, unchanged mechanics and legacy hashes. No model or visual fidelity result is claimed.");

@@ -1,0 +1,56 @@
+{
+  "version": "1.4.0",
+  "scope": "D14 local installation and player opening; no generation or gameplay validation",
+  "source_private_report_sha256": "25660d9484c2c30a5edd52050886d5b2039da6d5f42bd7a0dea555c24ffa57e3",
+  "installation": {
+    "script": "ops/deploy-lifecycle.ps1",
+    "started_at": "2026-09-20T21:05:45.4330683+00:00",
+    "completed_at": "2026-09-20T21:05:57.4556452+00:00",
+    "exit_code": 0,
+    "phase": "services_started",
+    "completed": true,
+    "migration_009_applied": true,
+    "precompiled_renderer_installed_with_protections": true,
+    "renderer_manifest_sha256": "d4358baca323e24875284abcd9ffe2a6da6faf6044fbf50b1630fe7e1aa7446f",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "worker_sha256": "c3eaa3f9a32de590254bb7ce8bb8a38898b81ed9ea0c61bd8da8d75f158f630a",
+    "api_sha256": "f1351126d63f2181af91d8ad7b889ca74e6b551c9f62bc7be2908a5fe5dbb51f"
+  },
+  "launch_observations": {
+    "source": "operator deployment and launch observations, plus lifecycle-delivery.json",
+    "api_pid": 16768,
+    "worker_pid": 26260,
+    "startup_ready_reported": true,
+    "player_pid": 36512,
+    "player_opened_at": "2026-09-20T21:06:22.1856828Z",
+    "player": "game/Build/WindowsLifecyclePlayable/Palimpseste.exe",
+    "desktop_shortcut_updated": true,
+    "previous_player_1_3_closed_cleanly": true
+  },
+  "execution_limits": {
+    "spell_generations": 0,
+    "diagnostics_executed": false,
+    "gameplay_tested": false,
+    "visual_validation_captures_executed": false,
+    "visual_acceptance": "pending_owner",
+    "core_smoke": "An earlier run passed before the owner's request to stop testing; no new run performed for this installation.",
+    "remaining": [
+      "D14 player generation A/G/B/J and bounded refinement",
+      "Visual fidelity and animation quality",
+      "Gameplay, impact and sound in the delivered player",
+      "Save and offline replay of a newly generated D14 spell",
+      "Human acceptance, other computer and remote deployment"
+    ]
+  },
+  "library_cleanup": {
+    "source": "operator observation after owner-requested deletion",
+    "local_spell_folders_removed": 21,
+    "backup_permanently_removed": true,
+    "library_empty_when_observed": true,
+    "server_history_purged": false
+  },
+  "references": {
+    "player_delivery": "evidence/public/unity/lifecycle-delivery.json",
+    "build_success_excerpt": "evidence/public/unity/lifecycle/build-result.log"
+  }
+}

@@ -21,11 +21,18 @@ namespace Palimpseste.Game.SpellRuntime
         private static readonly int EnvelopeId = Shader.PropertyToID("_Envelope");
         private static readonly int SeedId = Shader.PropertyToID("_Seed");
         private static readonly int ArmedId = Shader.PropertyToID("_Armed");
+        private static readonly int EmissionId = Shader.PropertyToID("_Emission");
+        private static readonly int RevealId = Shader.PropertyToID("_Reveal");
+        private static readonly int DissolveId = Shader.PropertyToID("_Dissolve");
         private readonly List<UnityEngine.Object> owned = new List<UnityEngine.Object>();
         private readonly List<PartState> parts = new List<PartState>(MaximumParts);
         private MaterialPropertyBlock properties;
         private float born, lifetime, birthDuration, retirementStarted = -1, retirementDuration;
         private bool initialized, impact, armed;
+        private SpellVisualLifecycle lifecycle;
+        private SpellVisualEnding ending;
+        private float pendingRetirement = -1;
+        private bool pendingContact;
         private Bounds authoredBounds;
         private Vector3 presentationScale = Vector3.one, presentationOffset;
         private Quaternion presentationRotation = Quaternion.identity;
@@ -64,6 +71,10 @@ namespace Palimpseste.Game.SpellRuntime
             public Quaternion rotation;
             public string motion;
             public float amplitude, frequency, phase, seed;
+            public float emission, shownScale = 1, shownOpacity = 1, shownEmission, shownReveal = 1;
+            public Vector3 shownPosition, retirementPosition;
+            public Quaternion shownRotation, retirementRotation;
+            public float retirementScale, retirementOpacity, retirementEmission, retirementReveal;
             public Mesh mesh;
             public BeamVertex[] beamSource;
             public int[] beamSourceTriangles;
@@ -76,6 +87,11 @@ namespace Palimpseste.Game.SpellRuntime
 
         public int PartCount => parts.Count;
         public bool IsImpact => impact;
+        public bool HasLifecycle => lifecycle != null;
+        public float RemainingEntrance => Mathf.Max(0,birthDuration - (Time.time - born));
+        public bool IsRetiring => retirementStarted >= 0;
+        public string PresentationPhase => IsRetiring ? (ending == lifecycle?.contact ? "contact" : "expiration")
+            : Time.time - born < birthDuration ? "appearance" : "active";
         public bool BeamTessellationLimited { get; private set; }
 
         public static bool Supports(SpellNode node)
@@ -91,11 +107,14 @@ namespace Palimpseste.Game.SpellRuntime
             // never in MonoBehaviour field initializers during construction.
             properties = new MaterialPropertyBlock();
             born = Time.time;
+            lifecycle = node.appearance.lifecycle;
             lifetime = Mathf.Max(.1f,(node.options?.lifetime_ticks ?? 150) * Time.fixedDeltaTime);
-            birthDuration = Mathf.Clamp((node.appearance.vfx?.charge_ms ?? 280) / 1000f,.12f,.65f);
+            birthDuration = lifecycle == null
+                ? Mathf.Clamp((node.appearance.vfx?.charge_ms ?? 280) / 1000f,.12f,.65f)
+                : Mathf.Clamp((lifecycle.intro?.duration_ms ?? 280) / 1000f,.1f,3f);
             // A fast projectile can hit before the long decorative charge
             // finishes. Reveal its silhouette promptly while the aura unfolds.
-            if (node.carrier == "projectile") birthDuration = Mathf.Min(birthDuration, .14f);
+            if (lifecycle == null && node.carrier == "projectile") birthDuration = Mathf.Min(birthDuration, .14f);
             var definition = node.appearance.construction.parts;
             for (var i = 0; i < definition.Count; i++)
             {
@@ -120,7 +139,8 @@ namespace Palimpseste.Game.SpellRuntime
                     amplitude = Mathf.Clamp(part.motion?.amplitude_cm ?? 0,0,150) / 100f,
                     frequency = Mathf.Clamp(part.motion?.frequency_mhz ?? 0,0,6000) / 1000f,
                     phase = (part.motion?.phase_mdeg ?? 0) / 1000f * Mathf.Deg2Rad,
-                    seed = (i * .61803399f) % 1f
+                    seed = (i * .61803399f) % 1f,
+                    emission = Mathf.Clamp(part.emission_milli / 1000f,0,6)
                 };
                 state.velocity = (state.position.normalized * .6f + new Vector3(
                     Mathf.Sin(i * 2.39f),.4f + (i % 5) * .16f,Mathf.Cos(i * 2.39f))) * (1.2f + i % 4 * .24f);
@@ -149,8 +169,47 @@ namespace Palimpseste.Game.SpellRuntime
             var visual = root.AddComponent<ImageConstructedSpellVisual>();
             visual.Initialize(node);
             visual.impact = true;
-            visual.Animate(0);
+            if (visual.lifecycle != null)
+            {
+                // A piercing contact leaves a decorative copy of the formed
+                // spell. It must not replay its entrance or acquire a collider.
+                visual.born = Time.time - visual.birthDuration;
+                visual.Animate(visual.birthDuration);
+                visual.RetireForCause(true);
+                Destroy(root,visual.retirementDuration + .03f);
+            }
+            else visual.Animate(0);
             return visual;
+        }
+
+        /// <summary>Only presentation survives; the runtime retires gameplay immediately.</summary>
+        public float RetireForCause(bool contact)
+        {
+            if (retirementStarted >= 0) return retirementDuration;
+            if (lifecycle == null) { Retire(.62f); return retirementDuration; }
+            Animate(Time.time - born);
+            ending = contact ? lifecycle.contact : lifecycle.expiration;
+            retirementDuration = Mathf.Clamp((ending?.duration_ms ?? 400) / 1000f,.1f,3f);
+            foreach (var part in parts)
+            {
+                part.retirementPosition = part.shownPosition;
+                part.retirementRotation = part.shownRotation;
+                part.retirementScale = part.shownScale;
+                part.retirementOpacity = part.shownOpacity;
+                part.retirementEmission = part.shownEmission;
+                part.retirementReveal = part.shownReveal;
+            }
+            retirementStarted = Time.time;
+            return retirementDuration;
+        }
+
+        public float FinishEntranceThenRetire(bool contact)
+        {
+            if (lifecycle == null || RemainingEntrance <= 0) return RetireForCause(contact);
+            pendingContact = contact;
+            pendingRetirement = Time.time + RemainingEntrance;
+            var selectedEnding = contact ? lifecycle.contact : lifecycle.expiration;
+            return RemainingEntrance + Mathf.Clamp((selectedEnding?.duration_ms ?? 400) / 1000f,.1f,3f);
         }
 
         public void Retire(float duration = .2f)
@@ -424,7 +483,12 @@ namespace Palimpseste.Game.SpellRuntime
         {
             if (!initialized) return;
             var age = Time.time - born;
-            if (impact && age >= ImpactLifetime) { Destroy(gameObject); return; }
+            if (pendingRetirement >= 0 && Time.time >= pendingRetirement)
+            {
+                pendingRetirement = -1;
+                RetireForCause(pendingContact);
+            }
+            if (impact && lifecycle == null && age >= ImpactLifetime) { Destroy(gameObject); return; }
             if (retirementStarted >= 0 && Time.time - retirementStarted >= retirementDuration)
             {
                 // This component may live on a gameplay carrier. Retiring
@@ -437,6 +501,7 @@ namespace Palimpseste.Game.SpellRuntime
 
         private void Animate(float age)
         {
+            if (lifecycle != null) { AnimateLifecycle(age); return; }
             var fade = impact ? 1f - Mathf.SmoothStep(0,1,Mathf.Clamp01((age / ImpactLifetime - .12f) / .88f))
                 : 1f - Mathf.SmoothStep(0,1,Mathf.Clamp01((age - lifetime + .16f) / .16f));
             if (retirementStarted >= 0) fade *= 1f - Mathf.SmoothStep(0,1,(Time.time - retirementStarted) / retirementDuration);
@@ -480,6 +545,151 @@ namespace Palimpseste.Game.SpellRuntime
                     part.transform.localScale = Vector3.one;
                 }
                 properties.Clear(); properties.SetFloat(EnvelopeId,fade * emergence); properties.SetFloat(SeedId,part.seed);
+                properties.SetFloat(ArmedId,armed ? 1 : 0);
+                part.renderer.SetPropertyBlock(properties);
+            }
+            beamNeedsUpload = false;
+        }
+
+        private void AnimateLifecycle(float age)
+        {
+            var intro = lifecycle.intro;
+            var live = lifecycle.active;
+            var entrance = Mathf.SmoothStep(0,1,Mathf.Clamp01(age / birthDuration));
+            var liveAge = Mathf.Max(0,age - birthDuration);
+            var activePhase = liveAge * Mathf.PI * 2 / Mathf.Clamp((live?.period_ms ?? 1000) / 1000f,.1f,6f);
+            var amplitude = Mathf.Clamp((live?.amplitude_milli ?? 0) / 1000f,0,.5f);
+            var startScale = Mathf.Clamp01((intro?.scale_start_milli ?? 0) / 1000f);
+            var startOpacity = Mathf.Clamp01((intro?.opacity_start_milli ?? 0) / 1000f);
+            var startEmission = Mathf.Clamp((intro?.emission_start_milli ?? 0) / 1000f,0,6);
+            var retiring = retirementStarted >= 0;
+            var endTime = retiring ? Mathf.Clamp01((Time.time - retirementStarted) / retirementDuration) : 0;
+            var endSmooth = Mathf.SmoothStep(0,1,endTime);
+            var spread = Mathf.Clamp((ending?.spread_cm ?? 0) / 100f,0,6);
+            var targetScale = Mathf.Clamp((ending?.scale_end_milli ?? 1000) / 1000f,0,3);
+            for (var i = 0; i < parts.Count; i++)
+            {
+                var part = parts[i];
+                var position = part.position;
+                var rotation = part.rotation;
+                var growth = Mathf.Lerp(startScale,1,entrance);
+                var opacity = Mathf.Lerp(startOpacity,1,entrance);
+                var emission = Mathf.Lerp(startEmission,part.emission,entrance);
+                var reveal = 1f;
+                var dissolve = 0f;
+                var partPhase = age * part.frequency * Mathf.PI * 2 + part.phase;
+                switch (part.motion)
+                {
+                    case "flutter":
+                        position += Vector3.up * (Mathf.Sin(partPhase) * part.amplitude * .22f);
+                        var flutter = Mathf.Min(28,part.amplitude * 22f);
+                        rotation *= Quaternion.Euler(Mathf.Sin(partPhase) * flutter,0,Mathf.Sin(partPhase + .8f) * flutter * .28f);
+                        break;
+                    case "orbit":
+                        position += new Vector3(Mathf.Cos(partPhase),Mathf.Sin(partPhase * .5f) * .18f,Mathf.Sin(partPhase)) * part.amplitude;
+                        rotation *= Quaternion.Euler(0,age * part.frequency * 45,0);
+                        break;
+                    case "drift":
+                        position += new Vector3(Mathf.Sin(partPhase * .73f) * .35f,Mathf.Sin(partPhase),Mathf.Cos(partPhase) * .45f) * part.amplitude;
+                        break;
+                }
+                switch (intro?.kind)
+                {
+                    case "assemble":
+                        var assembly = Mathf.SmoothStep(0,1,Mathf.Clamp01((age / birthDuration - part.seed * .22f) / (1 - part.seed * .22f)));
+                        position += part.velocity.normalized * Mathf.Min(2,authoredBounds.size.magnitude * .35f) * (1 - assembly);
+                        rotation = Quaternion.Slerp(part.rotation * Quaternion.Euler(35 * part.seed,90 * part.seed,40),rotation,assembly);
+                        break;
+                    case "ignite":
+                        emission = Mathf.Clamp(emission + Mathf.Sin(entrance * Mathf.PI) * 1.4f,0,6);
+                        break;
+                    case "draw": reveal = entrance; break;
+                    case "emerge":
+                        position += Vector3.down * Mathf.Min(3,Mathf.Max(.1f,authoredBounds.size.y)) * (1 - entrance);
+                        reveal = entrance;
+                        break;
+                    // Fade and grow use their separately specified opacity
+                    // and scale starts; neither forces a universal charge.
+                }
+                if (liveAge > 0)
+                {
+                    switch (live?.kind)
+                    {
+                        case "pulse":
+                            var pulse = Mathf.Pow(Mathf.Max(0,Mathf.Sin(activePhase)),3);
+                            growth *= 1 + pulse * amplitude * .16f;
+                            emission = Mathf.Clamp(emission * (1 + pulse * amplitude),0,6);
+                            break;
+                        case "breathe":
+                            var breathe = Mathf.Sin(activePhase);
+                            growth *= 1 + breathe * amplitude * .12f;
+                            opacity *= 1 - amplitude * .2f + breathe * amplitude * .2f;
+                            break;
+                        case "swirl":
+                            var swirl = Quaternion.AngleAxis(Mathf.Sin(activePhase) * amplitude * 32,Vector3.forward);
+                            position = swirl * position;
+                            rotation = swirl * rotation;
+                            break;
+                        case "surge":
+                            var surge = Mathf.Sin(activePhase - part.seed * Mathf.PI * 2);
+                            emission = Mathf.Clamp(emission * (1 + surge * amplitude),0,6);
+                            position += Vector3.forward * (surge * amplitude * .16f);
+                            break;
+                    }
+                }
+                if (retiring)
+                {
+                    // Snapshot the currently visible pose, including a partial
+                    // entrance. A hit must not snap to the fully formed model.
+                    position = part.retirementPosition;
+                    rotation = part.retirementRotation;
+                    growth = part.retirementScale * Mathf.Lerp(1,targetScale,endSmooth);
+                    opacity = part.retirementOpacity * (1 - endSmooth);
+                    emission = part.retirementEmission;
+                    reveal = part.retirementReveal;
+                    switch (ending?.kind)
+                    {
+                        case "burst":
+                            position += part.velocity.normalized * spread * (1 - Mathf.Pow(1 - endTime,3));
+                            emission = Mathf.Clamp(emission + Mathf.Sin(endTime * Mathf.PI) * 1.8f,0,6);
+                            break;
+                        case "shatter":
+                            position += part.velocity.normalized * spread * endTime + Vector3.down * spread * .28f * endTime * endTime;
+                            rotation *= Quaternion.Euler(endTime * (50 + i % 5 * 29),endTime * (i % 7 * 25),endTime * 95);
+                            break;
+                        case "dissolve":
+                            dissolve = endSmooth;
+                            position += Vector3.up * (spread * endSmooth * .22f);
+                            break;
+                        case "collapse":
+                            position = Vector3.Lerp(part.retirementPosition,authoredBounds.center,endSmooth);
+                            break;
+                        case "ripple":
+                            var radial = new Vector3(part.retirementPosition.x - authoredBounds.center.x,0,
+                                part.retirementPosition.z - authoredBounds.center.z);
+                            if (radial.sqrMagnitude < .0001f) radial = new Vector3(part.velocity.x,0,part.velocity.z);
+                            position += radial.normalized * spread * endSmooth;
+                            break;
+                    }
+                }
+                part.shownPosition = position; part.shownRotation = rotation;
+                part.shownScale = growth; part.shownOpacity = opacity;
+                part.shownEmission = emission; part.shownReveal = reveal;
+                part.transform.localPosition = presentationOffset + presentationRotation * Vector3.Scale(position,presentationScale);
+                part.transform.localRotation = presentationRotation * rotation;
+                part.transform.localScale = Vector3.Scale(part.scale,presentationScale) * Mathf.Max(.0001f,growth);
+                if (beamActive && part.beamSamples != null)
+                {
+                    // A lifecycle can change every frame even on an otherwise
+                    // still beam. The physical beam path stays immutable.
+                    DeformBeamPart(part,position,rotation,Mathf.Max(.0001f,growth));
+                    part.transform.localPosition = Vector3.zero;
+                    part.transform.localRotation = Quaternion.identity;
+                    part.transform.localScale = Vector3.one;
+                }
+                properties.Clear(); properties.SetFloat(EnvelopeId,Mathf.Clamp01(opacity));
+                properties.SetFloat(EmissionId,emission); properties.SetFloat(RevealId,reveal);
+                properties.SetFloat(DissolveId,dissolve); properties.SetFloat(SeedId,part.seed);
                 properties.SetFloat(ArmedId,armed ? 1 : 0);
                 part.renderer.SetPropertyBlock(properties);
             }

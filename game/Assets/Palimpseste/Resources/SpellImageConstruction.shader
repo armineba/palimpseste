@@ -8,6 +8,8 @@ Shader "Palimpseste/SpellImageConstruction"
         _Opacity ("Surface opacity", Range(0,1)) = .7
         _Emission ("Radiance", Range(0,6)) = 1
         _Envelope ("Lifecycle", Range(0,1)) = 1
+        _Reveal ("Authored entrance reveal", Range(0,1)) = 1
+        _Dissolve ("Authored ending erosion", Range(0,1)) = 0
         _Armed ("Armed presentation", Range(0,1)) = 0
         _Seed ("Controlled variation", Float) = 0
         [Enum(Off,0,On,1)] _ZWrite ("Depth write", Float) = 0
@@ -31,6 +33,7 @@ Shader "Palimpseste/SpellImageConstruction"
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
                 float _Material, _Shape, _Opacity, _Emission, _Envelope, _Seed, _Armed;
+                float _Reveal, _Dissolve;
             CBUFFER_END
             struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv:TEXCOORD0; };
             struct Varyings { float4 positionHCS:SV_POSITION; float3 positionWS:TEXCOORD0; float3 normalWS:TEXCOORD1; float2 uv:TEXCOORD2; };
@@ -131,7 +134,13 @@ Shader "Palimpseste/SpellImageConstruction"
                     radiance=(frac(uv.x*7+_Seed)*.02+outerEdge*.15)*_Emission;
                 }
                 float envelope=saturate(_Envelope);
+                float reveal=saturate((_Reveal*1.08-uv.x)/.08);
+                float erosion=saturate((fabric-_Dissolve*1.15+.10)/.10);
+                envelope*=reveal*erosion;
                 opacity=saturate(opacity*envelope);
+                // Transparent stone/metal parts must stop writing invisible
+                // depth after their bounded entrance/retirement animation.
+                clip(opacity-.00001);
                 return half4(colour*opacity+accent*min(radiance,_Material<2.5?16:6)*emissionCoverage*envelope*(1+_Armed*.15),opacity);
             }
             ENDHLSL

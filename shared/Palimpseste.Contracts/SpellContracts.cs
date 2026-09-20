@@ -12,6 +12,17 @@ namespace Palimpseste.Contracts
         public List<SpellClause> clauses;
         public List<SpellRelation> relations;
         public List<ShapeRequest> shape_requests;
+        // Null only for archived descriptions. New spells describe every subject from launch to retirement.
+        public List<SpellLifecycleDescription> lifecycle;
+    }
+
+    public sealed class SpellLifecycleDescription
+    {
+        public string subject_id;
+        public string appearance;
+        public string active;
+        public string contact;
+        public string expiration;
     }
 
     public sealed class SpellObservation
@@ -103,7 +114,56 @@ namespace Palimpseste.Contracts
         // Decorative, bounded VFX layers. Null preserves all earlier compiled packets.
         public SpellVfxProfile vfx;
         public SpellVisualConstruction construction;
+        // Decorative animation of the frozen description. Never changes carrier timing or collisions.
+        public SpellVisualLifecycle lifecycle;
         public string signature_geometry_id;
+    }
+
+    public sealed class SpellVisualLifecycle
+    {
+        public SpellVisualIntro intro;
+        public SpellVisualActive active;
+        public SpellVisualEnding contact;
+        public SpellVisualEnding expiration;
+    }
+
+    public sealed class SpellVisualIntro
+    {
+        public string kind;
+        public int duration_ms;
+        public int scale_start_milli;
+        public int opacity_start_milli;
+        public int emission_start_milli;
+    }
+
+    public sealed class SpellVisualActive
+    {
+        public string kind;
+        public int period_ms;
+        public int amplitude_milli;
+    }
+
+    public sealed class SpellVisualEnding
+    {
+        public string kind;
+        public int duration_ms;
+        public int spread_cm;
+        public int scale_end_milli;
+    }
+
+    public static class SpellVisualLifecycleLimits
+    {
+        public static readonly string[] IntroKinds = { "fade", "grow", "assemble", "ignite", "draw", "emerge" };
+        public static readonly string[] ActiveKinds = { "steady", "pulse", "breathe", "swirl", "surge" };
+        public static readonly string[] EndingKinds = { "fade", "burst", "shatter", "dissolve", "collapse", "ripple" };
+        public const int MinimumDurationMs = 100;
+        public const int MaximumDurationMs = 3000;
+        public const int MinimumPeriodMs = 100;
+        public const int MaximumPeriodMs = 6000;
+        public const int MaximumAmplitudeMilli = 500;
+        public const int MaximumSpreadCm = 600;
+        public const int MaximumEndScaleMilli = 3000;
+        public const int MaximumEmissionMilli = 6000;
     }
 
     public sealed class SpellVisualConstruction

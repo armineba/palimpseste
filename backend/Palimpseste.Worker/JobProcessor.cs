@@ -9,7 +9,7 @@ using Palimpseste.Storage;
 
 namespace Palimpseste.Worker;
 
-public sealed class JobProcessor
+public sealed partial class JobProcessor
 {
     private readonly JobRepository jobs;
     private readonly IArtifactStore files;
@@ -291,7 +291,7 @@ public sealed class JobProcessor
         var spellId = Guid.NewGuid();
         var actualARequestedModel = await jobs.GetSuccessfulRequestedModelAsync(job, "A", ct);
         var actualBRequestedModel = await jobs.GetSuccessfulRequestedModelAsync(job, "B", ct);
-        var compilation = SpellCompiler.Compile(new CompilationInput
+        var compilationInput = new CompilationInput
         {
             DescriptionJson = description, PlanJson = plan, GeometryJson = geometryJson, MaskPng = maskPng,
             VisualReference = visualMetadata,
@@ -310,7 +310,22 @@ public sealed class JobProcessor
                 // Codex JSONL exposes a thread ID, not a provider response ID.
                 response_a_id = null, response_b_id = null
             }
-        });
+        };
+        if (job.VisualPipelineVersion >= 2 && visualInput is not null && visualMetadata is not null)
+        {
+            var currentPlan = await jobs.GetPlanAsync(job, ct) ?? throw new InvalidDataException("visual_plan_missing");
+            var refined = await RefineVisualsAsync(job, description, plan, currentPlan, geometryContext, capabilities,
+                visualInput, visualMetadata, compilationInput, geometryJson, maskPng, ct);
+            if (refined is null) return;
+            compilationInput.PlanJson = refined;
+            var identity = await jobs.GetPlanProviderIdentityAsync(job, Sha256(refined), ct);
+            if (identity is not null)
+            {
+                compilationInput.Provenance.model_b = identity.Model;
+                compilationInput.Provenance.prompt_b_version = identity.PromptVersion;
+            }
+        }
+        var compilation = SpellCompiler.Compile(compilationInput);
         if (!compilation.Success)
         {
             await jobs.SetStateAsync(job, "needs_operator", "compile_rejected",
@@ -318,7 +333,18 @@ public sealed class JobProcessor
             return;
         }
         var compiledArtifact = await files.PutAsync(compilation.PayloadUtf8, "json", "application/json", ct);
-        await jobs.PublishAsync(job, spellId, compiledArtifact, ct);
+        var readyMessage = "Sort disponible";
+        if (job.VisualPipelineVersion >= 2)
+        {
+            var review = await jobs.GetVisualReviewAsync(job, Sha256(compilationInput.PlanJson), ct);
+            if (review is not null)
+                readyMessage = review.Score >= 10000 && review.LifecycleFaithful
+                    ? "Sort disponible · rendu comparé à l’image, à toi de juger"
+                    : review.LifecycleFaithful
+                        ? "Sort disponible · des écarts avec l’image restent à apprécier"
+                        : "Sort disponible · l’animation et le rendu restent à améliorer";
+        }
+        await jobs.PublishAsync(job, spellId, compiledArtifact, ct, readyMessage);
     }
 
     private async Task ProcessAuthoringAsync(ClaimedJob job, CancellationToken ct)
@@ -421,7 +447,7 @@ public sealed class JobProcessor
     private static IReadOnlyList<ValidationIssue> ValidateNewInterpretation(byte[]? utf8, bool requirePalette)
     {
         if (utf8 is null) return [];
-        return SpellCompiler.ValidateWholeImageDescriptionJson(utf8, requirePalette, requireVisualForm: true);
+        return SpellCompiler.ValidateWholeImageDescriptionJson(utf8, requirePalette, requireVisualForm: true, requireLifecycle: true);
     }
 
     private static string Sha256(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));

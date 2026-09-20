@@ -1,4 +1,6 @@
 * text=auto
+# JSON fixtures and frozen contracts bind their exact UTF-8 bytes with SHA-256.
+*.json text eol=lf
 *.png binary
 *.pdf binary
 *.zip binary

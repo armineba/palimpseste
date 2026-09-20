@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "string", "enum": ["sp.visual-judgement/1.0"] },
+    "description_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "plan_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "visual_reference_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "composition": { "type": "integer", "minimum": 0, "maximum": 3000 },
+    "lighting": { "type": "integer", "minimum": 0, "maximum": 3000 },
+    "materials": { "type": "integer", "minimum": 0, "maximum": 3000 },
+    "details": { "type": "integer", "minimum": 0, "maximum": 1000 },
+    "score": { "type": "integer", "minimum": 0, "maximum": 10000 },
+    "lifecycle_faithful": { "type": "boolean" },
+    "issues": { "type": "array", "maxItems": 24, "items": { "type": "string", "minLength": 1, "maxLength": 1200 } }
+  },
+  "required": ["schema_version", "description_sha256", "plan_sha256", "visual_reference_sha256", "composition", "lighting", "materials", "details", "score", "lifecycle_faithful", "issues"]
+}

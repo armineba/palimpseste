@@ -235,7 +235,7 @@ if (mode is "interpreter" or "astra")
             await EmitAsync(local, writePath);
             return 1;
         }
-        var issues = SpellCompiler.ValidateWholeImageDescriptionJson(a.Utf8, requirePalette: true, requireVisualForm: true);
+        var issues = SpellCompiler.ValidateWholeImageDescriptionJson(a.Utf8, requirePalette: true, requireVisualForm: true, requireLifecycle: true);
         local["description_issue_codes"] = issues.Select(issue => issue.Code).Distinct().ToArray();
         if (issues.Count != 0)
         {

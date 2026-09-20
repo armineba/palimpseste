@@ -10,12 +10,12 @@ public sealed record StoredVisualReference(string StorageKey, string Sha256, Gui
     string DescriptionSha256, string PromptVersion, int Width, int Height);
 public sealed record CaptureFiles(string ManifestJson, string ManifestSha, string SignatureSeedHex, string DrawingKey, string DrawingSha, string InkKey, string InkSha,
     string ReferenceKey, string ReferenceSha);
-public sealed record StoredDocument(string StorageKey, string Sha256, Guid ArtifactId, string? PromptVersion = null);
+public sealed record StoredDocument(string StorageKey, string Sha256, Guid ArtifactId, string? PromptVersion = null, int Revision = 0);
 public sealed record StoredGeometry(string GeometryId, Guid ArtifactId, string StorageKey, string Sha256);
 public sealed record StoredMask(string FileName, Guid ArtifactId, string StorageKey, string Sha256);
 public sealed record AuthoringInput(string DescriptionKey, string DescriptionSha, IReadOnlyList<Guid> GeometryArtifactIds);
 
-public sealed class JobRepository
+public sealed partial class JobRepository
 {
     private readonly NpgsqlDataSource source;
     public JobRepository(NpgsqlDataSource source) => this.source = source;
@@ -25,7 +25,7 @@ public sealed class JobRepository
         await using var cmd = source.CreateCommand("""
             WITH candidate AS (
                 SELECT id FROM jobs
-                WHERE state IN ('queued','interpreting','generating_visual_reference','resolving_geometry','planning','validating','waiting_retry')
+                WHERE state IN ('queued','interpreting','generating_visual_reference','resolving_geometry','planning','refining_visuals','validating','waiting_retry')
                   AND (lease_until IS NULL OR lease_until < now())
                   AND (next_attempt_at IS NULL OR next_attempt_at <= now())
                 ORDER BY created_at, id FOR UPDATE SKIP LOCKED LIMIT 1
@@ -96,7 +96,7 @@ public sealed class JobRepository
 
     public async Task<int> CountAttemptsAsync(ClaimedJob job, string stage, CancellationToken ct)
     {
-        if (stage is not ("A" or "G" or "B" or "repair_A" or "repair_B")) throw new ArgumentOutOfRangeException(nameof(stage));
+        if (stage is not ("A" or "G" or "B" or "J" or "repair_A" or "repair_B")) throw new ArgumentOutOfRangeException(nameof(stage));
         await using var cmd = source.CreateCommand("SELECT count(*) FROM provider_attempts WHERE job_id=$1 AND stage=$2");
         cmd.Parameters.AddWithValue(job.Id);
         cmd.Parameters.AddWithValue(stage);
@@ -119,7 +119,7 @@ public sealed class JobRepository
 
     public async Task ScheduleRetryAsync(ClaimedJob job, string stage, string reason, CancellationToken ct)
     {
-        if (stage is not ("A" or "G" or "B")) throw new ArgumentOutOfRangeException(nameof(stage));
+        if (stage is not ("A" or "G" or "B" or "J")) throw new ArgumentOutOfRangeException(nameof(stage));
         await using var cmd = source.CreateCommand("""
             UPDATE jobs SET state='waiting_retry',resume_stage=$3,error_code=$4,
                 message='Nouvelle tentative de transport planifiée',retryable=true,
@@ -166,13 +166,18 @@ public sealed class JobRepository
     public async Task<StoredDocument?> GetPlanAsync(ClaimedJob job, CancellationToken ct)
     {
         await using var cmd = source.CreateCommand("""
-            SELECT a.storage_key,p.plan_sha256,a.id,p.prompt_version FROM spell_plans p
+            SELECT a.storage_key,p.plan_sha256,a.id,p.prompt_version,p.revision FROM spell_plans p
             JOIN artifacts a ON a.id=p.plan_artifact_id
-            WHERE p.job_id=$1 AND p.validation_errors IS NULL ORDER BY p.revision LIMIT 1
+            JOIN jobs j ON j.id=p.job_id AND j.owner_id=a.owner_id
+            WHERE p.job_id=$1 AND j.fence_token=$2 AND p.validation_errors IS NULL AND a.kind='plan'
+              AND a.sha256=p.plan_sha256
+            ORDER BY CASE WHEN $3 THEN -p.revision ELSE p.revision END LIMIT 1
             """);
         cmd.Parameters.AddWithValue(job.Id);
+        cmd.Parameters.AddWithValue(job.Fence);
+        cmd.Parameters.AddWithValue(job.VisualPipelineVersion >= 2 && job.Kind == "production");
         await using var reader = await cmd.ExecuteReaderAsync(ct);
-        return await reader.ReadAsync(ct) ? new(reader.GetString(0), reader.GetString(1), reader.GetGuid(2), reader.GetString(3)) : null;
+        return await reader.ReadAsync(ct) ? new(reader.GetString(0), reader.GetString(1), reader.GetGuid(2), reader.GetString(3), reader.GetInt32(4)) : null;
     }
 
     public async Task<StoredVisualReference?> GetVisualReferenceAsync(ClaimedJob job, CancellationToken ct)
@@ -444,14 +449,17 @@ public sealed class JobRepository
     }
 
     public async Task SavePlanAsync(ClaimedJob job, Guid attemptId, StoredArtifact artifact,
-        string planJson, string promptVersion, CodexResult transport, CancellationToken ct)
+        string planJson, string promptVersion, CodexResult transport, CancellationToken ct, int revision = 0)
     {
+        if (revision < 0 || revision > 3 || revision > 0 && (job.VisualPipelineVersion < 2 || job.Kind != "production"))
+            throw new ArgumentOutOfRangeException(nameof(revision));
         await using var conn = await source.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
+        await LockUnpublishedJobAsync(conn, tx, job, ct);
         await InsertArtifactAsync(conn, tx, job, artifact, "plan", ct);
         await using (var cmd = new NpgsqlCommand("""
             INSERT INTO spell_plans(id,job_id,provider_attempt_id,revision,plan,plan_artifact_id,plan_sha256,prompt_version)
-            VALUES($1,$2,$3,0,$4::jsonb,$5,$6,$7)
+            VALUES($1,$2,$3,$8,$4::jsonb,$5,$6,$7)
             ON CONFLICT(job_id,revision) DO NOTHING
             """, conn, tx))
         {
@@ -459,14 +467,17 @@ public sealed class JobRepository
             cmd.Parameters.AddWithValue(attemptId); cmd.Parameters.AddWithValue(planJson);
             cmd.Parameters.AddWithValue(artifact.Id); cmd.Parameters.AddWithValue(artifact.Sha256);
             cmd.Parameters.AddWithValue(promptVersion);
+            cmd.Parameters.AddWithValue(revision);
             if (await cmd.ExecuteNonQueryAsync(ct) != 1) throw new InvalidOperationException("plan_already_frozen");
         }
         await CompleteSuccessfulAttemptInTransactionAsync(conn, tx, job, attemptId, artifact.Sha256, transport, ct);
-        await MoveInTransactionAsync(conn, tx, job, "validating", ct);
+        await MoveInTransactionAsync(conn, tx, job,
+            job.VisualPipelineVersion >= 2 && job.Kind == "production" ? "refining_visuals" : "validating", ct);
         await tx.CommitAsync(ct);
     }
 
-    public async Task PublishAsync(ClaimedJob job, Guid spellId, StoredArtifact artifact, CancellationToken ct)
+    public async Task PublishAsync(ClaimedJob job, Guid spellId, StoredArtifact artifact, CancellationToken ct,
+        string readyMessage = "Sort disponible")
     {
         if (job.ParchmentId is null) throw new InvalidOperationException("authoring_cannot_publish_player_spell");
         await using var conn = await source.OpenConnectionAsync(ct);
@@ -484,12 +495,13 @@ public sealed class JobRepository
             if (await cmd.ExecuteNonQueryAsync(ct) != 1) throw new InvalidOperationException("fence_lost_on_publish");
         }
         await using (var cmd = new NpgsqlCommand("""
-            UPDATE jobs SET state='ready',spell_id=$3,message='Sort disponible',error_code=NULL,
+            UPDATE jobs SET state='ready',spell_id=$3,message=$4,error_code=NULL,
                 retryable=false,resume_stage=NULL,lease_until=NULL,leased_by=NULL,updated_at=now()
             WHERE id=$1 AND fence_token=$2
             """, conn, tx))
         {
             cmd.Parameters.AddWithValue(job.Id); cmd.Parameters.AddWithValue(job.Fence); cmd.Parameters.AddWithValue(spellId);
+            cmd.Parameters.AddWithValue(readyMessage);
             if (await cmd.ExecuteNonQueryAsync(ct) != 1) throw new InvalidOperationException("fence_lost_on_ready");
         }
         await using (var cmd = new NpgsqlCommand("UPDATE parchments SET state='ready',updated_at=now() WHERE id=$1", conn, tx))

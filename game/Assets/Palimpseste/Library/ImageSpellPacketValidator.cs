@@ -101,6 +101,13 @@ namespace Palimpseste.Game.Library
                 parentIds.Add(id,parent?.Type == JTokenType.String ? parent.Value<string>() : null);
                 var appearance = node["appearance"] as JObject;
                 Require(appearance?["construction"] is JObject,"Every image-bound node requires a construction");
+                var lifecycle = appearance["lifecycle"];
+                if (lifecycle != null && lifecycle.Type != JTokenType.Null)
+                {
+                    Require(minimumVersion != null && minimumVersion >= new Version(1,4,0),"Lifecycle requires client 1.4.0 or later");
+                    ValidateLifecycle(lifecycle);
+                }
+                else Require(minimumVersion == null || minimumVersion < new Version(1,4,0),"Client 1.4.0 requires a lifecycle per node");
                 var constructionJson = (JObject)appearance["construction"];
                 Require(constructionJson["parts"] is JArray,"Missing construction parts");
                 var parts = (JArray)constructionJson["parts"];
@@ -160,6 +167,30 @@ namespace Palimpseste.Game.Library
         }
 
         private static string Text(JObject value, string key) => value?[key]?.Type == JTokenType.String ? value[key].Value<string>() : null;
+        private static void ValidateLifecycle(JToken token)
+        {
+            Require(token is JObject,"Lifecycle must be an object");
+            var lifecycle = (JObject)token;
+            Require(lifecycle["intro"] is JObject && lifecycle["active"] is JObject &&
+                lifecycle["contact"] is JObject && lifecycle["expiration"] is JObject,"Lifecycle requires four phases");
+            var intro = (JObject)lifecycle["intro"];
+            Require(SpellVisualLifecycleLimits.IntroKinds.Contains(Text(intro,"kind")),"Unknown entrance animation");
+            Integer(intro,"duration_ms",100,3000); Integer(intro,"scale_start_milli",0,1000);
+            Integer(intro,"opacity_start_milli",0,1000); Integer(intro,"emission_start_milli",0,6000);
+            var active = (JObject)lifecycle["active"];
+            Require(SpellVisualLifecycleLimits.ActiveKinds.Contains(Text(active,"kind")),"Unknown active animation");
+            Integer(active,"period_ms",100,6000); Integer(active,"amplitude_milli",0,500);
+            foreach (var name in new[] { "contact","expiration" })
+            {
+                var end = (JObject)lifecycle[name];
+                Require(SpellVisualLifecycleLimits.EndingKinds.Contains(Text(end,"kind")),"Unknown ending animation");
+                Integer(end,"duration_ms",100,3000); Integer(end,"spread_cm",0,600); Integer(end,"scale_end_milli",0,3000);
+            }
+            lifecycle.ToObject<SpellVisualLifecycle>(JsonSerializer.Create(new JsonSerializerSettings {
+                TypeNameHandling = TypeNameHandling.None, MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                MissingMemberHandling = MissingMemberHandling.Error, MaxDepth = 64
+            }));
+        }
         private static bool IsLowerHex(char value) => value >= '0' && value <= '9' || value >= 'a' && value <= 'f';
         private static bool Digest(string value) => value != null && value.Length == 64 && value.All(IsLowerHex);
         private static int PngInteger(byte[] bytes, int offset) => bytes[offset] << 24 | bytes[offset+1] << 16 | bytes[offset+2] << 8 | bytes[offset+3];

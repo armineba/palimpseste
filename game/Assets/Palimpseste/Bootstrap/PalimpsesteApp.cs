@@ -67,6 +67,7 @@ namespace Palimpseste.Game.Bootstrap
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void StartApp()
         {
+            if (SpellVisualCaptureRunner.TryStartFromCommandLine()) return;
             if (instance != null) return;
             var obj = new GameObject("Palimpseste App");
             instance = obj.AddComponent<PalimpsesteApp>();
@@ -389,6 +390,7 @@ namespace Palimpseste.Game.Bootstrap
                 "generating_visual_reference" => 2,
                 "resolving_geometry" => 3,
                 "planning" => 3,
+                "refining_visuals" => 3,
                 "validating" => 4,
                 "ready" => 5,
                 _ => descriptionView != null && selected == record ? 2 : 1
@@ -408,7 +410,8 @@ namespace Palimpseste.Game.Bootstrap
                 "interpreting" => "Lecture du dessin et création de son interprétation",
                 "generating_visual_reference" => "Création de l’image de référence depuis la description",
                 "resolving_geometry" => "Interprétation reçue · préparation des volumes 3D",
-                "planning" => "Construction du sort et de ses effets depuis l’image",
+                "planning" => "Construction du sort et de son animation depuis la description",
+                "refining_visuals" => "Comparaison du rendu Unity à l’image · ajustements visuels",
                 "validating" => "Plan compilé et ressources contrôlées avant publication",
                 "ready" => "Sort validé · téléchargement et contrôle local",
                 "waiting_retry" => "Nouvel essai de création prévu par le laboratoire",
@@ -439,7 +442,7 @@ namespace Palimpseste.Game.Bootstrap
                 if (showGeneratedReference)
                 {
                     GUI.DrawTexture(new Rect(area.x + 15, area.y + 59, area.width - 30, area.height - 92), visual, ScaleMode.ScaleToFit);
-                    GUI.Label(new Rect(area.x + 15, area.yMax - 28, area.width - 30, 24), "Image générée · référence pour la construction du sort", textStyle);
+                    GUI.Label(new Rect(area.x + 15, area.yMax - 28, area.width - 30, 24), "Image générée · cible visuelle du sort décrit", textStyle);
                     return;
                 }
             }
@@ -453,8 +456,13 @@ namespace Palimpseste.Game.Bootstrap
                 return;
             }
             var content = new StringBuilder();
-            content.AppendLine(descriptionView.Title).AppendLine().AppendLine(descriptionView.Summary)
-                .AppendLine().AppendLine("Ce qui a inspiré ce sort");
+            content.AppendLine(descriptionView.Title).AppendLine().AppendLine(descriptionView.Summary).AppendLine();
+            if (descriptionView.Lifecycle?.Length > 0)
+            {
+                content.AppendLine("Du lancement à la disparition").AppendLine();
+                foreach (var subject in descriptionView.Lifecycle) content.AppendLine(subject).AppendLine();
+            }
+            content.AppendLine("Ce qui a inspiré ce sort");
             foreach (var line in descriptionView.Observations) content.Append("• ").AppendLine(line).AppendLine();
             content.AppendLine("Idées de sort proposées");
             foreach (var line in descriptionView.Clauses) content.Append("• ").AppendLine(line).AppendLine();
@@ -482,7 +490,8 @@ namespace Palimpseste.Game.Bootstrap
                 "interpreting" => "Lecture du dessin",
                 "generating_visual_reference" => "Image du sort en création",
                 "resolving_geometry" => "Formes en préparation",
-                "planning" => "Construction depuis l’image",
+                "refining_visuals" => "Finition visuelle et animations",
+                "planning" => "Construction du sort décrit",
                 "validating" => "Compilation du sort",
                 "ready" => "Sort à récupérer",
                 "waiting_retry" => "Nouvel essai prévu",

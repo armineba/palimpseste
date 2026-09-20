@@ -565,5 +565,163 @@
       "motion_frequency": "frequency_mhz / 1000 hertz"
     },
     "mechanics": "Decorative only; image and construction never alter collision, effects or target filtering."
+  },
+  "visual_lifecycle": {
+    "schema_version": "sp.visual-lifecycle/1.0",
+    "minimum_client": "1.4.0",
+    "selection": "Mandatory per subject when SpellDescription.lifecycle is present. The frozen French text defines appearance, active animation, contact reaction and independent natural expiration; the generated image is the target for the representative active moment. An image never invents chronology or mechanics. Null preserves archived descriptions only.",
+    "intro": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "grow",
+            "assemble",
+            "ignite",
+            "draw",
+            "emerge"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 3000
+        },
+        "scale_start_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "opacity_start_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "emission_start_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6000
+        }
+      },
+      "required": [
+        "kind",
+        "duration_ms",
+        "scale_start_milli",
+        "opacity_start_milli",
+        "emission_start_milli"
+      ],
+      "additionalProperties": false
+    },
+    "active": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "steady",
+            "pulse",
+            "breathe",
+            "swirl",
+            "surge"
+          ]
+        },
+        "period_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 6000
+        },
+        "amplitude_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "kind",
+        "period_ms",
+        "amplitude_milli"
+      ],
+      "additionalProperties": false
+    },
+    "contact": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "burst",
+            "shatter",
+            "dissolve",
+            "collapse",
+            "ripple"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 3000
+        },
+        "spread_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "scale_end_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        }
+      },
+      "required": [
+        "kind",
+        "duration_ms",
+        "spread_cm",
+        "scale_end_milli"
+      ],
+      "additionalProperties": false
+    },
+    "expiration": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "burst",
+            "shatter",
+            "dissolve",
+            "collapse",
+            "ripple"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 3000
+        },
+        "spread_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "scale_end_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        }
+      },
+      "required": [
+        "kind",
+        "duration_ms",
+        "spread_cm",
+        "scale_end_milli"
+      ],
+      "additionalProperties": false
+    },
+    "mechanics": "Decorative only. Intro overlaps the existing carrier lifetime and does not postpone movement or damage. Contact animates only on a real carrier contact; expiration handles normal retirement without adding contacts, hits, targets or damage. Animated scale and spread never change collider dimensions.",
+    "precedence": "appearance.lifecycle defines launch, active and ending animation; appearance.vfx still supplies controlled secondary particles, materials and motifs. Contact/expiration profiles override legacy vfx.impact for their corresponding phase."
   }
 }

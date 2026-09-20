@@ -129,8 +129,12 @@ namespace Palimpseste.Core
 
         // This digest describes normalized contract data, independent of whitespace in
         // A's frozen JSON. The plan still binds separately to those exact source bytes.
-        public static string SemanticDescriptionSha256(SpellDescription description) =>
-            SpellCompiler.Sha256(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(description, Formatting.None)));
+        public static string SemanticDescriptionSha256(SpellDescription description)
+        {
+            var token = Newtonsoft.Json.Linq.JObject.FromObject(description);
+            if (description.lifecycle == null) token.Property("lifecycle")?.Remove();
+            return SpellCompiler.Sha256(Encoding.UTF8.GetBytes(token.ToString(Formatting.None)));
+        }
 
         public static string SemanticGeometryId(string subject, string kind) =>
             "semantic." + SpellCompiler.Sha256(Encoding.UTF8.GetBytes(subject)).Substring(0, 16) + "." + kind;

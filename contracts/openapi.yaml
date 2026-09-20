@@ -773,6 +773,7 @@ components:
           - generating_visual_reference
           - resolving_geometry
           - planning
+          - refining_visuals
           - validating
           - ready
           - waiting_retry

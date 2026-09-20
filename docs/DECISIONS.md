@@ -1,5 +1,17 @@
 # Décisions de réalisation
 
+## D14 — Le texte pilote le cycle complet, la critique indépendante compare le rendu
+
+La demande actuelle prolonge D13 avec une boucle **Dream-loop Pro**. La description est l'autorité pour chaque sujet du sort : **apparition, activité, réaction au contact et disparition naturelle sans contact**. Ces quatre phases doivent être décrites puis traduites en paramètres d'animation contrôlés. L'image générée représente un moment actif caractéristique et en fixe la cible d'apparence ; elle ne suffit pas à définir la chronologie ou les mécaniques.
+
+Les modèles restent **A `gpt-5.6-sol` / `high` ; G, B et J `gpt-6-astra` / `high`**. A utilise `sp.prompt.a/2.3`, B `sp.prompt.b/2.2` et le nouveau critique J `sp.prompt.j/1.0`. J reçoit dans une nouvelle session la description, l'image cible, le plan et quatre captures produites réellement par un **Player Unity de rendu précompilé**. Il fournit un verdict structuré et des corrections ; une éventuelle reprise B peut modifier seulement `appearance.construction`, `appearance.vfx` et `appearance.lifecycle`, avec conservation des mécaniques et validation des bornes. La boucle conserve les versions, captures et verdicts ; elle reste limitée en tours et appels. Son score ne constitue pas un verdict humain ni une garantie de ressemblance parfaite.
+
+Le créateur a autorisé les captures runtime et la critique à la génération du sort dans ce parcours Pro. Cette autorisation remplace les anciens passages interdisant toute capture par job. Le service lance une action de rendu fixe ; **aucun modèle ne reçoit un outil de capture, d'exécution, de modification de code ou de build**. Le binaire Codex durci reste utilisé : registre d'outils vide pour A/B/J, uniquement l'image native en G. Aucun C#, shader ou commande généré n'est exécuté. Les captures décoratives des phases ne prouvent pas la fluidité, le son, la collision ou les dégâts.
+
+Séparément, le créateur demande de finir la livraison et de le laisser tester lui-même : **ne plus lancer de tests, appels modèle ou captures de validation depuis l'agent de développement pour cette livraison**. Un CoreSmoke avait déjà réussi avant cette demande. Le build et le packaging Player `1.4.0` ont réussi ; le [manifeste](../evidence/public/unity/lifecycle-delivery.json) est conservé. Le backend D14 est déployé localement, la migration `009` appliquée, le renderer protégé installé et le Player ouvert pour le créateur : [preuve](../evidence/public/backend/lifecycle-2026-09-20.json). Aucun parcours joueur ni validation visuelle D14 n'est déclaré réalisé.
+
+Sur demande explicite du créateur, les **21 dossiers locaux de sorts** ont été supprimés, puis leur sauvegarde définitivement supprimée. La bibliothèque était vide à l'observation ; l'historique serveur n'a pas été purgé. Ce nettoyage demandé ne change pas le principe d'immuabilité des documents conservés côté serveur.
+
 ## D13 — Chaque nouveau sort reçoit une vraie image avant sa construction
 
 La dernière demande du créateur impose le parcours **dessin → description → image réellement générée depuis cette description → reconstruction 3D/VFX guidée par cette image → sort dans le laboratoire**. Cette autorisation remplace les restrictions D10–D12 qui réservaient les images générées au développement. L'image est un artefact du nouveau job, affichable au joueur et conservé pour la reprise ; une sélection de forme prédéfinie ou une capture du renderer existant ne remplit pas cette étape.

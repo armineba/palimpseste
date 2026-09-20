@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palimpseste.Worker.DbSmoke"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palimpseste.Provider.Security", "tests\Palimpseste.Provider.Security\Palimpseste.Provider.Security.csproj", "{5BB4F0DC-49B2-4DB8-84D3-2D1F15FED7E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpellVisualDoctor", "backend\SpellVisualDoctor\SpellVisualDoctor.csproj", "{77A66A00-343E-4392-BDD9-2CD81A1B10E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,18 @@ Global
 		{5BB4F0DC-49B2-4DB8-84D3-2D1F15FED7E1}.Release|x64.Build.0 = Release|Any CPU
 		{5BB4F0DC-49B2-4DB8-84D3-2D1F15FED7E1}.Release|x86.ActiveCfg = Release|Any CPU
 		{5BB4F0DC-49B2-4DB8-84D3-2D1F15FED7E1}.Release|x86.Build.0 = Release|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Debug|x64.Build.0 = Debug|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Debug|x86.Build.0 = Debug|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Release|x64.ActiveCfg = Release|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Release|x64.Build.0 = Release|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Release|x86.ActiveCfg = Release|Any CPU
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -174,5 +188,6 @@ Global
 		{883EC4C2-4753-4629-AA82-06161F4C513C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{C9D67A51-BE1B-4806-9496-6E1058BA2F14} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{5BB4F0DC-49B2-4DB8-84D3-2D1F15FED7E1} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{77A66A00-343E-4392-BDD9-2CD81A1B10E9} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
 	EndGlobalSection
 EndGlobal

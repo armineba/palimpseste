@@ -762,6 +762,9 @@
             },
             "construction": {
               "$ref": "#/$defs/visual_construction"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
             }
           },
           "required": [
@@ -1052,6 +1055,9 @@
             },
             "construction": {
               "$ref": "#/$defs/visual_construction"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
             }
           },
           "required": [
@@ -1327,6 +1333,9 @@
             },
             "construction": {
               "$ref": "#/$defs/visual_construction"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
             }
           },
           "required": [
@@ -1573,6 +1582,9 @@
             },
             "construction": {
               "$ref": "#/$defs/visual_construction"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
             }
           },
           "required": [
@@ -1819,6 +1831,9 @@
             },
             "construction": {
               "$ref": "#/$defs/visual_construction"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
             }
           },
           "required": [
@@ -2077,6 +2092,9 @@
             },
             "construction": {
               "$ref": "#/$defs/visual_construction"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
             }
           },
           "required": [
@@ -2316,6 +2334,172 @@
       },
       "required": [
         "parts"
+      ],
+      "additionalProperties": false
+    },
+    "visual_lifecycle": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "intro": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "grow",
+                "assemble",
+                "ignite",
+                "draw",
+                "emerge"
+              ]
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 3000
+            },
+            "scale_start_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "opacity_start_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "emission_start_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6000
+            }
+          },
+          "required": [
+            "kind",
+            "duration_ms",
+            "scale_start_milli",
+            "opacity_start_milli",
+            "emission_start_milli"
+          ],
+          "additionalProperties": false
+        },
+        "active": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "steady",
+                "pulse",
+                "breathe",
+                "swirl",
+                "surge"
+              ]
+            },
+            "period_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 6000
+            },
+            "amplitude_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 500
+            }
+          },
+          "required": [
+            "kind",
+            "period_ms",
+            "amplitude_milli"
+          ],
+          "additionalProperties": false
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "burst",
+                "shatter",
+                "dissolve",
+                "collapse",
+                "ripple"
+              ]
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 3000
+            },
+            "spread_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 600
+            },
+            "scale_end_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3000
+            }
+          },
+          "required": [
+            "kind",
+            "duration_ms",
+            "spread_cm",
+            "scale_end_milli"
+          ],
+          "additionalProperties": false
+        },
+        "expiration": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "burst",
+                "shatter",
+                "dissolve",
+                "collapse",
+                "ripple"
+              ]
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 3000
+            },
+            "spread_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 600
+            },
+            "scale_end_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3000
+            }
+          },
+          "required": [
+            "kind",
+            "duration_ms",
+            "spread_cm",
+            "scale_end_milli"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "intro",
+        "active",
+        "contact",
+        "expiration"
       ],
       "additionalProperties": false
     }

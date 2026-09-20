@@ -131,7 +131,7 @@ namespace Palimpseste.Game.SpellRuntime
             return root;
         }
 
-        private static Color ColorFor(string palette, string affinity)
+        internal static Color ColorFor(string palette, string affinity)
         {
             // The compiler accepts only this named palette. No model-supplied
             // shader, material path, code or unbounded color value reaches Unity.
@@ -296,23 +296,30 @@ namespace Palimpseste.Game.SpellRuntime
             line.widthMultiplier = width;
         }
 
-        public static void ProjectileHit(CarrierState state, Vector3 point)
+        public static GameObject ProjectileHit(CarrierState state, Vector3 point)
         {
-            if (state.node.carrier != "projectile") return;
+            if (state.node.carrier != "projectile") return null;
             if (ImageConstructedSpellVisual.Supports(state.node))
             {
+                if (state.node.appearance.lifecycle != null)
+                {
+                    // A final hit animates the existing carrier in place.
+                    // Only a continuing, piercing projectile needs a copy.
+                    return state.piercesLeft > 0
+                        ? ImageConstructedSpellVisual.SpawnImpact(state.node,point,state.direction)?.gameObject : null;
+                }
                 ImageConstructedSpellVisual.SpawnImpact(state.node, point, state.direction);
                 SpellVfxComposition.SpawnImpact(state.node.appearance, point, state.direction,
                     ColorFor(state.node.appearance.palette, state.node.appearance.affinity),
                     Mathf.Clamp(state.node.scale_cm / 400f, .5f, 2f));
-                return;
+                return null;
             }
             if (SemanticSpellVisual.Supports(state.node.appearance?.form))
             {
                 SpellVfxComposition.SpawnImpact(state.node.appearance, point, state.direction,
                     ColorFor(state.node.appearance.palette, state.node.appearance.affinity),
                     (state.node.options.radius_cm ?? 12) / 65f);
-                return;
+                return null;
             }
             var impulse = state.node.effects != null && state.node.effects.Exists(
                 effect => effect.@event == "hit" && effect.kind == "impulse");
@@ -337,6 +344,7 @@ namespace Palimpseste.Game.SpellRuntime
             afterimage.ring = ring;
             afterimage.color = tint;
             afterimage.impulse = impulse;
+            return root;
         }
 
         // A bounded visual acknowledgement for every applied mechanic. It is

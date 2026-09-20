@@ -14,6 +14,7 @@ namespace Palimpseste.Game.Service
         public string Summary { get; private set; }
         public string[] Observations { get; private set; }
         public string[] Clauses { get; private set; }
+        public string[] Lifecycle { get; private set; }
 
         public static bool TryRead(byte[] utf8, out SpellDescriptionView view)
         {
@@ -51,10 +52,29 @@ namespace Palimpseste.Game.Service
                     clauseLines.Add((kind == "visual_only" ? "Apparence — " : "Règle — ") + text);
                 }
 
+                var lifecycleLines = new List<string>();
+                if (root["lifecycle"] != null && root["lifecycle"].Type != JTokenType.Null)
+                {
+                    if (root["lifecycle"] is not JArray lifecycle || lifecycle.Count is < 1 or > 16) return false;
+                    foreach (var item in lifecycle)
+                    {
+                        if (item is not JObject subject) return false;
+                        var subjectId = Text(subject,"subject_id",1,64);
+                        var appearance = Text(subject,"appearance",1,800);
+                        var active = Text(subject,"active",1,800);
+                        var contact = Text(subject,"contact",1,800);
+                        var expiration = Text(subject,"expiration",1,800);
+                        if (subjectId == null || appearance == null || active == null || contact == null || expiration == null) return false;
+                        lifecycleLines.Add("Apparition — " + appearance + "\n\nEn action — " + active +
+                            "\n\nAu contact — " + contact + "\n\nSans contact, à la fin — " + expiration);
+                    }
+                }
+
                 view = new SpellDescriptionView
                 {
                     Title = title, Summary = summary,
-                    Observations = observationLines.ToArray(), Clauses = clauseLines.ToArray()
+                    Observations = observationLines.ToArray(), Clauses = clauseLines.ToArray(),
+                    Lifecycle = lifecycleLines.ToArray()
                 };
                 return true;
             }

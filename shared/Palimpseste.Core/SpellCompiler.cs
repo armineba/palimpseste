@@ -97,7 +97,9 @@ namespace Palimpseste.Core
 
             var minimumClient = input.MinimumClientVersion;
             if (!System.Version.TryParse(minimumClient, out var parsedClient)) parsedClient = new System.Version(0, 0, 0);
-            if (input.VisualReference != null && parsedClient < new System.Version(1, 3, 0))
+            if (plan.nodes.Any(node => node.appearance.lifecycle != null) && parsedClient < new System.Version(1, 4, 0))
+                minimumClient = "1.4.0";
+            else if (input.VisualReference != null && parsedClient < new System.Version(1, 3, 0))
                 minimumClient = "1.3.0";
             else if (plan.nodes.Any(node => node.appearance.vfx != null) && parsedClient < new System.Version(1, 2, 0))
                 minimumClient = "1.2.0";
@@ -150,6 +152,8 @@ namespace Palimpseste.Core
                     appearance.Property("vfx")?.Remove();
                 if (appearance["construction"]?.Type == JTokenType.Null)
                     appearance.Property("construction")?.Remove();
+                if (appearance["lifecycle"]?.Type == JTokenType.Null)
+                    appearance.Property("lifecycle")?.Remove();
                 if (appearance["signature_geometry_id"]?.Type == JTokenType.Null)
                     appearance.Property("signature_geometry_id")?.Remove();
             }
@@ -266,11 +270,14 @@ namespace Palimpseste.Core
         // New player captures use one composition. The palette gate applies only
         // to free_canvas_v2; older saved descriptions remain compilable offline.
         public static IReadOnlyList<ValidationIssue> ValidateWholeImageDescriptionJson(byte[] descriptionJson,
-            bool requirePalette, bool requireVisualForm = false)
+            bool requirePalette, bool requireVisualForm = false, bool requireLifecycle = false)
         {
             var issues = ValidateDescriptionJson(descriptionJson).ToList();
             if (issues.Count != 0) return issues;
             var description = ContractJson.DeserializeStrict<SpellDescription>(descriptionJson, "spell-description");
+            if (requireLifecycle && description.lifecycle == null)
+                Add(issues, "lifecycle_required", "$.lifecycle",
+                    "New spells require a complete launch, active, contact and expiration description for every subject");
             if (description.shape_requests == null || description.shape_requests.Count != 0)
                 Add(issues, "regional_shape_request", "$.shape_requests",
                     "New drawings must use the whole-image geometry bank");
@@ -513,6 +520,76 @@ namespace Palimpseste.Core
                 if (!subjects.Contains(request.subject_id)) Add(issues, "shape_subject", request.subject_id, "Unknown subject");
             if (GeometryResolver.UsesSemanticForms(d) && d.shape_requests?.Count > 0)
                 Add(issues, "semantic_shape_request", "$.shape_requests", "Semantic forms cannot request traced ink geometry");
+            CheckLifecycleDescription(d, subjects, issues);
+        }
+
+        private static void CheckLifecycleDescription(SpellDescription description,
+            IEnumerable<string> subjects, List<ValidationIssue> issues)
+        {
+            if (description.lifecycle == null) return; // Existing archived bytes remain valid.
+            var expected = new HashSet<string>(subjects, StringComparer.Ordinal);
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            for (var index = 0; index < description.lifecycle.Count; index++)
+            {
+                var lifecycle = description.lifecycle[index];
+                var path = "$.lifecycle[" + index + "]";
+                if (lifecycle == null || string.IsNullOrWhiteSpace(lifecycle.subject_id))
+                {
+                    Add(issues, "lifecycle_subject", path, "Lifecycle requires a known subject");
+                    continue;
+                }
+                if (!expected.Contains(lifecycle.subject_id))
+                    Add(issues, "lifecycle_subject", path, "Lifecycle refers to an unknown subject");
+                if (!seen.Add(lifecycle.subject_id))
+                    Add(issues, "lifecycle_duplicate", path, "Each subject has exactly one lifecycle description");
+                if (new[] { lifecycle.appearance, lifecycle.active, lifecycle.contact, lifecycle.expiration }
+                    .Any(text => string.IsNullOrWhiteSpace(text) || text.Length > 800))
+                    Add(issues, "lifecycle_text", path, "Each lifecycle phase requires nonempty bounded text");
+            }
+            if (!seen.SetEquals(expected))
+                Add(issues, "lifecycle_subjects", "$.lifecycle", "Lifecycle descriptions must cover every subject exactly once");
+        }
+
+        private static void CheckLifecyclePlan(SpellDescription description, SpellNode node,
+            List<ValidationIssue> issues)
+        {
+            var lifecycle = node.appearance.lifecycle;
+            var path = node.node_id + ".appearance.lifecycle";
+            var described = description.lifecycle?.Any(item => item.subject_id == node.subject_id) == true;
+            if (lifecycle == null)
+            {
+                if (described) Add(issues, "lifecycle_required", path,
+                    "The subject lifecycle must be translated into all four visual animation phases");
+                return;
+            }
+            if (!described)
+                Add(issues, "lifecycle_trace", path, "Visual lifecycle requires the same subject in the frozen description");
+            var intro = lifecycle.intro;
+            if (intro == null || !SpellVisualLifecycleLimits.IntroKinds.Contains(intro.kind) ||
+                intro.duration_ms < SpellVisualLifecycleLimits.MinimumDurationMs ||
+                intro.duration_ms > SpellVisualLifecycleLimits.MaximumDurationMs ||
+                intro.scale_start_milli < 0 || intro.scale_start_milli > 1000 ||
+                intro.opacity_start_milli < 0 || intro.opacity_start_milli > 1000 ||
+                intro.emission_start_milli < 0 || intro.emission_start_milli > SpellVisualLifecycleLimits.MaximumEmissionMilli)
+                Add(issues, "lifecycle_intro", path + ".intro", "Launch animation exceeds controlled bounds");
+            var active = lifecycle.active;
+            if (active == null || !SpellVisualLifecycleLimits.ActiveKinds.Contains(active.kind) ||
+                active.period_ms < SpellVisualLifecycleLimits.MinimumPeriodMs ||
+                active.period_ms > SpellVisualLifecycleLimits.MaximumPeriodMs ||
+                active.amplitude_milli < 0 || active.amplitude_milli > SpellVisualLifecycleLimits.MaximumAmplitudeMilli)
+                Add(issues, "lifecycle_active", path + ".active", "Active animation exceeds controlled bounds");
+            CheckLifecycleEnding(lifecycle.contact, path + ".contact", issues);
+            CheckLifecycleEnding(lifecycle.expiration, path + ".expiration", issues);
+        }
+
+        private static void CheckLifecycleEnding(SpellVisualEnding ending, string path, List<ValidationIssue> issues)
+        {
+            if (ending == null || !SpellVisualLifecycleLimits.EndingKinds.Contains(ending.kind) ||
+                ending.duration_ms < SpellVisualLifecycleLimits.MinimumDurationMs ||
+                ending.duration_ms > SpellVisualLifecycleLimits.MaximumDurationMs ||
+                ending.spread_cm < 0 || ending.spread_cm > SpellVisualLifecycleLimits.MaximumSpreadCm ||
+                ending.scale_end_milli < 0 || ending.scale_end_milli > SpellVisualLifecycleLimits.MaximumEndScaleMilli)
+                Add(issues, "lifecycle_ending", path, "Ending animation exceeds controlled bounds");
         }
 
         private static void CheckPlan(SpellDescription d, SpellPlan plan,
@@ -531,6 +608,7 @@ namespace Palimpseste.Core
             foreach (var node in plan.nodes)
             {
                 var p = node.node_id;
+                CheckLifecyclePlan(d, node, issues);
                 if (!Emitted.ContainsKey(node.carrier)) { Add(issues, "carrier", p, "Unknown carrier"); continue; }
                 var allSubjectClauses = d.clauses.Where(c => c.subject_id == node.subject_id).ToArray();
                 var subjectClauses = allSubjectClauses.Where(c => c.kind == "mechanical").ToArray();
