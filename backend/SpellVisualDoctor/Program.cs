@@ -19,7 +19,7 @@ internal static class VisualDoctor
     public static async Task<int> RunAsync(string[] args)
     {
         var report = new Dictionary<string, object?> {
-            ["kind"] = Kind, ["schema_version"] = "sp.visual-doctor/1.0",
+            ["kind"] = Kind, ["schema_version"] = "sp.visual-doctor/1.1",
             ["started_at"] = DateTimeOffset.UtcNow, ["phase"] = "arguments", ["result"] = "in_progress",
             ["new_model_calls_executed"] = 0, ["provider_call_pending"] = false,
             ["database_touched"] = false, ["player_library_touched"] = false,
@@ -139,10 +139,11 @@ internal static class VisualDoctor
                 source_description_sha256 = Hash(description), source_ink_sha256 = inputHashes["ink"],
                 geometry_ids = geometry.GeometryJson.Keys.OrderBy(id => id).ToArray(),
                 algorithms = geometry.Assets.Values.Select(asset => asset.algorithm).Distinct().ToArray() };
-            byte[] visualBytes;
+            var animationSheetJson = LunaCodexProvider.AnimationSheetRequest(description);
+            byte[] atlasBytes;
             if (CanReuse("g"))
             {
-                visualBytes = await ReuseDocumentAsync("g", "visual-reference.png");
+                atlasBytes = await ReuseDocumentAsync("g", "visual-atlas.png", animationSheetJson);
                 if (reused!.Value.GetProperty("description_sha256").GetString() != Hash(description))
                     throw new ProbeFailure("reuse_image_description_hash");
             }
@@ -153,9 +154,43 @@ internal static class VisualDoctor
                 var receipt = g.Transport.FinalJson is null ? null : Encoding.UTF8.GetBytes(g.Transport.FinalJson);
                 await RecordStageAsync("g", g.Transport, receipt, receipt is null ? null : Hash(receipt));
                 RequireStage(g.Transport, g.PngBytes, settings, "G");
-                if (g.Transport.GeneratedImage is null || g.Sha256 != Hash(g.PngBytes!)) throw new ProbeFailure("generated_image_attestation_missing");
-                visualBytes = g.PngBytes!;
+                if (g.Transport.GeneratedImage is null || g.Sha256 != Hash(g.PngBytes!) || g.AnimationSheetJson != animationSheetJson)
+                    throw new ProbeFailure("generated_image_attestation_missing");
+                atlasBytes = g.PngBytes!;
                 report["native_generated_image"] = g.Transport.GeneratedImage;
+            }
+            var atlasDimensions = VisualReferencePng.Validate(atlasBytes);
+            var atlasSha = Hash(atlasBytes);
+            await File.WriteAllBytesAsync(Path.Combine(cache, "visual-atlas.png"), atlasBytes, ct);
+            report["source_atlas_sha256"] = atlasSha;
+            report["source_atlas"] = new { path = Path.Combine(cache, "visual-atlas.png"), sha256 = atlasSha,
+                size_bytes = atlasBytes.Length, width_px = atlasDimensions.Width, height_px = atlasDimensions.Height };
+            using var sheetDocument = JsonDocument.Parse(animationSheetJson);
+            report["animation_sheet"] = sheetDocument.RootElement.Clone();
+            report["stage_g_completed"] = true;
+            // Freeze the real native atlas before formatting it; a compositor failure
+            // can then resume without consuming another G call.
+            await CheckpointAsync();
+
+            phase = "animation_sheet_composition";
+            await CheckpointAsync();
+            byte[] visualBytes;
+            var reusedSheet = reused is { } previousSheet && previousSheet.TryGetProperty("animation_sheet_composed", out var sheetDone) && sheetDone.GetBoolean();
+            if (reusedSheet)
+            {
+                var previousSheetPath = Path.Combine(reused!.Value.GetProperty("cache_directory").GetString()!, "visual-reference.png");
+                if (!settings.IsTrustedInputFile(previousSheetPath)) throw new ProbeFailure("reuse_sheet_untrusted");
+                visualBytes = await ReadBoundedAsync(previousSheetPath, 8 * 1024 * 1024, ct);
+                if (Hash(visualBytes) != reused.Value.GetProperty("visual_reference_sha256").GetString() ||
+                    reused.Value.GetProperty("source_atlas_sha256").GetString() != atlasSha ||
+                    reused.Value.GetProperty("animation_sheet_composer_version").GetString() != AnimationSheetComposer.Version)
+                    throw new ProbeFailure("reuse_sheet_binding");
+            }
+            else
+            {
+                if (CanReuse("b")) throw new ProbeFailure("reuse_plan_sheet_missing");
+                if (!OperatingSystem.IsWindows()) throw new ProbeFailure("animation_sheet_requires_windows");
+                visualBytes = AnimationSheetComposer.Compose(atlasBytes, typedDescription.title);
             }
             var dimensions = VisualReferencePng.Validate(visualBytes);
             var imageHash = Hash(visualBytes);
@@ -164,12 +199,19 @@ internal static class VisualDoctor
             report["visual_reference_sha256"] = imageHash;
             report["visual_reference"] = new { path = visualPath, sha256 = imageHash, size_bytes = visualBytes.Length,
                 width_px = dimensions.Width, height_px = dimensions.Height, description_sha256 = Hash(description) };
-            report["stage_g_completed"] = true;
+            report["animation_sheet_composed"] = true;
+            report["animation_sheet_reused"] = reusedSheet;
+            report["animation_sheet_composer_version"] = AnimationSheetComposer.Version;
+            report["visual_reference_origin"] = "fixed_server_layout_of_native_atlas";
             await CheckpointAsync();
-            var reference = new ProviderReference(visualPath, imageHash);
+            var reference = new ProviderReference(visualPath, imageHash, animationSheetJson);
             var metadata = new ContractReference { artifact_id = ArtifactId("reference", imageHash), sha256 = imageHash,
                 size_bytes = visualBytes.Length, width_px = dimensions.Width, height_px = dimensions.Height,
-                description_sha256 = Hash(description), prompt_version = LunaCodexProvider.PromptGVersion };
+                description_sha256 = Hash(description), prompt_version = LunaCodexProvider.PromptGVersion,
+                source_atlas_sha256 = atlasSha,
+                animation_sheet = new SpellAnimationSheet { layout_version = SpellAnimationSheetLimits.LayoutVersion,
+                    rows = SpellAnimationSheetLimits.Rows, columns = SpellAnimationSheetLimits.Columns,
+                    ending_basis = sheetDocument.RootElement.GetProperty("ending_basis").GetString()! } };
 
             SpellReferenceResearch? research = null;
             if (typedDescription.behaviors is not null)
@@ -239,7 +281,7 @@ internal static class VisualDoctor
                 GeometryArtifactIds = geometry.GeometryJson.ToDictionary(pair => pair.Key, pair => ArtifactId("geometry:" + pair.Key, Hash(pair.Value))),
                 MaskArtifactIds = geometry.MaskPng.ToDictionary(pair => pair.Key, pair => ArtifactId("mask:" + pair.Key, Hash(pair.Value))),
                 SpellId = "visual-probe-" + runId.ToString("N"), ParchmentId = "visual-probe-" + runId.ToString("N"),
-                CreatedAt = DateTimeOffset.UtcNow.ToString("o"), MinimumClientVersion = "1.5.0",
+                CreatedAt = DateTimeOffset.UtcNow.ToString("o"), MinimumClientVersion = "1.6.0",
                 SignatureSeedHex = inputHashes["drawing"][..16], VisualReference = metadata, ReferenceResearchSha256 = research?.Sha256,
                 Provenance = new SpellProvenance { mode = "drawing", capture_sha256 = inputHashes["drawing"], reference_sha256 = inputHashes["reference"],
                     model_a = settings.InterpreterModel, model_b = settings.Model, prompt_a_version = LunaCodexProvider.PromptAVersion,
@@ -304,7 +346,7 @@ internal static class VisualDoctor
                 await CheckpointAsync();
             }
             bool CanReuse(string stage) => reused is { } old && old.TryGetProperty("stage_" + stage + "_completed", out var done) && done.ValueKind == JsonValueKind.True;
-            async Task<byte[]> ReuseDocumentAsync(string stage, string filename)
+            async Task<byte[]> ReuseDocumentAsync(string stage, string filename, string? expectedAnimationSheetJson = null)
             {
                 var old = reused!.Value;
                 var historic = old.GetProperty("stage_" + stage);
@@ -318,7 +360,7 @@ internal static class VisualDoctor
                 var path = Path.Combine(old.GetProperty("cache_directory").GetString()!, filename);
                 if (!settings.IsTrustedInputFile(path)) throw new ProbeFailure("reuse_cache_untrusted");
                 var bytes = await ReadBoundedAsync(path, 8 * 1024 * 1024, ct);
-                var hashKey = stage switch { "a" => "description_sha256", "g" => "visual_reference_sha256", _ => "plan_sha256" };
+                var hashKey = stage switch { "a" => "description_sha256", "g" => "source_atlas_sha256", _ => "plan_sha256" };
                 if (Hash(bytes) != old.GetProperty(hashKey).GetString()) throw new ProbeFailure("reuse_document_hash");
                 var finalPath = historic.GetProperty("final_path").GetString();
                 if (finalPath is null || !CodexSettings.IsTrustedFile(finalPath, settings.AttemptRoot) ||
@@ -326,6 +368,15 @@ internal static class VisualDoctor
                     throw new ProbeFailure("reuse_native_final_hash");
                 if (stage == "g")
                 {
+                    if (expectedAnimationSheetJson is null) throw new ProbeFailure("reuse_sheet_metadata_missing");
+                    using var expectedSheet = JsonDocument.Parse(expectedAnimationSheetJson);
+                    using var originalReceipt = JsonDocument.Parse(await ReadBoundedAsync(finalPath, 2_000_000, ct));
+                    if (!originalReceipt.RootElement.TryGetProperty("animation_sheet", out var receiptSheet) ||
+                        receiptSheet.ValueKind != JsonValueKind.Object || receiptSheet.EnumerateObject().Count() != 4 ||
+                        expectedSheet.RootElement.EnumerateObject().Any(property =>
+                            !receiptSheet.TryGetProperty(property.Name, out var value) || value.ValueKind != property.Value.ValueKind ||
+                            value.ToString() != property.Value.ToString()))
+                        throw new ProbeFailure("reuse_sheet_metadata_binding");
                     var original = old.GetProperty("native_generated_image");
                     var nativePath = original.GetProperty("SavedPath").GetString()!;
                     if (!CodexSettings.IsTrustedFile(nativePath, Path.Combine(settings.CodexHome, "generated_images")) ||
@@ -429,7 +480,7 @@ internal static class VisualDoctor
             new FileInfo(manifestPath).Length > 128_000 || CodexSettings.ComputeExecutableSha256(manifestPath) != hash)
             throw new ProbeFailure("renderer_manifest_mismatch");
         using var manifest = JsonDocument.Parse(File.ReadAllBytes(manifestPath));
-        if (manifest.RootElement.GetProperty("version").GetString() != "1.5.0") throw new ProbeFailure("renderer_version_mismatch");
+        if (manifest.RootElement.GetProperty("version").GetString() != "1.6.0") throw new ProbeFailure("renderer_version_mismatch");
         foreach (var entry in manifest.RootElement.GetProperty("files").EnumerateArray())
         {
             var file = Path.GetFullPath(Path.Combine(directory, entry.GetProperty("file").GetString()!));

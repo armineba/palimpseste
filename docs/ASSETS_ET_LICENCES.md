@@ -13,3 +13,6 @@
 | Codex CLI modifié pour le service | Source officielle `openai/codex`, tag `rust-v0.154.0-alpha.6.2`, avec les deux correctifs conservés dans `ops/` ; licence Apache 2.0 et notice amont dans `ops/codex-licenses/` | Exécutable du backend, si inclus dans l'archive avec son SHA ; aucun fichier d'authentification inclus |
 
 Le bitmap de décor ne remplace pas la référence neutre envoyée à Luna A. D15 ajoute les ressources gratuites ci-dessus, avec notices dans le Player et sources dans le dépôt. Voir [le relevé des sources](references-vfx-sources.md). Les licences propres aux paquets Unity restent applicables à leurs composants ; ce document ne modifie pas leurs termes. Les droits de redistribution du dossier documentaire fourni restent à confirmer par le commanditaire avant publication publique.
+# Compositeur de planche D16
+
+Le backend utilise `System.Drawing.Common 10.0.12` sous licence MIT, via NuGet, pour découper l’atlas natif et ajouter la grille/typographie de la planche. [Paquet officiel](https://www.nuget.org/packages/System.Drawing.Common/10.0.12). Sa [notice MIT](../backend/Palimpseste.Provider/ThirdPartyNotices/System.Drawing.Common-MIT.txt) est incluse dans chaque publication backend. Les polices sont fournies par Windows et ne sont pas redistribuées. Aucun achat de ressource ni utilisation d’un service payant supplémentaire.

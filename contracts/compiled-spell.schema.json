@@ -398,6 +398,53 @@
           "minLength": 13,
           "maxLength": 80,
           "pattern": "^sp\\.prompt\\.g/[0-9]+\\.[0-9]+(\\.[0-9]+){0,2}$"
+        },
+        "animation_sheet": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "layout_version": {
+              "type": "string",
+              "enum": [
+                "sp.animation-sheet/1.0"
+              ]
+            },
+            "rows": {
+              "type": "integer",
+              "enum": [
+                3
+              ]
+            },
+            "columns": {
+              "type": "integer",
+              "enum": [
+                7
+              ]
+            },
+            "ending_basis": {
+              "type": "string",
+              "enum": [
+                "contact",
+                "expiration"
+              ]
+            }
+          },
+          "required": [
+            "layout_version",
+            "rows",
+            "columns",
+            "ending_basis"
+          ],
+          "additionalProperties": false
+        },
+        "source_atlas_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
         }
       },
       "required": [

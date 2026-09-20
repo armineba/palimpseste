@@ -1,6 +1,14 @@
 # État de réalisation et point de reprise
 
-## État courant — D15 / 1.5.0 construit et installé
+## État courant — D16 / 1.6.0 construit et installé
+
+Le format demandé est implémenté : titre, fond sombre, trois lignes APPARITION / STABLE / DISPARITION et sept cases numérotées. La description reste l’autorité du comportement, la planche guide sa réalisation visuelle. Le PNG natif est conservé avant la mise en page fixe, avec un SHA distinct. B construit un seul sort animé ; J compare sept poses réelles de chaque phase dans la boucle de génération joueur.
+
+**Player et backend 1.6.0 construits, empaquetés et installés avec le code 0**. Unity 6000.3.24f1 / URP / IL2CPP ; ZIP Player de **46 591 080 octets**, SHA `24ca0f949892fd3017889e8c0a1f23c48cd69f63125174a36951525739c5507f`. Migration 011 appliquée, renderer protégé installé, API **6640** et worker **30380** démarrés le 21 septembre à 01:48 Paris. Raccourci Bureau actualisé. [Preuve D16](../evidence/public/backend/animation-sheet-d16.json) · [Manifeste Player](../evidence/public/unity/lifecycle-delivery.json) · [Archive backend](../evidence/public/backend/lifecycle-delivery.json).
+
+**Aucun essai de jeu, test, appel modèle ou capture indépendante exécuté pour D16.** La planche générée, le parcours complet, la fluidité, la latence et la fidélité restent à observer par le créateur. La compilation et le démarrage du service ne valent pas acceptation artistique. [Point de reprise](NEXT_ACTIONS.md) · [Architecture D16](D16_ANIMATION_SHEET.md).
+
+## Historique — D15 / 1.5.0 construit et installé
 
 **La chaîne des prochains parchemins est mise à jour**, sans réécrire les sorts ou documents existants. Placement, trajectoire et phénomène sont déclarés par A, repris par B et contrôlés avant exécution. Le moteur applique rotation continue, écoulement, orbite, turbulence et balistique. Une recherche de références précède chaque construction ; 16 textures CC0 et du bruit Simplex MIT sont effectivement utilisés. La critique Pro dispose de quatre instants actifs.
 

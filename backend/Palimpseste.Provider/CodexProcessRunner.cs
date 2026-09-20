@@ -132,7 +132,11 @@ public sealed class CodexProcessRunner
             {
                 try
                 {
-                    VisualReferencePng.Validate(bytes);
+                    // Only the hash-bound rendering inputs after a D16 target may use
+                    // the fixed 2048x320 format. The generated target retains its stricter bounds.
+                    if (i > 0 && attempt.ImageSha256 is not null && attempt.VisualReference?.AnimationSheetJson is not null)
+                        VisualReferencePng.ValidateAnimationStrip(bytes);
+                    else VisualReferencePng.Validate(bytes);
                     var expectedHash = attempt.ImageSha256 is null ? attempt.VisualReference!.Sha256 : attempt.ImageSha256[i];
                     if (Convert.ToHexStringLower(SHA256.HashData(bytes)) != expectedHash ||
                         i == 0 && expectedHash != attempt.VisualReference!.Sha256)

@@ -1,6 +1,18 @@
 # Point de reprise immédiat
 
-## Priorité D15 — laisser le créateur essayer un nouveau parchemin
+## Priorité D16 — laisser le créateur essayer un nouveau parchemin
+
+Player et backend **1.6.0 construits, empaquetés et installés**, raccourci Bureau actualisé vers `WindowsAnimationSheetPlayable`. Build Unity et publication backend code 0 ; ZIP Player SHA `24ca0f949892fd3017889e8c0a1f23c48cd69f63125174a36951525739c5507f`. Migration 011 appliquée et renderer 1.6 installé le 21 septembre à **01:48 Paris**. Worker PID **30380**, API PID **6640** démarrés. [Preuve réelle D16](../evidence/public/backend/animation-sheet-d16.json).
+
+La référence devient une planche stricte **3 × 7** avec APPARITION, STABLE, DISPARITION. Le checkpoint natif précède sa mise en page ; une reprise de cette étape conserve la génération déjà reçue. B et J utilisent la progression complète, et la description garde autorité sur les mécaniques. [Architecture](D16_ANIMATION_SHEET.md) · [Essayer](TESTER_MAINTENANT.md) · [Archive backend et empreinte](../evidence/public/backend/lifecycle-delivery.json).
+
+1. Laisser le créateur ouvrir le raccourci Bureau, dessiner un **nouveau parchemin**, puis juger la planche et le sort dans le laboratoire.
+2. Recueillir son verdict sur formation, mouvement continu et disparition. La conformité artistique des 21 scènes et la fidélité du rendu ne sont pas encore observées dans cette version.
+3. En cas d’incident, lire les checkpoints du job réellement demandé. Ne pas modifier un sort par son nom ; corriger la chaîne générale concernée.
+
+Aucun test, diagnostic modèle, génération ou capture indépendante exécuté pour D16. Ne pas en lancer à la place du créateur. Aucun sort existant n’a été modifié ou régénéré pour cette livraison.
+
+## Historique — livraison D15 pour les futurs parchemins
 
 **Player et backend 1.5.0 construits, empaquetés et installés**, migration 010 appliquée, raccourci Bureau actualisé. Services démarrés : worker 38748 / API 37400, observation à 01:17 Paris le 21 septembre. [Preuve réelle](../evidence/public/backend/behavior-d15.json) · [Architecture](D15_BEHAVIOR_AND_RESEARCH.md).
 

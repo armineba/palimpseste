@@ -272,6 +272,25 @@ namespace Palimpseste.Contracts
         public int height_px;
         public string description_sha256;
         public string prompt_version;
+        public SpellAnimationSheet animation_sheet;
+        public string source_atlas_sha256;
+    }
+
+    public sealed class SpellAnimationSheet
+    {
+        public string layout_version;
+        public int rows;
+        public int columns;
+        public string ending_basis;
+    }
+
+    public static class SpellAnimationSheetLimits
+    {
+        public const string LayoutVersion = "sp.animation-sheet/1.0";
+        public const int Rows = 3;
+        public const int Columns = 7;
+        public static readonly int[] SampleTimesMilli = { 0, 130, 290, 470, 640, 820, 1000 };
+        public static readonly string[] EndingBases = { "contact", "expiration" };
     }
 
     public static class SpellVisualConstructionLimits

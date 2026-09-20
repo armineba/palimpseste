@@ -4,19 +4,20 @@ using System.Text.Json;
 
 namespace Palimpseste.Provider;
 
-public sealed record RenderedSpellFrame(string Phase, string PngPath, string Sha256, string? TimingJson = null);
+public sealed record RenderedSpellFrame(string Phase, string PngPath, string Sha256, string? TimingJson = null,
+    bool IsAnimationStrip = false);
 public sealed record VisualJudgement(ProviderDocument Document, int Score, bool LifecycleFaithful);
 
 public sealed partial class LunaCodexProvider
 {
-    public const string PromptJVersion = "sp.prompt.j/1.1";
+    public const string PromptJVersion = "sp.prompt.j/1.2";
     private readonly string visualReviewSpecRoot;
 
     public async Task<VisualJudgement> JudgeVisualAsync(string jobId, string attemptId,
         byte[] description, byte[] plan, SpellVisualReference reference,
         IReadOnlyList<RenderedSpellFrame> frames, string? previousVerdict, bool probe, CancellationToken ct)
     {
-        CheckVisualReviewInputs(description, plan, frames);
+        CheckVisualReviewInputs(description, plan, frames, reference);
         var promptPath = Path.Combine(visualReviewSpecRoot, "prompts", "05_VISUAL_CRITIC.md");
         var prompt = await File.ReadAllTextAsync(promptPath, ct);
         if (!prompt.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + PromptJVersion, StringComparison.Ordinal))
@@ -24,7 +25,7 @@ public sealed partial class LunaCodexProvider
         var descriptionHash = Digest(description); var planHash = Digest(plan);
         prompt += "\nDESCRIPTION_SHA256\n" + descriptionHash + "\nPLAN_SHA256\n" + planHash +
             "\nVISUAL_REFERENCE_SHA256\n" + reference.Sha256 + "\nSPELL_DESCRIPTION\n" + Encoding.UTF8.GetString(description) +
-            "\nCURRENT_PLAN\n" + Encoding.UTF8.GetString(plan) + FrameContext(frames) +
+            "\nCURRENT_PLAN\n" + Encoding.UTF8.GetString(plan) + VisualReferenceContext(reference) + FrameContext(frames) +
             "\nPREVIOUS_VERDICT_DATA\n" + (previousVerdict ?? "null");
         var images = new[] { reference.PngPath }.Concat(frames.Select(f => f.PngPath)).ToArray();
         var hashes = new[] { reference.Sha256 }.Concat(frames.Select(f => f.Sha256)).ToArray();
@@ -73,7 +74,7 @@ public sealed partial class LunaCodexProvider
         IReadOnlyList<RenderedSpellFrame> frames, string judgementJson, bool probe, CancellationToken ct, bool rethink = false,
         SpellReferenceResearch? research = null)
     {
-        CheckVisualReviewInputs(description, previousPlan, frames);
+        CheckVisualReviewInputs(description, previousPlan, frames, reference);
         if (judgementJson.Length is 0 or > 40_000) throw new ArgumentOutOfRangeException(nameof(judgementJson));
         var prompt = promptB + "\n\nVISUAL_REFINEMENT_ONLY\n" +
             "La description est l'autorité pour l'animation du lancement à la disparition. Améliore les données visuelles selon " +
@@ -99,19 +100,39 @@ public sealed partial class LunaCodexProvider
     }
 
     private static string Digest(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
-    private static string FrameContext(IReadOnlyList<RenderedSpellFrame> frames) =>
-        "\nIMAGE_ORDER\nImage 1: cible générée, moment principal. " +
-        string.Join(" ", frames.Select((f, i) => "Image " + (i + 2) + ": capture Unity réelle, phase " + f.Phase + ", SHA256 " + f.Sha256 + ".")) +
-        "\nPour les profils physiques 1.5, la phase active est une planche de quatre captures à des instants successifs, " +
-        "ordre de lecture gauche à droite puis bas. Compare le mouvement entre cases au phénomène décrit. " +
-        "Les images de phases montrent une présentation décorative contrôlée, pas une preuve de collision ou de dégâts.\n" +
-        string.Join("\n", frames.Where(f => f.TimingJson != null).Select(f => "OBSERVED_CAPTURE_TIMES " + f.Phase + "\n" + f.TimingJson));
-    private static void CheckVisualReviewInputs(byte[] description, byte[] plan, IReadOnlyList<RenderedSpellFrame> frames)
+    private static string FrameContext(IReadOnlyList<RenderedSpellFrame> frames)
+    {
+        var sheet = frames.Count > 0 && frames.All(f => f.IsAnimationStrip);
+        return "\nIMAGE_ORDER\n" + (sheet
+            ? "Image 1: cible composée en trois lignes de sept cases, APPARITION, STABLE, DISPARITION. " +
+              "Les cadres, numéros et titres sont une mise en page serveur ; juge les manifestations à l'intérieur des cases. "
+            : "Image 1: cible générée, moment principal. ") +
+            string.Join(" ", frames.Select((f, i) => "Image " + (i + 2) + ": capture Unity réelle, phase " + f.Phase +
+                (f.IsAnimationStrip ? ", bande horizontale de sept poses successives" : "") + ", SHA256 " + f.Sha256 + ".")) +
+            (sheet
+                ? "\nChaque bande fait 2048×320 ; lis les sept poses numérotées 1 à 7 de gauche à droite. " +
+                  "Elles correspondent aux instants normalisés 0, 130, 290, 470, 640, 820, 1000 sur mille. " +
+                  "Compare appearance à APPARITION, active à STABLE, et la phase choisie par animation_sheet.ending_basis à DISPARITION. " +
+                  "L'autre bande terminale montre le cas alternatif décrit dans le texte, pas une quatrième ligne cible. " +
+                  "Les horodatages sont ceux de la simulation de présentation Unity, avancée par sous-pas au plus de 1/120 s ; " +
+                  "le coût du rendu et du PNG n'avance pas cette horloge. Les sept poses sont des captures réelles, pas une vidéo interpolée. "
+                : "\nPour les profils physiques 1.5, la phase active est une planche de quatre captures à des instants successifs, " +
+                  "ordre de lecture gauche à droite puis bas. Compare le mouvement entre cases au phénomène décrit. ") +
+            "Les images montrent une présentation décorative contrôlée, pas une preuve de collision ou de dégâts.\n" +
+            string.Join("\n", frames.Where(f => f.TimingJson != null).Select(f => "OBSERVED_CAPTURE_TIMES " + f.Phase + "\n" + f.TimingJson));
+    }
+
+    private static void CheckVisualReviewInputs(byte[] description, byte[] plan, IReadOnlyList<RenderedSpellFrame> frames,
+        SpellVisualReference reference)
     {
         if (description.Length is 0 or > 250_000 || plan.Length is 0 or > 750_000 || frames.Count is < 1 or > 4 ||
             frames.Any(f => f.Phase is not ("appearance" or "active" or "contact" or "expiration")) ||
             frames.Any(f => f.TimingJson?.Length > 6000) ||
             frames.Select(f => f.Phase).Distinct().Count() != frames.Count)
             throw new ArgumentException("Invalid bounded visual review inputs");
+        var sheet = reference.AnimationSheetJson is not null;
+        if (frames.Any(f => f.IsAnimationStrip != sheet) || sheet &&
+            (frames.Count != 4 || frames.Any(f => string.IsNullOrWhiteSpace(f.TimingJson))))
+            throw new ArgumentException("Animation sheet and rendered frame layouts differ");
     }
 }

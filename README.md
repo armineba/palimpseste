@@ -1,18 +1,18 @@
 # Palimpseste — dessin vers sort dans Unity
 
-Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le parcours est : **dessin libre → description → image générée → composition 3D/VFX contrôlée → sort jouable dans le laboratoire**. Les sorts sont des données validées, jamais du code produit par le joueur.
+Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le parcours D16 est : **dessin libre → description → planche d’animation 3 × 7 → composition 3D/VFX contrôlée → sort jouable dans le laboratoire**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
-## Correctif actuel — Player 1.4.1, sort joueur en affinage
+## Version courante — D16 / Player 1.6.0
 
-Le Player **1.4.1** est construit, empaqueté, déployé et ouvert sur le poste d'origine. Il corrige la capture URP qui produisait quatre PNG noirs après la réussite A/G/B d'un vrai dessin joueur. Le job concerné a repris avec sa description, son image et son plan conservés ; la nouvelle capture s'est terminée et le critique J a réellement répondu. À **23:28:06 Paris, le 20 septembre 2026**, son score est **2250/10000**, le cycle encore jugé non fidèle et B poursuit la correction : **le sort n'est pas encore prêt ni accepté visuellement**. [Preuve](evidence/public/backend/lifecycle-capture-fix-2026-09-20.json), [livraison Player](evidence/public/unity/lifecycle-delivery.json), [reprise](docs/NEXT_ACTIONS.md).
+Le **Player 1.6.0 est construit et empaqueté**, selon son [manifeste réel](evidence/public/unity/lifecycle-delivery.json). Le backend, le déploiement et le jeu ouvert sont suivis dans [IMPLEMENTATION_STATUS](docs/IMPLEMENTATION_STATUS.md) et [NEXT_ACTIONS](docs/NEXT_ACTIONS.md). Aucun nouveau parcours joueur, test ou verdict visuel réussi n'est revendiqué ici : le créateur souhaite essayer lui-même.
 
-Les captures et appels observés appartiennent à la reprise de ce job joueur ; aucun test ou diagnostic indépendant n'a été ajouté. Le verdict humain et le rendu final dans le laboratoire restent à recueillir.
+La référence comporte **APPARITION / STABLE / DISPARITION**, sept cases numérotées par ligne. G génère un atlas ; le compositeur serveur ajoute titres et cadres pour produire la planche **1536 × 1152**. Atlas natif et planche finale conservent des artefacts et SHA distincts. Le texte fixe mécaniques et chronologie ; B construit le VFX depuis la planche et les ressources gratuites sélectionnées. J compare ensuite les bandes temporelles du renderer précompilé. Voir [l'architecture D16](docs/D16_ANIMATION_SHEET.md), [le protocole Unity](docs/UNITY_ANIMATION_SHEET_D16.md) et [comment essayer](docs/TESTER_MAINTENANT.md).
 
 ## Historique D14 / 1.4.0 — cycle de vie et critique visuelle
 
-Le **Player `1.4.0` a été construit, empaqueté et ouvert sur le poste d'origine** ; son [manifeste](evidence/public/unity/lifecycle-delivery.json) atteste 29 fichiers et un ZIP de 44 366 062 octets. Le backend D14 est déployé, la migration `009` appliquée et le renderer protégé installé : [preuve de livraison locale](evidence/public/backend/lifecycle-2026-09-20.json). Le texte pilote quatre phases : apparition, activité, réaction au contact et disparition naturelle. L'image fixe la cible visuelle ; un renderer Unity précompilé réalise les captures runtime, puis une nouvelle session critique J guide les corrections bornées du plan. Les modèles n'ont aucun accès aux outils de code, aux builds ou au lancement du renderer.
+Le Player et le backend D14 ont été construits et installés sur le poste d'origine : [preuve datée](evidence/public/backend/lifecycle-2026-09-20.json). Le correctif 1.4.1 a ensuite permis de reprendre un job joueur après les captures noires : [preuve de correction](evidence/public/backend/lifecycle-capture-fix-2026-09-20.json). Ces résultats restent historiques ; `lifecycle-delivery.json` indexe maintenant la livraison courante.
 
-Le CoreSmoke déjà réussi précède la dernière demande du créateur d'arrêter les tests. **Aucun parcours joueur, appel modèle, capture ou verdict visuel D14 n'est déclaré exécuté** : le créateur veut essayer lui-même. Ses 21 dossiers locaux de sorts et leur sauvegarde ont été supprimés sur demande ; l'historique serveur reste conservé. Voir [le point de reprise](docs/NEXT_ACTIONS.md).
+Les tests historiques consignés précèdent la consigne d'arrêter les essais de développement. Les captures et appels ultérieurs de la correction D14 appartenaient à la reprise du job joueur. Ses 21 dossiers locaux et leur sauvegarde avaient été supprimés sur demande ; l'historique serveur reste conservé. Les validations actuelles sont suivies dans [le point de reprise](docs/NEXT_ACTIONS.md).
 
 ## Reprendre le projet
 
@@ -28,6 +28,8 @@ git lfs pull
 ```
 
 Ouvrir le dossier **`game/`** depuis Unity Hub avec **Unity 6000.3.24f1**, URP 17 et le module Windows IL2CPP. Le dépôt contient les assets et paramètres du projet ; Unity recrée `Library/` à l'ouverture.
+
+Les scripts courants ciblent `WindowsAnimationSheetRelease` et `WindowsAnimationSheetPlayable`, journal `animation-sheet-build.log` : [exploitation D16](ops/README.md).
 
 Pour un agent de développement, lire d'abord `prompts/00_AGENT_BUILD.md`, puis `docs/05_OVERRIDE_LUNA_CODEX.md` et `docs/03_INTEGRATION_FOURNISSEUR.md`. Les avenants et décisions actuels prévalent sur les anciens instantanés du cahier.
 
@@ -47,11 +49,12 @@ Restent à constater ou accepter : nouveau parcours joueur D13 complet, relectur
 | `backend/` | API, worker durable, passerelle `codex exec`, diagnostic fournisseur et migrations SQL. |
 | `shared/` | Contrats C# et compilation contrôlée. |
 | `contracts/`, `prompts/`, `reference/` | Schémas, catalogue de capacités, consignes A/G/B/J et références. |
+| `assets/sourced-vfx/` | Textures CC0, bruit MIT, licences et catalogue de références primaires. |
 | `ops/` | Construction, publication, provisionnement, diagnostics et correctifs du CLI Codex. |
 | `docs/`, `evidence/public/` | Cahier, décisions, passation, résultats et limites des vérifications réalisées. |
 | `deliverables/` | Archives Windows du Player et du backend ; fichiers volumineux via Git LFS. |
 
-Les réglages actuels documentés sont **Sol/high pour A**, **Astra/high pour G et B**. Les noms historiques Luna/Astra dans certains fichiers ne remplacent pas ces réglages. Le transport est Unity → API du jeu → worker → `codex exec` non interactif, avec un binaire durci : aucun outil exécutable en A/B, uniquement l'outil image en G.
+Les réglages actuels documentés sont **Sol/high pour A**, **Astra/high pour G/B/J**. Les noms historiques Luna/Astra dans certains fichiers ne remplacent pas ces réglages. Le transport est Unity → API du jeu → worker → `codex exec` non interactif, avec un binaire durci : aucun outil en A/B/J, uniquement l'outil image en G. Le compositeur, la recherche et les captures sont des actions fixes du serveur.
 
 Les identifiants Codex, clés, jetons joueur, secrets PostgreSQL et données privées du service ne font pas partie du dépôt. L'opérateur provisionne son environnement séparément. Aucun achat ou rechargement n'est ajouté au code ; les réglages de facturation restent ceux du compte utilisé.
 

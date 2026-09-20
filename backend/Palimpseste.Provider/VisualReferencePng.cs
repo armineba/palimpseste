@@ -4,12 +4,12 @@ using System.IO.Compression;
 namespace Palimpseste.Provider;
 
 /// <summary>Server-created, hash-bound input. A client/model never supplies this filesystem path.</summary>
-public sealed record SpellVisualReference(string PngPath, string Sha256);
+public sealed record SpellVisualReference(string PngPath, string Sha256, string? AnimationSheetJson = null);
 
 public sealed record GeneratedImageArtifact(string SavedPath, string Sha256, int Width, int Height, string ToolCallId);
 
 public sealed record ProviderVisualReference(CodexResult Transport, byte[]? PngBytes, string? Sha256,
-    string? SavedPath, int? Width, int? Height);
+    string? SavedPath, int? Width, int? Height, string? AnimationSheetJson = null);
 
 public interface IVisualReferenceGenerator
 {
@@ -24,7 +24,12 @@ public static class VisualReferencePng
     private static readonly byte[] Signature = [137, 80, 78, 71, 13, 10, 26, 10];
     private static readonly uint[] CrcTable = BuildCrcTable();
 
-    public static (int Width, int Height) Validate(ReadOnlySpan<byte> bytes)
+    public static (int Width, int Height) Validate(ReadOnlySpan<byte> bytes) => ValidateCore(bytes, animationStrip: false);
+
+    /// <summary>Only for fixed Unity D16 output, never for model-generated image artifacts.</summary>
+    public static (int Width, int Height) ValidateAnimationStrip(ReadOnlySpan<byte> bytes) => ValidateCore(bytes, animationStrip: true);
+
+    private static (int Width, int Height) ValidateCore(ReadOnlySpan<byte> bytes, bool animationStrip)
     {
         if (bytes.Length is < 50 or > MaxBytes || !bytes[..8].SequenceEqual(Signature))
             throw new InvalidDataException("visual_reference_png_signature_or_size");
@@ -51,9 +56,11 @@ public static class VisualReferencePng
                 if (header || offset != 8 || length != 13) throw new InvalidDataException("visual_reference_png_header");
                 var w = BinaryPrimitives.ReadUInt32BigEndian(data[..4]);
                 var h = BinaryPrimitives.ReadUInt32BigEndian(data.Slice(4, 4));
-                if (w is < 512 or > 2048 || h is < 512 or > 2048 || data[8] != 8 ||
+                var invalidDimensions = animationStrip ? w != 2048 || h != 320 : w is < 512 or > 2048 || h is < 512 or > 2048;
+                if (invalidDimensions || data[8] != 8 ||
                     data[9] is not (2 or 6) || data[10] != 0 || data[11] != 0 || data[12] != 0)
-                    throw new InvalidDataException("visual_reference_png_requires_rgb_rgba8_noninterlaced_512_to_2048");
+                    throw new InvalidDataException(animationStrip ? "visual_capture_strip_requires_rgb_rgba8_2048x320" :
+                        "visual_reference_png_requires_rgb_rgba8_noninterlaced_512_to_2048");
                 width = (int)w; height = (int)h; channels = data[9] == 2 ? 3 : 4; header = true;
             }
             else if (type.SequenceEqual("IDAT"u8))

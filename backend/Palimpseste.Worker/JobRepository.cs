@@ -7,7 +7,8 @@ namespace Palimpseste.Worker;
 
 public sealed record ClaimedJob(Guid Id, Guid? ParchmentId, Guid? CaptureId, long Fence, string Kind, string State, int VisualPipelineVersion = 0);
 public sealed record StoredVisualReference(string StorageKey, string Sha256, Guid ArtifactId, int SizeBytes,
-    string DescriptionSha256, string PromptVersion, int Width, int Height);
+    string DescriptionSha256, string PromptVersion, int Width, int Height,
+    string? AnimationSheetJson = null, string? SourceAtlasSha256 = null);
 public sealed record CaptureFiles(string ManifestJson, string ManifestSha, string SignatureSeedHex, string DrawingKey, string DrawingSha, string InkKey, string InkSha,
     string ReferenceKey, string ReferenceSha);
 public sealed record StoredDocument(string StorageKey, string Sha256, Guid ArtifactId, string? PromptVersion = null, int Revision = 0);
@@ -183,21 +184,34 @@ public sealed partial class JobRepository
     public async Task<StoredVisualReference?> GetVisualReferenceAsync(ClaimedJob job, CancellationToken ct)
     {
         await using var cmd = source.CreateCommand("""
-            SELECT a.storage_key,a.sha256,a.id,a.byte_length,v.description_sha256,v.prompt_version,v.width_px,v.height_px
+            SELECT a.storage_key,a.sha256,a.id,a.byte_length,v.description_sha256,v.prompt_version,v.width_px,v.height_px,
+                   v.animation_sheet::text,native.sha256
             FROM visual_references v JOIN artifacts a ON a.id=v.artifact_id
             JOIN jobs j ON j.id=v.job_id AND a.owner_id=j.owner_id
+            LEFT JOIN visual_atlases atlas ON atlas.job_id=v.job_id AND atlas.artifact_id=v.source_atlas_artifact_id
+            LEFT JOIN artifacts native ON native.id=atlas.artifact_id AND native.owner_id=j.owner_id
+                AND native.kind='visual_atlas' AND native.content_type='image/png'
             WHERE v.job_id=$1 AND j.fence_token=$2 AND a.kind='visual_reference' AND a.content_type='image/png'
+              AND (v.source_atlas_artifact_id IS NULL OR native.id IS NOT NULL)
             """);
         cmd.Parameters.AddWithValue(job.Id); cmd.Parameters.AddWithValue(job.Fence);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         return await r.ReadAsync(ct) ? new(r.GetString(0), r.GetString(1), r.GetGuid(2), checked((int)r.GetInt64(3)),
-            r.GetString(4), r.GetString(5), r.GetInt32(6), r.GetInt32(7)) : null;
+            r.GetString(4), r.GetString(5), r.GetInt32(6), r.GetInt32(7),
+            r.IsDBNull(8) ? null : r.GetString(8), r.IsDBNull(9) ? null : r.GetString(9)) : null;
     }
 
     public async Task SaveVisualReferenceAsync(ClaimedJob job, Guid attemptId, StoredArtifact artifact,
         string descriptionHash, string inputHash, string promptVersion, int width, int height,
-        CodexResult transport, CancellationToken ct)
+        CodexResult? transport, CancellationToken ct, string? animationSheetJson = null, Guid? sourceAtlasArtifactId = null)
     {
+        if (job.VisualPipelineVersion >= 4 || animationSheetJson is not null || sourceAtlasArtifactId.HasValue)
+        {
+            await SaveComposedVisualReferenceAsync(job, attemptId, artifact, descriptionHash, inputHash,
+                promptVersion, width, height, animationSheetJson, sourceAtlasArtifactId, ct);
+            return;
+        }
+        ArgumentNullException.ThrowIfNull(transport);
         await using var conn = await source.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
         await InsertArtifactAsync(conn, tx, job, artifact, "visual_reference", ct);

@@ -1,0 +1,9 @@
+# Compositeur de planche d'animation
+
+`AnimationSheetComposer` utilise le package Microsoft **System.Drawing.Common 10.0.12**, gratuit sous MIT, ainsi que sa dépendance Microsoft.Win32.SystemEvents. La version a été vérifiée dans le [catalogue NuGet](https://www.nuget.org/packages/System.Drawing.Common/10.0.12) et l'[index officiel](https://api.nuget.org/v3-flatcontainer/system.drawing.common/index.json) le 21 septembre 2026. La [licence du tag amont](https://github.com/dotnet/winforms/blob/v10.0.12/LICENSE.TXT) a été lue avant l'ajout de la dépendance et est conservée dans `System.Drawing.Common-MIT.txt`, copiée lors de la publication .NET.
+
+Cette bibliothèque est [prise en charge sur Windows](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only). Le compositeur utilise GDI+ et les polices déjà installées : Segoe UI, Arial, puis la police sans sérif système. Il ne redistribue aucune police et n'installe aucun package pendant une génération joueur. Le rendu des lettres peut varier entre des hôtes Windows possédant des versions de polices différentes ; le serveur conserve les octets composés et leur SHA.
+
+La sortie est fixe : **1536 × 1152**, 3 lignes, 7 cadres carrés de **200 × 200** par ligne, numérotés **1 à 7**. Les phases sont APPARITION, STABLE et DISPARITION ; le nom en capitales et le sous-titre VFX ANIMATION SHEET sont composés par le serveur. Le fond est `#0c1116`, les repères des lignes bleu, vert et violet. Les 21 cellules de l'atlas sont découpées proportionnellement, puis ajustées sans déformation dans les cadres ; aucune recoloration n'est appliquée à l'image. L'atlas généré et la planche dérivée doivent conserver des provenances et empreintes distinctes.
+
+L'ajout contient du code et la dépendance déclarée. Aucun build, appel de modèle, rendu d'image ou test n'a été lancé par son auteur lors de cette modification.

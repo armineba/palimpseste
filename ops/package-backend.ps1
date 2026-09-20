@@ -24,6 +24,18 @@ Publish-App 'backend/ProviderDoctor/ProviderDoctor.csproj' 'doctor'
 Publish-App 'backend/SpellVisualDoctor/SpellVisualDoctor.csproj' 'visual-doctor'
 Get-ChildItem -LiteralPath $stage -Filter '*.pdb' -File -Recurse | Remove-Item -Force
 
+# Keep the compositor's MIT notice alongside every published application that
+# carries its managed dependency, including with single-file publication.
+$drawingNotice = Join-Path $projectRoot 'backend\Palimpseste.Provider\ThirdPartyNotices\System.Drawing.Common-MIT.txt'
+foreach ($application in @('api', 'worker', 'doctor', 'visual-doctor')) {
+    $noticeFolder = Join-Path (Join-Path $stage $application) 'ThirdPartyNotices'
+    New-Item -ItemType Directory -Path $noticeFolder -Force | Out-Null
+    $noticeTarget = Join-Path $noticeFolder 'System.Drawing.Common-MIT.txt'
+    Copy-Item -LiteralPath $drawingNotice -Destination $noticeTarget -Force
+    if ((Get-FileHash -LiteralPath $drawingNotice -Algorithm SHA256).Hash -cne
+        (Get-FileHash -LiteralPath $noticeTarget -Algorithm SHA256).Hash) { throw 'Compositor license copy differs.' }
+}
+
 $spec = Join-Path $stage 'spec'
 New-Item -ItemType Directory -Force -Path $spec | Out-Null
 foreach ($directory in @('contracts', 'reference')) {
@@ -58,7 +70,9 @@ foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_
 }
 $runtimePromptHistory = Join-Path $runtimePrompts 'history'
 New-Item -ItemType Directory -Force -Path $runtimePromptHistory | Out-Null
-Copy-Item -LiteralPath (Join-Path $projectRoot 'prompts/history/01_MODEL_A_INTERPRETE_2_3.md') -Destination (Join-Path $runtimePromptHistory '01_MODEL_A_INTERPRETE_2_3.md')
+foreach ($name in @('01_MODEL_A_INTERPRETE_2_3.md', '04_IMAGE_REFERENCE_1_2.md')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot ('prompts/history/' + $name)) -Destination (Join-Path $runtimePromptHistory $name)
+}
 New-Item -ItemType Directory -Force -Path (Join-Path $stage 'migrations') | Out-Null
 Get-ChildItem -LiteralPath (Join-Path $projectRoot 'backend/migrations') -Filter '*.sql' -File |
     Sort-Object Name |
@@ -115,17 +129,18 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Desti
 
 @"
 Palimpseste backend Windows x64. API, worker et doctor sont des exécutables .NET autoportants.
-Version D15 / 1.5.0. La chaîne privée est : dessin libre -> Sol high (description et cycle complet) -> image native Codex -> recherche dans les références primaires sélectionnées et choix des ressources gratuites -> Astra high (construction depuis la description, image cible et recherche conservée) -> compilateur contrôlé -> rendu Unity précompilé -> critique visuelle indépendante J -> ajustements bornés -> paquet Unity 1.5.
+Version D16 / 1.6.0. La chaîne privée est : dessin libre -> Sol high (description et cycle complet) -> atlas natif Codex 7x3 -> compositeur serveur fixe -> planche VFX 1536x1152 -> recherche dans les références primaires sélectionnées et choix des ressources gratuites -> Astra high (construction depuis la description, la planche et la recherche conservée) -> compilateur contrôlé -> rendu Unity précompilé -> critique visuelle indépendante J -> ajustements bornés -> paquet Unity 1.6.
+La planche comporte APPARITION, STABLE, DISPARITION, sept cases numérotées 1 à 7 par ligne, titre et sous-titre VFX ANIMATION SHEET. L'atlas réellement produit par le fournisseur et la planche mise en page par le serveur ont des artefacts et SHA distincts ; la planche n'est pas présentée comme la sortie native du modèle. System.Drawing.Common 10.0.12 est gratuit sous MIT, Windows uniquement ; sa notice accompagne les programmes publiés. Aucune police n'est distribuée.
 Le worker utilise codex exec sous un compte Windows de service isolé. Il n'exécute ni C# issu d'un dessin, ni build Unity.
-L'archive contient les contrats, références, prompts A/G/B/J et migrations001 à010, mais aucun auth.json, jeton joueur, secret DB ou clé API. spec/assets/sourced-vfx contient seulement les catalogues, licences et PNG contrôlés : aucun reference-code, plugin ni script d'import. Le binaire durci A/B/G/J et son attestation native sont décrits dans ops/codex-image-generation.md. Si codex/ est présent, son exécutable a été inclus avec un SHA vérifié et les notices amont ; sinon le construire à partir des correctifs fournis. Dans les deux cas, établir les preuves sur le compte de service avant activation.
+L'archive contient les contrats, références, prompts A/G/B/J et migrations 001 à 011, mais aucun auth.json, jeton joueur, secret DB ou clé API. Les versions historiques A 2.3 et G 1.2 restent incluses pour les anciens parcours admis. spec/assets/sourced-vfx contient seulement les catalogues, licences et PNG contrôlés : aucun reference-code, plugin ni script d'import. Le binaire durci A/B/G/J et son attestation native sont décrits dans ops/codex-image-generation.md. Si codex/ est présent, son exécutable a été inclus avec un SHA vérifié et les notices amont ; sinon le construire à partir des correctifs fournis. Dans les deux cas, établir les preuves sur le compte de service avant activation.
 Lire IMPLEMENTATION_STATUS.md puis ops/provision-runtime.ps1 avant toute installation.
 Extraire l'archive dans un dossier opérateur inaccessible au compte worker : elle contient des scripts ops d'administration.
 Copier api, worker et doctor publiés vers leurs emplacements de service avec ACL minimales ; ne pas lancer le worker depuis le dossier extrait.
 L'API attend DATABASE_URL, ARTIFACT_ROOT et PALIMPSESTE_SPEC_ROOT pointant vers la copie runtime de spec.
-Le worker attend en plus le compte Windows dédié, CODEX_HOME isolé et la preuve du doctor actif. D15 conserve le binaire natif D13 et ses preuves ; les nouveaux prompts et le rendu D15 restent à essayer par le propriétaire.
-Le rendu de critique demande PALIMPSESTE_VISUAL_RENDERER_EXE et PALIMPSESTE_VISUAL_RENDERER_MANIFEST_SHA256. Installer une copie du Player 1.5.0 livré, avec manifeste SHA de tous les fichiers, hors sources et dossiers modifiables du worker. ops/deploy-lifecycle.ps1 met à jour le PC existant : migration009 doit déjà être présente, seule migration010 est appliquée. Ne jamais rejouer009 après création de jobs version3 car elle restreint l'ancienne contrainte. Pour une base neuve, appliquer toutes les migrations001 à010 dans l'ordre avant de lancer les services. Ne pas exposer les scripts ops au worker.
+Le worker attend en plus le compte Windows dédié, CODEX_HOME isolé et la preuve du doctor actif. D16 conserve le binaire natif D13 et ses preuves ; les nouveaux prompts, le compositeur et le rendu D16 restent à essayer par le propriétaire.
+Le rendu de critique demande PALIMPSESTE_VISUAL_RENDERER_EXE et PALIMPSESTE_VISUAL_RENDERER_MANIFEST_SHA256. Installer une copie du Player 1.6.0 livré, avec manifeste SHA de tous les fichiers, hors sources et dossiers modifiables du worker. ops/deploy-lifecycle.ps1 met à jour le PC existant : migration 010 et sa table spell_reference_research doivent déjà être présentes, seule migration 011 est appliquée. Ne pas rejouer 009 ou 010 sur des jobs plus récents : elles restreignent l'ancienne contrainte de version. Pour une base neuve, appliquer toutes les migrations 001 à 011 dans l'ordre avant de lancer les services. Ne pas exposer les scripts ops au worker.
 La recherche par job consulte une bibliothèque de sources primaires sélectionnées et réutilise des textures CC0 ; elle ne donne aucun droit de téléchargement libre ou d'installation de code au joueur. Conserver les notices des textures dans la distribution du Player.
-Le programme visual-doctor est un diagnostic manuel facultatif, non exécuté pour cette livraison. Les captures automatiques de la génération joueur comparent quatre phases décoratives ; elles ne prouvent pas le gameplay ni une fidélité visuelle parfaite.
+Le programme visual-doctor est un diagnostic manuel facultatif, non exécuté pour cette livraison. Les captures automatiques de la génération joueur servent à la critique visuelle ; elles ne prouvent pas le gameplay ni une fidélité visuelle parfaite.
 La génération reste bloquée tant que le compte de service Codex et le doctor actif ne sont pas validés.
 Le service local actuel emploie 127.0.0.1 ; cette archive ne configure pas une URL HTTPS publique ni les identités des joueurs.
 "@ | Set-Content -LiteralPath (Join-Path $stage 'README.txt') -Encoding UTF8

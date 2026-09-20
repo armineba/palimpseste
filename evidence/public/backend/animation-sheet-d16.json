@@ -1,0 +1,84 @@
+{
+    "schema_version":  "sp.delivery-evidence/1.0",
+    "delivery":  "D16 strict 3x7 animation sheet",
+    "observed_at":  "2026-09-20T23:49:38.9184076+00:00",
+    "client_version":  "1.6.0",
+    "scope":  "Future parchments use a composed 21-frame animation sheet; no existing spell or job document rewritten",
+    "unity":  {
+                  "version":  "6000.3.24f1",
+                  "backend":  "IL2CPP",
+                  "build_exit":  0,
+                  "build_log_sha256":  "773d9ce368182c0e8440b9699cf84a252457039a05d65a0a2b399fb6d40059cd",
+                  "game_assembly_sha256":  "4a43ae59f07a5d23db7f74cacf5edb4191df6e6220e67db46dc1059181e96e2a",
+                  "player_zip_sha256":  "24ca0f949892fd3017889e8c0a1f23c48cd69f63125174a36951525739c5507f",
+                  "player_zip_bytes":  46591080,
+                  "installed_shortcut":  "Palimpseste Spell Lab",
+                  "developer_launch_executed":  false
+              },
+    "backend":  {
+                    "publish_exit":  0,
+                    "build_log_sha256":  "ffd9f8ff608c893759c0ed8e1658c431d322f61bffb6a86dda369ccad5f828d6",
+                    "deploy_exit":  0,
+                    "installed":  true,
+                    "deployed_at":  "2026-09-20T23:48:00.6344510+00:00",
+                    "worker_pid":  30380,
+                    "api_pid":  6640,
+                    "worker_sha256":  "28044b85e462b575fcb424faa111d2444eb7baa58a0535395422772c4bb93913",
+                    "api_sha256":  "755d3eeeafea435610b6b762df0fee311f3cc4a82ca324522694b60b2e218fcb",
+                    "renderer_manifest_sha256":  "487175e3182a03995b30687c7738251ec32020cbdb265e2794155d3aee9f2bf0",
+                    "migration_011_applied":  true,
+                    "migration_011_sha256":  "9ad00bf0d9af1e79da1d84b23b92ca308ae2f4eb4ea14328eae8cb09ee4f2195",
+                    "native_codex_sha256":  "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+                    "local_only":  true
+                },
+    "animation_sheet":  {
+                            "layout_version":  "sp.animation-sheet/1.0",
+                            "rows":  3,
+                            "columns":  7,
+                            "labels":  [
+                                           "APPARITION",
+                                           "STABLE",
+                                           "DISPARITION"
+                                       ],
+                            "final_width":  1536,
+                            "final_height":  1152,
+                            "normalized_times_milli":  [
+                                                           0,
+                                                           130,
+                                                           290,
+                                                           470,
+                                                           640,
+                                                           820,
+                                                           1000
+                                                       ],
+                            "native_atlas_checkpoint_before_composition":  true,
+                            "native_and_composed_sha_distinct_fields":  true,
+                            "future_pipeline_version":  4,
+                            "g_prompt":  "sp.prompt.g/1.3",
+                            "b_prompt":  "sp.prompt.b/2.4",
+                            "j_prompt":  "sp.prompt.j/1.2",
+                            "renderer_source_frames":  28,
+                            "renderer_phase_strips":  4,
+                            "strip_width":  2048,
+                            "strip_height":  320
+                        },
+    "verification":  {
+                         "builds_and_installation_executed":  true,
+                         "test_suites_executed":  false,
+                         "developer_gameplay_trials":  0,
+                         "developer_capture_replays":  0,
+                         "developer_generation_calls":  0,
+                         "runtime_pro_loop_exercised_for_d16":  false,
+                         "generated_atlas_layout_observed_for_d16":  false,
+                         "artistic_acceptance":  "pending_owner",
+                         "latency_measured_for_d16":  false
+                     },
+    "limitations":  [
+                        "Fixed server layout enforces labels and cell placement; artistic contents and motion inside generated cells are not yet observed.",
+                        "Presentation captures use controlled simulation time; they do not prove gameplay physics, damage or visual fidelity.",
+                        "Pro review is bounded and may deliver its best reviewed candidate with remaining visual differences.",
+                        "Resource research still uses the reviewed primary-source index and free assets from D15.",
+                        "No public VPS or remote-player deployment performed."
+                    ],
+    "resume":  "Owner opens Palimpseste Spell Lab 1.6.0, draws a new parchment, inspects the animation sheet and tries the final spell."
+}

@@ -1,15 +1,15 @@
 {
-    "version":  "1.5.0",
-    "updated_at":  "2026-09-20T23:22:07.4190970+00:00",
+    "version":  "1.6.0",
+    "updated_at":  "2026-09-20T23:51:45.7825842+00:00",
     "build_exit":  0,
-    "binary_stage":  "deliverables/.stage-backend/777f2153449f412ab57c7daa5e1dfe15",
+    "binary_stage":  "deliverables/.stage-backend/22bf76e06c9a4b4bb9e194faf97c7e1d",
     "documentation_refreshed":  true,
     "zip":  "deliverables/Palimpseste-Backend-Windows-x64.zip",
-    "bytes":  245666251,
-    "sha256":  "5378156279debadaa5c16c1ad7b7a579e1c8920ed5d5315c08535af4aa984654",
-    "worker_sha256":  "0357d4b30c903ecc716025b65a690391094db37300129883ec80f57002539782",
-    "api_sha256":  "4246f335486a25f2dcac83a4516cff27a9e042c6097238ab99ef9b7a8f973fa6",
+    "bytes":  247753524,
+    "sha256":  "da81603cfccf638aa5328ce30f7fe9d4b336320f3d24acb270547251c9b5a741",
+    "worker_sha256":  "28044b85e462b575fcb424faa111d2444eb7baa58a0535395422772c4bb93913",
+    "api_sha256":  "755d3eeeafea435610b6b762df0fee311f3cc4a82ca324522694b60b2e218fcb",
     "tests_executed":  false,
     "gameplay_acceptance":  "pending_owner",
-    "evidence":  "evidence/public/backend/behavior-d15.json"
+    "evidence":  "evidence/public/backend/animation-sheet-d16.json"
 }

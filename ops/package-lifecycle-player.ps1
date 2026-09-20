@@ -7,15 +7,15 @@ param(
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $buildRoot = Join-Path $repo 'game\Build'
-$source = Join-Path $buildRoot 'WindowsBehaviorRelease'
-$playable = Join-Path $buildRoot 'WindowsBehaviorPlayable'
+$source = Join-Path $buildRoot 'WindowsAnimationSheetRelease'
+$playable = Join-Path $buildRoot 'WindowsAnimationSheetPlayable'
 $zipPath = Join-Path $repo 'deliverables\Palimpseste-Windows-x64-IL2CPP.zip'
 $proofPath = Join-Path $repo 'evidence\public\unity\lifecycle-delivery.json'
-$logPath = Join-Path $repo 'game\Logs\behavior-build.log'
+$logPath = Join-Path $repo 'game\Logs\animation-sheet-build.log'
 $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
-$stage = Join-Path $buildRoot ('behavior-package-stage-' + $stamp)
+$stage = Join-Path $buildRoot ('animation-sheet-package-stage-' + $stamp)
 $pendingZip = $stage + '.zip'
-$backup = Join-Path $buildRoot ('BehaviorDeliveryBackups\' + $stamp)
+$backup = Join-Path $buildRoot ('AnimationSheetDeliveryBackups\' + $stamp)
 
 function Assert-Under([string]$Path, [string]$Scope) {
     $absolute = [IO.Path]::GetFullPath($Path)
@@ -48,7 +48,7 @@ $resultMarkers = [regex]::Matches($logText, 'Build Finished, Result: (\w+)')
 if ($logText -notmatch ('PALIMPSESTE_BUILD_OK ' + [regex]::Escape($expectedExe) + ' bytes=') -or
     $resultMarkers.Count -eq 0 -or $resultMarkers[$resultMarkers.Count - 1].Groups[1].Value -ne 'Success' -or
     $exitMarkers.Count -eq 0 -or $exitMarkers[$exitMarkers.Count - 1].Groups[1].Value -ne '0') { throw 'Le journal ne prouve pas la réussite de ce build et sa sortie 0.' }
-if ([IO.File]::ReadAllText((Join-Path $repo 'game\ProjectSettings\ProjectSettings.asset')) -notmatch '(?m)^\s*bundleVersion:\s*1\.5\.0\s*$') { throw 'La version du projet doit être 1.5.0.' }
+if ([IO.File]::ReadAllText((Join-Path $repo 'game\ProjectSettings\ProjectSettings.asset')) -notmatch '(?m)^\s*bundleVersion:\s*1\.6\.0\s*$') { throw 'La version du projet doit être 1.6.0.' }
 $required = @('Palimpseste.exe', 'GameAssembly.dll', 'UnityPlayer.dll', 'Palimpseste_Data\globalgamemanagers', 'Palimpseste_Data\il2cpp_data\Metadata\global-metadata.dat')
 foreach ($relative in $required) {
     $file = Get-Item -LiteralPath (Join-Path $source $relative)
@@ -152,7 +152,7 @@ Assert-Under $playable $buildRoot
 Move-Item -LiteralPath $stage -Destination $playable
 Move-Item -LiteralPath $pendingZip -Destination $zipPath
 $proof = [ordered]@{
-    observed_at = [DateTime]::UtcNow.ToString('O'); client_version = '1.5.0'; delivery_name='D15 behavior and sourced VFX'; unity = '6000.3.24f1'; backend = 'IL2CPP'
+    observed_at = [DateTime]::UtcNow.ToString('O'); client_version = '1.6.0'; delivery_name='D16 strict 3x7 animation sheet'; unity = '6000.3.24f1'; backend = 'IL2CPP'
     build_exit = 0; build_success_marker_observed = $true; build_log = Relative $logPath; build_log_sha256 = Hash $logPath
     source = Relative $source; playable = Relative $playable; zip = Relative $zipPath
     zip_bytes = (Get-Item -LiteralPath $zipPath).Length; zip_sha256 = Hash $zipPath
@@ -180,10 +180,10 @@ if ($UpdateDesktopShortcut) {
     try {
         $shortcut = $shell.CreateShortcut($shortcutPath)
         $shortcut.TargetPath = $executable; $shortcut.WorkingDirectory = $playable
-        $shortcut.Description = 'Palimpseste Spell Lab 1.5.0'; $shortcut.Save()
+        $shortcut.Description = 'Palimpseste Spell Lab 1.6.0'; $shortcut.Save()
         $verifiedShortcut = $shell.CreateShortcut($shortcutPath)
         if ($verifiedShortcut.TargetPath -ne $executable -or $verifiedShortcut.WorkingDirectory -ne $playable) {
-            throw 'Le raccourci enregistré ne cible pas la livraison 1.5.0.'
+            throw 'Le raccourci enregistré ne cible pas la livraison 1.6.0.'
         }
     }
     finally {
@@ -197,7 +197,7 @@ if ($UpdateDesktopShortcut) {
     }
     Save-Proof $proof
 }
-Write-Output "Player 1.5.0 : $playable"
+Write-Output "Player 1.6.0 : $playable"
 Write-Output "ZIP SHA256 : $($proof.zip_sha256) ($($proof.zip_bytes) octets)"
 Write-Output "Preuve : $proofPath"
 Write-Output "Livraison précédente conservée : $backup"

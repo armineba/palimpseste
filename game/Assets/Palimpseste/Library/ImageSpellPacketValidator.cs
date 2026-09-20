@@ -75,6 +75,20 @@ namespace Palimpseste.Game.Library
             var referenceSize = Integer(visual,"size_bytes",33,SpellVisualConstructionLimits.MaximumReferenceBytes);
             var width = Integer(visual,"width_px",512,SpellVisualConstructionLimits.MaximumReferenceDimension);
             var height = Integer(visual,"height_px",512,SpellVisualConstructionLimits.MaximumReferenceDimension);
+            var sheetToken = visual["animation_sheet"];
+            var hasSheet = sheetToken != null && sheetToken.Type != JTokenType.Null;
+            var nativeAtlasHash = Text(visual,"source_atlas_sha256");
+            if (hasSheet || nativeAtlasHash != null || minimumVersion != null && minimumVersion >= new Version(1,6,0))
+            {
+                Require(minimumVersion != null && minimumVersion >= new Version(1,6,0),"Animation sheet requires client 1.6.0");
+                Require(sheetToken is JObject && Digest(nativeAtlasHash),"Animation sheet and native atlas provenance are required");
+                var sheet = (JObject)sheetToken;
+                Require(sheet.Properties().Count() == 4 &&
+                    Text(sheet,"layout_version") == SpellAnimationSheetLimits.LayoutVersion &&
+                    Integer(sheet,"rows",3,3) == 3 && Integer(sheet,"columns",7,7) == 7 &&
+                    SpellAnimationSheetLimits.EndingBases.Contains(Text(sheet,"ending_basis")),"Invalid animation sheet layout");
+                Require(width == 1536 && height == 1152,"Animation sheet must use the framed 1536x1152 layout");
+            }
 
             // Count the full plan, not just one renderer about to be spawned.
             // Integer token checks precede deserialization to avoid coercing a

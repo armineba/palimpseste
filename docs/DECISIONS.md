@@ -102,3 +102,7 @@ sur l'identité courante. Hors ligne, il ne retrouve cette identité qu'avec le 
 du coffre Windows associé à l'URL et son empreinte locale. Les anciens parchemins
 sans propriétaire prouvé restent sur disque mais sont masqués ; aucune attribution
 automatique à un autre joueur n'est faite.
+
+## D16 — Planche d’animation 3 × 7 (21 septembre 2026)
+
+Le créateur remplace l’image cible unique par sa référence de planche : APPARITION, STABLE, DISPARITION, sept cases par ligne. Un atlas natif G précède une mise en page fixe du serveur ; les deux SHA et artefacts sont conservés séparément. La description demeure l’autorité du cycle et des mécaniques. B construit un seul sort animé et J examine sept poses réelles par phase. Pipeline 4 / client 1.6.0 ; aucun sort existant modifié. Les essais restent au créateur. Voir [D16](D16_ANIMATION_SHEET.md).

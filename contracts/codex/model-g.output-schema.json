@@ -1,10 +1,69 @@
 {
   "type": "object",
   "properties": {
-    "schema_version": { "type": "string", "enum": ["sp.visual-reference-receipt/1.0"] },
-    "description_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "status": { "type": "string", "enum": ["generated", "unavailable"] }
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "sp.visual-reference-receipt/1.0"
+      ]
+    },
+    "description_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "generated",
+        "unavailable"
+      ]
+    },
+    "animation_sheet": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "layout_version": {
+          "type": "string",
+          "enum": [
+            "sp.animation-sheet/1.0"
+          ]
+        },
+        "rows": {
+          "type": "integer",
+          "enum": [
+            3
+          ]
+        },
+        "columns": {
+          "type": "integer",
+          "enum": [
+            7
+          ]
+        },
+        "ending_basis": {
+          "type": "string",
+          "enum": [
+            "contact",
+            "expiration"
+          ]
+        }
+      },
+      "required": [
+        "layout_version",
+        "rows",
+        "columns",
+        "ending_basis"
+      ],
+      "additionalProperties": false
+    }
   },
-  "required": ["schema_version", "description_sha256", "status"],
+  "required": [
+    "schema_version",
+    "description_sha256",
+    "status",
+    "animation_sheet"
+  ],
   "additionalProperties": false
 }

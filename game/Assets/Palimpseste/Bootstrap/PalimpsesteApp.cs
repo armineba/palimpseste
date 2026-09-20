@@ -62,6 +62,9 @@ namespace Palimpseste.Game.Bootstrap
         private Texture2D generatedPreview;
         private string generatedPreviewHash;
         private bool showGeneratedReference = true;
+        private bool showReferenceViewer;
+        private float referenceZoom = 1;
+        private Vector2 referenceScroll;
         private Vector2 libraryScroll;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -163,6 +166,7 @@ namespace Palimpseste.Game.Bootstrap
         private void OnGUI()
         {
             InitializeStyles();
+            if (showReferenceViewer) { DrawReferenceViewer(); return; }
             if (page == Page.Library && libraryBackdrop != null)
             {
                 GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), libraryBackdrop, ScaleMode.ScaleAndCrop);
@@ -442,7 +446,13 @@ namespace Palimpseste.Game.Bootstrap
                 if (showGeneratedReference)
                 {
                     GUI.DrawTexture(new Rect(area.x + 15, area.y + 59, area.width - 30, area.height - 92), visual, ScaleMode.ScaleToFit);
-                    GUI.Label(new Rect(area.x + 15, area.yMax - 28, area.width - 30, 24), "Image générée · cible visuelle du sort décrit", textStyle);
+                    if (GUI.Button(new Rect(area.x + 15, area.yMax - 30, area.width - 30, 26),
+                            "Agrandir l’image · zoom et déplacement", buttonStyle))
+                    {
+                        referenceZoom = 1;
+                        referenceScroll = Vector2.zero;
+                        showReferenceViewer = true;
+                    }
                     return;
                 }
             }
@@ -476,6 +486,54 @@ namespace Palimpseste.Game.Bootstrap
                 new Rect(0, 0, contentWidth, contentHeight));
             GUI.Label(new Rect(0, 0, contentWidth, contentHeight), text, textStyle);
             GUI.EndScrollView();
+        }
+
+        private void DrawReferenceViewer()
+        {
+            var visual = GeneratedReferencePreview();
+            if (visual == null) { showReferenceViewer = false; return; }
+            var input = Event.current;
+            if (input.type == EventType.KeyDown && input.keyCode == KeyCode.Escape)
+            {
+                showReferenceViewer = false;
+                input.Use();
+                return;
+            }
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), SolidBackground);
+            GUI.Label(new Rect(20, 12, Screen.width - 170, 38), "Image du sort", titleStyle);
+            if (GUI.Button(new Rect(Screen.width - 142, 12, 122, 38), "Fermer", buttonStyle))
+                showReferenceViewer = false;
+            var previousZoom = referenceZoom;
+            if (GUI.Button(new Rect(20, 60, 94, 34), "Vue entière", buttonStyle)) referenceZoom = 1;
+            if (GUI.Button(new Rect(123, 60, 44, 34), "−", buttonStyle)) referenceZoom = Mathf.Max(1, referenceZoom / 1.4f);
+            referenceZoom = GUI.HorizontalSlider(new Rect(181, 70, Mathf.Max(80, Screen.width - 466), 20), referenceZoom, 1, 7);
+            if (GUI.Button(new Rect(Screen.width - 272, 60, 44, 34), "+", buttonStyle)) referenceZoom = Mathf.Min(7, referenceZoom * 1.4f);
+            GUI.Label(new Rect(Screen.width - 218, 63, 195, 30), "Zoom ×" + referenceZoom.ToString("0.0", CultureInfo.InvariantCulture), textStyle);
+            var viewport = new Rect(18, 108, Screen.width - 36, Mathf.Max(80, Screen.height - 146));
+            var fit = Mathf.Min((viewport.width - 20) / visual.width, (viewport.height - 20) / visual.height);
+            var imageSize = new Vector2(visual.width * fit, visual.height * fit) * referenceZoom;
+            if (input.type == EventType.ScrollWheel && viewport.Contains(input.mousePosition))
+            {
+                referenceZoom = Mathf.Clamp(referenceZoom * Mathf.Pow(1.12f, -input.delta.y), 1, 7);
+                input.Use();
+                imageSize = new Vector2(visual.width * fit, visual.height * fit) * referenceZoom;
+            }
+            if (!Mathf.Approximately(referenceZoom, previousZoom))
+                referenceScroll = (referenceScroll + viewport.size * .5f) * (referenceZoom / previousZoom) - viewport.size * .5f;
+            if (input.type == EventType.MouseDrag && input.button == 0 && viewport.Contains(input.mousePosition))
+            {
+                referenceScroll -= input.delta;
+                input.Use();
+            }
+            var content = new Rect(0, 0, Mathf.Max(viewport.width - 20, imageSize.x), Mathf.Max(viewport.height - 20, imageSize.y));
+            referenceScroll.x = Mathf.Clamp(referenceScroll.x, 0, Mathf.Max(0, content.width - viewport.width + 20));
+            referenceScroll.y = Mathf.Clamp(referenceScroll.y, 0, Mathf.Max(0, content.height - viewport.height + 20));
+            referenceScroll = GUI.BeginScrollView(viewport, referenceScroll, content);
+            GUI.DrawTexture(new Rect((content.width - imageSize.x) * .5f, (content.height - imageSize.y) * .5f,
+                imageSize.x, imageSize.y), visual, ScaleMode.ScaleToFit);
+            GUI.EndScrollView();
+            GUI.Label(new Rect(20, Screen.height - 32, Screen.width - 40, 26),
+                "Molette pour zoomer · Maintenir et glisser pour parcourir l’image · Échap pour fermer", textStyle);
         }
 
         private static string LibraryStateLabel(ParchmentRecord record)

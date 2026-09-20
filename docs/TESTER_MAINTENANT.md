@@ -1,6 +1,17 @@
 # Tester le lecteur actuel
 
-## Parcours D15 / 1.5.0
+## Parcours D16 / 1.6.0 — planche d’animation
+
+Ouvrir **Palimpseste Spell Lab** depuis le raccourci Bureau actualisé. L’état réel du service et de son installation figure dans [le point de reprise](NEXT_ACTIONS.md).
+
+1. Dessiner **un nouveau parchemin**, avec autant de traits que souhaité, puis cliquer **Dessin terminé**.
+2. Lire la description et attendre la **planche VFX** : APPARITION, STABLE, DISPARITION, sept cases numérotées par ligne. L’agrandir pour examiner les détails ; molette pour zoomer et glisser pour se déplacer.
+3. Laisser la recherche de ressources, la construction et la critique Pro se terminer, puis ouvrir le laboratoire et lancer le sort dans l’arène.
+4. Comparer la formation, le mouvement actif et la fin au texte et à la planche. Donner son verdict et les corrections souhaitées.
+
+La planche est une référence artistique du sort, pas une animation préenregistrée affichée dans le laboratoire. Les anciens parchemins conservent leur image et leur sort ; un nouveau dessin est nécessaire pour essayer D16. Aucun essai de cette version n’a été effectué à la place du créateur.
+
+## Historique — parcours D15 / 1.5.0
 
 Le Player 1.5.0 a été construit et empaqueté. L'état d'installation du service est indiqué dans [le point de reprise](NEXT_ACTIONS.md) et [la preuve D15](../evidence/public/backend/behavior-d15.json).
 

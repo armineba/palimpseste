@@ -25,11 +25,13 @@ namespace Palimpseste.Game.Bootstrap
     {
         public const string Argument = "--palimpseste-visual-capture";
         private const int Resolution = 1024;
+        private const int BandWidth = 2048, BandHeight = 320, CellPixels = 288;
         private string inputDirectory, outputDirectory, packetHash;
         private CompiledSpell packet;
         private readonly List<GameObject> carriers = new List<GameObject>();
         private readonly List<object> frames = new List<object>();
         private readonly List<object> activeSamples = new List<object>();
+        private readonly List<object> phaseSamples = new List<object>();
         private Camera captureCamera;
         private RenderPipeline.StandardRequest renderRequest;
         private RenderTexture target;
@@ -85,6 +87,13 @@ namespace Palimpseste.Game.Bootstrap
         {
             LoadVerifiedPacket();
             CreateStage();
+            if (packet.visual_reference.animation_sheet != null)
+            {
+                var sheets = CaptureAnimationSheets();
+                while (sheets.MoveNext()) yield return sheets.Current;
+            }
+            else
+            {
             BuildComposition();
             FitCamera();
             var introDuration = packet.plan.nodes.Max(node => node.appearance.lifecycle.intro.duration_ms) / 1000f;
@@ -152,6 +161,7 @@ namespace Palimpseste.Game.Bootstrap
             while (Time.time - phaseStarted < expirationDelay) yield return null;
             yield return null;
             Capture("expiration");
+            }
 
             var unchanged = packetHash == ParchmentStore.Hash(File.ReadAllBytes(Path.Combine(inputDirectory,"spell.json")));
             if (!unchanged) throw new InvalidDataException("Input packet changed during visual capture");
@@ -159,6 +169,159 @@ namespace Palimpseste.Game.Bootstrap
             finished = true;
             Debug.Log("PALIMPSESTE_VISUAL_CAPTURE_OK " + packetHash);
             Application.Quit(0);
+        }
+
+        private IEnumerator CaptureAnimationSheets()
+        {
+            BuildComposition();
+            FitCamera();
+            // FPS remains a wall-clock measurement of completed GPU work.
+            // It is separate from the controlled presentation clock below.
+            Time.captureDeltaTime = 0;
+            RenderAndReadback();
+            var measuredStart = System.Diagnostics.Stopwatch.GetTimestamp();
+            while (ElapsedSeconds(measuredStart) < .75)
+            {
+                yield return null;
+                RenderAndReadback();
+                measuredFrames++;
+            }
+            measuredSeconds = ElapsedSeconds(measuredStart);
+            ClearComposition();
+            Time.captureDeltaTime = 1f / 120f;
+            yield return null;
+            BuildComposition();
+            var introDuration = InitialNodes().Max(node => node.appearance.lifecycle.intro.duration_ms) / 1000f;
+            var stableDuration = InitialNodes().Max(node => node.appearance.lifecycle.active.period_ms) / 1000f;
+            var appearance = CaptureBand("appearance",introDuration);
+            while (appearance.MoveNext()) yield return appearance.Current;
+            var active = CaptureBand("active",stableDuration);
+            while (active.MoveNext()) yield return active.Current;
+            var contact = CaptureBand("contact",BeginSheetEnding(true));
+            while (contact.MoveNext()) yield return contact.Current;
+
+            // Expiration starts from an independent replay of the same fully
+            // formed composition. The camera never moves between any cells.
+            ClearComposition();
+            Time.captureDeltaTime = 1f / 120f;
+            yield return null;
+            BuildComposition();
+            var replayStarted = Time.time;
+            var replay = AdvancePresentationTo(replayStarted,introDuration + stableDuration);
+            while (replay.MoveNext()) yield return replay.Current;
+            var expiration = CaptureBand("expiration",BeginSheetEnding(false));
+            while (expiration.MoveNext()) yield return expiration.Current;
+            Time.captureDeltaTime = 0;
+        }
+
+        private IEnumerable<SpellNode> InitialNodes() => packet.plan.nodes.Where(node =>
+            node.activation.parent_id == null || node.activation.@event == "spawn" || node.activation.@event == "tick");
+
+        private IEnumerator AdvancePresentationTo(float started, float requestedSeconds)
+        {
+            // A 100ms entrance still receives all seven true rendered poses.
+            // PNG encoding and GPU readback never advance the spell's clock.
+            // Substeps also integrate particles instead of jumping their age.
+            while (Time.time - started < requestedSeconds - .000005f)
+            {
+                Time.captureDeltaTime = Mathf.Min(1f / 120f,requestedSeconds - (Time.time - started));
+                yield return null;
+            }
+        }
+
+        private IEnumerator CaptureBand(string phase, float duration)
+        {
+            var started = Time.time;
+            var samples = new List<object>();
+            var band = new Color32[BandWidth * BandHeight];
+            for (var pixel = 0; pixel < band.Length; pixel++) band[pixel] = new Color32(12,17,25,255);
+            var instants = SpellAnimationSheetLimits.SampleTimesMilli;
+            for (var index = 0; index < instants.Length; index++)
+            {
+                var requested = duration * instants[index] / 1000f;
+                var advance = AdvancePresentationTo(started,requested);
+                while (advance.MoveNext()) yield return advance.Current;
+                var observed = Time.time - started;
+                var file = phase + "_" + index + ".png";
+                // Empty start/end poses are authored lifecycle states. Stable
+                // cells and every intermediate pose still require real detail.
+                var allowEmpty = phase != "active" && (index == 0 || index == instants.Length - 1);
+                var pixels = Capture(phase,file,false,allowEmpty);
+                PlaceBandCell(band,pixels,index);
+                samples.Add(new { index,normalized_milli = instants[index],time_seconds = observed,
+                    requested_time_seconds = requested,file,
+                    sha256 = ParchmentStore.Hash(File.ReadAllBytes(Path.Combine(outputDirectory,file))) });
+            }
+            var texture = new Texture2D(BandWidth,BandHeight,TextureFormat.RGB24,false,false);
+            byte[] bytes;
+            try { texture.SetPixels32(band); texture.Apply(false,false); bytes = texture.EncodeToPNG(); }
+            finally { Destroy(texture); }
+            var bandFile = phase + ".png";
+            EnsureOrdinaryPath(Path.Combine(outputDirectory,bandFile));
+            File.WriteAllBytes(Path.Combine(outputDirectory,bandFile),bytes);
+            frames.Add(new { phase,file = bandFile,sha256 = ParchmentStore.Hash(bytes),width_px = BandWidth,height_px = BandHeight });
+            phaseSamples.Add(new { phase,duration_seconds = duration,samples });
+        }
+
+        private static void PlaceBandCell(Color32[] band, Color32[] pixels, int index)
+        {
+            var cellStart = index * BandWidth / 7;
+            var cellEnd = (index + 1) * BandWidth / 7;
+            var left = cellStart + (cellEnd - cellStart - CellPixels) / 2;
+            for (var y = 0; y < CellPixels; y++)
+                for (var x = 0; x < CellPixels; x++)
+                {
+                    // Bilinear resampling preserves the complete square view.
+                    var sx = (x + .5f) * Resolution / CellPixels - .5f;
+                    var sy = (y + .5f) * Resolution / CellPixels - .5f;
+                    var x0 = Mathf.Clamp(Mathf.FloorToInt(sx),0,Resolution - 2);
+                    var y0 = Mathf.Clamp(Mathf.FloorToInt(sy),0,Resolution - 2);
+                    var a = Color.Lerp(pixels[y0 * Resolution + x0],pixels[y0 * Resolution + x0 + 1],sx - x0);
+                    var b = Color.Lerp(pixels[(y0 + 1) * Resolution + x0],pixels[(y0 + 1) * Resolution + x0 + 1],sx - x0);
+                    band[y * BandWidth + left + x] = Color.Lerp(a,b,sy - y0);
+                }
+            var border = new Color32(128,104,67,255);
+            for (var y = 0; y < BandHeight; y++) { band[y * BandWidth + cellStart] = border; band[y * BandWidth + cellEnd - 1] = border; }
+            for (var x = cellStart; x < cellEnd; x++) { band[CellPixels * BandWidth + x] = border; band[(BandHeight - 1) * BandWidth + x] = border; }
+            // Small fixed glyphs avoid platform fonts, UI cameras or text
+            // supplied by a generated packet inside the proof compositor.
+            var glyphs = new[] { "010110010010111", "111001111100111", "111001111001111", "101101111001001", "111100111001111", "111100111101111", "111001010010010" };
+            var glyph = glyphs[index];
+            var center = (cellStart + cellEnd) / 2;
+            for (var row = 0; row < 5; row++)
+                for (var column = 0; column < 3; column++)
+                    if (glyph[row * 3 + column] == '1')
+                        for (var dy = 0; dy < 3; dy++)
+                            for (var dx = 0; dx < 3; dx++)
+                                band[(CellPixels + 8 + (4 - row) * 3 + dy) * BandWidth + center - 4 + column * 3 + dx] = new Color32(234,213,174,255);
+        }
+
+        private float BeginSheetEnding(bool contact)
+        {
+            var duration = .1f;
+            foreach (var host in carriers)
+            {
+                if (host == null) continue;
+                var visual = host.GetComponent<ImageConstructedSpellVisual>();
+                if (visual == null) continue;
+                var endingDuration = visual.RetireForCause(contact);
+                host.GetComponent<SpellVfxComposition>()?.DissolveWake(endingDuration);
+                duration = Mathf.Max(duration,endingDuration);
+            }
+            foreach (var node in packet.plan.nodes)
+            {
+                if (node.activation.parent_id == null) continue;
+                var trigger = node.activation.@event;
+                if (!(contact ? trigger == "hit" || trigger == "block" || trigger == "trigger" : trigger == "expire")) continue;
+                CreateNode(node);
+                var host = carriers[carriers.Count - 1];
+                var visual = host.GetComponent<ImageConstructedSpellVisual>();
+                var intro = visual.RemainingEntrance;
+                var total = visual.FinishEntranceThenRetire(contact);
+                host.GetComponent<SpellVfxComposition>()?.DissolveWake(Mathf.Max(.1f,total - intro),intro);
+                duration = Mathf.Max(duration,total);
+            }
+            return duration;
         }
 
         private void LoadVerifiedPacket()
@@ -343,7 +506,7 @@ namespace Palimpseste.Game.Bootstrap
             return Mathf.Max(.025f,minimumDuration * .35f);
         }
 
-        private Color32[] Capture(string phase, string filename = null, bool includePhase = true)
+        private Color32[] Capture(string phase, string filename = null, bool includePhase = true, bool allowUniform = false)
         {
             RenderAndReadback();
             var pixels = readback.GetPixels();
@@ -361,7 +524,7 @@ namespace Palimpseste.Game.Bootstrap
                 pixels[i] = QualitySettings.activeColorSpace == ColorSpace.Linear ? color.gamma : color;
             }
             var variation = maximum - minimum;
-            if (Mathf.Max(variation.x,Mathf.Max(variation.y,variation.z)) < .0001f)
+            if (!allowUniform && Mathf.Max(variation.x,Mathf.Max(variation.y,variation.z)) < .0001f)
                 throw new InvalidDataException("GPU capture is uniform; no visible spell rendered: " + phase);
             srgb.SetPixels(pixels); srgb.Apply(false,false);
             var bytes = srgb.EncodeToPNG();
@@ -423,7 +586,14 @@ namespace Palimpseste.Game.Bootstrap
                 capture_method = "URP StandardRequest for one camera, including full frame initialization; separate precompiled three-quarter stage; carrier positions fixed; real lifecycle animation; independent contact and expiration replay",
                 completed_camera_renders = completedCameraRenders,
                 active_samples = activeSamples,
-                active_layout = "2x2 temporal contact sheet; chronological left-to-right, top-to-bottom; actual times in active_samples",
+                phase_samples = phaseSamples,
+                animation_sheet = packet?.visual_reference?.animation_sheet,
+                sample_clock = packet?.visual_reference?.animation_sheet != null
+                    ? "Unity presentation simulation clock; Time.captureDeltaTime substeps at most 1/120s, shortened to requested instants; GPU/PNG cost excluded from animation time; not physical elapsed time"
+                    : "Unity elapsed presentation time",
+                active_layout = packet?.visual_reference?.animation_sheet != null
+                    ? "Four independent 2048x320 phase bands; seven numbered square cells each, chronological left-to-right; 1024x1024 source poses in phase_samples; target disappearance selects animation_sheet.ending_basis"
+                    : "2x2 temporal contact sheet; chronological left-to-right, top-to-bottom; actual times in active_samples",
                 color_encoding = QualitySettings.activeColorSpace == ColorSpace.Linear ? "Linear HDR readback converted to display sRGB" : "Gamma project readback retained",
                 camera_position = captureCamera == null ? null : new[] { captureCamera.transform.position.x,captureCamera.transform.position.y,captureCamera.transform.position.z },
                 camera_field_of_view = captureCamera == null ? 0 : captureCamera.fieldOfView,
@@ -436,6 +606,7 @@ namespace Palimpseste.Game.Bootstrap
         {
             if (finished) return;
             finished = true;
+            Time.captureDeltaTime = 0;
             try { WriteManifest(false,error); } catch { /* Keep the original failure in the private process log. */ }
             Debug.LogError("PALIMPSESTE_VISUAL_CAPTURE_FAILED " + error);
             Application.Quit(2);
@@ -449,6 +620,7 @@ namespace Palimpseste.Game.Bootstrap
 
         private void OnDestroy()
         {
+            Time.captureDeltaTime = 0;
             RenderPipelineManager.endCameraRendering -= OnCameraRendered;
             ClearComposition();
             if (target != null) { target.Release(); Destroy(target); }
