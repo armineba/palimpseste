@@ -151,6 +151,7 @@ namespace Palimpseste.Game.SpellRuntime
         public long DamageMilli => runtime?.DamageMilli ?? 0;
         public int Impulses => runtime?.Impulses ?? 0;
         public bool Ready => runtime != null;
+        public bool InputSuppressed { get; set; }
         public string SpellTitle => spell?.display?.title ?? "Sort";
 
         public bool Cast(Vector3 aimPoint)
@@ -278,6 +279,7 @@ namespace Palimpseste.Game.SpellRuntime
         private void Update()
         {
             if (runtime == null) return;
+            if (InputSuppressed) return;
             if (Input.GetMouseButton(1)) { yaw += Input.GetAxis("Mouse X") * 3f; pitch = Mathf.Clamp(pitch - Input.GetAxis("Mouse Y") * 3f, 12f, 78f); }
             distance = Mathf.Clamp(distance - Input.mouseScrollDelta.y, 9, 30);
             UpdateCamera();

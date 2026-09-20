@@ -1,12 +1,18 @@
 # Recette M7 — dossier à remplir par les créateurs
 
-Ce protocole applique le cahier et `contracts/human-review.schema.json`. Il ne constitue aucune approbation : aucun cas issu de Luna ni verdict humain n'a été enregistré au 19 septembre 2026.
+Ce protocole applique le cahier et `contracts/human-review.schema.json`. Il ne constitue aucune approbation. Le 20 septembre 2026, l'utilisateur a rejeté dans la conversation la lecture A « faisceau de feu visuel, sans cible ni dégâts » d'un trait rouge-brun diagonal. Ce verdict oriente le recalibrage ; il n'a pas été soumis comme revue signée à l'API et ne vaut pas campagne M7.
 
 ## Préparer la série
 
 1. Authentifier le compte Codex dédié au worker, puis exécuter le doctor actif avec les deux images de la capture Unity. Garder le JSON complet, son SHA-256 et les dossiers de tentative hors du dépôt public. Ne lever la porte `PALIMPSESTE_EFFORT_VERIFIED` qu'après vérification du modèle `gpt-5.6-luna`, de l'effort `max` **retournés** et des restrictions d'outils observées pour A et B.
 2. Figer un commit, les hashes des deux archives, les versions Unity/Codex, les prompts A/B, les contrats et le catalogue. Consigner ces identifiants dans le dossier privé de recette. Toute modification de l'un d'eux ouvre une nouvelle campagne.
 3. Conserver séparément 30 dessins de conception et 30 dessins inédits de recette. Dans ces derniers, prévoir dix paires de deux auteurs à intention proche, cinq dessins maladroits ou partiels et cinq compositions à plusieurs étapes. Enregistrer l'intention avant de lire la description de A. Ne pas entraîner ou ajuster les prompts sur les 30 cas inédits.
+
+Le cas rejeté sert au corpus de conception : recueillir d'abord l'intention
+attendue, corriger le prompt A dans une **nouvelle version**, comparer au plus
+deux configurations sur les mêmes dessins, puis archiver le nouvel appel et
+son verdict. Le formulaire de retour du laboratoire recueille un avis ; il
+ne modifie pas automatiquement le prompt, ni un parchemin déjà figé.
 
 ## Pour chaque cas inédit
 

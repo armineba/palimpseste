@@ -39,6 +39,9 @@ namespace Palimpseste.Game.Bootstrap
         private bool busy;
         private string spellJson;
         private SpellDescriptionView descriptionView;
+        private string feedbackDraft = "";
+        private bool feedbackBusy;
+        private bool showLabFeedback;
         private readonly HashSet<string> pollingJobs = new HashSet<string>(StringComparer.Ordinal);
         private Vector2 interpretationScroll;
         private SpellLab lab;
@@ -329,6 +332,9 @@ namespace Palimpseste.Game.Bootstrap
                      !pollingJobs.Contains(selected.job_id) &&
                      GUI.Button(new Rect(r.x + 211, r.yMax - 66, 188, 42), "Actualiser", buttonStyle))
                 StartCoroutine(Poll(selected));
+            if (descriptionView != null && spellJson == null &&
+                GUI.Button(new Rect(r.x + 415, r.yMax - 66, 204, 42), "Lire et signaler", buttonStyle))
+                page = Page.Interpretation;
             if (spellJson != null && descriptionView != null &&
                 GUI.Button(new Rect(r.xMax - 211, r.yMax - 66, 187, 42), "Voir le sort", buttonStyle))
                 page = Page.Card;
@@ -443,8 +449,76 @@ namespace Palimpseste.Game.Bootstrap
         {
             if (selected == null) { page = Page.Library; return; }
             var area = new Rect(Screen.width * .12f, 120, Screen.width * .76f, Screen.height - 202);
-            DrawInterpretationPanel(area);
-            if (GUI.Button(new Rect(area.x + 15, area.yMax + 14, 190, 42), "Retour au sort", buttonStyle)) page = Page.Card;
+            DrawInterpretationPanel(new Rect(area.x, area.y, area.width, area.height - 190));
+            DrawFeedbackForm(new Rect(area.x + 15, area.yMax - 182, area.width - 30, 177));
+            if (GUI.Button(new Rect(area.x + 15, area.yMax + 14, 190, 42),
+                    spellJson == null ? "Retour au suivi" : "Retour au sort", buttonStyle))
+                page = spellJson == null ? Page.Processing : Page.Card;
+        }
+
+        private void DrawFeedbackForm(Rect area)
+        {
+            if (selected == null || descriptionView == null || string.IsNullOrEmpty(selected.job_id) ||
+                string.IsNullOrEmpty(selected.description_sha256)) return;
+            GUI.Label(new Rect(area.x, area.y, area.width, 29), "Signaler une lecture incorrecte", textStyle);
+            var pending = !string.IsNullOrEmpty(selected.feedback_key);
+            var previousEnabled = GUI.enabled;
+            GUI.enabled = previousEnabled && !pending && !feedbackBusy;
+            feedbackDraft = GUI.TextArea(new Rect(area.x, area.y + 31, area.width, 72),
+                feedbackDraft ?? "", 2000);
+            GUI.enabled = previousEnabled;
+            var message = selected.feedback_sent
+                ? "Retour enregistré. Le sort de ce parchemin reste inchangé."
+                : pending
+                    ? "Retour conservé sur cet appareil. Réessayez la transmission si nécessaire."
+                    : "Décrivez ce que le dessin devait évoquer. Une future version de Luna pourra en tenir compte.";
+            GUI.Label(new Rect(area.x, area.y + 107, area.width, 34), message, textStyle);
+            GUI.enabled = previousEnabled && api.Configured && !feedbackBusy && !selected.feedback_sent &&
+                          (pending || !string.IsNullOrWhiteSpace(feedbackDraft));
+            if (GUI.Button(new Rect(area.x, area.y + 139, Mathf.Min(area.width, 255), 36),
+                    pending ? "Réessayer l'envoi" : "Envoyer ce retour", buttonStyle))
+                StartCoroutine(SendFeedback(selected));
+            GUI.enabled = previousEnabled;
+        }
+
+        private IEnumerator SendFeedback(ParchmentRecord record)
+        {
+            if (feedbackBusy || !api.Configured || record == null || record.feedback_sent ||
+                string.IsNullOrEmpty(record.job_id) || string.IsNullOrEmpty(record.description_sha256)) yield break;
+            if (string.IsNullOrEmpty(record.feedback_key))
+            {
+                var correction = (feedbackDraft ?? "").Trim();
+                if (correction.Length is < 1 or > 2000) yield break;
+                record.feedback_key = Guid.NewGuid().ToString("N");
+                record.feedback_description_sha256 = record.description_sha256;
+                record.feedback_correction = correction;
+                store.Save(record);
+            }
+            if (record.feedback_description_sha256 != record.description_sha256)
+            {
+                notice = "La lecture conservée a changé ; ce retour ne peut pas être transmis.";
+                yield break;
+            }
+            feedbackBusy = true;
+            InterpretationFeedbackDto response = null;
+            string error = null;
+            yield return api.SendInterpretationFeedback(record.job_id, record.feedback_description_sha256,
+                record.feedback_correction, record.feedback_key,
+                (value, failure) => { response = value; error = failure; });
+            feedbackBusy = false;
+            if (error != null || response == null || !response.recorded ||
+                response.job_id != record.job_id ||
+                response.description_sha256 != record.feedback_description_sha256 ||
+                !Guid.TryParseExact(response.feedback_id, "N", out _))
+            {
+                notice = "Retour conservé sur cet appareil ; envoi à réessayer. " +
+                         (error ?? "Réponse du laboratoire incohérente.");
+                yield break;
+            }
+            record.feedback_id = response.feedback_id;
+            record.feedback_sent = true;
+            store.Save(record);
+            notice = "Lecture incorrecte signalée. Ce sort reste inchangé ; le laboratoire utilisera ce retour pour ses prochaines versions.";
         }
 
         private Texture2D LocalCapturePreview()
@@ -498,7 +572,9 @@ namespace Palimpseste.Game.Bootstrap
 
         private void DrawLabHud()
         {
-            GUI.DrawTexture(new Rect(20, 105, 370, 275), labHudBackground);
+            if (lab != null) lab.InputSuppressed = showLabFeedback;
+            if (showLabFeedback) { DrawLabFeedback(); return; }
+            GUI.DrawTexture(new Rect(20, 105, 370, 345), labHudBackground);
             GUI.DrawTexture(new Rect(20, 105, 370, 3), goldBar);
             GUI.Label(new Rect(37, 120, 340, 32), "Scène d'épreuve", titleStyle);
             GUI.Label(new Rect(37, 160, 340, 30), lab == null ? "" : lab.SpellTitle, textStyle);
@@ -509,7 +585,13 @@ namespace Palimpseste.Game.Bootstrap
                 page = Page.Library;
                 SceneManager.LoadScene("Bootstrap");
             }
-            GUI.Label(new Rect(37, 336, 340, 45), "Clic : lancer · clic droit : orbiter\nMolette : zoom · RAZ : annuler", textStyle);
+            GUI.Label(new Rect(37, 381, 340, 45), "Clic : lancer · clic droit : orbiter\nMolette : zoom · RAZ : annuler", textStyle);
+            if (descriptionView != null && GUI.Button(new Rect(37, 335, 325, 38),
+                    "Lire ou signaler l'interprétation", buttonStyle))
+            {
+                showLabFeedback = true;
+                if (lab != null) lab.InputSuppressed = true;
+            }
             var legendX = Screen.width - 209;
             GUI.DrawTexture(new Rect(legendX, 105, 186, 124), labHudBackground);
             GUI.DrawTexture(new Rect(legendX, 105, 186, 3), goldBar);
@@ -520,6 +602,29 @@ namespace Palimpseste.Game.Bootstrap
             GUI.Label(new Rect(legendX + 34, 173, 135, 25), "Allié", textStyle);
             GUI.DrawTexture(new Rect(legendX + 98, 179, 11, 11), objectSwatch);
             GUI.Label(new Rect(legendX + 116, 173, 58, 25), "Objet", textStyle);
+        }
+
+        private void DrawLabFeedback()
+        {
+            var area = new Rect(Screen.width * .08f, 105, Screen.width * .84f, Screen.height - 128);
+            GUI.Box(area, GUIContent.none, panelStyle);
+            var previewWidth = Mathf.Min(250, area.width * .27f);
+            var preview = LocalCapturePreview();
+            if (preview != null)
+                GUI.DrawTexture(new Rect(area.x + 16, area.y + 22, previewWidth - 20, previewWidth - 20),
+                    preview, ScaleMode.ScaleToFit);
+            GUI.Label(new Rect(area.x + 16, area.y + previewWidth + 5, previewWidth - 20, 78),
+                "Votre dessin et la lecture de Luna A", textStyle);
+            var rightX = area.x + previewWidth + 10;
+            var rightWidth = area.width - previewWidth - 27;
+            DrawInterpretationPanel(new Rect(rightX, area.y + 12, rightWidth, area.height - 214));
+            DrawFeedbackForm(new Rect(rightX + 12, area.yMax - 193, rightWidth - 24, 177));
+            if (GUI.Button(new Rect(area.x + 16, area.yMax - 50, previewWidth - 20, 36),
+                    "Retour au sort", buttonStyle))
+            {
+                showLabFeedback = false;
+                if (lab != null) lab.InputSuppressed = false;
+            }
         }
 
         private IEnumerator BootstrapSession(bool openDrawing)
@@ -704,6 +809,8 @@ namespace Palimpseste.Game.Bootstrap
             selected = record;
             interpretationScroll = Vector2.zero;
             descriptionView = null;
+            feedbackDraft = record.feedback_correction ?? "";
+            showLabFeedback = false;
             if (record.server_issued || !string.IsNullOrEmpty(record.job_id))
                 DescriptionCache.TryLoad(record, store.DirectoryFor(record), out descriptionView);
             canvas = store.Replay(record);

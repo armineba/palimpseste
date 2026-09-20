@@ -23,6 +23,15 @@ namespace Palimpseste.Game.Service
     }
     [Serializable] public sealed class InvitationRequestDto { public string invitation_code; }
     [Serializable] public sealed class SessionDto { public string token; }
+    [Serializable] public sealed class InterpretationFeedbackRequestDto
+    {
+        public string description_sha256, verdict = "incorrect", correction;
+    }
+    [Serializable] public sealed class InterpretationFeedbackDto
+    {
+        public string feedback_id, job_id, description_sha256;
+        public bool recorded;
+    }
 
     [Serializable]
     public sealed class DrawingCaptureDto
@@ -181,6 +190,27 @@ namespace Palimpseste.Game.Service
             {
                 yield return req.SendWebRequest();
                 done(req.result == UnityWebRequest.Result.Success ? JsonUtility.FromJson<JobDto>(req.downloadHandler.text) : null, Error(req));
+            }
+        }
+
+        public IEnumerator SendInterpretationFeedback(string jobId, string descriptionHash,
+            string correction, string key, Action<InterpretationFeedbackDto, string> done)
+        {
+            var payload = new InterpretationFeedbackRequestDto
+            {
+                description_sha256 = descriptionHash, correction = correction
+            };
+            using (var req = Request("POST", "/v1/jobs/" + PathId(jobId) + "/interpretation-feedback",
+                       Json(JsonUtility.ToJson(payload)), "application/json", key))
+            {
+                yield return req.SendWebRequest();
+                InterpretationFeedbackDto response = null;
+                if (req.result == UnityWebRequest.Result.Success && req.responseCode == 201)
+                {
+                    try { response = JsonUtility.FromJson<InterpretationFeedbackDto>(req.downloadHandler.text); }
+                    catch (ArgumentException) { }
+                }
+                done(response, response == null ? Error(req) ?? "Retour non enregistré par le laboratoire" : null);
             }
         }
 

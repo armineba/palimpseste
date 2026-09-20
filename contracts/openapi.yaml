@@ -277,6 +277,73 @@ paths:
           type: string
           minLength: 1
           maxLength: 80
+  /v1/jobs/{id}/interpretation-feedback:
+    post:
+      operationId: submitInterpretationFeedback
+      summary: Enregistrer le verdict humain sur la lecture A de son propre dessin
+      description: Retour de laboratoire pour calibrer une future version du prompt. Ne relance pas Luna et ne modifie pas le parchemin ou le sort.
+      tags:
+      - Boucle de sorts
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9a-f]{32}$'
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 16
+          maxLength: 120
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description_sha256:
+                  type: string
+                  pattern: '^[0-9a-f]{64}$'
+                verdict:
+                  type: string
+                  enum: [correct, incorrect]
+                correction:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+              required: [description_sha256, verdict, correction]
+              additionalProperties: false
+      responses:
+        '201':
+          description: Retour attaché à la description A figée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feedback_id:
+                    type: string
+                    pattern: '^[0-9a-f]{32}$'
+                  job_id:
+                    type: string
+                    pattern: '^[0-9a-f]{32}$'
+                  description_sha256:
+                    type: string
+                    pattern: '^[0-9a-f]{64}$'
+                  recorded:
+                    const: true
+                required: [feedback_id, job_id, description_sha256, recorded]
+                additionalProperties: false
+        default:
+          description: Erreur contrôlée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /v1/jobs/{id}/resume:
     post:
       operationId: resumeJob

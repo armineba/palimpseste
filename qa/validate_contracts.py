@@ -200,7 +200,8 @@ def api_structure():
         elif isinstance(node,list):
             for val in node: visit(val)
     visit(data)
-    ensure(len(ids)==17, 'Nombre d’opérations API modifié ; mettre à jour le contrôle explicite')
+    ensure(len(ids)==18 and 'submitInterpretationFeedback' in ids,
+           'Nombre d’opérations API modifié ; mettre à jour le contrôle explicite')
     capabilities = data['components']['schemas']['Capabilities']
     ensure('principal_id' in capabilities['required'] and
            capabilities['properties']['principal_id']['pattern'] == '^[0-9a-f]{32}$',

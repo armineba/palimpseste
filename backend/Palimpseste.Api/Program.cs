@@ -95,6 +95,7 @@ app.MapPost("/v1/parchments", ApiHandlers.AllocateParchment);
 app.MapPost("/v1/parchments/{id}/begin", ApiHandlers.BeginParchment);
 app.MapPut("/v1/parchments/{id}/capture", ApiHandlers.CommitCapture).DisableAntiforgery();
 app.MapGet("/v1/jobs/{id}", ApiHandlers.GetJob);
+app.MapPost("/v1/jobs/{id}/interpretation-feedback", ApiHandlers.SubmitInterpretationFeedback);
 app.MapPost("/v1/jobs/{id}/resume", ApiHandlers.ResumeJob);
 app.MapGet("/v1/spells/{id}", ApiHandlers.GetSpell);
 app.MapGet("/v1/artifacts/{id}", ApiHandlers.GetArtifact);
