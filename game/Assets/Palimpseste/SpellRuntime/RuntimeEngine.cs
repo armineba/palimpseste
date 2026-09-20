@@ -37,7 +37,7 @@ namespace Palimpseste.Game.SpellRuntime
         private readonly LabReceiver casterReceiver;
         private readonly List<LabReceiver> targets;
         private readonly List<CarrierState> active = new List<CarrierState>();
-        private readonly List<GameObject> retiredBeamVisuals = new List<GameObject>();
+        private readonly List<GameObject> retiredVisuals = new List<GameObject>();
         private readonly List<ScheduledCarrier> scheduled = new List<ScheduledCarrier>();
         private readonly Dictionary<string, int> activationCounts = new Dictionary<string, int>();
         private int nextInstance, nextCast;
@@ -112,13 +112,16 @@ namespace Palimpseste.Game.SpellRuntime
                         if (active[i].node.carrier == "beam" && Option(active[i].node.options.lifetime_ticks, 1) == 1)
                         {
                             CarrierVisual.KeepOneTickBeamVisible(visual);
-                            retiredBeamVisuals.Add(visual);
+                            retiredVisuals.Add(visual);
                         }
+                        else if (visual.TryGetComponent<SemanticSpellVisual>(out var semantic) &&
+                            semantic.RetireWithDissolvingWake())
+                            retiredVisuals.Add(visual);
                         else UnityEngine.Object.Destroy(visual);
                     }
                     active.RemoveAt(i);
                 }
-            retiredBeamVisuals.RemoveAll(visual => visual == null);
+            retiredVisuals.RemoveAll(visual => visual == null);
             foreach (var target in targets)
             {
                 if (target == null) continue;
@@ -130,8 +133,8 @@ namespace Palimpseste.Game.SpellRuntime
         public void CancelAll()
         {
             foreach (var state in active) if (state.visual != null) UnityEngine.Object.Destroy(state.visual);
-            foreach (var visual in retiredBeamVisuals) if (visual != null) UnityEngine.Object.Destroy(visual);
-            retiredBeamVisuals.Clear();
+            foreach (var visual in retiredVisuals) if (visual != null) UnityEngine.Object.Destroy(visual);
+            retiredVisuals.Clear();
             active.Clear(); scheduled.Clear(); activationCounts.Clear();
             Hits = Impulses = Statuses = StructuresBroken = 0; DamageMilli = HealMilli = 0;
         }

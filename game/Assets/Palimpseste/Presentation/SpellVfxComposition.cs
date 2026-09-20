@@ -21,9 +21,14 @@ namespace Palimpseste.Game.SpellRuntime
         private readonly List<Material> materials = new List<Material>();
         private readonly List<float> opacities = new List<float>();
         private readonly List<Transform> ribbons = new List<Transform>();
+        private readonly List<Transform> spectralVeils = new List<Transform>();
+        private float spectralScale;
         private readonly List<ParticleSystem> particleLayers = new List<ParticleSystem>(4);
         private readonly List<Material> styledMaterials = new List<Material>();
-        private Transform energyRoot, groundRoot, seal, corona, skirt, atmosphere, charge, chargeCorona, shockwave, secondWave, pillar;
+        private Transform energyRoot, groundRoot, seal, corona, skirt, atmosphere, charge, chargeCorona, shockwave, secondWave, pillar, contactFlash;
+        private Material contactFlashMaterial;
+        private bool dissolving;
+        private float dissolveStarted;
         private Material chargeMaterial, chargeCoronaMaterial;
         private Light localLight;
         private Mesh quad;
@@ -74,12 +79,16 @@ namespace Palimpseste.Game.SpellRuntime
                 // Wide translucent fabric with actual folds and torn edges,
                 // not a sphere enclosing the interpreted character.
                 var cloth = ClothMaterial(true);
-                for (var i = 0; i < 4; i++)
+                spectralScale = Mathf.Clamp(physicalSize, 1.1f, 1.6f);
+                for (var i = 0; i < 6; i++)
                 {
                     var veil = Surface("Long spectral veil " + i, energyRoot,
-                        Own(Veil(i)), cloth);
-                    veil.localScale = Vector3.one * Mathf.Clamp(span, .85f, 1.45f);
+                        Own(Veil(i)), i == 0 ? cloth : ClothMaterial(true));
+                    veil.GetComponent<Renderer>().sharedMaterial.SetFloat("_Seed", .37f + i * 1.731f);
+                    veil.localScale = Vector3.one;
+                    spectralVeils.Add(veil);
                 }
+                gameObject.AddComponent<SpectralWakeMotion>().Initialize(transform, energyRoot, spectralVeils, spectralScale);
             }
             else
             {
@@ -97,7 +106,7 @@ namespace Palimpseste.Game.SpellRuntime
             }
             if (carrier == "projectile")
             {
-                AddTrail(energyRoot, spectral);
+                if (!spectral) AddTrail(energyRoot, false);
                 MakeCharge();
             }
             else if (carrier == "beam") MakeCharge();
@@ -242,25 +251,13 @@ namespace Palimpseste.Game.SpellRuntime
             var shader = Resources.Load<Shader>("SpellSpectralCloth");
             if (shader == null) throw new InvalidOperationException("SpellSpectralCloth shader missing from player");
             var result = Own(new Material(shader));
-            result.SetColor("_Color", Color.Lerp(hue, accent, .18f));
-            result.SetColor("_Accent", accent * 1.6f);
-            result.SetFloat("_Opacity", .82f);
+            result.SetColor("_Color", Color.Lerp(hue, new Color(.42f, .30f, .60f), .68f));
+            result.SetColor("_Accent", new Color(.78f, .60f, 1f) * 2.15f);
+            result.SetFloat("_Opacity", .88f);
             result.SetFloat("_Torn", torn ? 1 : 0);
             result.SetFloat("_Seed", FormSeed());
-            materials.Add(result); opacities.Add(.82f);
+            materials.Add(result); opacities.Add(.88f);
             return result;
-        }
-
-        public static Material CreateHoodMaterial(Color tint)
-        {
-            var shader = Resources.Load<Shader>("SpellSpectralCloth");
-            if (shader == null) throw new InvalidOperationException("SpellSpectralCloth shader missing from player");
-            var material = new Material(shader);
-            material.SetColor("_Color", Color.Lerp(tint, new Color(.07f,.025f,.13f), .75f));
-            material.SetColor("_Accent", Color.Lerp(tint, Color.white, .62f) * 1.7f);
-            material.SetFloat("_Opacity", .95f);
-            material.SetFloat("_Torn", 0);
-            return material;
         }
 
         private static Transform Child(string name, Transform parent)
@@ -349,6 +346,17 @@ namespace Palimpseste.Game.SpellRuntime
             shape.shapeType = groundComposition ? ParticleSystemShapeType.Circle : ParticleSystemShapeType.Sphere;
             shape.radius = span * (groundComposition ? .78f : .32f);
             shape.radiusThickness = groundComposition ? .4f : 1;
+            if (form == "spirit" && !burst)
+            {
+                // Dust belongs to the long cloth wake rather than a fountain
+                // at the head. World-space particles persist along the flight.
+                shape.shapeType = ParticleSystemShapeType.Box;
+                shape.position = new Vector3(0, .1f, -1.6f);
+                shape.scale = new Vector3(1.1f, .75f, 3.1f);
+                main.startSize = new ParticleSystem.MinMaxCurve(layer == 3 ? .6f : .018f,
+                    layer == 3 ? 1.2f : layer == 2 ? .10f : .065f);
+                emission.rateOverTime = layer == 3 ? 12 : layer == 2 ? 9 : 14;
+            }
             if (groundComposition) shape.rotation = new Vector3(90, 0, 0);
             if (!burst)
             {
@@ -359,6 +367,11 @@ namespace Palimpseste.Game.SpellRuntime
                 velocity.x = new ParticleSystem.MinMaxCurve(0, 0);
                 velocity.y = new ParticleSystem.MinMaxCurve(scale * (layer == 0 ? 1f : .2f), scale * (layer == 0 ? 2.8f : .8f));
                 velocity.z = new ParticleSystem.MinMaxCurve(0, 0);
+                if (form == "spirit")
+                {
+                    velocity.y = new ParticleSystem.MinMaxCurve(-.08f, .13f);
+                    velocity.z = new ParticleSystem.MinMaxCurve(-.48f, -.18f);
+                }
                 velocity.orbitalX = new ParticleSystem.MinMaxCurve(0, 0);
                 velocity.orbitalY = groundComposition && layer == 1
                     ? new ParticleSystem.MinMaxCurve(.7f, 1.5f)
@@ -378,7 +391,8 @@ namespace Palimpseste.Game.SpellRuntime
                 new Keyframe(.62f, layer == 3 ? 1.18f : .8f), new Keyframe(1, layer == 3 ? 1.4f : 0)));
             var renderer = particles.GetComponent<ParticleSystemRenderer>();
             renderer.sharedMaterial = StylizedMaterial(layer == 0 ? 6 : layer == 3 ? 5 : 3,
-                layer == 3 ? .13f : 1, layer == 3 ? .65f : layer == 2 ? 3.2f : 2.5f, .6f);
+                layer == 3 ? form == "spirit" ? .18f : .13f : 1,
+                layer == 3 ? form == "spirit" ? 1.2f : .65f : layer == 2 ? 3.2f : 2.5f, .6f);
             renderer.renderMode = layer == 0 ? ParticleSystemRenderMode.Stretch : ParticleSystemRenderMode.Billboard;
             if (layer == 0) { renderer.lengthScale = burst ? 3.4f : 4.5f; renderer.velocityScale = .22f; }
             renderer.shadowCastingMode = ShadowCastingMode.Off; renderer.receiveShadows = false;
@@ -453,7 +467,31 @@ namespace Palimpseste.Game.SpellRuntime
             var filaments = Surface("Burst radial filaments", root.transform, visual.Own(BurstMesh(visual.impact=="shatter")), visual.StylizedMaterial(1,.9f,3.6f,1.8f));
             filaments.localScale = Vector3.one * visual.span;
             visual.ribbons.Add(filaments);
-            if (visual.impact=="pillar" || visual.style=="holy" || visual.style=="fire" || visual.style=="arcane" || visual.style=="shadow")
+            if (visual.form == "spirit")
+            {
+                visual.energyRoot.rotation = Quaternion.LookRotation(direction.sqrMagnitude > .001f ? direction : Vector3.forward);
+                for (var i = 0; i < 7; i++)
+                {
+                    var cloth = visual.ClothMaterial(true);
+                    cloth.SetFloat("_Seed", i * 1.37f);
+                    var shard = Surface("Dispersing spectral cloth " + i, visual.energyRoot,
+                        visual.Own(SpectralBurst(i)), cloth);
+                    visual.ribbons.Add(shard);
+                }
+                visual.contactFlash = Child("Pearlescent spectral contact", visual.energyRoot);
+                visual.contactFlashMaterial = visual.StylizedMaterial(3, 1f, 7f, 1);
+                visual.contactFlashMaterial.SetColor("_Color", new Color(.87f,.74f,1f));
+                visual.contactFlashMaterial.SetColor("_AccentColor", Color.white);
+                // Crossed planes provide a contact flash visible around the
+                // impact; no dependence on the laboratory's camera pose.
+                for (var axis = 0; axis < 3; axis++)
+                {
+                    var flash = Surface("Contact radiance " + axis, visual.contactFlash, visual.quad, visual.contactFlashMaterial);
+                    flash.localRotation = axis == 0 ? Quaternion.identity : axis == 1
+                        ? Quaternion.Euler(0,90,0) : Quaternion.Euler(90,0,0);
+                }
+            }
+            else if (visual.impact=="pillar" || visual.style=="holy" || visual.style=="fire" || visual.style=="arcane" || visual.style=="shadow")
             {
                 visual.pillar = Surface("Flared impact light crown", root.transform, visual.Own(FlaredSkirt(false)), visual.StylizedMaterial(2,.72f,3.2f,1.3f));
                 visual.pillar.localScale = new Vector3(visual.span,visual.span*1.7f,visual.span);
@@ -524,11 +562,34 @@ namespace Palimpseste.Game.SpellRuntime
         public void SetPulseRadius(float radius) { pulseRadius = Mathf.Max(.01f,radius); }
         public void Arm() { armed = true; }
 
+        public void DissolveWake()
+        {
+            if (dissolving) return;
+            dissolving = true;
+            dissolveStarted = Time.time;
+            if (charge != null) charge.gameObject.SetActive(false);
+            if (chargeCorona != null) chargeCorona.gameObject.SetActive(false);
+            foreach (var particles in particleLayers)
+                particles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+        }
+
         private void Update() { TickVisuals(Time.time-born); }
 
         private void TickVisuals(float age)
         {
             for (var i = 0; i < styledMaterials.Count; i++) styledMaterials[i].SetFloat("_Age", age);
+            if (dissolving)
+            {
+                // The mechanical carrier has already retired. Its existing
+                // cloth keeps billowing while the hit flash and fragments fire.
+                var t = Mathf.Clamp01((Time.time - dissolveStarted) / .62f);
+                var envelope = 1 - Mathf.SmoothStep(0, 1, t);
+                for (var i = 0; i < materials.Count; i++)
+                    materials[i].SetFloat("_Opacity", opacities[i] * envelope);
+                if (localLight != null) localLight.intensity = envelope * .7f;
+                if (t >= 1) Destroy(gameObject);
+                return;
+            }
             if (ephemeral)
             {
                 if (age>=ImpactDuration) { Destroy(gameObject); return; }
@@ -538,6 +599,12 @@ namespace Palimpseste.Game.SpellRuntime
                 if (shockwave!=null) shockwave.localScale=Vector3.one*span*Mathf.Lerp(.35f,5f,1-Mathf.Pow(1-t,3));
                 if (secondWave!=null) secondWave.localScale=Vector3.one*span*Mathf.Lerp(.28f,3.1f,Mathf.Sqrt(t));
                 foreach (var ribbon in ribbons) ribbon.localScale=Vector3.one*span*Mathf.Lerp(.12f,1.8f,Mathf.Sqrt(t));
+                if (contactFlash != null)
+                {
+                    var flashAge = Mathf.Clamp01(age / .24f);
+                    contactFlash.localScale = Vector3.one * span * Mathf.Lerp(.5f, 2.4f, Mathf.Sqrt(flashAge));
+                    contactFlashMaterial.SetFloat("_Opacity", Mathf.Pow(1-flashAge, 2));
+                }
                 if (pillar!=null) pillar.localScale=new Vector3(span*Mathf.Lerp(.5f,1.3f,t),span*Mathf.Lerp(.7f,2.7f,1-Mathf.Pow(1-t,3)),span*Mathf.Lerp(.5f,1.3f,t));
                 if (localLight!=null) localLight.intensity=(3.4f+3f*Mathf.Exp(-age*24))*envelope;
                 return;
@@ -771,25 +838,61 @@ namespace Palimpseste.Game.SpellRuntime
 
         private static Mesh Veil(int seed)
         {
-            const int segments=54,widthSegments=5;
+            const int segments=80,widthSegments=12;
             var vertices=new List<Vector3>(); var uvs=new List<Vector2>(); var indices=new List<int>();
-            var side=seed<2 ? -1 : 1; var band=seed%2;
+            var side=seed<3 ? -1 : 1; var band=seed%3;
             for (var i=0;i<=segments;i++)
             {
                 var t=i/(float)segments;
-                var length=2.5f+band*.65f;
-                var center=new Vector3(side*(.19f+t*.36f)+Mathf.Sin(t*8+seed)*.14f*t,
-                    .12f-band*.22f+Mathf.Sin(t*6+seed)*.23f*t-t*.33f,.02f-t*length);
-                var width=(.15f+.25f*Mathf.Sin(t*Mathf.PI))*(1-Mathf.Pow(t,5)*.95f);
+                var length=band == 0 ? 5.8f : band == 1 ? 4.9f : 6.3f;
+                var spread = Mathf.Sin(t * Mathf.PI * .82f);
+                var center=new Vector3(side*(.24f+spread*(.48f+band*.18f))+Mathf.Sin(t*9+seed*1.31f)*.22f*t,
+                    .20f-band*.17f+Mathf.Sin(t*7+seed*1.23f)*(.18f+band*.10f)*spread
+                    + (band == 0 ? .46f : band == 1 ? -.14f : .16f)*spread-t*.54f,
+                    -.32f-t*length);
+                var width=(band == 2 ? .08f+.11f*Mathf.Sin(t*Mathf.PI)
+                    : .19f+.24f*Mathf.Sin(t*Mathf.PI))*(1-Mathf.Pow(t,8)*.98f);
                 for (var j=0;j<=widthSegments;j++)
                 {
                     var v=j/(float)widthSegments; var offset=(v*2-1)*width;
-                    vertices.Add(center+new Vector3(offset,Mathf.Sin(v*Mathf.PI*3+t*7)*.065f,offset*.3f*side));
+                    var twist = side * (.25f + band * .38f) + Mathf.Sin(t * 5 + seed) * .55f;
+                    var cross = new Vector3(Mathf.Cos(twist), Mathf.Sin(twist), .16f * side);
+                    var fold = Mathf.Sin(v*Mathf.PI*4+t*8+seed)*.055f
+                        + Mathf.Sin(v*Mathf.PI*9-t*5)*.018f;
+                    vertices.Add(center + cross * offset + new Vector3(0, fold, fold*.7f));
                     uvs.Add(new Vector2(t,v));
                     if (i<segments && j<widthSegments) { var n=i*(widthSegments+1)+j; indices.AddRange(new[] {n,n+1,n+widthSegments+1,n+1,n+widthSegments+2,n+widthSegments+1}); }
                 }
             }
             return Finish("Tattered spectral veil",vertices,uvs,indices);
+        }
+
+        private static Mesh SpectralBurst(int seed)
+        {
+            const int rows = 28, columns = 6;
+            var vertices = new List<Vector3>(); var uv = new List<Vector2>(); var indices = new List<int>();
+            var angle = seed * Mathf.PI * 2 / 7;
+            var direction = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), (seed % 3 - 1) * .48f - .12f);
+            var side = new Vector3(-direction.y, direction.x, 0);
+            for (var row = 0; row <= rows; row++)
+            {
+                var t = row / (float)rows;
+                var center = direction * (.12f + t * (1.2f + seed % 3 * .25f))
+                    + side * Mathf.Sin(t * 5 + seed) * t * .25f;
+                for (var col = 0; col <= columns; col++)
+                {
+                    var v = col / (float)columns;
+                    vertices.Add(center + side * ((v * 2 - 1) * (.08f + Mathf.Sin(t*Mathf.PI)*.17f))
+                        + Vector3.forward * Mathf.Sin(v*7+t*8)*.065f);
+                    uv.Add(new Vector2(t,v));
+                    if (row < rows && col < columns)
+                    {
+                        var n=row*(columns+1)+col;
+                        indices.AddRange(new[]{n,n+1,n+columns+1,n+1,n+columns+2,n+columns+1});
+                    }
+                }
+            }
+            return Finish("Torn cloth impact fragment",vertices,uv,indices);
         }
 
         private static Mesh BurstMesh(bool shattered)

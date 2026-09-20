@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-20 17:15:39Z" end-time="2026-09-20 17:15:42Z" duration="3,0901703">
+  <test-suite type="TestSuite" id="1037" name="Palimpseste Spell Lab" fullname="Palimpseste Spell Lab" runstate="Runnable" testcasecount="20" result="Passed" start-time="2026-09-20 17:15:39Z" end-time="2026-09-20 17:15:42Z" duration="3.090170" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1030" name="Palimpseste.Game.PlayModeTests.dll" fullname="E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Library/ScriptAssemblies/Palimpseste.Game.PlayModeTests.dll" runstate="Runnable" testcasecount="20" result="Passed" start-time="2026-09-20 17:15:39Z" end-time="2026-09-20 17:15:42Z" duration="3.054776" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="27424" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1031" name="Palimpseste" fullname="Palimpseste" runstate="Runnable" testcasecount="20" result="Passed" start-time="2026-09-20 17:15:39Z" end-time="2026-09-20 17:15:42Z" duration="3.053732" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1032" name="Game" fullname="Palimpseste.Game" runstate="Runnable" testcasecount="20" result="Passed" start-time="2026-09-20 17:15:39Z" end-time="2026-09-20 17:15:42Z" duration="3.053083" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1033" name="PlayModeTests" fullname="Palimpseste.Game.PlayModeTests" runstate="Runnable" testcasecount="20" result="Passed" start-time="2026-09-20 17:15:39Z" end-time="2026-09-20 17:15:42Z" duration="3.052506" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1004" name="CachedSpectrePresentationTests" fullname="Palimpseste.Game.PlayModeTests.CachedSpectrePresentationTests" classname="Palimpseste.Game.PlayModeTests.CachedSpectrePresentationTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-20 17:15:39Z" end-time="2026-09-20 17:15:42Z" duration="3.050989" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1005" name="CaptureExistingSpectreInLab" fullname="Palimpseste.Game.PlayModeTests.CachedSpectrePresentationTests.CaptureExistingSpectreInLab" methodname="CaptureExistingSpectreInLab" classname="Palimpseste.Game.PlayModeTests.CachedSpectrePresentationTests" runstate="Runnable" seed="1106718099" result="Passed" start-time="2026-09-20 17:15:39Z" end-time="2026-09-20 17:15:42Z" duration="3.038412" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[PALIMPSESTE_EXISTING_SPECTRE_CAPTURE E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\evidence\public\unity\spectral-fidelity\iteration-01
+Saving results to: USER_PROFILE/AppData/LocalLow/Palimpseste/Palimpseste Spell Lab\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

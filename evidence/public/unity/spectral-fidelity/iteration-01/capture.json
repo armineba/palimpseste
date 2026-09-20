@@ -1,0 +1,437 @@
+{
+  "evidence_kind": "existing_player_packet_unity_lab_replay",
+  "packet_sha256": "0ed08fee15298d8e61fc396eddc4f2a5ed2827d0b8efd51639e2771f2162e467",
+  "spell_title": "Envol du spectre aux longs voiles",
+  "art_acceptance": "not_claimed",
+  "model_calls": 0,
+  "camera": "shipping lab pose and postprocessing; arena viewport without UI",
+  "side_comparison_camera": "additional low side three-quarter camera follows the real carrier and its wake; same packet, arena and postprocessing; different camera pose and 40 degree field of view; no UI; holds its final pose after the carrier expires",
+  "capture_framerate": 60,
+  "capture": "ARGBHalf linear target; postprocessed image converted to sRGB PNG",
+  "graphics_device": "NVIDIA GeForce RTX 3070",
+  "initial_target_position": [
+    0.0,
+    0.99999994,
+    6.0
+  ],
+  "initial_target_health_milli": 100000,
+  "final_target_health_milli": 88000,
+  "hits": 1,
+  "damage_milli": 12000,
+  "impulses": 1,
+  "target_displacement_m": 0.00154048076,
+  "frames": [
+    {
+      "file": "spectre-frame-00.png",
+      "sha256": "80c89f9093e18e29d9763daca0570b8fcef84d23d384f5500749fb181976992a",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_comparison": {
+        "file": "spectre-side-frame-00.png",
+        "sha256": "1f6f5a3f013eabb1f7a60412c93d4b65d24b40d2995b699ce22f7f12884184f8",
+        "camera": {
+          "position": [
+            7.7032814,
+            2.85,
+            -9.439328
+          ],
+          "forward": [
+            -0.925646663,
+            -0.161048457,
+            0.342405766
+          ],
+          "up": [
+            -0.151045635,
+            0.9869465,
+            0.05587327
+          ],
+          "field_of_view_degrees": 40.0
+        },
+        "tracked_flight_position": [
+          0.5393319,
+          1.1,
+          -4.669598
+        ],
+        "tracked_flight_direction": [
+          0.6779039,
+          0.0,
+          0.7351505
+        ]
+      },
+      "elapsed_seconds": 0.100000024,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "visual_position": [
+        0.6339095,
+        1.1,
+        -4.54087162
+      ],
+      "target_position": [
+        0.0,
+        1.0,
+        6.0
+      ],
+      "target_health_milli": 100000
+    },
+    {
+      "file": "spectre-frame-01.png",
+      "sha256": "8b7abf85d2618484ce45d9d71e9347cc68614361219dd003fa9574513f072681",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_comparison": {
+        "file": "spectre-side-frame-01.png",
+        "sha256": "15a2455dccb2040a9a15e6908675c715d18f5b8c6ed99c3328a3910f1c333ee5",
+        "camera": {
+          "position": [
+            9.05369949,
+            2.85,
+            -0.667849541
+          ],
+          "forward": [
+            -0.8819756,
+            -0.161048442,
+            -0.442925125
+          ],
+          "up": [
+            -0.143919438,
+            0.9869465,
+            -0.07227583
+          ],
+          "field_of_view_degrees": 40.0
+        },
+        "tracked_flight_position": [
+          0.678345859,
+          1.1,
+          -2.64925
+        ],
+        "tracked_flight_direction": [
+          -0.0747264251,
+          0.0,
+          0.997204065
+        ]
+      },
+      "elapsed_seconds": 0.366666675,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "visual_position": [
+        0.666389644,
+        1.1,
+        -2.48969746
+      ],
+      "target_position": [
+        0.0,
+        0.99999994,
+        6.0
+      ],
+      "target_health_milli": 100000
+    },
+    {
+      "file": "spectre-frame-02.png",
+      "sha256": "6a6bb5069a7e2738ef558ec677af311566a42931f19b46c2e86268c2845483ed",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_comparison": {
+        "file": "spectre-side-frame-02.png",
+        "sha256": "5f41b68177c9d3d4971e40f1780e5c935f88e3ff95b14495e4c929700b7fbd9d",
+        "camera": {
+          "position": [
+            8.838488,
+            2.85,
+            2.20409775
+          ],
+          "forward": [
+            -0.8819756,
+            -0.161048442,
+            -0.442925125
+          ],
+          "up": [
+            -0.143919438,
+            0.9869465,
+            -0.07227583
+          ],
+          "field_of_view_degrees": 40.0
+        },
+        "tracked_flight_position": [
+          0.463134,
+          1.1,
+          0.222697541
+        ],
+        "tracked_flight_direction": [
+          -0.0747264251,
+          0.0,
+          0.997204065
+        ]
+      },
+      "elapsed_seconds": 0.716666639,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "visual_position": [
+        0.451177776,
+        1.1,
+        0.3822502
+      ],
+      "target_position": [
+        0.0,
+        0.99999994,
+        6.0
+      ],
+      "target_health_milli": 100000
+    },
+    {
+      "file": "spectre-frame-03.png",
+      "sha256": "122e74886b2f6750f798edf19b9c4fed9fafee919cc3bdca22ae9323991c37d9",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_comparison": {
+        "file": "spectre-side-frame-03.png",
+        "sha256": "4470dd87120d19c70ebb54807be17d62a9f7bbb5d3aa41900e18a899e7ae3095",
+        "camera": {
+          "position": [
+            8.635232,
+            2.85,
+            4.91649246
+          ],
+          "forward": [
+            -0.8819756,
+            -0.161048442,
+            -0.442925125
+          ],
+          "up": [
+            -0.143919438,
+            0.9869465,
+            -0.07227583
+          ],
+          "field_of_view_degrees": 40.0
+        },
+        "tracked_flight_position": [
+          0.259878337,
+          1.1,
+          2.93509245
+        ],
+        "tracked_flight_direction": [
+          -0.0747264251,
+          0.0,
+          0.997204065
+        ]
+      },
+      "elapsed_seconds": 1.0666666,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "visual_position": [
+        0.247922108,
+        1.1,
+        3.094645
+      ],
+      "target_position": [
+        0.0,
+        0.99999994,
+        6.0
+      ],
+      "target_health_milli": 100000
+    },
+    {
+      "file": "spectre-frame-04.png",
+      "sha256": "1bcf081ba7db069f0a2367d36f4dd2fff297839b305939333c42b114c2e392c1",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_comparison": {
+        "file": "spectre-side-frame-04.png",
+        "sha256": "77f2d75aade3c79a313f05265f7b58cf823b54f2c644c41a9b1cd8772d2a5670",
+        "camera": {
+          "position": [
+            8.479801,
+            2.85,
+            6.990676
+          ],
+          "forward": [
+            -0.8819756,
+            -0.161048442,
+            -0.442925125
+          ],
+          "up": [
+            -0.143919438,
+            0.9869465,
+            -0.07227583
+          ],
+          "field_of_view_degrees": 40.0
+        },
+        "tracked_flight_position": [
+          0.10444735,
+          1.1,
+          5.009276
+        ],
+        "tracked_flight_direction": [
+          -0.0747264251,
+          0.0,
+          0.997204065
+        ]
+      },
+      "elapsed_seconds": 1.41666675,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "impulses": 1,
+      "visual_position": null,
+      "target_position": [
+        -0.000169529041,
+        0.99999994,
+        6.001531
+      ],
+      "target_health_milli": 88000
+    },
+    {
+      "file": "spectre-frame-05.png",
+      "sha256": "f63fd09c4a8f656798d781032f49f689eb50a9bc3b67ef214b93cf531bb0bd24",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_comparison": {
+        "file": "spectre-side-frame-05.png",
+        "sha256": "2d73c7ebeb0ef83b20f0693dbeca6d43152aa2b1ede09b5109d50a745c02a5a7",
+        "camera": {
+          "position": [
+            8.479801,
+            2.85,
+            6.990676
+          ],
+          "forward": [
+            -0.8819756,
+            -0.161048442,
+            -0.442925125
+          ],
+          "up": [
+            -0.143919438,
+            0.9869465,
+            -0.07227583
+          ],
+          "field_of_view_degrees": 40.0
+        },
+        "tracked_flight_position": [
+          0.10444735,
+          1.1,
+          5.009276
+        ],
+        "tracked_flight_direction": [
+          -0.0747264251,
+          0.0,
+          0.997204065
+        ]
+      },
+      "elapsed_seconds": 1.7166667,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "impulses": 1,
+      "visual_position": null,
+      "target_position": [
+        -0.000169529041,
+        1.0,
+        6.001531
+      ],
+      "target_health_milli": 88000
+    }
+  ]
+}

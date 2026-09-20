@@ -1,0 +1,3592 @@
+{
+  "evidence_kind": "existing_player_packet_unity_animation_sequence",
+  "packet_sha256": "0ed08fee15298d8e61fc396eddc4f2a5ed2827d0b8efd51639e2771f2162e467",
+  "model_calls": 0,
+  "art_acceptance": "not_claimed",
+  "completed": true,
+  "presentation_framerate": 60,
+  "sequence_framerate": 30,
+  "capture": "last completed GPU frame every second presentation frame; ARGBHalf linear target with shipping tone mapping, converted to sRGB JPEG quality 95",
+  "shipping_camera": "unchanged lab pose and postprocessing, arena viewport without UI",
+  "side_camera": "additional low side three-quarter comparison camera, same runtime and postprocessing, 40 degree field of view",
+  "frame_count": 73,
+  "frames": [
+    {
+      "index": 0,
+      "file": "shipping/frame-0000.jpg",
+      "sha256": "8b21053b1bb43dffbaad862420f1c199f57960bf521c8b818c185ba1e708a886",
+      "readback_elapsed_seconds": 0.0,
+      "completed_frame_elapsed_seconds": 0.0,
+      "presentation_frame_offset": 0,
+      "active_carriers": 0,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0000.jpg",
+      "side_sha256": "53ce4cd08f299ea5698b08f9fdb6fb0dd0176d1f387cc29c1ff4fc4a48f0f866",
+      "side_camera": {
+        "position": [
+          8.5,
+          2.85,
+          -3.65
+        ],
+        "forward": [
+          -0.912607849,
+          -0.161048442,
+          -0.3757799
+        ],
+        "up": [
+          -0.148917973,
+          0.9869465,
+          -0.06131918
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 1,
+      "file": "shipping/frame-0001.jpg",
+      "sha256": "6b6708e980e05c31953508154c37faab662766575d42ae00804be72e986e0b1b",
+      "readback_elapsed_seconds": 0.03333333,
+      "completed_frame_elapsed_seconds": 0.0166666638,
+      "presentation_frame_offset": 2,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0001.jpg",
+      "side_sha256": "9daff7c50ae20ee0114a3988f0203f6b90a6c6f2ebd26a381185cbe642643d74",
+      "side_camera": {
+        "position": [
+          4.893299,
+          2.85,
+          -12.1239681
+        ],
+        "forward": [
+          -0.719510257,
+          -0.161048427,
+          0.675550461
+        ],
+        "up": [
+          -0.117408589,
+          0.9869465,
+          0.110235289
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 2,
+      "file": "shipping/frame-0002.jpg",
+      "sha256": "a72ca03d937a624995e9c9873990532b73d4a4f5827b4bcedf383515c192d164",
+      "readback_elapsed_seconds": 0.06666669,
+      "completed_frame_elapsed_seconds": 0.0500000268,
+      "presentation_frame_offset": 4,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0002.jpg",
+      "side_sha256": "a4ba6e23726ea1aaa3dfd6291a5fd42510a5a95899f328e17bb2d5e8997f6096",
+      "side_camera": {
+        "position": [
+          6.931941,
+          2.85,
+          -10.4112635
+        ],
+        "forward": [
+          -0.875328243,
+          -0.161048412,
+          0.455920845
+        ],
+        "up": [
+          -0.142834723,
+          0.9869465,
+          0.07439647
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 3,
+      "file": "shipping/frame-0003.jpg",
+      "sha256": "dc406b1b8222dd4d87840a0d1d89d4e847b417aac8d5017b45f4d35bffe5d31b",
+      "readback_elapsed_seconds": 0.100000024,
+      "completed_frame_elapsed_seconds": 0.08333336,
+      "presentation_frame_offset": 6,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0003.jpg",
+      "side_sha256": "0200578bfb0ce1cdd076d5c7acfd22a73a1a7693edc4fd7b9c1daeede86b134e",
+      "side_camera": {
+        "position": [
+          7.7032814,
+          2.85,
+          -9.439328
+        ],
+        "forward": [
+          -0.925646663,
+          -0.161048457,
+          0.342405766
+        ],
+        "up": [
+          -0.151045635,
+          0.9869465,
+          0.05587327
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 4,
+      "file": "shipping/frame-0004.jpg",
+      "sha256": "3e36a8e7c893bfcf90c5f092ee5c34711852d6a364ac7baad000a3c52c1b64db",
+      "readback_elapsed_seconds": 0.133333325,
+      "completed_frame_elapsed_seconds": 0.11666666,
+      "presentation_frame_offset": 8,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0004.jpg",
+      "side_sha256": "a8edb42b16c1cbeaf444dad8c29839d2d6318a12fd3ed652e6b06c7df087f3a6",
+      "side_camera": {
+        "position": [
+          9.150405,
+          2.85,
+          -6.05017328
+        ],
+        "forward": [
+          -0.986162663,
+          -0.161048427,
+          -0.03932675
+        ],
+        "up": [
+          -0.160920531,
+          0.9869465,
+          -0.00641727448
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 5,
+      "file": "shipping/frame-0005.jpg",
+      "sha256": "dd087ff6122082075473f15f43aad993d99d3346a98354d03e756a1669a69ce0",
+      "readback_elapsed_seconds": 0.166666687,
+      "completed_frame_elapsed_seconds": 0.150000021,
+      "presentation_frame_offset": 10,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0005.jpg",
+      "side_sha256": "0c6853820230afa065e00c44ecc6b76638be8e1721ce61f857367d83d05d9c5b",
+      "side_camera": {
+        "position": [
+          9.339565,
+          2.85,
+          -3.28238583
+        ],
+        "forward": [
+          -0.934787154,
+          -0.161048412,
+          -0.316601157
+        ],
+        "up": [
+          -0.152537137,
+          0.9869465,
+          -0.05166249
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 6,
+      "file": "shipping/frame-0006.jpg",
+      "sha256": "146dec29a39549f726644eb486c594f84e46e3bdb0815d5b63031907869a0bf3",
+      "readback_elapsed_seconds": 0.199999988,
+      "completed_frame_elapsed_seconds": 0.183333322,
+      "presentation_frame_offset": 12,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0006.jpg",
+      "side_sha256": "76624675c5b23886e472e3e7121e876537a8016d65ea10ed751a244b23043029",
+      "side_camera": {
+        "position": [
+          9.227791,
+          2.85,
+          -2.31699324
+        ],
+        "forward": [
+          -0.900716662,
+          -0.161048442,
+          -0.403451443
+        ],
+        "up": [
+          -0.146977574,
+          0.9869465,
+          -0.06583457
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 7,
+      "file": "shipping/frame-0007.jpg",
+      "sha256": "20b40a1742412e0acc836450a9d5a4cc94d36f6cb4c7abbc8e923195eeabd4a5",
+      "readback_elapsed_seconds": 0.233333349,
+      "completed_frame_elapsed_seconds": 0.216666684,
+      "presentation_frame_offset": 14,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0007.jpg",
+      "side_sha256": "ff658bd9ce6ac14f5e1f17dfaabe5c5785a5c95bf7bed6850767ff27468328ed",
+      "side_camera": {
+        "position": [
+          9.125437,
+          2.85,
+          -1.625165
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 8,
+      "file": "shipping/frame-0008.jpg",
+      "sha256": "a6727dcc3e0494c26fdd49d6dde904a841b73e6400f58e95ca44b03b62b97705",
+      "readback_elapsed_seconds": 0.266666651,
+      "completed_frame_elapsed_seconds": 0.249999985,
+      "presentation_frame_offset": 16,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0008.jpg",
+      "side_sha256": "19c9031f82181379c6b9058a3c935602517bbf1273598720c5217a0c7edc183f",
+      "side_camera": {
+        "position": [
+          9.101524,
+          2.85,
+          -1.30605984
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 9,
+      "file": "shipping/frame-0009.jpg",
+      "sha256": "e7834f7228b021115e1d43292518f09e28ffa2b9cb11fcfecf3be667723181ce",
+      "readback_elapsed_seconds": 0.3,
+      "completed_frame_elapsed_seconds": 0.283333331,
+      "presentation_frame_offset": 18,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0009.jpg",
+      "side_sha256": "ddf8a1a95d75e324b658b92fd5535f35a592637694e378251a0ae80886664109",
+      "side_camera": {
+        "position": [
+          9.089568,
+          2.85,
+          -1.14650726
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 10,
+      "file": "shipping/frame-0010.jpg",
+      "sha256": "23b02138221b372efeec882453491eeff0f54ba538a5e9245696939ef26aed6e",
+      "readback_elapsed_seconds": 0.333333373,
+      "completed_frame_elapsed_seconds": 0.3166667,
+      "presentation_frame_offset": 20,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0010.jpg",
+      "side_sha256": "7aaf12de67b62496c1911be0924ee9632e0fbea8c3cc4a0446127db3fbaca05a",
+      "side_camera": {
+        "position": [
+          9.065656,
+          2.85,
+          -0.8274021
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 11,
+      "file": "shipping/frame-0011.jpg",
+      "sha256": "74459b8efc0fdd5837572106663d5a0bfc69ee50c6da68059970592bcada4c51",
+      "readback_elapsed_seconds": 0.366666675,
+      "completed_frame_elapsed_seconds": 0.35,
+      "presentation_frame_offset": 22,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0011.jpg",
+      "side_sha256": "5bb6c91219bd14e2930604208d11fd9078260bf69c0153cf8f5d529e63798204",
+      "side_camera": {
+        "position": [
+          9.041743,
+          2.85,
+          -0.508296967
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 12,
+      "file": "shipping/frame-0012.jpg",
+      "sha256": "7a817da0064e28c69dec4b852f4571f8bbdbb16c057a574e1128aa39ae78703c",
+      "readback_elapsed_seconds": 0.400000036,
+      "completed_frame_elapsed_seconds": 0.383333355,
+      "presentation_frame_offset": 24,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0012.jpg",
+      "side_sha256": "7a4d61ac568474c9f1951fe243fb72bce3e9846188c8fe20cf7b8b8fdd2ec285",
+      "side_camera": {
+        "position": [
+          9.029787,
+          2.85,
+          -0.3487444
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 13,
+      "file": "shipping/frame-0013.jpg",
+      "sha256": "a36334ec7749969f5bee1d2a78d4b3923fde219e5eb07980638d4d766049adc1",
+      "readback_elapsed_seconds": 0.433333337,
+      "completed_frame_elapsed_seconds": 0.416666657,
+      "presentation_frame_offset": 26,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0013.jpg",
+      "side_sha256": "cd9ac91ff6d2843f64f37f1473381193f6c0f407becdfcd93c6efc94e8e4ebff",
+      "side_camera": {
+        "position": [
+          9.005875,
+          2.85,
+          -0.0296392441
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 14,
+      "file": "shipping/frame-0014.jpg",
+      "sha256": "b1a0e9b6186c97a8c7e6f5b0c5e96e021b4985b1699d25b3c554ced0c61105cf",
+      "readback_elapsed_seconds": 0.4666667,
+      "completed_frame_elapsed_seconds": 0.450000018,
+      "presentation_frame_offset": 28,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0014.jpg",
+      "side_sha256": "af32ca855ddaf3e3198305cc7af065a564193eb4578541d36ee5e6bd7c53e3fc",
+      "side_camera": {
+        "position": [
+          8.981962,
+          2.85,
+          0.2894659
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 15,
+      "file": "shipping/frame-0015.jpg",
+      "sha256": "9efac669d61c52a462b697ce84036b374db964dd36cd2f033ec4cb1113a5848b",
+      "readback_elapsed_seconds": 0.5,
+      "completed_frame_elapsed_seconds": 0.483333319,
+      "presentation_frame_offset": 30,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0015.jpg",
+      "side_sha256": "2ff63a50e3277400bae4d5e3da3049c15350e3ad1e89b0622271cda54a05ed41",
+      "side_camera": {
+        "position": [
+          8.970006,
+          2.85,
+          0.449018478
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 16,
+      "file": "shipping/frame-0016.jpg",
+      "sha256": "d8c8574074af77d84bb85ecca35503b32b27061a346cc20775de2b7b7b2b484d",
+      "readback_elapsed_seconds": 0.533333361,
+      "completed_frame_elapsed_seconds": 0.5166667,
+      "presentation_frame_offset": 32,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0016.jpg",
+      "side_sha256": "b5892f51e27b917abe41adf2b555c5f569bb2308cf0c796b03c13a3ba59ecdf2",
+      "side_camera": {
+        "position": [
+          8.946094,
+          2.85,
+          0.7681241
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 17,
+      "file": "shipping/frame-0017.jpg",
+      "sha256": "13a83b9d9384cea88bd4bb642e34626be36a3ee38f0daa61aa7fece930f3076b",
+      "readback_elapsed_seconds": 0.566666663,
+      "completed_frame_elapsed_seconds": 0.55,
+      "presentation_frame_offset": 34,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0017.jpg",
+      "side_sha256": "1d467c3da744a276a8a760a6737073dae8dbdcae25cb650b6c347a0ae475e1ca",
+      "side_camera": {
+        "position": [
+          8.922181,
+          2.85,
+          1.08722925
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 18,
+      "file": "shipping/frame-0018.jpg",
+      "sha256": "d606562cee54f7387893a11d6d05eed73d276277f7d16ae180521c92a856a629",
+      "readback_elapsed_seconds": 0.6,
+      "completed_frame_elapsed_seconds": 0.5833334,
+      "presentation_frame_offset": 36,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0018.jpg",
+      "side_sha256": "a5c3d8a9900df0dec23179d054441e96969ccf66c5fc3d0280dd27e5562cf9e8",
+      "side_camera": {
+        "position": [
+          8.910225,
+          2.85,
+          1.24678183
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 19,
+      "file": "shipping/frame-0019.jpg",
+      "sha256": "3b7369a7bc2d39d6edda2891ea8b47c8880006c14a42b4c29836a481787c2adf",
+      "readback_elapsed_seconds": 0.6333334,
+      "completed_frame_elapsed_seconds": 0.616666734,
+      "presentation_frame_offset": 38,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0019.jpg",
+      "side_sha256": "32db804a1db49c48d339c35beeed817245a20f6e37f931258f75704ee91ab998",
+      "side_camera": {
+        "position": [
+          8.88631248,
+          2.85,
+          1.56588709
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 20,
+      "file": "shipping/frame-0020.jpg",
+      "sha256": "8fa43a6e936257496b34f22b9d95fee8f4dfe2b68f646e24865e362463a42780",
+      "readback_elapsed_seconds": 0.6666667,
+      "completed_frame_elapsed_seconds": 0.650000036,
+      "presentation_frame_offset": 40,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0020.jpg",
+      "side_sha256": "40a89021870eab4440582ade8cc6396c752949d03cdfaeacaee348f5edd845cc",
+      "side_camera": {
+        "position": [
+          8.8624,
+          2.85,
+          1.88499248
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 21,
+      "file": "shipping/frame-0021.jpg",
+      "sha256": "3c1769e005657530a8ca327c6b4d15c1f489475437accde9521f9c81d31f1e27",
+      "readback_elapsed_seconds": 0.7,
+      "completed_frame_elapsed_seconds": 0.683333337,
+      "presentation_frame_offset": 42,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0021.jpg",
+      "side_sha256": "33281a3635780a7f15e1dba50332fbb17491c1302bed179155f598b20827b02e",
+      "side_camera": {
+        "position": [
+          8.850444,
+          2.85,
+          2.04454517
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 22,
+      "file": "shipping/frame-0022.jpg",
+      "sha256": "37d982ba4901ab87fba4054f3088f87df6f418251f7ad46989864f7de0df20ac",
+      "readback_elapsed_seconds": 0.7333333,
+      "completed_frame_elapsed_seconds": 0.716666639,
+      "presentation_frame_offset": 44,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0022.jpg",
+      "side_sha256": "a233e6001276a6ae2893a045dc60ee4d32217b5c1fda9bd4ad1a56bb3d8cdedf",
+      "side_camera": {
+        "position": [
+          8.826531,
+          2.85,
+          2.36365032
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 23,
+      "file": "shipping/frame-0023.jpg",
+      "sha256": "db9d493bff4ca32b64a265e77d2091466c2611d8d67f2f501d227ed1381a155d",
+      "readback_elapsed_seconds": 0.7666667,
+      "completed_frame_elapsed_seconds": 0.75000006,
+      "presentation_frame_offset": 46,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0023.jpg",
+      "side_sha256": "d7f24bee967facbd51f8b1d9e2995ace1e94c1dddd8c61956c48ac7d2ead063d",
+      "side_camera": {
+        "position": [
+          8.802619,
+          2.85,
+          2.68275547
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 24,
+      "file": "shipping/frame-0024.jpg",
+      "sha256": "a575c66a44a8405abb66b324680340806645a878250b950fe32772a11b97a2e8",
+      "readback_elapsed_seconds": 0.8,
+      "completed_frame_elapsed_seconds": 0.783333361,
+      "presentation_frame_offset": 48,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0024.jpg",
+      "side_sha256": "5d4bf7196465442cc3275e501d3c9c9cf8cd91682a1018f74b9365a284514f8c",
+      "side_camera": {
+        "position": [
+          8.790663,
+          2.85,
+          2.842308
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 25,
+      "file": "shipping/frame-0025.jpg",
+      "sha256": "75ecaeb39b6a6d0000c4e8fa3f69d26b1fd159fc5bbaca941a9cc9527be75435",
+      "readback_elapsed_seconds": 0.8333333,
+      "completed_frame_elapsed_seconds": 0.816666663,
+      "presentation_frame_offset": 50,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0025.jpg",
+      "side_sha256": "0b428a141050be1d51ee9b662e3a168d18c429748d5285b41d08e18b87ce2190",
+      "side_camera": {
+        "position": [
+          8.76675,
+          2.85,
+          3.16141367
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 26,
+      "file": "shipping/frame-0026.jpg",
+      "sha256": "058d500020d7183c90131c185b3ea5b00af3faef73714257ef07967fa91c53d2",
+      "readback_elapsed_seconds": 0.866666734,
+      "completed_frame_elapsed_seconds": 0.8500001,
+      "presentation_frame_offset": 52,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0026.jpg",
+      "side_sha256": "3e7438aa138dd76be68110c97469aea5b4d051462efa4e7e4b3489a822576a81",
+      "side_camera": {
+        "position": [
+          8.742838,
+          2.85,
+          3.48051882
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 27,
+      "file": "shipping/frame-0027.jpg",
+      "sha256": "12c76ebd1fd94e0691c63a599511b16fde090c9aa1b98950b8cea8fcf5f78690",
+      "readback_elapsed_seconds": 0.900000036,
+      "completed_frame_elapsed_seconds": 0.8833334,
+      "presentation_frame_offset": 54,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0027.jpg",
+      "side_sha256": "83dd7aa2fc8b7be2ec51fbe84c10b17afe6b89bd6576550fea45d0774c83ba45",
+      "side_camera": {
+        "position": [
+          8.730882,
+          2.85,
+          3.64007163
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 28,
+      "file": "shipping/frame-0028.jpg",
+      "sha256": "5b44e4c1ccb227ed1c32339abdb844950789103ef2c909a11bfad6e532a69b6e",
+      "readback_elapsed_seconds": 0.933333337,
+      "completed_frame_elapsed_seconds": 0.9166667,
+      "presentation_frame_offset": 56,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0028.jpg",
+      "side_sha256": "fbea5125d2c2edfcc2e73f6f9992d7efac262d63e0ae9f95345a3115d12cadcd",
+      "side_camera": {
+        "position": [
+          8.706969,
+          2.85,
+          3.959177
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 29,
+      "file": "shipping/frame-0029.jpg",
+      "sha256": "3946043507ae52db4f29d09e7ae16826d237fafc85bc483a37e8004a4e24a8a6",
+      "readback_elapsed_seconds": 0.966666639,
+      "completed_frame_elapsed_seconds": 0.95,
+      "presentation_frame_offset": 58,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0029.jpg",
+      "side_sha256": "3fa52d0d6c5f3caec1b7b9fae756247c23ab030c9780d448632715e43d9c97c8",
+      "side_camera": {
+        "position": [
+          8.683057,
+          2.85,
+          4.278282
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 30,
+      "file": "shipping/frame-0030.jpg",
+      "sha256": "48472a2a997b5ea0f5b2c85bef45da286c30dd0d2cc82a9598290f4253e939bc",
+      "readback_elapsed_seconds": 1.0,
+      "completed_frame_elapsed_seconds": 0.9833334,
+      "presentation_frame_offset": 60,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0030.jpg",
+      "side_sha256": "97eb10c468a6d6ccbd41acbc5ca292119964fcae80d26c56fb804b51317274a2",
+      "side_camera": {
+        "position": [
+          8.671101,
+          2.85,
+          4.43783474
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 31,
+      "file": "shipping/frame-0031.jpg",
+      "sha256": "8b528f77196db70129def78a4b1b85dae6bef5a245adf008e227012c3ccbb697",
+      "readback_elapsed_seconds": 1.0333333,
+      "completed_frame_elapsed_seconds": 1.01666665,
+      "presentation_frame_offset": 62,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0031.jpg",
+      "side_sha256": "1164159d8053a39ed7cbd2f3098f840d7d611541334d7a18b74ca04bf0d8e81e",
+      "side_camera": {
+        "position": [
+          8.647188,
+          2.85,
+          4.75694
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 32,
+      "file": "shipping/frame-0032.jpg",
+      "sha256": "3db5529e0d6b6b175c5226b137935fb7fc0d5bd65b194a53cdd94f8a4c06a111",
+      "readback_elapsed_seconds": 1.0666666,
+      "completed_frame_elapsed_seconds": 1.05,
+      "presentation_frame_offset": 64,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0032.jpg",
+      "side_sha256": "fd69af4ba5fa83a3d60fc80eb504f5fbeb9b98b1d33eee76c41ce5f29fb7631f",
+      "side_camera": {
+        "position": [
+          8.623276,
+          2.85,
+          5.076045
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 33,
+      "file": "shipping/frame-0033.jpg",
+      "sha256": "d0e27cdba43388119b30fa837fb21b1ebef92d1a04b8a1f74d365536c1ce907b",
+      "readback_elapsed_seconds": 1.0999999,
+      "completed_frame_elapsed_seconds": 1.08333325,
+      "presentation_frame_offset": 66,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0033.jpg",
+      "side_sha256": "170d194c04f37e451c06576286aced264b90b423793e8a15180779c29b032dbd",
+      "side_camera": {
+        "position": [
+          8.61132,
+          2.85,
+          5.23559761
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 34,
+      "file": "shipping/frame-0034.jpg",
+      "sha256": "832d84d01e8f1752ec81f65a74680c95222963fd641b61852a9b883de1d089da",
+      "readback_elapsed_seconds": 1.13333344,
+      "completed_frame_elapsed_seconds": 1.11666667,
+      "presentation_frame_offset": 68,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0034.jpg",
+      "side_sha256": "de6d427e6375682ec92e1bc4e04bce143c9a72856e24326a534a0a21adc0448a",
+      "side_camera": {
+        "position": [
+          8.587407,
+          2.85,
+          5.55470276
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 35,
+      "file": "shipping/frame-0035.jpg",
+      "sha256": "021f2e1b8e14fe0c2620f782b8a04ce8745e8c83e4bdd423f1302ae76ff502cd",
+      "readback_elapsed_seconds": 1.16666675,
+      "completed_frame_elapsed_seconds": 1.15,
+      "presentation_frame_offset": 70,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0035.jpg",
+      "side_sha256": "6632bcc3cfa2e816c58fc4fa57f8b0f53a8607ca0fc07ba74ec74081b8169ba8",
+      "side_camera": {
+        "position": [
+          8.563495,
+          2.85,
+          5.873808
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 36,
+      "file": "shipping/frame-0036.jpg",
+      "sha256": "fa63370c8078fbc117dc7112dc0f9f8ff5dda88e670c50e06a1409505e13d0a5",
+      "readback_elapsed_seconds": 1.2,
+      "completed_frame_elapsed_seconds": 1.18333328,
+      "presentation_frame_offset": 72,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0036.jpg",
+      "side_sha256": "b48420c6708536e76b8a5fbfafd77296ced912f60b0938ffd95a3e1444b369e2",
+      "side_camera": {
+        "position": [
+          8.551538,
+          2.85,
+          6.03336048
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 37,
+      "file": "shipping/frame-0037.jpg",
+      "sha256": "4814fe13f9783c06f7a95672bf84a8c1ebc98a3e8bd20a3e6213980183cb5ad5",
+      "readback_elapsed_seconds": 1.23333335,
+      "completed_frame_elapsed_seconds": 1.21666658,
+      "presentation_frame_offset": 74,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0037.jpg",
+      "side_sha256": "dc9913c265280415e1f6e9ff3b0a77b6ffe26a57838c38923497840d8ffd1d73",
+      "side_camera": {
+        "position": [
+          8.527626,
+          2.85,
+          6.35246563
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 38,
+      "file": "shipping/frame-0038.jpg",
+      "sha256": "feb12158717378ecca0fa0977af15ebab709a0614def4d0f5439174a59af9ae7",
+      "readback_elapsed_seconds": 1.26666665,
+      "completed_frame_elapsed_seconds": 1.25,
+      "presentation_frame_offset": 76,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0038.jpg",
+      "side_sha256": "8ab74430f64ff855c423e68d7915689fa255a76bd8c2ba5e870211da3ff39da0",
+      "side_camera": {
+        "position": [
+          8.503714,
+          2.85,
+          6.671571
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 39,
+      "file": "shipping/frame-0039.jpg",
+      "sha256": "1669697a2d54d9b3777ef362df4a0f04daee2ee1af001c8b31e643baf288755f",
+      "readback_elapsed_seconds": 1.3,
+      "completed_frame_elapsed_seconds": 1.2833333,
+      "presentation_frame_offset": 78,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0039.jpg",
+      "side_sha256": "2ed8efe5da8a23661e301d79481a2b186f0ce8cb618691630009e3b878a93630",
+      "side_camera": {
+        "position": [
+          8.491757,
+          2.85,
+          6.83112335
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227583
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 40,
+      "file": "shipping/frame-0040.jpg",
+      "sha256": "52d422ab4199d176b13be1ebc091575a065103a6e5e483b260fd1b8d03ca7f8e",
+      "readback_elapsed_seconds": 1.33333325,
+      "completed_frame_elapsed_seconds": 1.3166666,
+      "presentation_frame_offset": 80,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0040.jpg",
+      "side_sha256": "83563b8ab7678c1c1d59c64ff9210ea2773db760d7f6f396679e5b6f587fcf65",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 41,
+      "file": "shipping/frame-0041.jpg",
+      "sha256": "dd5cb89d45c19e8361be36416b33c01a45112bf8e375e681bab32d2464c6b7a8",
+      "readback_elapsed_seconds": 1.36666679,
+      "completed_frame_elapsed_seconds": 1.35,
+      "presentation_frame_offset": 82,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0041.jpg",
+      "side_sha256": "d4524a0253660f4e477580d63b5e8035942a42aac8c6682da7b9f4d09d98359d",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 42,
+      "file": "shipping/frame-0042.jpg",
+      "sha256": "879054af02c3c2f1f964ce9fc59560e35f4f23a6eba62e3a0923ce7aead6106a",
+      "readback_elapsed_seconds": 1.4000001,
+      "completed_frame_elapsed_seconds": 1.38333333,
+      "presentation_frame_offset": 84,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0042.jpg",
+      "side_sha256": "819dba4c41eaa8505274fa0a1e9555fb2ae4ffca19fffe8eb5bb7c653dd208fc",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 43,
+      "file": "shipping/frame-0043.jpg",
+      "sha256": "37140c3c950aa804b9a6b54e18a290b9d07c5941ea9bb149a92aa40d927b6102",
+      "readback_elapsed_seconds": 1.4333334,
+      "completed_frame_elapsed_seconds": 1.41666663,
+      "presentation_frame_offset": 86,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0043.jpg",
+      "side_sha256": "6b0247f5a84e791896e8184375ef25f58b505d07555164f06f5cbfe89082d2c3",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 44,
+      "file": "shipping/frame-0044.jpg",
+      "sha256": "e5919a1c2b349bda40f68cf234ee13cc927e31bff65d3392fb79996aa47701d6",
+      "readback_elapsed_seconds": 1.4666667,
+      "completed_frame_elapsed_seconds": 1.44999993,
+      "presentation_frame_offset": 88,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0044.jpg",
+      "side_sha256": "6dd06f22ff2f35ad781d78fb91a3007d529f5e0de3a763e698fbcbd8ef4c3e6d",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 45,
+      "file": "shipping/frame-0045.jpg",
+      "sha256": "48bbf0f040704b5f0bb1358a6cd3e2fe141e77d32888f16fd19556661e07b73e",
+      "readback_elapsed_seconds": 1.5,
+      "completed_frame_elapsed_seconds": 1.48333335,
+      "presentation_frame_offset": 90,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0045.jpg",
+      "side_sha256": "a746acfbd02c1f7a660e30d6bc332c1e49fad7d1d3733756d79d610eea68db34",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 46,
+      "file": "shipping/frame-0046.jpg",
+      "sha256": "1aa210e6d798ed08155332f1ae9340bc5d5dc51dcdb2bfd524b5e848b4c782fc",
+      "readback_elapsed_seconds": 1.5333333,
+      "completed_frame_elapsed_seconds": 1.51666665,
+      "presentation_frame_offset": 92,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0046.jpg",
+      "side_sha256": "3640bac955b510afada5cb1b384537d08f22bdf1a9172767d560baf9871550a5",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 47,
+      "file": "shipping/frame-0047.jpg",
+      "sha256": "fb36faccbe3423b60388b2fa047ea4a0be2555d63789329284f5025614dd532e",
+      "readback_elapsed_seconds": 1.5666666,
+      "completed_frame_elapsed_seconds": 1.55,
+      "presentation_frame_offset": 94,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0047.jpg",
+      "side_sha256": "51668d8b6b6e2d07b675baa69826e1e547ed49e0330a074692ffec8ca9254b77",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 48,
+      "file": "shipping/frame-0048.jpg",
+      "sha256": "9bf5f280738eeb55d6eae3b53af74dcf8700928cc4551f3569084c8695769d2a",
+      "readback_elapsed_seconds": 1.5999999,
+      "completed_frame_elapsed_seconds": 1.58333325,
+      "presentation_frame_offset": 96,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0048.jpg",
+      "side_sha256": "f5a88fb5e365ade93041c5a79ccc7d16305b78ddc323605ad3e39c02c324e74d",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 49,
+      "file": "shipping/frame-0049.jpg",
+      "sha256": "5417b65e95589a3f0dbcbd939eb458001ab3085accf57a87240dd5bbb8a8ed39",
+      "readback_elapsed_seconds": 1.63333321,
+      "completed_frame_elapsed_seconds": 1.61666656,
+      "presentation_frame_offset": 98,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0049.jpg",
+      "side_sha256": "19b586bd9f3d2ee2c77be3c0a16fa1662b611fafa3a7721ea1281660aa81c2a9",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 50,
+      "file": "shipping/frame-0050.jpg",
+      "sha256": "9bbfed0dd8f616e699ef3c0ab2e0022b50e9c392b98d1ea7f1149b03e4802634",
+      "readback_elapsed_seconds": 1.66666651,
+      "completed_frame_elapsed_seconds": 1.64999986,
+      "presentation_frame_offset": 100,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0050.jpg",
+      "side_sha256": "ce4e27a5bff61dce9a0a8933fb09ba135db95e8cfb643de7162328339fe5ab12",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 51,
+      "file": "shipping/frame-0051.jpg",
+      "sha256": "9628d548140f164a92b8741d6bcc8722b9027cdd1dab5e122fe539034d66fcee",
+      "readback_elapsed_seconds": 1.7,
+      "completed_frame_elapsed_seconds": 1.6833334,
+      "presentation_frame_offset": 102,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0051.jpg",
+      "side_sha256": "877b5196e9a741b18d7af8d2331958aed8707320dca91476fd4758529602b31d",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 52,
+      "file": "shipping/frame-0052.jpg",
+      "sha256": "392f902a7f657173eaaa95502ee451c13af95eb4ec832481cdfb1014b7d97e30",
+      "readback_elapsed_seconds": 1.73333335,
+      "completed_frame_elapsed_seconds": 1.7166667,
+      "presentation_frame_offset": 104,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0052.jpg",
+      "side_sha256": "dded7b007166a5a990d7cc684c3df7dff50059e7cb2966fae3b131290ee7e0df",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 53,
+      "file": "shipping/frame-0053.jpg",
+      "sha256": "db6116080f1014b0e78b24d3b07b00183ae4322f2a78ae84a41b7d9dbba5a425",
+      "readback_elapsed_seconds": 1.76666665,
+      "completed_frame_elapsed_seconds": 1.75,
+      "presentation_frame_offset": 106,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0053.jpg",
+      "side_sha256": "e2347bf5639b8a274b72bace59d9afbaf5cedcf30c36ba5471938bb5c11dc3ee",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 54,
+      "file": "shipping/frame-0054.jpg",
+      "sha256": "f9bf29d312102e0761c7dc2357c051fd1d88d8445f8243cad9484adcbb88cfff",
+      "readback_elapsed_seconds": 1.8,
+      "completed_frame_elapsed_seconds": 1.7833333,
+      "presentation_frame_offset": 108,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0054.jpg",
+      "side_sha256": "7b93f58cc70e55331db99daec478552a777af8ed313497958467097ecbe7373f",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 55,
+      "file": "shipping/frame-0055.jpg",
+      "sha256": "665bc2e26eecd7346bf02e703e2b9a81b79ebfe7af6751ecb0137809202a7dca",
+      "readback_elapsed_seconds": 1.83333325,
+      "completed_frame_elapsed_seconds": 1.8166666,
+      "presentation_frame_offset": 110,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0055.jpg",
+      "side_sha256": "c27569f59ab0aed82ff92d6a07decd0f828b77ba9191c476f10486e239eb9d6b",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 56,
+      "file": "shipping/frame-0056.jpg",
+      "sha256": "b83e9c5271559173a4dbe8a96c477eb14aaa6f255c12d1c2dcca4bc1700cb687",
+      "readback_elapsed_seconds": 1.86666656,
+      "completed_frame_elapsed_seconds": 1.8499999,
+      "presentation_frame_offset": 112,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0056.jpg",
+      "side_sha256": "aa7631d5f4c27be308bd0c9584f69bd135b7592c0dc7e770db0a3e42257d23a3",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 57,
+      "file": "shipping/frame-0057.jpg",
+      "sha256": "c0828501cfbfff3d712a86ec8270e4188b5a2116b344ace0d0bc5389c318b8cb",
+      "readback_elapsed_seconds": 1.89999986,
+      "completed_frame_elapsed_seconds": 1.88333321,
+      "presentation_frame_offset": 114,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0057.jpg",
+      "side_sha256": "c4a63c3c9187227ada11d509e3cd90ab884fe3f25e6f903c0eb8264b0cfca5e7",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 58,
+      "file": "shipping/frame-0058.jpg",
+      "sha256": "ff5e8919b96b77ab9265333302939b68b3c348af3cb4d53012d7d6681fe0c2f2",
+      "readback_elapsed_seconds": 1.9333334,
+      "completed_frame_elapsed_seconds": 1.91666675,
+      "presentation_frame_offset": 116,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0058.jpg",
+      "side_sha256": "b42058958bf0925f3a497b43e87f34bcde19408e3e24f8078638fc7ba4743b45",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 59,
+      "file": "shipping/frame-0059.jpg",
+      "sha256": "a917eb2b77d880124a3dbcb500aac5f00e57ddf3ba8f51f1636a6b6f4d336ca0",
+      "readback_elapsed_seconds": 1.9666667,
+      "completed_frame_elapsed_seconds": 1.95,
+      "presentation_frame_offset": 118,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0059.jpg",
+      "side_sha256": "876b5dcb38b457318c981e72c9b1af941589381342476a4e21f04e26dd6a8212",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 60,
+      "file": "shipping/frame-0060.jpg",
+      "sha256": "9322a56a30cf5383a0e54b2ec17082604b25d6f6b55f6901efe9ee2065590722",
+      "readback_elapsed_seconds": 2.0,
+      "completed_frame_elapsed_seconds": 1.98333335,
+      "presentation_frame_offset": 120,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0060.jpg",
+      "side_sha256": "33f065454859e264b79cd716e8b83ac7762bba7bae6307686671eed253caac4a",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 61,
+      "file": "shipping/frame-0061.jpg",
+      "sha256": "a02ee68fde7684468948b8fbab6d92e64ef2c77d67f87be5b09511857e86f867",
+      "readback_elapsed_seconds": 2.0333333,
+      "completed_frame_elapsed_seconds": 2.01666665,
+      "presentation_frame_offset": 122,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0061.jpg",
+      "side_sha256": "da962508d3ca543a98d61abc70ff8149b3703227fe4cf4eb1a219050d9e81adf",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 62,
+      "file": "shipping/frame-0062.jpg",
+      "sha256": "c7e5e1c6c77689c24d31962116ca6363e778533deead5d8c8804d2114849c266",
+      "readback_elapsed_seconds": 2.0666666,
+      "completed_frame_elapsed_seconds": 2.05,
+      "presentation_frame_offset": 124,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0062.jpg",
+      "side_sha256": "d09a78cd403a172e732bde63ac09adf87712c77edeb868a319883038b3fa97d5",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 63,
+      "file": "shipping/frame-0063.jpg",
+      "sha256": "0598261107b818a72f76446d01824595d25a2d589952dacd18bcde784ff18d8d",
+      "readback_elapsed_seconds": 2.1,
+      "completed_frame_elapsed_seconds": 2.08333325,
+      "presentation_frame_offset": 126,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0063.jpg",
+      "side_sha256": "72d233e43b2e0f66d90739abfb0654eaa1ff0795de380265c40b8f6cae50e19f",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 64,
+      "file": "shipping/frame-0064.jpg",
+      "sha256": "01d030c5963bd536989014d540cb6942626211c30182794091d35eb1aefe7b40",
+      "readback_elapsed_seconds": 2.13333321,
+      "completed_frame_elapsed_seconds": 2.11666656,
+      "presentation_frame_offset": 128,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0064.jpg",
+      "side_sha256": "e2559d419e16b4020ebea70b3ddd7816090ff69d96aff9b095bc95abad770eee",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 65,
+      "file": "shipping/frame-0065.jpg",
+      "sha256": "b04a5e4d0367801be30fc7ac109457ed0a94a54907c688e64ccd131eb2a11203",
+      "readback_elapsed_seconds": 2.16666651,
+      "completed_frame_elapsed_seconds": 2.14999986,
+      "presentation_frame_offset": 130,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0065.jpg",
+      "side_sha256": "55be5f045f2c883a84b3e7e7e2ef3b9135103a1b8d90bc0890d2770e106ca39e",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 66,
+      "file": "shipping/frame-0066.jpg",
+      "sha256": "b2a7248dd5244b0910cd168d83e8ded99f317b802d3930898fe69de435f4c2f0",
+      "readback_elapsed_seconds": 2.2,
+      "completed_frame_elapsed_seconds": 2.1833334,
+      "presentation_frame_offset": 132,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0066.jpg",
+      "side_sha256": "aa3ba0aa268de5e7556f1c30cab001094e99cf6c07bd345e912464214691e36f",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 67,
+      "file": "shipping/frame-0067.jpg",
+      "sha256": "e3b0d12dc8f100517f7c38b4d52e45e6851e8746c10361353f7b28ef42dd8cef",
+      "readback_elapsed_seconds": 2.23333335,
+      "completed_frame_elapsed_seconds": 2.2166667,
+      "presentation_frame_offset": 134,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0067.jpg",
+      "side_sha256": "217a34a3addca02755da6fe6eb2e4f19a26304607dcc86622ff0956fc4d28b60",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 68,
+      "file": "shipping/frame-0068.jpg",
+      "sha256": "79fe3558a40ea35e088e1489eaddcc393f02143cdae34cec8e52619386110255",
+      "readback_elapsed_seconds": 2.26666665,
+      "completed_frame_elapsed_seconds": 2.25,
+      "presentation_frame_offset": 136,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0068.jpg",
+      "side_sha256": "6c40abfe434ed8c915a24a8d83acabe0d6819a6f7f3f3650e1dc958932f3e57a",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 69,
+      "file": "shipping/frame-0069.jpg",
+      "sha256": "bb956d980a3c34dcb99d49948f1f6240e7fe6d43190912ea212e8cbc99147cd4",
+      "readback_elapsed_seconds": 2.3,
+      "completed_frame_elapsed_seconds": 2.2833333,
+      "presentation_frame_offset": 138,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0069.jpg",
+      "side_sha256": "5b48984e6740636757f1c16ec5dc411788037a437121aefb8a6f0a0018625330",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 70,
+      "file": "shipping/frame-0070.jpg",
+      "sha256": "08d17a4c119c3a6a41ef67bcd2ba86fc5280e4ffedcba9e8623be36daf079e21",
+      "readback_elapsed_seconds": 2.33333325,
+      "completed_frame_elapsed_seconds": 2.3166666,
+      "presentation_frame_offset": 140,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0070.jpg",
+      "side_sha256": "b731aa697e9d9f05becc3096a0494910d6253d88f6108100c06a5841750ae658",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 71,
+      "file": "shipping/frame-0071.jpg",
+      "sha256": "d02578911cd8fc516b2632a6c12dd97966fa7395fb3cbcbf3a75276a290c62c6",
+      "readback_elapsed_seconds": 2.36666656,
+      "completed_frame_elapsed_seconds": 2.35,
+      "presentation_frame_offset": 142,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0071.jpg",
+      "side_sha256": "a5828f59b94ad92ff7ea913c247fae78ef7791d63ae45c863e08ada15f4b914c",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    },
+    {
+      "index": 72,
+      "file": "shipping/frame-0072.jpg",
+      "sha256": "8fda9ac490575492ae7cf00fc5727b751ce70936a889555363a333b08876769c",
+      "readback_elapsed_seconds": 2.39999986,
+      "completed_frame_elapsed_seconds": 2.38333321,
+      "presentation_frame_offset": 144,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "up": [
+          -0.1583156,
+          0.906307757,
+          0.3918448
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_file": "side/frame-0072.jpg",
+      "side_sha256": "5ccac24bf47e5a01ad2cb864814cb30990bfd5746f302e99eb416460c5a9d8b4",
+      "side_camera": {
+        "position": [
+          8.430363,
+          2.85,
+          7.4844346
+        ],
+        "forward": [
+          -0.8819756,
+          -0.161048442,
+          -0.442925125
+        ],
+        "up": [
+          -0.143919438,
+          0.9869465,
+          -0.07227584
+        ],
+        "field_of_view_degrees": 40.0
+      }
+    }
+  ]
+}

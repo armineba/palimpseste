@@ -1,0 +1,176 @@
+{
+    "observed_at":  "2026-09-20T17:42:06.263212+00:00",
+    "client_version":  "1.2.2",
+    "unity":  "6000.3.24f1",
+    "backend":  "IL2CPP",
+    "build_exit":  0,
+    "source":  "game/Build/WindowsSpectralEnergyRelease",
+    "playable":  "game/Build/WindowsSpectralEnergyPlayable",
+    "zip":  "deliverables/Palimpseste-Windows-x64-IL2CPP.zip",
+    "zip_bytes":  44089295,
+    "zip_sha256":  "6836f2cac5941a58d28b5a07c1b7f5e0b88cc5c51430320a6c9d9d199c1c542e",
+    "files_verified":  29,
+    "playable_bytes":  122554797,
+    "excluded_directories":  [
+                                 "Palimpseste Spell Lab_BurstDebugInformation_DoNotShip",
+                                 "Palimpseste_BackUpThisFolder_ButDontShipItWithYourGame"
+                             ],
+    "files":  [
+                  {
+                      "file":  "baselib.dll",
+                      "bytes":  239536,
+                      "sha256":  "b1c81019d9e7b525f5d52a3fa46417b08be0e073a5c2354319b495c07e1e4d94"
+                  },
+                  {
+                      "file":  "D3D12/D3D12Core.dll",
+                      "bytes":  4725304,
+                      "sha256":  "625bd40005b1c3708695d5256ecf230d278e6b8edba5a88af70f3d91324f3052"
+                  },
+                  {
+                      "file":  "GameAssembly.dll",
+                      "bytes":  50983936,
+                      "sha256":  "6f75e04a5d9874cd91f390d47803d0e4564e5f1390754cfe03395381b95a3a9e"
+                  },
+                  {
+                      "file":  "Palimpseste.exe",
+                      "bytes":  667136,
+                      "sha256":  "049f79454586f2ac5445f26b55191cf6611be62f10c4a5e12f92f806050149c2"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/app.info",
+                      "bytes":  33,
+                      "sha256":  "fb8ea29e27f64f69f6831a98d4ae46950e0897715143379bf00525373f021774"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/boot.config",
+                      "bytes":  156,
+                      "sha256":  "c8373eccf5d634f7cfc9dacc194abb51fdf3db32e95e7cbe4eb267123b352284"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/globalgamemanagers",
+                      "bytes":  214644,
+                      "sha256":  "3da959460da7145e5b5de4e1d8f785f9f17271e7119bd52101a52e4eeec70b12"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/globalgamemanagers.assets",
+                      "bytes":  1012024,
+                      "sha256":  "8406103d3ea467f1973eb7a4dce8456f4e9442c2ceeabc30121b892da747d188"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/globalgamemanagers.assets.resS",
+                      "bytes":  6174944,
+                      "sha256":  "26b24bbd0bdb7017ecbac3b829c0ed7c4848bc343af5702e96ebdb75a7258b04"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Metadata/global-metadata.dat",
+                      "bytes":  10557596,
+                      "sha256":  "d1f143df03c1a1f9d10af4fc8d8102338e15ff4b9d0f9e0e7424b051e761251b"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Resources/mscorlib.dll-resources.dat",
+                      "bytes":  337563,
+                      "sha256":  "c5baa176a5b72cd545266340e42102d393a5e43d38c95796bc828918bb95277f"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Resources/Newtonsoft.Json.dll-resources.dat",
+                      "bytes":  900,
+                      "sha256":  "531de49e73ddea25554c9f656f54da2a665946f3fec57048e0cfe3b9e49b03f8"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Resources/System.Data.dll-resources.dat",
+                      "bytes":  93718,
+                      "sha256":  "98a7950ec6de3242c2e190dfa630188dfa32511a125542b94baa952d1c757d49"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Resources/System.Drawing.dll-resources.dat",
+                      "bytes":  25453,
+                      "sha256":  "7c33aa707bc3fdc83991b81a97d6fc622b140762a767300f08f616c2c0a91255"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/level0",
+                      "bytes":  2668,
+                      "sha256":  "fa12289c44c5327eb592ee7006523dd40b1c2043d3836e94eabcc3dd2982cff8"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/level1",
+                      "bytes":  2668,
+                      "sha256":  "fa12289c44c5327eb592ee7006523dd40b1c2043d3836e94eabcc3dd2982cff8"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/Plugins/x86_64/lib_burst_generated.dll",
+                      "bytes":  381440,
+                      "sha256":  "fb2b6d0e1c6caa3ca5f2a90c67c957f8aefd37f7c2bafcc5dc413bda89514d5d"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/Resources/unity default resources",
+                      "bytes":  5883716,
+                      "sha256":  "32b58bdb9cf090212b46a8ca7436dcdae89e4ef43e9d55a835233c21d1347734"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/Resources/unity_builtin_extra",
+                      "bytes":  397720,
+                      "sha256":  "1aaf0d2a3f870903aba2596836425a590724df4c2bc046fc00d324e4858e928e"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/resources.assets",
+                      "bytes":  554632,
+                      "sha256":  "f41039248be615ae113dafa747db18b125983598cc0db2149fed5d9bfcd8709e"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/resources.assets.resS",
+                      "bytes":  1405360,
+                      "sha256":  "5b1e402fa3ea347154f10c0c45e2daeedb2b00d4a6cec760ebb114fddfc574b0"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/RuntimeInitializeOnLoads.json",
+                      "bytes":  2701,
+                      "sha256":  "159628ab433cae20aab08f92ac8dfc6fc041b98f47f493a905b29ff7a1e9cb63"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/ScriptingAssemblies.json",
+                      "bytes":  4313,
+                      "sha256":  "8cca4e3764c3c208b8d1fe0fb42a04a115d668cc728418b975926f714b24d27b"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/sharedassets0.assets",
+                      "bytes":  8064,
+                      "sha256":  "e3f3bac50937420bd494d9959665200a161272e60314b0f97a3ef6ecc9220e3d"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/sharedassets0.assets.resS",
+                      "bytes":  524288,
+                      "sha256":  "393efe6399536384aa91bdfc4e64f244b4d3e1fbb6a4ff145c483ffee64ccb36"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/sharedassets1.assets",
+                      "bytes":  505,
+                      "sha256":  "919745621a7d27f95ffe30fb96987217cf0beb9de1e069f7c8a6810ecdaa418b"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/StreamingAssets/service.json",
+                      "bytes":  19,
+                      "sha256":  "7405724d4a5bbbca9e70e9ef39ba2eb3de0ce3c476025151466ff09b75af8cc2"
+                  },
+                  {
+                      "file":  "UnityCrashHandler64.exe",
+                      "bytes":  1669552,
+                      "sha256":  "c110a9e47b4c8173a51978f9ff1224b9eff00216084cef0237958c53dcc1da99"
+                  },
+                  {
+                      "file":  "UnityPlayer.dll",
+                      "bytes":  36684208,
+                      "sha256":  "79a54af1c83b5b3bfa34936be18899de49fa88eea6a33ba7351c2163f95f6613"
+                  }
+              ],
+    "model_calls_for_this_visual_revision":  0,
+    "human_art_acceptance":  "not_claimed",
+    "exact_reference_match":  "not_demonstrated",
+    "shipping_camera_changed":  false,
+    "player_launch":  {
+                          "pid":  13972,
+                          "responding":  true,
+                          "window_title":  "Palimpseste Spell Lab",
+                          "observed_at":  "2026-09-20T17:42:55.6945602Z",
+                          "shortcut_updated":  true
+                      }
+}

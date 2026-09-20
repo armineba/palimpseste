@@ -1,5 +1,15 @@
 # Décisions de réalisation
 
+## D12 — Fidélité à l'image et itérations visuelles obligatoires
+
+Le créateur rejette explicitement le spectre de la version 1.2.1 et demande une correspondance « 1 pour 1 » avec `art-direction/spectral-veils-target.png`, puis précise qu'il faut itérer. Le verdict artistique D11 est donc **refusé** pour ce spectre. Une compilation réussie, des particules supplémentaires ou une capture du moteur ne constituent pas une acceptation de sa ressemblance.
+
+La cible est une capuche drapée creuse avec lumière nacrée, de très longues nappes de tissu violet ajouré, une silhouette étirée dans le sens du vol et un impact qui disperse cette même matière. Chaque itération conserve des captures Unity comparables, observe les écarts de proportions, de silhouette et de matière, puis les corrige. Une seconde caméra de revue peut faciliter la comparaison à l'image, mais doit être identifiée comme telle ; elle ne remplace pas la vue livrée dans le laboratoire. La correspondance exacte reste une exigence à vérifier, jamais une réussite présumée.
+
+Le paquet joueur, sa physique et l'isolation du worker restent inchangés. Le travail de création des assets et du renderer se fait pendant le développement ; aucune étape de capture, test, build ou génération d'image n'est ajoutée au parcours joueur.
+
+Précisions après la deuxième itération : le créateur rejette l'aspect « modèle 3D » et demande une apparition magique **sans corps réel**. La capuche ne doit donc pas devenir un costume opaque : brume lumineuse, filaments et nappes d'énergie suggèrent une présence. Il demande une animation fluide, organique lorsque le matériau s'y prête, et un impact marqué. La caméra du labo reste inchangée ; les corrections portent sur les VFX.
+
 ## D11 — Magie stylisée et mouvements superposés
 
 Le créateur juge le rendu 1.2.0 trop simple et fournit deux références : soin vert en spirale, puis jaillissement arcanique violet avec une couronne et des particules verticales. Le travail demandé porte sur des VFX plus complexes et stylisés : rubans larges et effilés, plusieurs rythmes de rotation et d'élévation, éclats en étoile, brumes légères, naissance et extinction soignées. La forme centrale reste celle de l'objet interprété ; les effets ne copient pas les pixels du dessin.

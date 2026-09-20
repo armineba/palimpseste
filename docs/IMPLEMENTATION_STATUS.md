@@ -1,6 +1,16 @@
 # État de réalisation et point de reprise
 
-## État courant — D11, Player stylisé 1.2.1 livré
+## Livraison actuelle — D12, spectre magique 1.2.2, verdict artistique ouvert
+
+**Le Player Windows IL2CPP `1.2.2` est construit et livré** dans [WindowsSpectralEnergyPlayable](../game/Build/WindowsSpectralEnergyPlayable/Palimpseste.exe). Le build a terminé avec le **code 0**. Les **29 fichiers du dossier totalisent 122 554 797 octets** ; le [ZIP Player](../deliverables/Palimpseste-Windows-x64-IL2CPP.zip) fait **44 089 295 octets**, SHA-256 `6836f2cac5941a58d28b5a07c1b7f5e0b88cc5c51430320a6c9d9d199c1c542e`. Voir le [manifeste de livraison](../evidence/public/unity/spectral-energy-delivery.json). Le nouveau Player a été lancé sous le PID `13972` et le raccourci Bureau **Palimpseste Spell Lab** est actualisé.
+
+Le créateur avait refusé le spectre `1.2.1`, puis **explicitement rejeté l'itération 02** pour son corps trop solide. Quatre itérations visuelles ont suivi la demande de magie translucide, d'animation organique et d'impact. La version finale remplace la capuche et le visage opaques par de la brume volumétrique et des courants lumineux. Six nappes suivent l'historique réel du vol ; le sillage se dissipe durant **0,62 s** après retrait du porteur mécanique, sans nouvelle touche. La caméra du laboratoire et le paquet joueur sont conservés. Aucun appel modèle n'a été nécessaire.
+
+Les [preuves D12](../evidence/public/unity/spectral-fidelity-2026-09-20.md) consignent les captures : **01 : 1/1, 02 : 1/1, 03 : 5/5, 04 finale : 1/1**. La capture finale rejoue le vrai spectre avec une touche, 12 000 unités internes de dégâts et une impulsion. Deux vidéos de **73 images, 30 images/s, 2,433333 s**, sans son, montrent [la caméra du labo](../evidence/public/unity/spectral-fidelity/iteration-04/spectre-lab.mp4) et [une caméra latérale de comparaison](../evidence/public/unity/spectral-fidelity/iteration-04/spectre-side-review.mp4). Cette seconde caméra est réservée aux preuves ; la cadence fixe de capture ne constitue pas un benchmark de FPS.
+
+**Point de reprise : verdict du créateur sur le spectre conservé dans `1.2.2`.** La correspondance exacte « 1 pour 1 » à la référence n'est pas démontrée, et aucune acceptation humaine du nouveau rendu ou du son n'est enregistrée. Rejouer ce sort ne consomme aucun appel modèle. Les autres styles et recettes ne sont pas déclarés artistiquement validés par cette reprise ; aucun nouveau parcours dessin → modèles → Player, autre poste ou accès de joueurs distants n'est attesté ici. Les sections suivantes décrivent les livraisons historiques.
+
+## Historique — D11, Player stylisé 1.2.1 livré puis spectre refusé
 
 Le retour du créateur est que 1.2.0 convient à une démonstration mais reste trop simple visuellement. La version 1.2.1 ajoute des compositions de zones, des spirales ascendantes et des couronnes, quatre familles de particules, des rubans translucides et un éclairage HDR maîtrisé. Le rythme visuel d'un soin exploite ses effets `heal`/`regen`. Le backend, les prompts et les données de sort ne changent pas ; **aucun appel fournisseur** n'a été effectué pour cette finition. Voir [D11](DECISIONS.md).
 

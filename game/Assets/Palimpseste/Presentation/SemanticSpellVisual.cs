@@ -298,39 +298,53 @@ namespace Palimpseste.Game.SpellRuntime
 
         private void Spirit(Transform parent)
         {
-            var cloak = Own(SpellVfxComposition.CreateHoodMaterial(tint));
-            const int segments = 32, rings = 12;
-            var vertices = new List<Vector3>(); var triangles = new List<int>(); var uv = new List<Vector2>();
-            for (var row = 0; row <= rings; row++)
+            // The interpreted spirit has no solid character body or face.
+            // This enclosing mesh is only a bounded integration domain for
+            // luminous participating mist; its surface is never rendered.
+            var mistShader = Resources.Load<Shader>("SpellSpectralMist");
+            if (mistShader == null) throw new InvalidOperationException("Spectral mist shader missing from player");
+            var mist = Own(new Material(mistShader));
+            mist.SetColor("_Color", new Color(.36f, .16f, .65f));
+            mist.SetColor("_Accent", new Color(.89f, .79f, 1f) * 3.2f);
+            mist.SetFloat("_Opacity", .85f);
+            mist.SetFloat("_Seed", .37f);
+            var presence = Round(parent, new Vector3(0,.40f,.02f), new Vector3(.88f,1.12f,1.08f),mist);
+            presence.name = "Volumetric spectral presence";
+            presence.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.Off;
+            presence.GetComponent<Renderer>().receiveShadows = false;
+
+            // Broken light currents suggest the arch of the apparition.
+            // No dark lining, opaque face, solid trim or closed cloak is used.
+            var current = Own(new Material(Resources.Load<Shader>("SpellEnergy")));
+            current.SetColor("_BaseColor",new Color(.77f,.57f,1f,.48f)*1.6f);
+            current.SetFloat("_Radial",0);
+            for (var band=0;band<3;band++)
             {
-                var t = row / (float)rings;
-                var radius = Mathf.Sin(t * Mathf.PI * .52f) * .33f + .006f;
-                for (var col = 0; col <= segments; col++)
+                const int steps=48;
+                var vertices=new List<Vector3>(); var uv=new List<Vector2>();
+                var triangles=new List<int>(); var colors=new List<Color>();
+                for (var i=0;i<=steps;i++)
                 {
-                    var a = col / (float)segments * Mathf.PI * 2;
-                    vertices.Add(new Vector3(Mathf.Cos(a) * radius,
-                        .32f + Mathf.Sin(a) * radius * 1.18f, -.34f + t * .76f));
-                    uv.Add(new Vector2(t,col / (float)segments));
-                    if (row < rings && col < segments)
-                    {
-                        var n = row * (segments + 1) + col;
-                        triangles.AddRange(new[] { n,n+1,n+segments+1,n+1,n+segments+2,n+segments+1 });
-                    }
+                    var t=i/(float)steps;
+                    var angle=Mathf.Lerp(-.18f,Mathf.PI+1.1f,t)+band*.18f;
+                    var radius=.25f+band*.027f+Mathf.Sin(t*12+band)*.015f;
+                    var center=new Vector3(Mathf.Cos(angle)*radius,
+                        .39f+Mathf.Sin(angle)*(.33f+band*.025f),
+                        .24f-band*.10f-Mathf.Pow(t,3)*.65f);
+                    var width=(.009f+Mathf.Sin(t*Mathf.PI)*.015f)*(band==1 ? 1.35f : 1);
+                    var radial=new Vector3(Mathf.Cos(angle),Mathf.Sin(angle),.15f);
+                    vertices.Add(center-radial*width); vertices.Add(center+radial*width);
+                    uv.Add(new Vector2(t,0)); uv.Add(new Vector2(t,1));
+                    var alpha=Mathf.Pow(Mathf.Sin(t*Mathf.PI),2)*(.42f+.58f*Mathf.Pow(Mathf.Sin(t*8+band),2));
+                    colors.Add(new Color(1,1,1,alpha)); colors.Add(new Color(1,1,1,alpha));
+                    if(i<steps) { var n=i*2; triangles.AddRange(new[]{n,n+1,n+2,n+1,n+3,n+2}); }
                 }
+                var mesh=Own(Finish(vertices,triangles,false)); mesh.SetUVs(0,uv); mesh.SetColors(colors);
+                mesh.name="Apparition light current";
+                var part=Part("Broken spectral arch "+band,parent,mesh,Vector3.zero,Vector3.one,current);
+                part.GetComponent<Renderer>().shadowCastingMode=ShadowCastingMode.Off;
+                part.GetComponent<Renderer>().receiveShadows=false;
             }
-            var hood = Own(Finish(vertices,triangles,false));
-            hood.name = "Open spectral hood"; hood.SetUVs(0,uv);
-            Part("Translucent spectral hood",parent,hood,Vector3.zero,Vector3.one,cloak);
-            Round(parent,new Vector3(0,.30f,.34f),new Vector3(.49f,.58f,.09f),dark);
-            Round(parent,new Vector3(0,.30f,.411f),new Vector3(.12f,.17f,.065f),bright);
-            Round(parent,new Vector3(0,-.025f,-.14f),new Vector3(.38f,.39f,.63f),cloak);
-            var rim = new Vector3[33];
-            for (var i=0;i<rim.Length;i++)
-            {
-                var a=i/(float)(rim.Length-1)*Mathf.PI*2;
-                rim[i]=new Vector3(Mathf.Cos(a)*.338f,.32f+Mathf.Sin(a)*.398f,.419f);
-            }
-            Tube(parent,"Pearlescent hood seam",rim,.009f,.009f,energy);
         }
 
         private void Weapon(Transform parent, bool spear)
@@ -738,6 +752,14 @@ namespace Palimpseste.Game.SpellRuntime
         public static void Impact(string form, Vector3 point, Vector3 direction, Color color, float radius)
         {
             SpellVfxComposition.SpawnImpact(new SpellAppearance { form = form }, point, direction, color, radius);
+        }
+
+        public bool RetireWithDissolvingWake()
+        {
+            if (Form != "spirit" || carrier != "projectile" || composition == null) return false;
+            body.gameObject.SetActive(false);
+            composition.DissolveWake();
+            return true;
         }
 
         private void Update()

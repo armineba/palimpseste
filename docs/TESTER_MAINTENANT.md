@@ -1,6 +1,20 @@
 # Tester le lecteur actuel
 
-## Essayer la version stylisée D11 livrée — 1.2.1
+## Essayer le spectre magique livré — D12 / 1.2.2
+
+Ouvrir le raccourci Bureau **Palimpseste Spell Lab** ou [le Player `1.2.2`](../game/Build/WindowsSpectralEnergyPlayable/Palimpseste.exe), déjà lancé sur ce PC. Conserver les **29 fichiers du dossier** ensemble ; [preuves de livraison](../evidence/public/unity/spectral-energy-delivery.json).
+
+1. Dans la bibliothèque, ouvrir **« Envol du spectre aux longs voiles »**.
+2. Ouvrir le laboratoire puis lancer le sort.
+3. Observer la présence en brume, les longues nappes qui suivent le vol et leur dispersion après l'impact ; écouter également le résultat sonore.
+
+Il n'est pas nécessaire de redessiner ni de lancer une nouvelle génération pour cet essai. La caméra habituelle du labo reste inchangée. Le spectre emploie désormais de l'énergie translucide ; la capuche et le visage opaques de l'itération 02, refusés par le créateur, ont été retirés.
+
+Voir l'[animation réelle avec la caméra du labo](../evidence/public/unity/spectral-fidelity/iteration-04/spectre-lab.mp4) et la [vue latérale supplémentaire](../evidence/public/unity/spectral-fidelity/iteration-04/spectre-side-review.mp4). Ces vidéos de 2,433333 s sont sans son. Les [preuves détaillées](../evidence/public/unity/spectral-fidelity-2026-09-20.md) établissent le replay, les dégâts et la disparition du sillage ; **la correspondance exacte à la référence et la satisfaction artistique restent à apprécier**.
+
+Pour créer un autre sort, dessiner puis cliquer **Dessin terminé**, lire l'interprétation et lancer le sort prêt. La chaîne demeure **Sol/high → Astra/high**. Cette mise à jour du spectre ne démontre pas la finition de tous les autres sorts ni l'accès de joueurs distants.
+
+## Historique — version stylisée D11 livrée, 1.2.1
 
 La finition ajoute des spirales, des couronnes et plusieurs couches de particules, avec un soin vert plus doux et des impacts plus développés. Les [captures Unity réelles](../evidence/public/unity/stylized-vfx-2026-09-20.md) sont disponibles ; trois compositions sont des fixtures de présentation, et le spectre provient d'un vrai sort conservé. Elles ne constituent pas une validation artistique humaine.
 

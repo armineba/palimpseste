@@ -1,6 +1,16 @@
 # Point de reprise immédiat
 
-## Priorité actuelle — essayer le Player stylisé D11 livré
+## Priorité actuelle — essayer le spectre magique livré, D12 / 1.2.2
+
+Le [Player `1.2.2`](../game/Build/WindowsSpectralEnergyPlayable/Palimpseste.exe) est construit avec le code 0, empaqueté en **29 fichiers, 122 554 797 octets**, puis lancé sous le PID `13972`. Le raccourci Bureau est actualisé. Le [manifeste de livraison](../evidence/public/unity/spectral-energy-delivery.json) atteste le ZIP de **44 089 295 octets**, SHA-256 `6836f2cac5941a58d28b5a07c1b7f5e0b88cc5c51430320a6c9d9d199c1c542e`.
+
+1. Rejouer **« Envol du spectre aux longs voiles »** depuis la bibliothèque pour apprécier la brume magique, les nappes animées et l'impact. Le paquet et la caméra du labo sont conservés ; aucun nouvel appel modèle n'est nécessaire.
+2. Recueillir le verdict du créateur. Il a explicitement refusé l'itération 02, trop solide. Les itérations 03 et 04 remplacent ce corps par une présence magique ; **la fidélité « 1 pour 1 » et l'acceptation artistique restent ouvertes**. La [vidéo réelle du labo](../evidence/public/unity/spectral-fidelity/iteration-04/spectre-lab.mp4) et la [vue latérale de comparaison](../evidence/public/unity/spectral-fidelity/iteration-04/spectre-side-review.mp4) permettent de discuter du mouvement ; elles ne contiennent pas de son.
+3. Si un défaut précis est signalé, reprendre cette partie du VFX puis la même capture. Les [preuves existantes](../evidence/public/unity/spectral-fidelity-2026-09-20.md) comprennent **5/5 tests à l'itération 03**, puis la capture finale **1/1** après le dernier réglage. Le sillage décoratif de 0,62 s ne prolonge pas les dégâts. Ne pas recommencer une campagne sans risque concret à résoudre.
+
+Cette reprise ne valide pas l'ensemble des recettes ou styles, les performances sous charge, un nouveau parcours complet de génération, un autre poste ou l'accès des joueurs distants. Ces travaux et l'écoute humaine restent ouverts. Le backend demeure celui de D10.
+
+## Historique — essayer le Player stylisé D11 livré
 
 Le renderer `1.2.1` et sa [galerie finale](../evidence/public/unity/stylized-vfx-2026-09-20.md) sont vérifiés : neuf images de fixtures, six images du vrai spectre conservé avec une touche, 12 000 unités internes de dégâts et une impulsion. Les corrections ciblées ont été suivies d'une reprise de la galerie seule, réussie **1/1**. Les cinq autres contrôles ont réussi lors de la deuxième exécution ; ne pas transformer ces deux résultats en un passage unique 6/6 ni recommencer une campagne sans problème concret.
 

@@ -1,0 +1,20 @@
+{
+  "source": "Unity HDR render sequence; no model call; original JPEG frames retained in game/Logs/spectral-sequence-04",
+  "encoded_fps": 30,
+  "source_frames": 73,
+  "duration_seconds": 2.433333333333333,
+  "audio_recorded": false,
+  "is_performance_benchmark": false,
+  "videos": [
+    {
+      "file": "spectre-lab.mp4",
+      "bytes": 902026,
+      "sha256": "055e299e370abdd7cde62c253c5e2e12f089099ca927545aa3ea170db6491a09"
+    },
+    {
+      "file": "spectre-side-review.mp4",
+      "bytes": 1811426,
+      "sha256": "4299eb428230f3ce15da8c00c619e40fece5fdb0c63306d813c56948f30a0aa0"
+    }
+  ]
+}
