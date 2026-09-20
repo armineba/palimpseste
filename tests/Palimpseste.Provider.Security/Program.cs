@@ -253,6 +253,18 @@ try
     };
     Assert(!WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
         "hash-linked A/B reports and offline compiled validation must pass the composite gate");
+    await File.WriteAllTextAsync(planBReport, JsonSerializer.Serialize(validPlanEvidence), new UTF8Encoding(true));
+    var bomPlanBytes = await File.ReadAllBytesAsync(planBReport);
+    Assert(bomPlanBytes.AsSpan(0, 3).SequenceEqual(new byte[] { 0xEF, 0xBB, 0xBF }),
+        "the source report fixture must have a UTF-8 BOM");
+    await WriteCompositeAsync(PlanReportSha(), OfflineReportSha());
+    Assert(!WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
+        "a source report with UTF-8 BOM must pass when its hash covers the complete file bytes");
+    await WriteCompositeAsync(new string('b', 64), OfflineReportSha());
+    Assert(WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
+        "a UTF-8 BOM source report must still fail when its recorded hash is wrong");
+    await File.WriteAllTextAsync(planBReport, JsonSerializer.Serialize(validPlanEvidence), new UTF8Encoding(false));
+    await WriteCompositeAsync(PlanReportSha(), OfflineReportSha());
     await File.WriteAllTextAsync(aFinal, "tampered A");
     Assert(WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
         "composite proof must reject changed A final bytes");
