@@ -1,16 +1,43 @@
 # Point de reprise immédiat
 
-Mis à jour le 20 septembre 2026 après un essai joueur réel sur le laboratoire propriétaire.
+Mis à jour le 20 septembre 2026 après l'incident d'une nouvelle capture restée locale dans un Player lancé hors ligne.
 
 Preuve détaillée : [essai joueur, build et relecture sans API](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md).
+
+## Incident du nouveau dessin et point de reprise
+
+Le Player PID `35804` avait démarré pendant l'arrêt de l'API. Le nouveau dessin
+fermé est conservé localement : `capture_pending`, `needs_begin=true`,
+`needs_capture=true`, 151 entrées de journal. Malgré le retour de `/health/ready`
+à 200 et le worker actif, aucun nouveau job n'existe pour cette capture.
+L'écran « transmission de la capture en attente » n'est donc pas une longue
+lecture Luna. Le code ajoute le bouton « Reconnecter », qui relance la session
+du laboratoire puis rouvre ce même parchemin, et sa transmission peut alors
+être retentée. Une relance du Player est également possible ; conserver le
+même profil Windows et ses données locales. L'utilisateur accepte de
+redessiner si nécessaire, mais la première action est de vérifier la reprise
+de la trace conservée.
+
+Unity a produit `game/Build/WindowsPlayerReconnectPlayable/` : 29 fichiers,
+122 095 741 octets, hashes identiques au build brut, hors deux dossiers
+`DoNotShip`. EXE SHA-256
+`049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2` ;
+GameAssembly SHA-256
+`E379AD0EC9CB79533E319BDEB97826E480BE55D614697A66F4183AB81669D75F`.
+Le journal Unity SHA-256
+`46AEEE27A7CE810FA399FC4BA3017B92F5043D17B85065327268EAA1EE1AEBC8`
+contient `PALIMPSESTE_BUILD_OK` et « Application will terminate with return
+code 0 », sans erreur `CS`. Le code de retour de la commande PowerShell
+parente n'a pas été capturé. **Le nouveau Player et la reprise du dessin ne
+sont pas encore testés.** Voir la [preuve de l'incident et du correctif](../evidence/public/unity/player-reconnect-pending-capture-2026-09-20.md).
 
 ## Chaîne exécutée
 
 Le Player Windows a envoyé une vraie capture rouge-brun courbe, distincte du trait droit utilisé pour la calibration des prompts. Le job `production` de cette capture est `ready` : deux tentatives fournisseur réussies, une description A, un plan B et un `compiled_spell`, aucune tentative en échec. Le worker isolé sous `PalRuntimeSvc` a utilisé `codex exec` avec `gpt-5.6-luna` et l'effort `max` attesté par les contrôles préalables. Le Player a affiché A « Faisceau courbe de lave », téléchargé et vérifié la fiche, ouvert le laboratoire et compté un lancement (`Lancers : 1`, `Dégâts : 0`). Ce plan ne prévoit pas de dégâts.
 
-Le correctif de visibilité du rayon à `0,6 s` a passé 2/2 tests PlayMode sur le **paquet du joueur**, puis Unity 6000.3.24f1 a terminé le build Windows IL2CPP/URP avec le code 0. Le build actuel est `game/Build/WindowsPlayerBeamVisibleReady/` : 29 fichiers, 122 093 149 octets ; EXE SHA-256 `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`, `GameAssembly.dll` SHA-256 `9FB651D09680CAF09B0A8668BEF2A914EFDE6B61F930EDBAE1CE90AF3B5C18C9`. Une capture du Player montre l'effet visible puis disparu.
+Le correctif de visibilité du rayon à `0,6 s` a passé 2/2 tests PlayMode sur le **paquet du joueur**, puis Unity 6000.3.24f1 a terminé le build Windows IL2CPP/URP avec le code 0. Le build précédent testé est `game/Build/WindowsPlayerBeamVisibleReady/` : 29 fichiers, 122 093 149 octets ; EXE SHA-256 `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`, `GameAssembly.dll` SHA-256 `9FB651D09680CAF09B0A8668BEF2A914EFDE6B61F930EDBAE1CE90AF3B5C18C9`. Une capture de ce Player montre l'effet visible puis disparu.
 
-L'API précédente (PID `25848`) a été arrêtée. Le nouveau Player a été relancé (PID `35804`) et la bibliothèque, la fiche, le laboratoire ainsi qu'un lancement du même sort sont restés accessibles **sans API**. L'API a ensuite redémarré sous `PalRuntimeSvc` (PID `16420`) ; `http://127.0.0.1:18080/health/ready` a répondu 200. Le worker PID `8180` est resté actif. Cet essai démontre la relecture locale lors d'une indisponibilité de l'API ; il ne mesure pas la qualité artistique ni l'écoute du son.
+L'API précédente (PID `25848`) a été arrêtée. Le Player BeamVisibleReady précédent a été relancé (PID `35804`) et la bibliothèque, la fiche, le laboratoire ainsi qu'un lancement du même sort sont restés accessibles **sans API**. L'API a ensuite redémarré sous `PalRuntimeSvc` (PID `16420`) ; `http://127.0.0.1:18080/health/ready` a répondu 200. Le worker PID `8180` est resté actif. Cet essai démontre la relecture locale lors d'une indisponibilité de l'API ; il ne mesure pas la qualité artistique ni l'écoute du son.
 
 Une commande de confort pour fermer puis relancer le Player avec l'API restaurée a été refusée **avant exécution** par la revue automatique (`blocked by policy`, sans motif détaillé). Elle n'a pas été réessayée par un moyen équivalent. Le Player PID `35804` reste ouvert dans la session issue de l'essai sans API ; l'API PID `16420` répond 200 et le worker PID `8180` reste actif. Aucune relance du Player en ligne après cette restauration n'est revendiquée.
 
@@ -26,9 +53,10 @@ Le laboratoire reste privé sur `127.0.0.1` avec invitation propriétaire ; aucu
 
 ## Travaux restants
 
-1. Faire écouter le son et recueillir les verdicts des créateurs sur le texte A, le rendu, l'intérêt du sort et l'expérience de dessin ; enregistrer ces décisions séparément de la preuve technique.
-2. Exécuter la recette finale sur les 30 dessins inédits, avec le second créateur et une machine Windows propre. Le seul job propriétaire réussi ne satisfait pas M7.
-3. Vérifier l'installation et le parcours sur un autre poste, puis décider de la livraison publique, de l'HTTPS et du cadre d'usage du compte avant ouverture à des joueurs externes.
-4. Livrer le dossier Windows actuel. La création du ZIP actualisé a été refusée avant exécution par la revue automatique (`blocked by policy`) ; les ZIP existants restent historiques. Le démarrage de l'API, lui, fonctionne via `ops/start-owner-api.ps1` sans secret dans l'appel de l'outil.
+1. Lancer le build `WindowsPlayerReconnectPlayable` dans le même profil Windows, ouvrir le dessin local en attente et essayer « Reconnecter », puis « Transmettre » si proposé. Vérifier qu'un nouveau job est créé et que la lecture A apparaît. En cas d'échec, conserver le journal local et relever le message exact avant de redessiner. Aucune réussite de cette reprise n'est encore attestée.
+2. Faire écouter le son et recueillir les verdicts des créateurs sur le texte A, le rendu, l'intérêt du sort et l'expérience de dessin ; enregistrer ces décisions séparément de la preuve technique.
+3. Exécuter la recette finale sur les 30 dessins inédits, avec le second créateur et une machine Windows propre. Le seul job propriétaire réussi ne satisfait pas M7.
+4. Vérifier l'installation et le parcours sur un autre poste, puis décider de la livraison publique, de l'HTTPS et du cadre d'usage du compte avant ouverture à des joueurs externes.
+5. Livrer le dossier Windows actuel. La création du ZIP actualisé a été refusée avant exécution par la revue automatique (`blocked by policy`) ; les ZIP existants restent historiques. Le démarrage de l'API, lui, fonctionne via `ops/start-owner-api.ps1` sans secret dans l'appel de l'outil.
 
 Les détails du worker et les hashes des preuves sont dans [OWNER_WORKER_CUTOVER.md](ops/OWNER_WORKER_CUTOVER.md). Le parcours sur ce PC est dans [TESTER_MAINTENANT.md](TESTER_MAINTENANT.md). Les statuts par ticket et limites sont dans [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).

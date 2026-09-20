@@ -1,7 +1,7 @@
 # Manuel du lecteur Palimpseste
 
-Sur ce PC, lancer [Palimpseste.exe](../game/Build/WindowsPlayerBeamVisibleReady/Palimpseste.exe)
-depuis son dossier `game/Build/WindowsPlayerBeamVisibleReady/`. Garder les autres
+Sur ce PC, lancer [Palimpseste.exe](../game/Build/WindowsPlayerReconnectPlayable/Palimpseste.exe)
+depuis son dossier `game/Build/WindowsPlayerReconnectPlayable/`. Garder les autres
 fichiers du dossier avec l'exécutable. L'ancienne archive ZIP contient une
 version antérieure. Le jeu ne demande ni connexion Codex par joueur, ni adresse
 de service, ni jeton à saisir. L'accès au laboratoire déjà installé permet
@@ -18,6 +18,15 @@ type de trait et son épaisseur dans l'atelier. Cliquer sur « Fermer le
 parchemin » pour figer la capture. Le dessin et son journal restent enregistrés
 sur cet appareil. Le jeu tente de transmettre la capture ; si elle est encore
 en attente, utiliser « Transmettre » sur l'écran « Du dessin au sort ».
+
+Si l'écran reste sur « transmission de la capture en attente », le dessin est
+conservé localement. Dans ce build, « Reconnecter » relance l'accès au
+laboratoire, puis rouvre le même parchemin pour transmettre sa capture. Si la
+connexion est déjà rétablie, « Transmettre » tente l'envoi. Garder le même
+profil Windows et ne pas effacer les données locales avant la reprise. Il est
+aussi possible de fermer puis rouvrir ce build et de sélectionner le
+parchemin dans la bibliothèque. La reprise de la capture qui a révélé cet
+incident reste à vérifier dans le Player.
 
 Cet écran montre la trace et les étapes signalées par le laboratoire : lecture
 du dessin par Luna A, extraction des formes, traduction par Luna B, contrôle du

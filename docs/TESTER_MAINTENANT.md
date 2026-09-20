@@ -1,20 +1,49 @@
 # Tester le lecteur actuel
 
-## Sur ce PC, maintenant
+## Nouveau build de reconnexion sur ce PC
 
-Lancer `game/Build/WindowsPlayerBeamVisibleReady/Palimpseste.exe`. Ce lecteur
+Lancer [Palimpseste.exe](../game/Build/WindowsPlayerReconnectPlayable/Palimpseste.exe)
+depuis `game/Build/WindowsPlayerReconnectPlayable/`, en conservant les 29
+fichiers ensemble. Ce dossier jouable contient 122 095 741 octets. L'EXE a
+pour SHA-256 `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`
+et `GameAssembly.dll` pour SHA-256
+`E379AD0EC9CB79533E319BDEB97826E480BE55D614697A66F4183AB81669D75F`.
+Les 29 fichiers correspondent au build brut ; les deux dossiers `DoNotShip`
+du build brut ont été exclus. Le journal Unity contient `PALIMPSESTE_BUILD_OK`,
+« Application will terminate with return code 0 » et aucune erreur `CS` ; le
+code de retour de la commande PowerShell parente n'a pas été capturé. Le
+nouveau Player et la reprise du dessin en attente n'ont pas encore été
+observés en exécution.
+
+Le Player précédent, PID `35804`, avait démarré pendant que l'API était
+indisponible. Après un nouveau tracé, son écran est resté sur « transmission
+de la capture en attente ». Son enregistrement local est `capture_pending`,
+avec `needs_begin` et `needs_capture` vrais et 151 entrées de journal. L'API
+répondait de nouveau 200 et le worker était actif, mais aucun nouveau job
+n'avait été créé : attendre seul sur cet écran ne lançait donc pas Luna.
+Le correctif ajoute « Reconnecter » sur l'écran de traitement hors ligne.
+Dans le nouveau build, rouvrir le même parchemin depuis la bibliothèque puis
+cliquer sur ce bouton ; après reconnexion, le Player doit tenter la
+transmission. Si « Transmettre » apparaît, cliquer dessus. Garder le même
+profil Windows pour récupérer le journal ; il est possible de redessiner si
+la reprise échoue. Consigner le résultat de cet essai avant de le déclarer
+réussi. Voir la [preuve de l'incident et du correctif](../evidence/public/unity/player-reconnect-pending-capture-2026-09-20.md).
+
+## Essai déjà observé avec le build précédent
+
+Le lecteur `game/Build/WindowsPlayerBeamVisibleReady/Palimpseste.exe`
 Windows x64 IL2CPP/URP a été construit avec Unity 6000.3.24f1. Il contient
 29 fichiers, 122 093 149 octets, et le shader `LavaBeam` dans
 `resources.assets` ; l'exécutable a pour SHA-256
 `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`,
 `GameAssembly.dll` pour SHA-256
 `9FB651D09680CAF09B0A8668BEF2A914EFDE6B61F930EDBAE1CE90AF3B5C18C9`.
-C'est le build actuel, terminé par Unity avec le code 0 ; aucun ZIP
+C'était le build testé, terminé par Unity avec le code 0 ; aucun ZIP
 correspondant n'a été créé.
 L'API propriétaire locale tourne sous `PalRuntimeSvc` sur
 `http://127.0.0.1:18080` ; `/health/ready` a répondu 200 après redémarrage de
 l'API sous le PID `16420`. Le worker reste actif sous le PID `8180`. Le Player
-actuel a été ouvert en fenêtre visible, PID `35804`. La session
+de ce build a été ouvert en fenêtre visible, PID `35804`. La session
 conservée et l'écran « Capture reçue / En file d'attente » ont été observés
 dans le Player LavaReady précédent pour une vraie capture propriétaire reçue
 par l'API. La base contenait alors un job `production` et quatre artefacts :
@@ -27,9 +56,9 @@ description, un plan et un `compiled_spell`, sans échec enregistré. Le Player
 a montré A « Faisceau courbe de lave », puis la fiche du sort téléchargée et
 vérifiée. Le laboratoire s'est ouvert ; un clic a donné `Lancers : 1` et
 `Dégâts : 0`. Ce dernier chiffre correspond au plan visuel sans dégâts. Dans
-le nouveau Player, une capture montre l'effet visible puis disparu. L'écoute
+ce Player précédent, une capture montre l'effet visible puis disparu. L'écoute
 humaine du son reste à vérifier.
-Voir la [preuve du parcours joueur et du build actuel](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md),
+Voir la [preuve du parcours joueur et du build précédent testé](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md),
 la [capture du sort visible](../evidence/public/unity/owner-player-lava-beam-2026-09-20.png)
 et la [capture de sa relecture sans API](../evidence/public/unity/owner-player-offline-lava-beam-2026-09-20.png).
 

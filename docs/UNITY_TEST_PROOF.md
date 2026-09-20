@@ -1,6 +1,15 @@
 # Preuves Unity — 20 septembre 2026
 
-## Build actuel : sort joueur Luna dans le Player et hors ligne
+Le build correctif `game/Build/WindowsPlayerReconnectPlayable/` a été produit
+après un second dessin resté local dans un Player lancé sans API. Son journal
+Unity contient `PALIMPSESTE_BUILD_OK` et un retour 0 annoncé ; le code retour
+PowerShell parent n'a pas été capturé. Le nouveau Player et la reprise du
+dessin **ne sont pas encore exécutés**. Voir la [preuve de l'incident et du
+correctif](../evidence/public/unity/player-reconnect-pending-capture-2026-09-20.md).
+Le build `WindowsPlayerBeamVisibleReady` décrit ci-dessous reste la preuve
+observée du sort, du laboratoire et de la réutilisation hors ligne.
+
+## Build précédent testé : sort joueur Luna dans le Player et hors ligne
 
 Le [rapport de bout en bout du propriétaire](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md)
 lie une vraie capture rouge-brun courbe du Player à deux tentatives Luna A/B

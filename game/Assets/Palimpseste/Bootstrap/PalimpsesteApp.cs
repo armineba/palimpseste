@@ -308,6 +308,10 @@ namespace Palimpseste.Game.Bootstrap
             GUI.Label(new Rect(r.x + 24, r.y + 16, r.width - 48, 40), "Du dessin au sort", titleStyle);
             GUI.Label(new Rect(r.x + 24, r.y + 59, r.width - 48, 46),
                 cacheUnavailable ? "Paquet local à restaurer. Le dessin et la lecture restent conservés." :
+                selected != null && !api.Configured && selected.needs_capture ?
+                    "Hors ligne · la trace est conservée ici. Reconnectez le laboratoire pour la transmettre." :
+                selected != null && !api.Configured && !string.IsNullOrEmpty(selected.job_id) ?
+                    "Hors ligne · le traitement reprendra après reconnexion au laboratoire." :
                 selected == null ? "" : JobStateLabel(selected), textStyle);
             DrawProcessingSteps(new Rect(r.x + 24, r.y + 109, r.width - 48, 57));
             var previewWidth = Mathf.Min(260, (r.width - 72) * .31f);
@@ -332,6 +336,16 @@ namespace Palimpseste.Game.Bootstrap
                      !pollingJobs.Contains(selected.job_id) &&
                      GUI.Button(new Rect(r.x + 211, r.yMax - 66, 188, 42), "Actualiser", buttonStyle))
                 StartCoroutine(Poll(selected));
+            else if (selected != null && !api.Configured &&
+                     (selected.needs_capture || !string.IsNullOrEmpty(selected.job_id)))
+            {
+                var previousEnabled = GUI.enabled;
+                GUI.enabled = previousEnabled && !busy;
+                if (GUI.Button(new Rect(r.x + 211, r.yMax - 66, 188, 42),
+                        busy ? "Reconnexion…" : "Reconnecter", buttonStyle))
+                    StartCoroutine(ReconnectToPendingParchment(selected.parchment_id));
+                GUI.enabled = previousEnabled;
+            }
             if (descriptionView != null && spellJson == null &&
                 GUI.Button(new Rect(r.x + 415, r.yMax - 66, 204, 42), "Lire et signaler", buttonStyle))
                 page = Page.Interpretation;
@@ -752,6 +766,18 @@ namespace Palimpseste.Game.Bootstrap
                 if (ongoing != null) Open(ongoing);
                 else yield return NewParchment();
             }
+        }
+
+        private IEnumerator ReconnectToPendingParchment(string parchmentId)
+        {
+            if (busy || string.IsNullOrEmpty(parchmentId)) yield break;
+            yield return BootstrapSession(false);
+            if (!api.Configured) yield break;
+            // BootstrapSession reloads the library under the authenticated principal.
+            // Never reopen a stale record captured before that identity check.
+            var restored = records.Find(item => item.parchment_id == parchmentId &&
+                PlayerParchmentFilter.IsUserParchment(item, principalId));
+            if (restored != null) Open(restored);
         }
 
         private IEnumerator RedeemAccess(string accessPath, string invitationCode, Action<bool> done)
