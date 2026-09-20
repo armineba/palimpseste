@@ -242,10 +242,11 @@ for name, target in [('model-a','spell-description.schema.json'),('model-b','spe
     fmt=load(C/(name+'.response-format.json'))
     example=deepcopy(D if name=='model-a' else P)
     if name=='model-b':
-        # Stored legacy packets omit palette/form; strict Codex output sends null.
+        # Stored legacy packets omit palette/form/vfx; strict Codex output sends null.
         for node in example['nodes']:
             node['appearance']['palette'] = None
             node['appearance']['form'] = None
+            node['appearance']['vfx'] = None
     check('Format local fournisseur : '+name, lambda f=fmt: jsonschema.Draft202012Validator.check_schema(f['schema']))
     check('Exemple conforme au format local : '+name, lambda f=fmt,d=example: jsonschema.Draft202012Validator(f['schema']).validate(d))
     check('Transport Codex strict statique : '+name, lambda n=name,f=fmt: codex_transport_schema(n,f))

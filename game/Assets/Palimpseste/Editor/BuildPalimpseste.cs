@@ -27,7 +27,7 @@ namespace Palimpseste.Game.Editor
             EditorBuildSettings.scenes = Array.ConvertAll(Scenes, scene => new EditorBuildSettingsScene(scene, true));
             PlayerSettings.companyName = "Palimpseste";
             PlayerSettings.productName = "Palimpseste Spell Lab";
-            PlayerSettings.bundleVersion = "1.1.0";
+            PlayerSettings.bundleVersion = "1.2.0";
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.IL2CPP);
             PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
             var directory = Environment.GetEnvironmentVariable("PALIMPSESTE_BUILD_DIR");
@@ -92,14 +92,14 @@ namespace Palimpseste.Game.Editor
                 AssetDatabase.CreateAsset(profile, path);
             }
             var bloom = Component<Bloom>(profile);
-            bloom.intensity.Override(.32f);
-            bloom.threshold.Override(1.1f);
+            bloom.intensity.Override(.7f);
+            bloom.threshold.Override(1.15f);
             bloom.scatter.Override(.65f);
-            bloom.clamp.Override(12f);
+            bloom.clamp.Override(8f);
             var tone = Component<Tonemapping>(profile);
             tone.mode.Override(TonemappingMode.ACES);
             var color = Component<ColorAdjustments>(profile);
-            color.postExposure.Override(.15f);
+            color.postExposure.Override(0f);
             color.contrast.Override(7f);
             color.saturation.Override(3f);
             EditorUtility.SetDirty(profile);

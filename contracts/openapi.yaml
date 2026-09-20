@@ -805,6 +805,21 @@ components:
           type: integer
           minimum: 1000
           maximum: 10000
+        created_at:
+          type: [string, 'null']
+          format: date-time
+          description: Horodatage serveur de réception durable du job, renseigné par GET job.
+        updated_at:
+          type: [string, 'null']
+          format: date-time
+        elapsed_ms:
+          type: [integer, 'null']
+          minimum: 0
+          description: Durée mesurée depuis created_at. Figée à updated_at pour un job prêt ou en incident, sans estimation du temps restant.
+        stage_started_at:
+          type: [string, 'null']
+          format: date-time
+          description: Début réel de la tentative fournisseur en cours, sinon nul.
       required:
       - job_id
       - parchment_id

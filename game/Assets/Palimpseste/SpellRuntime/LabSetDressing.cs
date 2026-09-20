@@ -13,10 +13,10 @@ namespace Palimpseste.Game.SpellRuntime
         public static void BuildEnvironment(Transform root)
         {
             RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(.24f, .29f, .31f);
+            RenderSettings.ambientLight = new Color(.14f, .16f, .22f);
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = new Color(.055f, .09f, .12f);
+            RenderSettings.fogColor = new Color(.021f, .027f, .046f);
             RenderSettings.fogStartDistance = 19f;
             RenderSettings.fogEndDistance = 37f;
 
@@ -25,8 +25,8 @@ namespace Palimpseste.Game.SpellRuntime
             sun.transform.rotation = Quaternion.Euler(52, -32, 0);
             var main = sun.AddComponent<Light>();
             main.type = LightType.Directional;
-            main.color = new Color(1f, .82f, .64f);
-            main.intensity = 1.45f;
+            main.color = new Color(.84f, .89f, 1f);
+            main.intensity = 1.15f;
             main.shadows = LightShadows.Soft;
             main.shadowStrength = .78f;
 
@@ -34,7 +34,7 @@ namespace Palimpseste.Game.SpellRuntime
             PointLight(root, "Reflet de cuivre", new Vector3(-8, 5, 8), new Color(.22f, .72f, .83f), 14f, 1.8f);
 
             var floor = Primitive(PrimitiveType.Cube, root, "Dalle d'épreuve",
-                new Vector3(0, -.18f, 4), new Vector3(26, .36f, 26), new Color(.105f, .16f, .17f), true);
+                new Vector3(0, -.18f, 4), new Vector3(26, .36f, 26), new Color(.062f, .072f, .092f), true);
             floor.GetComponent<Renderer>().receiveShadows = true;
             Primitive(PrimitiveType.Cube, root, "Bord nord", new Vector3(0, .11f, 17),
                 new Vector3(26.5f, .22f, .22f), Brass);
@@ -45,7 +45,7 @@ namespace Palimpseste.Game.SpellRuntime
             Primitive(PrimitiveType.Cube, root, "Bord est", new Vector3(13, .11f, 4),
                 new Vector3(.22f, .22f, 26.5f), Brass);
 
-            var grid = new Color(.48f, .65f, .62f, .24f);
+            var grid = new Color(.31f, .36f, .46f, .10f);
             for (var step = -12; step <= 12; step += 2)
             {
                 Line(root, "Graduation est-ouest", new Vector3(-12.8f, .017f, 4 + step),
@@ -53,9 +53,9 @@ namespace Palimpseste.Game.SpellRuntime
                 Line(root, "Graduation nord-sud", new Vector3(step, .018f, -8.8f),
                     new Vector3(step, .018f, 16.8f), grid, .012f);
             }
-            Circle(root, "Cercle de l'arène", 9.4f, .023f, new Color(.76f, .54f, .29f, .43f), .037f,
+            Circle(root, "Cercle de l'arène", 9.4f, .023f, new Color(.51f, .43f, .33f, .24f), .026f,
                 new Vector3(0, 0, 4));
-            Circle(root, "Cercle intérieur", 4.4f, .025f, new Color(.31f, .78f, .8f, .39f), .026f,
+            Circle(root, "Cercle intérieur", 4.4f, .025f, new Color(.33f, .41f, .55f, .16f), .018f,
                 new Vector3(0, 0, 4));
 
             var plinth = Primitive(PrimitiveType.Cylinder, root, "Socle lanceur",
@@ -77,7 +77,7 @@ namespace Palimpseste.Game.SpellRuntime
         {
             var hostile = team == "hostile";
             var ally = team == "ally";
-            var body = hostile ? new Color(.43f, .16f, .15f) : ally ? new Color(.15f, .43f, .46f) : new Color(.38f, .34f, .28f);
+            var body = hostile ? new Color(.23f, .19f, .23f) : ally ? new Color(.16f, .24f, .28f) : new Color(.28f, .25f, .22f);
             actor.GetComponent<Renderer>().material = SpellLab.MaterialFor(body, false);
             if (team != "environment")
             {

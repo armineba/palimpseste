@@ -95,7 +95,8 @@ public static partial class ApiHandlers
     private static object Parchment(Guid id, string state, string layout, Guid? jobId, Guid? spellId)
         => new { parchment_id = id.ToString("N"), state, layout_version = layout, job_id = jobId?.ToString("N"), spell_id = spellId?.ToString("N") };
 
-    private static object Job(Guid id, Guid? parchmentId, string state, string? resumeStage, Guid? spellId, int attempts, string message, string? errorCode, bool retryable, int pollAfterMs = 2000, Guid? descriptionArtifactId = null)
+    private static object Job(Guid id, Guid? parchmentId, string state, string? resumeStage, Guid? spellId, int attempts, string message, string? errorCode, bool retryable, int pollAfterMs = 2000, Guid? descriptionArtifactId = null,
+        DateTime? createdAt = null, DateTime? updatedAt = null, long? elapsedMs = null, DateTime? stageStartedAt = null)
         => new
         {
             job_id = id.ToString("N"),
@@ -108,6 +109,10 @@ public static partial class ApiHandlers
             message,
             error_code = errorCode,
             retryable,
-            poll_after_ms = pollAfterMs
+            poll_after_ms = pollAfterMs,
+            created_at = createdAt,
+            updated_at = updatedAt,
+            elapsed_ms = elapsedMs,
+            stage_started_at = stageStartedAt
         };
 }

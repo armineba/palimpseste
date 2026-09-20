@@ -1,6 +1,16 @@
 # Tester le lecteur actuel
 
-## Essayer le nouveau rendu 3D
+## Essayer la version D10 livrée
+
+Ouvrir le raccourci Bureau **Palimpseste Spell Lab** ou [ce Player `1.2.0`](../game/Build/WindowsComposedVfxPlayable/Palimpseste.exe). Le jeu a déjà été lancé sous le PID `32064`. Conserver ensemble les 29 fichiers du dossier ; le [ZIP vérifié](../deliverables/Palimpseste-Windows-x64-IL2CPP.zip) permet de transporter ce dossier complet. Le build final Windows IL2CPP/URP a terminé avec le code 0 ; [preuves de livraison](../evidence/public/unity/composed-vfx-delivery.json).
+
+Dans la bibliothèque, ouvrir **« Envol du spectre aux longs voiles »**, puis lancer le sort au laboratoire. Ce sort sauvegardé bénéficie du nouveau renderer sans redessiner ni consommer une nouvelle génération. Pour essayer la nouvelle chaîne de modèles, créer ensuite un dessin, ajouter autant de traits que souhaité, cliquer sur **Dessin terminé**, lire l'interprétation, puis lancer le sort quand sa fiche est prête. L'écran affiche le temps écoulé mesuré ; aucun délai fixe n'est garanti.
+
+Le backend **Sol/high → Astra/high** est déployé (prompts A `2.2` / B `1.9`). Un [diagnostic réel](../evidence/public/backend/sol-astra-latency-2026-09-20.md) a obtenu un plan compilé avec **60,403 s d'appels**, sans réparation, environ 63 s au total. Ce résultat sur un dessin ne garantit pas le temps des suivants. Le renderer a passé **5/5 tests ciblés**, avec [six captures réelles du spectre conservé](../evidence/public/unity/composed-vfx-2026-09-20.md). L'essai humain et le son restent à apprécier ; aucun verdict artistique n'est enregistré. Les sections suivantes concernent des livraisons historiques.
+
+L'image [spectre de référence](art-direction/spectral-veils-target.png) est un concept artistique généré, pas une capture du Player. L'appréciation du rendu réel et du son reste à donner dans le laboratoire. La génération de chaque sort ne lance ni tests, ni build Unity, ni génération de cette image.
+
+## Historique — essai du rendu 3D D09
 
 La [décision D09](DECISIONS.md) demande que le sort affiché soit **l'objet imaginé par Astra en 3D**, par exemple un rocher, et ne reprenne plus automatiquement le contour du dessin. Le [Player Windows final](../game/Build/WindowsSemanticVfxPlayable/Palimpseste.exe) est livré avec ses 29 fichiers et le [ZIP vérifié](../deliverables/Palimpseste-Windows-x64-IL2CPP.zip). Il a été lancé sur ce PC, PID `26864`, fenêtre réactive. A `2.1`/B `1.8` et le compilateur préparent 21 formes contrôlées ; le backend local est déployé. Le renderer a passé **5/5 tests PlayMode ciblés** et le cache hors ligne **1/1 EditMode**. Le build final inclut explicitement le matériau d'émission IL2CPP. Voir [la preuve Unity](../evidence/public/unity/semantic-visuals-2026-09-20.md).
 

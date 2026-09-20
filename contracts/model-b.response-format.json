@@ -336,6 +336,73 @@
                   "golem",
                   null
                 ]
+              },
+              "vfx": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "arcane",
+                      "fire",
+                      "frost",
+                      "lightning",
+                      "earth",
+                      "poison",
+                      "holy",
+                      "shadow",
+                      "nature",
+                      "water"
+                    ]
+                  },
+                  "motif": {
+                    "type": "string",
+                    "enum": [
+                      "runic",
+                      "orbital",
+                      "vortex",
+                      "fracture",
+                      "storm",
+                      "petal"
+                    ]
+                  },
+                  "density": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                  },
+                  "aura_cm": {
+                    "type": "integer",
+                    "minimum": 80,
+                    "maximum": 400
+                  },
+                  "charge_ms": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 800
+                  },
+                  "impact": {
+                    "type": "string",
+                    "enum": [
+                      "nova",
+                      "shatter",
+                      "ripple",
+                      "pillar"
+                    ]
+                  }
+                },
+                "required": [
+                  "style",
+                  "motif",
+                  "density",
+                  "aura_cm",
+                  "charge_ms",
+                  "impact"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -343,7 +410,8 @@
               "pattern",
               "palette",
               "signature_geometry_id",
-              "form"
+              "form",
+              "vfx"
             ],
             "additionalProperties": false
           },
@@ -567,6 +635,73 @@
                   "golem",
                   null
                 ]
+              },
+              "vfx": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "arcane",
+                      "fire",
+                      "frost",
+                      "lightning",
+                      "earth",
+                      "poison",
+                      "holy",
+                      "shadow",
+                      "nature",
+                      "water"
+                    ]
+                  },
+                  "motif": {
+                    "type": "string",
+                    "enum": [
+                      "runic",
+                      "orbital",
+                      "vortex",
+                      "fracture",
+                      "storm",
+                      "petal"
+                    ]
+                  },
+                  "density": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                  },
+                  "aura_cm": {
+                    "type": "integer",
+                    "minimum": 80,
+                    "maximum": 400
+                  },
+                  "charge_ms": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 800
+                  },
+                  "impact": {
+                    "type": "string",
+                    "enum": [
+                      "nova",
+                      "shatter",
+                      "ripple",
+                      "pillar"
+                    ]
+                  }
+                },
+                "required": [
+                  "style",
+                  "motif",
+                  "density",
+                  "aura_cm",
+                  "charge_ms",
+                  "impact"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -574,7 +709,8 @@
               "pattern",
               "palette",
               "signature_geometry_id",
-              "form"
+              "form",
+              "vfx"
             ],
             "additionalProperties": false
           },
@@ -783,6 +919,73 @@
                   "golem",
                   null
                 ]
+              },
+              "vfx": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "arcane",
+                      "fire",
+                      "frost",
+                      "lightning",
+                      "earth",
+                      "poison",
+                      "holy",
+                      "shadow",
+                      "nature",
+                      "water"
+                    ]
+                  },
+                  "motif": {
+                    "type": "string",
+                    "enum": [
+                      "runic",
+                      "orbital",
+                      "vortex",
+                      "fracture",
+                      "storm",
+                      "petal"
+                    ]
+                  },
+                  "density": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                  },
+                  "aura_cm": {
+                    "type": "integer",
+                    "minimum": 80,
+                    "maximum": 400
+                  },
+                  "charge_ms": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 800
+                  },
+                  "impact": {
+                    "type": "string",
+                    "enum": [
+                      "nova",
+                      "shatter",
+                      "ripple",
+                      "pillar"
+                    ]
+                  }
+                },
+                "required": [
+                  "style",
+                  "motif",
+                  "density",
+                  "aura_cm",
+                  "charge_ms",
+                  "impact"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -790,7 +993,8 @@
               "pattern",
               "palette",
               "signature_geometry_id",
-              "form"
+              "form",
+              "vfx"
             ],
             "additionalProperties": false
           },
@@ -970,6 +1174,73 @@
                   "golem",
                   null
                 ]
+              },
+              "vfx": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "arcane",
+                      "fire",
+                      "frost",
+                      "lightning",
+                      "earth",
+                      "poison",
+                      "holy",
+                      "shadow",
+                      "nature",
+                      "water"
+                    ]
+                  },
+                  "motif": {
+                    "type": "string",
+                    "enum": [
+                      "runic",
+                      "orbital",
+                      "vortex",
+                      "fracture",
+                      "storm",
+                      "petal"
+                    ]
+                  },
+                  "density": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                  },
+                  "aura_cm": {
+                    "type": "integer",
+                    "minimum": 80,
+                    "maximum": 400
+                  },
+                  "charge_ms": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 800
+                  },
+                  "impact": {
+                    "type": "string",
+                    "enum": [
+                      "nova",
+                      "shatter",
+                      "ripple",
+                      "pillar"
+                    ]
+                  }
+                },
+                "required": [
+                  "style",
+                  "motif",
+                  "density",
+                  "aura_cm",
+                  "charge_ms",
+                  "impact"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -977,7 +1248,8 @@
               "pattern",
               "palette",
               "signature_geometry_id",
-              "form"
+              "form",
+              "vfx"
             ],
             "additionalProperties": false
           },
@@ -1157,6 +1429,73 @@
                   "golem",
                   null
                 ]
+              },
+              "vfx": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "arcane",
+                      "fire",
+                      "frost",
+                      "lightning",
+                      "earth",
+                      "poison",
+                      "holy",
+                      "shadow",
+                      "nature",
+                      "water"
+                    ]
+                  },
+                  "motif": {
+                    "type": "string",
+                    "enum": [
+                      "runic",
+                      "orbital",
+                      "vortex",
+                      "fracture",
+                      "storm",
+                      "petal"
+                    ]
+                  },
+                  "density": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                  },
+                  "aura_cm": {
+                    "type": "integer",
+                    "minimum": 80,
+                    "maximum": 400
+                  },
+                  "charge_ms": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 800
+                  },
+                  "impact": {
+                    "type": "string",
+                    "enum": [
+                      "nova",
+                      "shatter",
+                      "ripple",
+                      "pillar"
+                    ]
+                  }
+                },
+                "required": [
+                  "style",
+                  "motif",
+                  "density",
+                  "aura_cm",
+                  "charge_ms",
+                  "impact"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -1164,7 +1503,8 @@
               "pattern",
               "palette",
               "signature_geometry_id",
-              "form"
+              "form",
+              "vfx"
             ],
             "additionalProperties": false
           },
@@ -1356,6 +1696,73 @@
                   "golem",
                   null
                 ]
+              },
+              "vfx": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "enum": [
+                      "arcane",
+                      "fire",
+                      "frost",
+                      "lightning",
+                      "earth",
+                      "poison",
+                      "holy",
+                      "shadow",
+                      "nature",
+                      "water"
+                    ]
+                  },
+                  "motif": {
+                    "type": "string",
+                    "enum": [
+                      "runic",
+                      "orbital",
+                      "vortex",
+                      "fracture",
+                      "storm",
+                      "petal"
+                    ]
+                  },
+                  "density": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                  },
+                  "aura_cm": {
+                    "type": "integer",
+                    "minimum": 80,
+                    "maximum": 400
+                  },
+                  "charge_ms": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 800
+                  },
+                  "impact": {
+                    "type": "string",
+                    "enum": [
+                      "nova",
+                      "shatter",
+                      "ripple",
+                      "pillar"
+                    ]
+                  }
+                },
+                "required": [
+                  "style",
+                  "motif",
+                  "density",
+                  "aura_cm",
+                  "charge_ms",
+                  "impact"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -1363,7 +1770,8 @@
               "pattern",
               "palette",
               "signature_geometry_id",
-              "form"
+              "form",
+              "vfx"
             ],
             "additionalProperties": false
           },

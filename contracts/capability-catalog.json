@@ -437,5 +437,48 @@
         "minimum_projectile_radius_cm": 45
       }
     ]
+  },
+  "visual_composition": {
+    "schema_version": "sp.visual-composition/1.0",
+    "selection": "Optional decorative appearance.vfx chosen by planner from frozen interpretation text, visual form, palette and effects. It cannot add mechanics, targets, carriers, code or assets.",
+    "style": [
+      "arcane",
+      "fire",
+      "frost",
+      "lightning",
+      "earth",
+      "poison",
+      "holy",
+      "shadow",
+      "nature",
+      "water"
+    ],
+    "motif": [
+      "runic",
+      "orbital",
+      "vortex",
+      "fracture",
+      "storm",
+      "petal"
+    ],
+    "density": {
+      "minimum": 1,
+      "maximum": 3
+    },
+    "aura_cm": {
+      "minimum": 80,
+      "maximum": 400
+    },
+    "charge_ms": {
+      "minimum": 100,
+      "maximum": 800
+    },
+    "impact": [
+      "nova",
+      "shatter",
+      "ripple",
+      "pillar"
+    ],
+    "minimum_client": "1.2.0"
   }
 }

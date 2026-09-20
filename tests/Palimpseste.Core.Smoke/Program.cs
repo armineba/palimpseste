@@ -643,6 +643,51 @@ Require(semanticCompiled.Spell.versions.min_client == "1.1.0" &&
     ((JObject)semanticPublished["plan"]["nodes"][0]["appearance"]).Property("signature_geometry_id") == null &&
     (string)semanticPublished["plan"]["nodes"][0]["appearance"]["form"] == "boulder",
     "Published semantic packet leaked an ink signature or supports an incompatible old player");
+var vfxPlan = (JObject)semanticPlan.DeepClone();
+vfxPlan["nodes"][0]["appearance"]["vfx"] = new JObject {
+    ["style"] = "earth", ["motif"] = "fracture", ["density"] = 3,
+    ["aura_cm"] = 400, ["charge_ms"] = 800, ["impact"] = "shatter"
+};
+var vfxInput = new CompilationInput {
+    DescriptionJson = semanticDescriptionBytes, PlanJson = JsonBytes(vfxPlan),
+    GeometryJson = semanticGeometry.GeometryJson, MaskPng = semanticGeometry.MaskPng,
+    GeometryArtifactIds = semanticInput.GeometryArtifactIds, MaskArtifactIds = semanticInput.MaskArtifactIds,
+    SpellId = "decorative-vfx-smoke", ParchmentId = "vfx-support", SignatureSeedHex = "e10a330a765bc981",
+    Provenance = input.Provenance
+};
+var vfxCompiled = SpellCompiler.Compile(vfxInput);
+Require(vfxCompiled.Success && vfxCompiled.Spell.versions.min_client == "1.2.0" &&
+    (string)ContractJson.ParseStrict(vfxCompiled.PayloadUtf8)["plan"]["nodes"][0]["appearance"]["vfx"]["impact"] == "shatter" &&
+    JToken.DeepEquals(JToken.FromObject(vfxCompiled.Spell.resource_bounds),
+        JToken.FromObject(semanticCompiled.Spell.resource_bounds)),
+    "Decorative VFX profile failed publication, client gate, or changed gameplay budgets");
+var nullVfxPlan = (JObject)semanticPlan.DeepClone();
+nullVfxPlan["nodes"][0]["appearance"]["vfx"] = JValue.CreateNull();
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(nullVfxPlan),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng).Count == 0 &&
+    ((JObject)semanticPublished["plan"]["nodes"][0]["appearance"]).Property("vfx") == null,
+    "Nullable transport VFX profile broke legacy packet compatibility");
+foreach (var badProfile in new[] {
+    (field: "style", value: (JToken)"unsafe_custom_shader"),
+    (field: "motif", value: (JToken)"unsafe_asset"),
+    (field: "density", value: (JToken)4),
+    (field: "aura_cm", value: (JToken)401),
+    (field: "charge_ms", value: (JToken)801),
+    (field: "impact", value: (JToken)"custom_code")
+})
+{
+    var altered = (JObject)vfxPlan.DeepClone();
+    altered["nodes"][0]["appearance"]["vfx"][badProfile.field] = badProfile.value;
+    Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(altered),
+        semanticGeometry.GeometryJson, semanticGeometry.MaskPng).Count > 0,
+        "Invalid VFX profile field escaped validation: " + badProfile.field);
+}
+foreach (var appearance in plannerSchema.DescendantsAndSelf().OfType<JObject>()
+    .Where(obj => obj["properties"]?["vfx"] != null))
+    Require(((JArray)appearance["required"]).Values<string>().Contains("vfx") &&
+        ((JArray)appearance["properties"]["vfx"]["type"]).Values<string>().Contains("null") &&
+        ((JArray)appearance["properties"]["vfx"]["required"]).Count == 6,
+        "Codex B transport does not require a nullable six-field controlled VFX profile");
 var mismatchedForm = (JObject)semanticPlan.DeepClone();
 mismatchedForm["nodes"][0]["appearance"]["form"] = "wolf";
 Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(mismatchedForm),

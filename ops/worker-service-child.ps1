@@ -13,7 +13,7 @@ $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\', '/')
 if (-not [string]::Equals($runtime, 'E:\PalimpsesteRuntime', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab worker accepts only E:\PalimpsesteRuntime.'
 }
-$expectedWorkerSha256 = '19DBB0856F0504B4A51230E35086D4D44C9026135211B979A375890A9DCD7EDA'
+$expectedWorkerSha256 = 'FC78432166EAED3E646885F68B36832C2F1FC691AE4F271017D2056FD76530DA'
 $child = Join-Path $runtime 'bin\WorkerService.Child.ps1'
 $worker = Join-Path $runtime 'bin\Palimpseste.Worker.exe'
 $envFile = Join-Path $runtime 'runtime.env'
@@ -139,19 +139,17 @@ function Require-Evidence($Entries, [string]$NamePrefix) {
 $config = Read-Entries $envFile
 Require-Value $config 'PALIMPSESTE_DEPLOYMENT_MODE' 'private_lab'
 Require-Value $config 'PALIMPSESTE_PROVIDER' 'codex_exec'
-Require-Value $config 'PALIMPSESTE_LUNA_MODEL' 'gpt-5.6-luna'
-Require-Value $config 'PALIMPSESTE_LUNA_MODEL_A' 'gpt-6-astra'
-Require-Value $config 'PALIMPSESTE_LUNA_MODEL_B' 'gpt-5.6-luna'
-Require-Value $config 'PALIMPSESTE_LUNA_EFFORT' 'max'
-Require-Value $config 'PALIMPSESTE_ASTRA_MODEL' 'gpt-6-astra'
-Require-Value $config 'PALIMPSESTE_ASTRA_EFFORT' 'max'
-Require-Value $config 'PALIMPSESTE_ASTRA_VERIFIED' 'true'
+Require-Value $config 'PALIMPSESTE_PLANNER_MODEL' 'gpt-6-astra'
+Require-Value $config 'PALIMPSESTE_PLANNER_EFFORT' 'high'
+Require-Value $config 'PALIMPSESTE_INTERPRETER_MODEL' 'gpt-5.6-sol'
+Require-Value $config 'PALIMPSESTE_INTERPRETER_EFFORT' 'high'
+Require-Value $config 'PALIMPSESTE_INTERPRETER_VERIFIED' 'true'
 Require-Value $config 'PALIMPSESTE_MAX_PROVIDER_CONCURRENCY' '1'
 Require-Value $config 'PALIMPSESTE_RUNTIME_FEATURES_VERIFIED' 'true'
 Require-Value $config 'PALIMPSESTE_EFFORT_VERIFIED' 'true'
 Require-Evidence $config 'PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE'
 Require-Evidence $config 'PALIMPSESTE_EFFORT_EVIDENCE'
-Require-Evidence $config 'PALIMPSESTE_ASTRA_EVIDENCE'
+Require-Evidence $config 'PALIMPSESTE_INTERPRETER_EVIDENCE'
 
 $vault = Read-Entries $databaseEnv
 if (-not $vault.ContainsKey('DATABASE_URL') -or

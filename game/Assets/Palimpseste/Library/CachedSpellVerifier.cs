@@ -63,7 +63,7 @@ namespace Palimpseste.Game.Library
             return root.Type == JTokenType.String ? root.Value<string>() : null;
         }
 
-        private static bool SupportedMinimumClient(string version) => version == "1.0.0" || version == "1.1.0";
+        private static bool SupportedMinimumClient(string version) => version == "1.0.0" || version == "1.1.0" || version == "1.2.0";
 
         private static bool VerifyArtifact(JToken item, string root, HashSet<string> seen)
         {

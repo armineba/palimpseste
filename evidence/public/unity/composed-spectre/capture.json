@@ -1,0 +1,134 @@
+{
+  "evidence_kind": "existing_player_packet_unity_lab_replay",
+  "packet_sha256": "0ed08fee15298d8e61fc396eddc4f2a5ed2827d0b8efd51639e2771f2162e467",
+  "spell_title": "Envol du spectre aux longs voiles",
+  "art_acceptance": "not_claimed",
+  "model_calls": 0,
+  "camera": "shipping lab pose and postprocessing; arena viewport without UI",
+  "graphics_device": "NVIDIA GeForce RTX 3070",
+  "initial_target_position": [
+    0.0,
+    0.99999994,
+    6.0
+  ],
+  "initial_target_health_milli": 100000,
+  "final_target_health_milli": 88000,
+  "hits": 1,
+  "damage_milli": 12000,
+  "impulses": 1,
+  "target_displacement_m": 0.00154048076,
+  "frames": [
+    {
+      "file": "spectre-frame-00.png",
+      "sha256": "4fe8f9e91c876d3b5e263ed0a1a97f2d2fe0c90fc662d5b6050cf71356475a31",
+      "elapsed_seconds": 0.406457245,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "visual_position": [
+        0.6424772,
+        1.1,
+        -2.17059231
+      ],
+      "target_position": [
+        0.0,
+        0.99999994,
+        6.0
+      ],
+      "target_health_milli": 100000
+    },
+    {
+      "file": "spectre-frame-01.png",
+      "sha256": "8e7c00b415a86ad00f615a154f916ab573e02a6383a6c78173bc1e4c6ceacf45",
+      "elapsed_seconds": 0.4565668,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "visual_position": [
+        0.60660857,
+        1.1,
+        -1.69193435
+      ],
+      "target_position": [
+        0.0,
+        0.99999994,
+        6.0
+      ],
+      "target_health_milli": 100000
+    },
+    {
+      "file": "spectre-frame-02.png",
+      "sha256": "faa6b2b1084af2986e3277f6e86d1c7f4ed45c53d82bd9788c01cb6dc8a49883",
+      "elapsed_seconds": 0.703910947,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "visual_position": [
+        0.463134,
+        1.1,
+        0.222697541
+      ],
+      "target_position": [
+        0.0,
+        0.99999994,
+        6.0
+      ],
+      "target_health_milli": 100000
+    },
+    {
+      "file": "spectre-frame-03.png",
+      "sha256": "9c72e92a24c81a5fc4e36cd19fd484f578b21a28fc33cfc58795fe88dcb3b263",
+      "elapsed_seconds": 1.05197811,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "visual_position": [
+        0.259878337,
+        1.1,
+        2.93509245
+      ],
+      "target_position": [
+        0.0,
+        0.99999994,
+        6.0
+      ],
+      "target_health_milli": 100000
+    },
+    {
+      "file": "spectre-frame-04.png",
+      "sha256": "04bfb2dc339315dececf639fb4608cee3fde436c6600b7096bb01b3b41134736",
+      "elapsed_seconds": 1.40222251,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "impulses": 1,
+      "visual_position": null,
+      "target_position": [
+        -0.000169529041,
+        1.0,
+        6.001531
+      ],
+      "target_health_milli": 88000
+    },
+    {
+      "file": "spectre-frame-05.png",
+      "sha256": "2ac04bfc8bc8b6f28126a67b4ea5cdc8219fdc8cfb1495d2309e262477760cdf",
+      "elapsed_seconds": 1.703082,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "impulses": 1,
+      "visual_position": null,
+      "target_position": [
+        -0.000169529041,
+        0.99999994,
+        6.001531
+      ],
+      "target_health_milli": 88000
+    }
+  ]
+}

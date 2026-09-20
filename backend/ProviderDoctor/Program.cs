@@ -7,9 +7,9 @@ using Palimpseste.Core;
 using Palimpseste.Provider;
 
 var settings = CodexSettings.FromEnvironment();
-if (args.Length == 0 || args[0] is not ("local" or "astra" or "active" or "plan" or "validate"))
+if (args.Length == 0 || args[0] is not ("local" or "interpreter" or "astra" or "active" or "plan" or "validate"))
 {
-    Console.Error.WriteLine("Usage: ProviderDoctor local | astra <spec-root> <reference.png> <drawing.png> | active <spec-root> <reference.png> <drawing.png> --ink <ink.png> | plan <spec-root> <frozen-a.json> --a-sha256 <sha256> --ink <ink.png> | validate <spec-root> <a-final.json> <b-final.json> --a-sha256 <sha256> --b-sha256 <sha256> --ink <ink.png>; all modes accept --write <evidence.json>.");
+    Console.Error.WriteLine("Usage: ProviderDoctor local | interpreter <spec-root> <reference.png> <drawing.png> | active <spec-root> <reference.png> <drawing.png> --ink <ink.png> | plan <spec-root> <frozen-a.json> --a-sha256 <sha256> --ink <ink.png> | validate <spec-root> <a-final.json> <b-final.json> --a-sha256 <sha256> --b-sha256 <sha256> --ink <ink.png>; all modes accept --write <evidence.json>.");
     return 2;
 }
 
@@ -86,6 +86,8 @@ var local = new Dictionary<string, object?>
     ["expected_service_identity"] = settings.ExpectedServiceUser,
     ["requested_model"] = settings.Model,
     ["requested_effort"] = settings.Effort,
+    ["interpreter_requested_model"] = settings.InterpreterModel,
+    ["interpreter_requested_effort"] = settings.InterpreterEffort,
     ["effort_compatibility_verified"] = settings.EffortCompatibilityVerified,
     ["runtime_features_compatibility_verified"] = settings.RuntimeFeaturesCompatibilityVerified,
     ["runtime_feature_evidence_path"] = settings.RuntimeFeaturesEvidencePath,
@@ -133,9 +135,9 @@ if (mode == "local")
 // One explicit multimodal A call consumes normal Codex account usage under the dedicated
 // service identity. It never promotes itself: the operator must review and
 // hash the report before setting the production evidence path.
-if (mode == "astra")
+if (mode is "interpreter" or "astra")
 {
-    local["kind"] = "astra_multimodal_probe";
+    local["kind"] = "interpreter_multimodal_probe";
     local["requested_model"] = settings.InterpreterModel;
     local["requested_effort"] = settings.InterpreterEffort;
     local["production_issues"] = settings.Check(true, stage: "A");
@@ -177,7 +179,7 @@ if (mode == "astra")
         var layout = await File.ReadAllTextAsync(layoutPath);
         var astraCapabilities = await File.ReadAllTextAsync(Path.Combine(specRoot, "contracts", "capability-catalog.json"));
         var astraProvider = new LunaCodexProvider(new CodexProcessRunner(settings), specRoot);
-        var a = await astraProvider.ProbeInterpretAsync("operator-astra-probe", Guid.NewGuid().ToString("N"),
+        var a = await astraProvider.ProbeInterpretAsync("operator-interpreter-probe", Guid.NewGuid().ToString("N"),
             referencePath, drawingPath, layout, astraCapabilities, CancellationToken.None);
         local["model_calls_executed"] = a.Transport.ProcessStarted;
         local["process_started"] = a.Transport.ProcessStarted;
@@ -191,7 +193,7 @@ if (mode == "astra")
         if (a.Utf8 is null || finalFile is null || !File.Exists(finalFile) ||
             !MatchesRequestedMetadata(a.Transport, settings, "A"))
         {
-            local["result"] = "astra_transport_or_attestation_failed";
+            local["result"] = "interpreter_transport_or_attestation_failed";
             await EmitAsync(local, writePath);
             return 1;
         }
@@ -219,7 +221,7 @@ if (mode == "astra")
     }
     catch (Exception error) when (error is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
     {
-        local["result"] = "astra_input_or_output_unreadable";
+        local["result"] = "interpreter_input_or_output_unreadable";
         local["error_type"] = error.GetType().Name;
         await EmitAsync(local, writePath);
         return 1;
@@ -569,6 +571,9 @@ static object StageEvidence(ProviderDocument document) => new
     reported_model = document.Transport.ReportedModel,
     reported_effort = document.Transport.ReportedEffort,
     process_started = document.Transport.ProcessStarted,
+    started_at = document.Transport.StartedAt,
+    ended_at = document.Transport.EndedAt,
+    elapsed_ms = Math.Max(0, (long)(document.Transport.EndedAt - document.Transport.StartedAt).TotalMilliseconds),
     usage = document.Transport.UsageJson,
     diagnostic_category = document.Transport.DiagnosticCategory,
     diagnostic_stdout_sha256 = document.Transport.DiagnosticStdoutSha256,

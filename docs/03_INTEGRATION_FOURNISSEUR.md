@@ -1,5 +1,9 @@
 # Intégration du fournisseur — Luna via Codex serveur
 
+> **Priorité actuelle D10, 20 septembre 2026 :** les choix de modèles historiques de ce document sont remplacés par A `gpt-5.6-sol` / `high` (prompt `2.2`) puis B `gpt-6-astra` / `high` (prompt `1.9`). Le serveur configure séparément `PALIMPSESTE_INTERPRETER_MODEL`, `PALIMPSESTE_INTERPRETER_EFFORT`, `PALIMPSESTE_PLANNER_MODEL` et `PALIMPSESTE_PLANNER_EFFORT`. Le diagnostic et les preuves de compatibilité doivent correspondre à ce couple exact avant activation ; les anciens rapports Astra/max ou Luna/max ne suffisent pas. Voir [D10](DECISIONS.md), `ops/configure-sol-astra.ps1` et [l'état de réalisation](IMPLEMENTATION_STATUS.md).
+>
+> A conserve toutes les recettes disponibles avec une projection concise des capacités ; B reçoit les définitions utiles à sa description figée, les limites globales et la composition visuelle. Les schémas de transport sont minifiés sans suppression de contrainte. Le compilateur conserve ses validations complètes. `appearance.vfx` est décoratif, facultatif pour les paquets existants et exige le client `1.2.0` lorsqu'il est présent. Les horodatages et `elapsed_ms` exposent l'attente réellement mesurée, sans temps restant inventé. Aucun test, build logiciel ou appel de génération d'image n'est ajouté au parcours joueur.
+
 **Avenant SP-1.1-LUNA · 19 septembre 2026.** Ce fichier remplace l'ancienne référence à l'API Responses directe. Il spécifie du travail à réaliser ; il ne contient ni backend développé ni preuve d'appel réel. Sources officielles et limites de vérification : `docs/06_SOURCES_CODEX.md`.
 
 ## 1. Décision

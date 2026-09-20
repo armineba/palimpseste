@@ -1,0 +1,36 @@
+﻿{
+    "observed_at":  "2026-09-20T16:07:13.1518400Z",
+    "binaries":  [
+                     {
+                         "file":  "api\\Palimpseste.Api.exe",
+                         "sha256":  "6168f278c0070f9ed286050dcd82f8bbab4d8f273fb7a351d55412bca8553923",
+                         "matches_published":  true
+                     },
+                     {
+                         "file":  "bin\\Palimpseste.Worker.exe",
+                         "sha256":  "fc78432166eaed3e646885f68b36832c2f1fc691ae4f271017d2056fd76530da",
+                         "matches_published":  true
+                     },
+                     {
+                         "file":  "bin\\ProviderDoctor.exe",
+                         "sha256":  "f0197c22267f5c91760bc079e7a43d986a942938a533e0d8868394390bbe1f0f",
+                         "matches_published":  true
+                     }
+                 ],
+    "matching_spec_files":  17,
+    "processes":  [
+                      {
+                          "name":  "Palimpseste.Api.exe",
+                          "pid":  8932,
+                          "identity":  "PalRuntimeSvc"
+                      },
+                      {
+                          "name":  "Palimpseste.Worker.exe",
+                          "pid":  19656,
+                          "identity":  "PalRuntimeSvc"
+                      }
+                  ],
+    "ready_http_status":  200,
+    "active_doctor_sha256":  "0dad228b711d5243afb45f49386fe2dce82b85b4d72725d3241b7943fbe63ce1",
+    "human_acceptance":  "not_claimed"
+}

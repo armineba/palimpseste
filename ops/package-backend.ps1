@@ -44,7 +44,7 @@ Get-ChildItem -LiteralPath (Join-Path $projectRoot 'ops') -File |
 # Bind the archive's worker launch scripts to the executable in this archive.
 function Set-ArchiveHashPin([string]$Path, [string]$Variable, [string]$Hash) {
     $content = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
-    $pattern = '(?m)^\$' + [regex]::Escape($Variable) + " = '[0-9A-Fa-f]{64}'$"
+    $pattern = '(?m)^\$' + [regex]::Escape($Variable) + " = '[0-9A-Fa-f]{64}'(?=\r?$)"
     if ([regex]::Matches($content, $pattern).Count -ne 1) { throw "Archive pin missing: $Variable" }
     $line = [string]::Concat('$', $Variable, ' = ', [char]39, $Hash, [char]39)
     $content = [regex]::Replace($content, $pattern,
@@ -69,7 +69,7 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Desti
 
 @"
 Palimpseste backend Windows x64. API, worker et doctor sont des exécutables .NET autoportants.
-La chaîne privée est : dessin libre -> Astra multimodale (description) -> Luna (plan déclaratif) -> compilateur contrôlé -> paquet de sort Unity.
+La chaîne privée est : dessin libre -> Sol high (description) -> Astra high (plan déclaratif et VFX) -> compilateur contrôlé -> paquet de sort Unity 1.2.
 Le worker utilise codex exec sous un compte Windows de service isolé. Il n'exécute ni C# issu d'un dessin, ni build Unity.
 L'archive contient les contrats, références, prompts A/B et migrations, mais aucun auth.json, jeton joueur, secret DB ou clé API.
 Lire IMPLEMENTATION_STATUS.md puis ops/provision-runtime.ps1 avant toute installation.
@@ -82,7 +82,12 @@ Le service local actuel emploie 127.0.0.1 ; cette archive ne configure pas une U
 "@ | Set-Content -LiteralPath (Join-Path $stage 'README.txt') -Encoding UTF8
 
 $zip = Join-Path $deliverables 'Palimpseste-Backend-Windows-x64.zip'
-Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip -CompressionLevel Optimal -Force
+$pendingZip = Join-Path $stageRoot ([Guid]::NewGuid().ToString('N') + '.zip')
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[IO.Compression.ZipFile]::CreateFromDirectory($stage, $pendingZip,
+    [IO.Compression.CompressionLevel]::Optimal, $false)
+# Finish and close the archive before replacing the distributable file.
+Move-Item -LiteralPath $pendingZip -Destination $zip -Force
 $file = Get-Item -LiteralPath $zip
 $sha = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
 Write-Output "Backend ZIP: $($file.FullName)"

@@ -28,6 +28,7 @@ namespace Palimpseste.Game.SpellRuntime
         private float beamWidth;
         private bool armed;
         private bool ephemeral;
+        private SpellVfxComposition composition;
 
         public static bool Supports(string form)
         {
@@ -63,6 +64,9 @@ namespace Palimpseste.Game.SpellRuntime
             size = carrier == "projectile" ? Mathf.Clamp((node.options.radius_cm ?? 12) * .022f, .22f, 2.6f)
                 : carrier == "beam" ? Mathf.Clamp((node.options.width_cm ?? 8) * .025f, .18f, .8f)
                 : Mathf.Clamp(node.scale_cm / 100f * .72f, .45f, 4.5f);
+            // The spectral robe is a decorative wake. Its visible head remains
+            // distinct from the energy envelope, even in archived small spells.
+            if (Form == "spirit") size = Mathf.Max(size, 1.3f);
             body.localScale = Vector3.one * size;
             if (carrier == "field" || carrier == "trap" || carrier == "barrier")
                 body.localPosition = Vector3.up * (.08f - transform.position.y + size * .52f);
@@ -76,24 +80,9 @@ namespace Palimpseste.Game.SpellRuntime
             BuildForm(body);
             if (carrier == "barrier") BuildBarrierVolume(node);
             if (carrier == "beam") BuildBeam(node.options.width_cm ?? 8);
-            else if (carrier == "projectile") Trail(node);
-            else if (carrier == "field" || carrier == "trap" || carrier == "pulse")
-            {
-                pulseRing = Child("Ground energy", transform);
-                pulseRing.localPosition = Vector3.up * (.065f - transform.position.y);
-                pulseRing.localScale = Vector3.one * Mathf.Clamp(node.scale_cm / 100f, .25f, 10f);
-                Ring(pulseRing, Vector3.zero, .47f, .012f, energy, 64);
-                Ring(pulseRing, Vector3.up * .025f, .42f, .007f, bright, 64);
-                if (carrier == "pulse") body.localPosition = Vector3.up * (.09f - transform.position.y);
-            }
-            var particles = Particles("Drifting embers", transform, false, size, 26);
-            var shape = particles.shape;
-            shape.position = body.localPosition;
-            if (Form == "boulder" || Form == "hammer" || Form == "shield")
-            {
-                var emission = particles.emission;
-                emission.rateOverTime = 7f;
-            }
+            if (carrier == "pulse") body.localPosition = Vector3.up * (.09f - transform.position.y);
+            composition = gameObject.AddComponent<SpellVfxComposition>();
+            composition.Initialize(node, tint, body.localPosition, size);
         }
 
         private T Own<T>(T item) where T : UnityEngine.Object { owned.Add(item); return item; }
@@ -283,17 +272,50 @@ namespace Palimpseste.Game.SpellRuntime
                 case "skull":
                     Skull(parent); break;
                 case "spirit":
-                    Round(parent, new Vector3(0, .23f, 0), new Vector3(.45f, .54f, .42f), energy);
-                    Round(parent, new Vector3(0, -.06f, 0), new Vector3(.55f, .54f, .36f), energy);
-                    Tube(parent, "Spirit tail", new[] { new Vector3(0, -.17f, 0), new Vector3(.12f, -.42f, -.15f),
-                        new Vector3(-.06f, -.65f, -.4f) }, .2f, .001f, energy);
-                    Eyes(parent, .085f, .29f, .18f, .063f);
+                    Spirit(parent);
                     break;
                 case "wolf": Wolf(parent); break;
                 case "bird": Bird(parent); break;
                 case "serpent": Serpent(parent); break;
                 case "golem": Golem(parent); break;
             }
+        }
+
+        private void Spirit(Transform parent)
+        {
+            var cloak = Own(SpellVfxComposition.CreateHoodMaterial(tint));
+            const int segments = 32, rings = 12;
+            var vertices = new List<Vector3>(); var triangles = new List<int>(); var uv = new List<Vector2>();
+            for (var row = 0; row <= rings; row++)
+            {
+                var t = row / (float)rings;
+                var radius = Mathf.Sin(t * Mathf.PI * .52f) * .33f + .006f;
+                for (var col = 0; col <= segments; col++)
+                {
+                    var a = col / (float)segments * Mathf.PI * 2;
+                    vertices.Add(new Vector3(Mathf.Cos(a) * radius,
+                        .32f + Mathf.Sin(a) * radius * 1.18f, -.34f + t * .76f));
+                    uv.Add(new Vector2(t,col / (float)segments));
+                    if (row < rings && col < segments)
+                    {
+                        var n = row * (segments + 1) + col;
+                        triangles.AddRange(new[] { n,n+1,n+segments+1,n+1,n+segments+2,n+segments+1 });
+                    }
+                }
+            }
+            var hood = Own(Finish(vertices,triangles,false));
+            hood.name = "Open spectral hood"; hood.SetUVs(0,uv);
+            Part("Translucent spectral hood",parent,hood,Vector3.zero,Vector3.one,cloak);
+            Round(parent,new Vector3(0,.30f,.34f),new Vector3(.49f,.58f,.09f),dark);
+            Round(parent,new Vector3(0,.30f,.411f),new Vector3(.12f,.17f,.065f),bright);
+            Round(parent,new Vector3(0,-.025f,-.14f),new Vector3(.38f,.39f,.63f),cloak);
+            var rim = new Vector3[33];
+            for (var i=0;i<rim.Length;i++)
+            {
+                var a=i/(float)(rim.Length-1)*Mathf.PI*2;
+                rim[i]=new Vector3(Mathf.Cos(a)*.338f,.32f+Mathf.Sin(a)*.398f,.419f);
+            }
+            Tube(parent,"Pearlescent hood seam",rim,.009f,.009f,energy);
         }
 
         private void Weapon(Transform parent, bool spear)
@@ -653,6 +675,7 @@ namespace Palimpseste.Game.SpellRuntime
             beamPath = points.ToArray();
             if (body != null && beamPath.Length > 1) body.position = beamPath[beamPath.Length - 1];
             AnimateBeam();
+            composition?.SetBeamPath(points);
         }
 
         private void AnimateBeam()
@@ -685,6 +708,7 @@ namespace Palimpseste.Game.SpellRuntime
         {
             if (pulseRing != null) pulseRing.localScale = Vector3.one * Mathf.Max(.02f, radius * 2);
             if (body != null && (Form == "wave" || Form == "vortex")) body.localScale = Vector3.one * Mathf.Max(.02f, radius * 2);
+            composition?.SetPulseRadius(radius);
         }
 
         public void Arm()
@@ -693,35 +717,12 @@ namespace Palimpseste.Game.SpellRuntime
             armed = true;
             if (pulseRing != null) pulseRing.localPosition += Vector3.up * .018f;
             if (energy != null) energy.SetColor("_EmissionColor", tint * 2.8f);
+            composition?.Arm();
         }
 
         public static void Impact(string form, Vector3 point, Vector3 direction, Color color, float radius)
         {
-            var root = new GameObject("Semantic impact " + form);
-            root.transform.position = point;
-            var visual = root.AddComponent<SemanticSpellVisual>();
-            visual.Form = form; visual.tint = color; visual.tint.a = 1;
-            visual.born = Time.time; visual.ephemeral = true; visual.MakeMaterials();
-            visual.pulseRing = Child("Impact shock ring", root.transform);
-            visual.pulseRing.rotation = Quaternion.LookRotation(direction.sqrMagnitude > .0001f ? direction : Vector3.forward) * Quaternion.Euler(90, 0, 0);
-            visual.Ring(visual.pulseRing, Vector3.zero, 1f, .025f, visual.bright, 48);
-            visual.size = Mathf.Clamp(radius, .25f, 1.4f);
-            visual.Particles("Impact sparks", root.transform, true, visual.size, 28);
-            if (form == "boulder" || form == "meteor" || form == "crystal" || form == "golem" ||
-                form == "hammer" || form == "shield")
-            {
-                var shard = visual.Own(Lathe(new[] { -.5f, -.12f, .38f }, new[] { .09f, .4f, .03f }, 5, .25f, .1f, true));
-                for (var i = 0; i < 8; i++)
-                {
-                    var angle = i * Mathf.PI * .25f;
-                    var part = visual.Part("Impact fragment", root.transform, shard, Vector3.zero,
-                        Vector3.one * visual.size * (.12f + i % 3 * .035f),
-                        form == "crystal" || i % 3 == 0 ? visual.energy : visual.stone);
-                    visual.debris.Add(part);
-                    visual.debrisVelocity.Add(new Vector3(Mathf.Cos(angle), .6f + i % 3 * .25f,
-                        Mathf.Sin(angle)) * visual.size * 2.3f);
-                }
-            }
+            SpellVfxComposition.SpawnImpact(new SpellAppearance { form = form }, point, direction, color, radius);
         }
 
         private void Update()

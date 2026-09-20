@@ -40,12 +40,12 @@ namespace Palimpseste.Game.Tests
                 Assert.IsNotEmpty(verified);
 
                 var semanticVersion = JObject.Parse(Encoding.UTF8.GetString(packet));
-                semanticVersion["versions"]["min_client"] = "1.1.0";
+                semanticVersion["versions"]["min_client"] = "1.2.0";
                 var semanticBytes = Encoding.UTF8.GetBytes(semanticVersion.ToString());
                 File.WriteAllBytes(spellPath, semanticBytes);
                 File.WriteAllText(marker, ParchmentStore.Hash(semanticBytes), Encoding.ASCII);
                 Assert.IsTrue(CachedSpellVerifier.TryLoad(record, directory, out verified),
-                    "This Player understands packets requiring semantic 3D rendering");
+                    "This Player understands packets requiring composed 3D VFX");
                 semanticVersion["versions"]["min_client"] = "2.0.0";
                 var futureBytes = Encoding.UTF8.GetBytes(semanticVersion.ToString());
                 File.WriteAllBytes(spellPath, futureBytes);

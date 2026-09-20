@@ -1,6 +1,21 @@
 # Point de reprise immédiat
 
-## Priorité actuelle — modèle 3D sémantique D09
+## Priorité actuelle — essai du Player D10 livré
+
+Le backend **A `gpt-5.6-sol` / `high`, prompt `2.2`, puis B `gpt-6-astra` / `high`, prompt `1.9` est déployé**. Le [diagnostic réel](../evidence/public/backend/sol-astra-active-2026-09-20.json) a validé et compilé le plan : **60,403 s d'appels**, sans réparation, environ 63 s pour le diagnostic complet. Le worker PID `19656` tourne sous `PalRuntimeSvc`, la santé HTTP répond 200 et la porte technique est approuvée. La [relecture du spectre conservé dans Unity](../evidence/public/unity/composed-vfx-2026-09-20.md) a produit six images successives et les **5/5 tests ciblés ont passé**. Ne pas refaire ces contrôles sans nouveau problème concret.
+
+Le [Player Windows `1.2.0`](../game/Build/WindowsComposedVfxPlayable/Palimpseste.exe) a été construit, empaqueté en 29 fichiers vérifiés, puis lancé sous le PID `32064`. Le raccourci Bureau « Palimpseste Spell Lab » pointe sur ce build. La reconstruction finale a terminé avec le code 0 et sans avertissement shader trouvé. Voir [le manifeste de livraison](../evidence/public/unity/composed-vfx-delivery.json) et [les preuves Unity](../evidence/public/unity/composed-vfx-2026-09-20.md).
+
+Travail restant :
+
+1. Recueillir le verdict du créateur sur le spectre conservé : apparence, animation, impact et son.
+2. Essayer un nouveau dessin complet dans ce Player pour relever séparément la lecture Sol, le plan Astra, le rendu et le délai vécu. La réussite du diagnostic technique ne remplace pas ce parcours joueur.
+3. Compléter la recette humaine sur les 30 dessins inédits, avec le second créateur et un autre poste Windows ; ne pas déclarer ces essais exécutés par extrapolation.
+4. Configurer et vérifier le déploiement HTTPS et l'admission des joueurs sur le serveur distant avant de déclarer un accès public fonctionnel. Le service livré est actuellement local.
+
+La [comparaison de latence](../evidence/public/backend/sol-astra-latency-2026-09-20.md) porte sur un seul dessin conservé : environ 63 s pour le diagnostic D10 contre 285 s pour le job historique, avec des chemins et modèles différents. Elle ne garantit pas la durée des nouveaux dessins. Le [concept spectral](art-direction/spectral-veils-target.png) guide les assets ; aucun générateur d'image, test ou build logiciel n'est appelé pour chaque sort joueur.
+
+## Historique — modèle 3D sémantique D09
 
 Le créateur a choisi un sort qui **représente en volume l'objet interprété par Astra** : un dessin évoquant un rocher doit produire un rocher 3D propre, pas un volume reprenant mécaniquement le gribouillis. Voir [D09](DECISIONS.md). A `2.1`/B `1.8` et les contrats proposent 21 `visual_form`, une forme `appearance.form` vérifiée par le compilateur et une géométrie sémantique par sujet. Le smoke Core des 141 recettes / 705 porteurs et de cette géométrie, la compilation de la solution (0 avertissement, 0 erreur) et la QA contrats **61/61** ont réussi. Le renderer Unity a passé **5/5 tests PlayMode ciblés**, dont une [capture de fixture](../evidence/public/unity/semantic-forms-preview-20260920.png) ; le cache a passé **1/1 EditMode**. **A `2.1`/B `1.8` sont déployés**, doctor local code 0. Un [diagnostic A/B réel](../evidence/public/backend/semantic-visual-generation-2026-09-20.md) a compilé un golem `stone` avec rayon corrigé. Le [Player Windows 3D final](../game/Build/WindowsSemanticVfxPlayable/Palimpseste.exe) a été construit, empaqueté, puis lancé sur ce PC (PID `26864`, fenêtre réactive) ; aucun lancement de ce golem en jeu n'est encore attesté.
 

@@ -1,0 +1,82 @@
+﻿{
+    "mode":  "active",
+    "kind":  "provider_doctor",
+    "service_identity":  "PalRuntimeSvc",
+    "requested_model":  "gpt-6-astra",
+    "requested_effort":  "high",
+    "interpreter_requested_model":  "gpt-5.6-sol",
+    "interpreter_requested_effort":  "high",
+    "active_result":  "success",
+    "active_block_reason":  null,
+    "active_test_issues":  [
+
+                           ],
+    "plan_validation_status":  "success",
+    "compilation_status":  "success",
+    "compiler_version":  "sp.compiler/1.0",
+    "compiled_probe_sha256":  "68bc6277f1d56947c7fcc2f1b17f2b5c9d06b5b5c396c0d89555d00dbbd8ae68",
+    "stage_a":  {
+                    "outcome":  "Success",
+                    "error_code":  null,
+                    "exit_code":  0,
+                    "cli_version":  "non exposé",
+                    "requested_model":  "gpt-5.6-sol",
+                    "requested_effort":  "high",
+                    "reported_model":  "gpt-5.6-sol",
+                    "reported_effort":  "high",
+                    "process_started":  true,
+                    "started_at":  "2026-09-20T16:02:52.2794028+00:00",
+                    "ended_at":  "2026-09-20T16:03:23.4564351+00:00",
+                    "elapsed_ms":  31177,
+                    "usage":  "{\"input_tokens\":24283,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":1060,\"reasoning_output_tokens\":422}",
+                    "diagnostic_category":  null,
+                    "diagnostic_stdout_sha256":  null,
+                    "diagnostic_stdout_length":  null,
+                    "diagnostic_stdout_truncated":  false,
+                    "diagnostic_event_error_sha256":  null,
+                    "diagnostic_event_error_length":  null,
+                    "diagnostic_event_error_truncated":  false,
+                    "final_sha256":  "17ab71e6e86ef2acb1aea0f149db83a68afc881d53cd1321e7a8dc625a95d22d",
+                    "attempt_directory":  "E:\\PalimpsesteRuntime\\attempts\\6f6a1feb1c424887b5be1f55cbcd3fcb"
+                },
+    "stage_b":  {
+                    "outcome":  "Success",
+                    "error_code":  null,
+                    "exit_code":  0,
+                    "cli_version":  "non exposé",
+                    "requested_model":  "gpt-6-astra",
+                    "requested_effort":  "high",
+                    "reported_model":  "gpt-6-astra",
+                    "reported_effort":  "high",
+                    "process_started":  true,
+                    "started_at":  "2026-09-20T16:03:23.7644216+00:00",
+                    "ended_at":  "2026-09-20T16:03:52.9905235+00:00",
+                    "elapsed_ms":  29226,
+                    "usage":  "{\"input_tokens\":17155,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":752,\"reasoning_output_tokens\":104}",
+                    "diagnostic_category":  null,
+                    "diagnostic_stdout_sha256":  null,
+                    "diagnostic_stdout_length":  null,
+                    "diagnostic_stdout_truncated":  false,
+                    "diagnostic_event_error_sha256":  null,
+                    "diagnostic_event_error_length":  null,
+                    "diagnostic_event_error_truncated":  false,
+                    "final_sha256":  "45bcfc15f51b9325cc6a727f9e0ed55b67380167021ba92bf6f6be21d4eb3fab",
+                    "attempt_directory":  "E:\\PalimpsesteRuntime\\attempts\\44f221c292c54b2f8b94c37899fd4754"
+                },
+    "geometry":  {
+                     "source":  "controlled_geometry_from_interpretation",
+                     "resolver_versions":  [
+                                               "sp.geometry.resolver/2.0.semantic"
+                                           ],
+                     "description_sha256":  "17ab71e6e86ef2acb1aea0f149db83a68afc881d53cd1321e7a8dc625a95d22d",
+                     "ink_sha256":  "bc9c61f39ca1075be3c105d3c8940ea546aa33dee30d983d2c2ec7a221aad02f",
+                     "context_sha256":  "63e7c6bc977ca58a2a9243245837a362674551ea893a631a6b790ab97c86eb38",
+                     "geometry_ids":  [
+                                          "semantic.ec18eac8d758b1eb.path"
+                                      ],
+                     "mask_ids":  [
+
+                                  ]
+                 },
+    "compiled_summary":  null
+}

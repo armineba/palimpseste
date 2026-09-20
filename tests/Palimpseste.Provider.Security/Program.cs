@@ -96,7 +96,7 @@ Environment.SetEnvironmentVariable("CODEX_HOME", "E:\\PersonalCodexSentinel");
 try
 {
     var settings = new CodexSettings(
-        fakeCommand, home, attempts, Environment.UserName, "gpt-5.6-luna", "max", true,
+        fakeCommand, home, attempts, Environment.UserName, "gpt-6-astra", "high", true,
         TimeSpan.FromSeconds(20), 2_000_000, spec, input, development);
     var productionIssues = settings.Check(true);
     Assert(productionIssues.Contains("spec_tree_service_is_owner") || productionIssues.Contains("spec_tree_service_write_access"),
@@ -129,7 +129,7 @@ try
     var validFeatureJson = JsonSerializer.Serialize(new
     {
         kind = "provider_feature_doctor", service_identity = Environment.UserName,
-        model = "gpt-5.6-luna", effort = "max", disable_flag_parser_status = "ok",
+        model = "gpt-6-astra", effort = "high", disable_flag_parser_status = "ok",
         effective_disable_observed = true,
         cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand)
     });
@@ -161,15 +161,15 @@ try
     var contextSha = new string('c', 64);
     var stageA = new
     {
-        outcome = "Success", requested_model = "gpt-5.6-luna", requested_effort = "max",
-        reported_model = "gpt-5.6-luna", reported_effort = "max",
+        outcome = "Success", requested_model = "gpt-5.6-sol", requested_effort = "high",
+        reported_model = "gpt-5.6-sol", reported_effort = "high",
         process_started = true, exit_code = 0, final_sha256 = aSha,
         attempt_directory = aAttemptDirectory
     };
     var stageB = new
     {
-        outcome = "Success", requested_model = "gpt-5.6-luna", requested_effort = "max",
-        reported_model = "gpt-5.6-luna", reported_effort = "max",
+        outcome = "Success", requested_model = "gpt-6-astra", requested_effort = "high",
+        reported_model = "gpt-6-astra", reported_effort = "high",
         process_started = true, exit_code = 0, final_sha256 = bSha,
         attempt_directory = bAttemptDirectory
     };
@@ -178,7 +178,7 @@ try
         kind = "provider_doctor", mode = "active", active_result = "success", plan_validation_status = "success",
         compilation_status = "success", compiler_version = "sp.compiler/1.0",
         compiled_probe_sha256 = contextSha,
-        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        requested_model = "gpt-6-astra", requested_effort = "high",
         cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
         expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
         stage_a = stageA, stage_b = stageB,
@@ -192,6 +192,26 @@ try
     };
     Assert(!effortSettings.Check(true).Contains("effort_evidence_content_invalid"),
         "an active doctor evidence hash must bind to the configured executable");
+    var obsoleteEvidence = Path.Combine(root, "obsolete-luna-evidence.json");
+    var obsoleteJson = (await File.ReadAllTextAsync(effortEvidence))
+        .Replace("gpt-5.6-sol", "gpt-6-astra", StringComparison.Ordinal)
+        .Replace("\"requested_model\":\"gpt-6-astra\"", "\"requested_model\":\"gpt-5.6-luna\"", StringComparison.Ordinal)
+        .Replace("\"reported_model\":\"gpt-6-astra\"", "\"reported_model\":\"gpt-5.6-luna\"", StringComparison.Ordinal)
+        .Replace("\"high\"", "\"max\"", StringComparison.Ordinal);
+    await File.WriteAllTextAsync(obsoleteEvidence, obsoleteJson);
+    Assert((effortSettings with
+    {
+        CompatibilityEvidencePath = obsoleteEvidence,
+        CompatibilityEvidenceSha256 = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(obsoleteEvidence)))
+    }).Check(true).Contains("effort_evidence_content_invalid"),
+        "an old Luna max proof must not authorize the Sol high and Astra high policy");
+    Assert(!(effortSettings with
+    {
+        InterpreterCompatibilityVerified = true,
+        InterpreterEvidencePath = effortEvidence,
+        InterpreterEvidenceSha256 = effortSettings.CompatibilityEvidenceSha256
+    }).Check(true, stage: "A").Any(issue => issue.StartsWith("interpreter_evidence_", StringComparison.Ordinal)),
+        "the exact validated active pair may establish the interpreter gate too");
     Assert((effortSettings with { Executable = otherExecutable }).Check(true).Contains("effort_evidence_content_invalid"),
         "a replaced CLI must invalidate its previous active effort evidence");
 
@@ -201,12 +221,12 @@ try
     await File.WriteAllTextAsync(activeAReport, JsonSerializer.Serialize(new
     {
         kind = "provider_doctor", mode = "active", active_result = "success",
-        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        requested_model = "gpt-6-astra", requested_effort = "high",
         cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
         expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
         stage_a = stageA,
         // This obsolete doctor's apparent B success must never count as B proof.
-        stage_b = new { outcome = "Success", reported_effort = "max" }
+        stage_b = new { outcome = "Success", reported_effort = "high" }
     }));
     Assert((effortSettings with
     {
@@ -220,7 +240,7 @@ try
     var validPlanEvidence = new
     {
         kind = "provider_doctor", mode = "plan", active_result = "success",
-        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        requested_model = "gpt-6-astra", requested_effort = "high",
         cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
         expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
         stage_a_reuse = new { source_file = aFinal,
@@ -239,7 +259,7 @@ try
     {
         kind = "provider_offline_validation", mode = "validate", result = "success",
         validation_status = "success", compilation_status = "success",
-        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        requested_model = "gpt-6-astra", requested_effort = "high",
         cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
         expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
         model_calls_executed = false,
@@ -303,7 +323,7 @@ try
     {
         kind = "provider_offline_validation", mode = "validate", result = "success",
         validation_status = "success", compilation_status = "not_run",
-        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        requested_model = "gpt-6-astra", requested_effort = "high",
         cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
         expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
         model_calls_executed = false,
@@ -322,7 +342,7 @@ try
     await File.WriteAllTextAsync(planBReport, JsonSerializer.Serialize(new
     {
         kind = "provider_doctor", mode = "plan", active_result = "success",
-        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        requested_model = "gpt-6-astra", requested_effort = "high",
         cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
         expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
         stage_a_reuse = new { source_file = aFinal,
@@ -333,8 +353,8 @@ try
     Assert(WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
         "composite proof must reject a B report bound to another A output");
     Assert(settings.Check(false).Count == 0, "transport fixture must pass non-production isolation check: " + string.Join(',', settings.Check(false)));
-    Assert((settings with { Effort = "xhigh" }).Check(false).Contains("effort_below_documented_max"),
-        "the worker must reject a configured effort below the documented maximum");
+    Assert((settings with { Effort = "xhigh" }).Check(false).Contains("planner_effort_policy_mismatch"),
+        "the worker must reject a configured effort below the configured stage policy");
     var overlap = settings with { TrustedInputRoot = attempts };
     Assert(overlap.Check(false).Contains("attempt_root_and_input_root_overlap"),
         "attempt state and trusted input must not share a root");
@@ -356,7 +376,7 @@ try
     var preflightBlocked = await new CodexProcessRunner(settings with { Effort = "xhigh" }).ProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "preflight must block before launch", schema,
         [reference, drawing], "job-security"), CancellationToken.None);
-    Assert(preflightBlocked.ErrorCode?.Contains("effort_below_documented_max", StringComparison.Ordinal) == true &&
+    Assert(preflightBlocked.ErrorCode?.Contains("planner_effort_policy_mismatch", StringComparison.Ordinal) == true &&
         preflightBlocked.ErrorCode?.Contains("runtime_feature_disable_not_verified", StringComparison.Ordinal) == true &&
         !preflightBlocked.ProcessStarted && preflightBlocked.AttemptDirectory is null,
         "ProbeAsync must defer only effort evidence and retain the runtime feature gate");
@@ -372,8 +392,8 @@ try
     var argumentCapture = Path.Combine(valid.AttemptDirectory!, "fake-arguments.txt");
     Assert(File.Exists(argumentCapture), "fake executable must have received structured arguments");
     var arguments = await File.ReadAllTextAsync(argumentCapture);
-    Assert(arguments.Contains("--model\ngpt-6-astra", StringComparison.Ordinal), "A must request Astra as a distinct process argument");
-    Assert(arguments.Contains("model_reasoning_effort=\"max\"", StringComparison.Ordinal), "maximum requested effort must be forwarded literally");
+    Assert(arguments.Contains("--model\ngpt-5.6-sol", StringComparison.Ordinal), "A must request Sol as a distinct process argument");
+    Assert(arguments.Contains("model_reasoning_effort=\"high\"", StringComparison.Ordinal), "configured high effort must be forwarded literally");
     Assert(arguments.Contains("--sandbox\nread-only", StringComparison.Ordinal), "read-only sandbox must be requested");
     Assert(arguments.Contains("--disable\nshell_tool", StringComparison.Ordinal), "shell tool must be explicitly disabled");
     Assert(!arguments.Contains("whoami", StringComparison.Ordinal), "prompt data must never be copied into process arguments");
@@ -388,12 +408,12 @@ try
     var planner = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "B", "trusted frozen description", schema,
         [], "job-security"), CancellationToken.None);
-    Assert(planner.Outcome == ProviderOutcome.Success && planner.RequestedModel == "gpt-5.6-luna",
-        "B must request Luna without inheriting A's Astra model");
+    Assert(planner.Outcome == ProviderOutcome.Success && planner.RequestedModel == "gpt-6-astra",
+        "B must request Astra without inheriting A's Sol model");
     Assert(planner.AttemptDirectory is not null &&
         (await File.ReadAllTextAsync(Path.Combine(planner.AttemptDirectory, "fake-arguments.txt")))
-            .Contains("--model\ngpt-5.6-luna", StringComparison.Ordinal),
-        "B must pass Luna explicitly to codex exec");
+            .Contains("--model\ngpt-6-astra", StringComparison.Ordinal),
+        "B must pass Astra explicitly to codex exec");
 
     var exitWithStderr = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", exitStderrSchema, [reference, drawing], "job-security"), CancellationToken.None);
@@ -482,7 +502,7 @@ try
     var arbitraryMetadata = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", arbitraryMetadataSchema, [reference, drawing], "job-security"), CancellationToken.None);
     Assert(arbitraryMetadata.Outcome == ProviderOutcome.Success &&
-        arbitraryMetadata.ReportedModel == "gpt-6-astra" && arbitraryMetadata.ReportedEffort == "max",
+        arbitraryMetadata.ReportedModel == "gpt-5.6-sol" && arbitraryMetadata.ReportedEffort == "high",
         "model and effort fields on ordinary JSONL events must not be trusted");
 
     var invalidJson = await runner.TransportProbeAsync(new(
@@ -590,7 +610,7 @@ static async Task RunFakeProviderAsync(string[] arguments)
             ? "{not-json"
             : $"{{\"schema_version\":\"{version}\"}}", new UTF8Encoding(false));
         var model = schemaText.Contains("divergent-model", StringComparison.OrdinalIgnoreCase) ? "other-model" : requestedModel;
-        var effort = schemaText.Contains("divergent-effort", StringComparison.OrdinalIgnoreCase) ? "high" : requestedEffort;
+        var effort = schemaText.Contains("divergent-effort", StringComparison.OrdinalIgnoreCase) ? "max" : requestedEffort;
         var missingModel = schemaText.Contains("missing-model", StringComparison.OrdinalIgnoreCase);
         var missingEffort = schemaText.Contains("missing-effort", StringComparison.OrdinalIgnoreCase);
         var missingAttestation = schemaText.Contains("missing-attestation", StringComparison.OrdinalIgnoreCase);
@@ -602,7 +622,7 @@ static async Task RunFakeProviderAsync(string[] arguments)
             ? "{\"type\":\"thread.started\",\"thread_id\":\"fake-thread\",\"model\":\"spoofed-model\",\"reasoning_effort\":\"low\"}"
             : "{\"type\":\"thread.started\",\"thread_id\":\"fake-thread\"}");
         var attestation = missingModel
-            ? "{\"type\":\"provider.attested\",\"source\":\"server_response\",\"reasoning_effort\":\"max\",\"response_count\":1}"
+            ? "{\"type\":\"provider.attested\",\"source\":\"server_response\",\"reasoning_effort\":\"high\",\"response_count\":1}"
             : missingEffort
                 ? $"{{\"type\":\"provider.attested\",\"source\":\"server_response\",\"model\":\"{requestedModel}\",\"response_count\":1}}"
                 : invalidAttestation

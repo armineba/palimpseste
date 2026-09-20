@@ -4,7 +4,7 @@ param([string]$RuntimeRoot = 'E:\PalimpsesteRuntime')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$expectedApiSha256 = 'E98D511270AC2E6722F1946A368730968F640EFE569B476073DC33C521F9E194'
+$expectedApiSha256 = '6168F278C0070F9ED286050DCD82F8BBAB4D8F273FB7A351D55412BCA8553923'
 $expectedChildSha256 = '3655615CF544B6E757F33FC61B773C83943935E06B0C70559B7B20E2EA2D1762'
 
 $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\', '/')

@@ -37,7 +37,9 @@ namespace Palimpseste.Game.PlayModeTests
                 Assert.AreEqual(form, visual.Form);
                 var renderers = root.GetComponentsInChildren<MeshRenderer>();
                 Assert.Greater(renderers.Length, 0, form + " must contain solid meshes");
-                Assert.LessOrEqual(renderers.Length, 32, form + " renderer budget");
+                // Layered aura/ribbons add bounded decorative meshes to the
+                // existing volumetric forms; they may not add physics bodies.
+                Assert.LessOrEqual(renderers.Length, 48, form + " renderer budget");
                 var meshes = root.GetComponentsInChildren<MeshFilter>().Select(filter => filter.sharedMesh).Distinct().ToArray();
                 Assert.IsTrue(meshes.Any(mesh => mesh.bounds.size.x > .03f && mesh.bounds.size.y > .03f && mesh.bounds.size.z > .03f),
                     form + " must contain a genuinely volumetric subject");

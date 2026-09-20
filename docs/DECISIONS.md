@@ -2,6 +2,14 @@
 
 Mis à jour le 20 septembre 2026. Les arbitrages P01–P10 du cahier restent des bases de réalisation, sans validation humaine implicite. Les décisions D07 et D08 ci-dessous remplacent le découpage en trois régions et le choix Luna A des versions antérieures pour les nouveaux parchemins.
 
+## D10 — Interprétation rapide et VFX composés
+
+Le créateur veut des sorts visuellement spectaculaires dans le laboratoire et une attente de génération mesurable. La chaîne cible est Sol avec effort `high` pour interpréter le dessin, puis Astra avec effort `high` pour planifier le sort. Ce changement de modèles doit être vérifié sur le transport Codex installé et sur un vrai job avant d'être déclaré en production ; la version antérieure Astra → Luna reste un fait historique des preuves déjà enregistrées.
+
+Chaque nœud peut contenir un profil visuel décoratif `appearance.vfx` : style, motif, densité, rayon d'aura, durée de charge et forme d'impact, dans des listes et bornes fixes. Le profil sert à superposer des VFX du moteur Unity autour de la forme et des effets du sort. Il ne change ni les dégâts, ni les cibles, ni les collisions, ni les limites de porteurs. Un paquet sans profil reste lisible ; un paquet avec profil exige le client 1.2.0. Les images d'inspiration créées pendant le développement peuvent guider les assets du jeu, mais aucun appel d'image générative supplémentaire n'est déclenché pour chaque joueur.
+
+La durée du parcours doit être instrumentée par étapes observables (file, interprétation, planification, compilation, téléchargement) sans afficher un pourcentage inventé. Les budgets, quotas et permissions du worker demeurent bornés ; le rendu ne donne jamais à un parchemin accès au code, au build ou aux fichiers du serveur.
+
 ## D09 — L'objet interprété détermine le modèle 3D
 
 Le créateur demande que le sort représente ce qu'Astra imagine : si le gribouillis évoque un rocher, le laboratoire affiche un rocher en volume ; il ne doit plus recopier automatiquement la silhouette du dessin. Cette demande remplace l'obligation historique de faire provenir la forme visible ou l'emprise de chaque sort des pixels d'encre. Le dessin continue d'alimenter l'interprétation multimodale et ses observations ; la description choisit ensuite une forme visuelle contrôlée, son mouvement, sa palette et ses effets.

@@ -117,6 +117,8 @@ namespace Palimpseste.Game.SpellRuntime
                 case "barrier": Barrier(root, state, tint); break;
                 case "trap": Footprint(root, mask, node.scale_cm, tint * .65f, true); break;
             }
+            root.AddComponent<SpellVfxComposition>().Initialize(node,tint,Vector3.zero,
+                Mathf.Clamp((node.options.radius_cm ?? 25)/50f,.4f,2f));
             return root;
         }
 
@@ -290,7 +292,7 @@ namespace Palimpseste.Game.SpellRuntime
             if (state.node.carrier != "projectile") return;
             if (SemanticSpellVisual.Supports(state.node.appearance?.form))
             {
-                SemanticSpellVisual.Impact(state.node.appearance.form, point, state.direction,
+                SpellVfxComposition.SpawnImpact(state.node.appearance, point, state.direction,
                     ColorFor(state.node.appearance.palette, state.node.appearance.affinity),
                     (state.node.options.radius_cm ?? 12) / 65f);
                 return;
@@ -298,6 +300,8 @@ namespace Palimpseste.Game.SpellRuntime
             var impulse = state.node.effects != null && state.node.effects.Exists(
                 effect => effect.@event == "hit" && effect.kind == "impulse");
             var tint = ColorFor(state.node.appearance?.palette, state.node.appearance?.affinity);
+            SpellVfxComposition.SpawnImpact(state.node.appearance, point, state.direction, tint,
+                (state.node.options.radius_cm ?? 12)/65f);
             var root = new GameObject(impulse ? "Onde de recul" : "Éclat d'impact");
             root.transform.position = point;
             root.transform.rotation = Quaternion.LookRotation(state.direction);
@@ -473,6 +477,7 @@ namespace Palimpseste.Game.SpellRuntime
                 semantic.SetBeamPath(points);
                 return;
             }
+            state.visual.GetComponent<SpellVfxComposition>()?.SetBeamPath(points);
             var positions = points.ToArray();
             var pattern = state.visual.GetComponent<BeamPatternVisual>();
             foreach (var line in state.visual.GetComponentsInChildren<LineRenderer>())
@@ -574,6 +579,7 @@ namespace Palimpseste.Game.SpellRuntime
                 semantic.SetPulseRadius(outerRadius);
                 return;
             }
+            state.visual?.GetComponent<SpellVfxComposition>()?.SetPulseRadius(outerRadius);
             var visual = state.visual?.GetComponent<PulseVisual>();
             if (visual == null || visual.source == null || visual.live == null) return;
             var pixels = new Color32[128 * 128];
@@ -625,6 +631,7 @@ namespace Palimpseste.Game.SpellRuntime
                 semantic.Arm();
                 return;
             }
+            state.visual?.GetComponent<SpellVfxComposition>()?.Arm();
             var renderer = state.visual?.GetComponentInChildren<Renderer>();
             if (renderer != null) renderer.material.color = new Color(1f, .82f, .4f, .75f);
         }

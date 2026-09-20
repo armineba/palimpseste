@@ -1,0 +1,446 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.3/staging' branch; Version is '6000.3.24f1 (4e7b9b5b6244) revision 5143451'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-REDACTED" at "2026-09-20T16:02:19.3990663Z"
+OS: 'Windows 11  (10.0.26200) Core' Language: 'fr' Physical Memory: 32711 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-09-20T16:02:19Z
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 31576, path: "E:/unity/Unity Hub/UnityLicensingClient_V1/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.3+d7ffd15
+  Session Id:              REDACTED
+  Correlation Id:          REDACTED
+  External correlation Id: REDACTED
+  Machine Id:              REDACTED
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-REDACTED" (connect: 0.00s, validation: 0.00s, handshake: 0.09s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-REDACTED" at "2026-09-20T16:02:19.4935301Z"
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: REDACTED
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 0.10s
+
+COMMAND LINE ARGUMENTS:
+C:\ProgramData\6000.3.24f1-x86_64\Editor\Unity.exe
+-batchmode
+-quit
+-projectPath
+E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game
+-executeMethod
+Palimpseste.Game.Editor.BuildPalimpseste.PrepareMaterials
+-logFile
+E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Logs\composed-vfx-prepare.log
+Successfully changed project path to: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game
+E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-remapper-allocator-initial-capacity=32768"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+Player connection [12916]  Target information:
+
+Player connection [12916]  * "[IP] PRIVATE_IP [Port] 55504 [Flags] 2 [Guid] 1586360383 [EditorId] 1586360383 [Version] 1048832 [Id] WindowsEditor(7,HOST_REDACTED) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [12916]  * "[IP] PRIVATE_IP [Port] 55504 [Flags] 2 [Guid] 1586360383 [EditorId] 1586360383 [Version] 1048832 [Id] WindowsEditor(7,HOST_REDACTED) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [12916] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [12916] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Package Manager] Connected to IPC stream "Upm-17236" after 0.2 seconds.
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Artifact Garbage Collection - Removed 2 unused hashed content files
+Refreshing native plugins compatible for Editor in 0.12 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 6000.3.24f1 (4e7b9b5b6244)
+[Subsystems] Discovering subsystems at path C:/ProgramData/6000.3.24f1-x86_64/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Assets
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+d3d12: failed to query info queue interface (0x80004002).
+Direct3D:
+    Version:         Direct3D 12 [level 12.2]
+    Renderer:        NVIDIA GeForce RTX 3070 (ID=0x2484)
+    Vendor:          NVIDIA
+    VRAM:            8018 MB
+    App VRAM Budget: 7250 MB
+    Driver:          32.0.15.9186
+Initialize mono
+Mono path[0] = 'C:/ProgramData/6000.3.24f1-x86_64/Editor/Data/Managed'
+Mono path[1] = 'C:/ProgramData/6000.3.24f1-x86_64/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'C:/ProgramData/6000.3.24f1-x86_64/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56236
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/ProgramData/6000.3.24f1-x86_64/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.001474 seconds.
+- Loaded All Assemblies, in  2.002 seconds
+Native extension for WindowsStandalone target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.424 seconds
+Domain Reload Profiling: 2424ms
+	BeginReloadAssembly (321ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (0ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (3ms)
+	RebuildCommonClasses (449ms)
+	RebuildNativeTypeToScriptingClass (13ms)
+	initialDomainReloadingComplete (51ms)
+	LoadAllAssembliesAndSetupDomain (1164ms)
+		LoadAssemblies (323ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (1151ms)
+			TypeCache.Refresh (1150ms)
+				TypeCache.ScanAssembly (899ms)
+			BuildScriptInfoCaches (0ms)
+			ResolveRequiredComponents (0ms)
+	FinalizeReload (425ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (384ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (53ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (80ms)
+			ProcessInitializeOnLoadAttributes (144ms)
+			ProcessInitializeOnLoadMethodAttributes (104ms)
+			AfterProcessingInitializeOnLoad (0ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (0ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 36 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.ai.navigation@2.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.ai.navigation@f6367599281e)
+    com.unity.collab-proxy@2.2.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.collab-proxy@b26119cdd155)
+    com.unity.ide.rider@3.0.27 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.ide.rider@8ca554ad34c2)
+    com.unity.ide.visualstudio@2.0.22 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.ide.visualstudio@8140e851d83e)
+    com.unity.inputsystem@1.17.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.inputsystem@02433b2481ab)
+    com.unity.nuget.newtonsoft-json@3.2.1 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0)
+    com.unity.timeline@1.8.6 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.timeline@9ac0df085fa8)
+    com.unity.visualscripting@1.9.1 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.visualscripting@80ee0eef820c)
+    com.unity.searcher@4.9.5 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.searcher@a463122f2c00)
+    com.unity.burst@1.8.30 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.burst@2f3d916873ea)
+    com.unity.mathematics@1.3.3 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.mathematics@19a9377c4ffa)
+    com.unity.collections@2.6.8 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.collections@84e8eb3fc12e)
+    com.unity.nuget.mono-cecil@1.11.6 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff)
+    com.unity.test-framework.performance@3.5.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.test-framework.performance@8b56083ec0f0)
+  Built-in packages:
+    com.unity.render-pipelines.universal@17.3.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.render-pipelines.universal@a8b4b2fc3560)
+    com.unity.test-framework@1.6.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.test-framework@bd7f943e9647)
+    com.unity.ugui@2.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.ugui@b996e7548785)
+    com.unity.modules.unitywebrequest@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.unitywebrequest)
+    com.unity.modules.imageconversion@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.modules.jsonserialize@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.ui@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.ui)
+    com.unity.modules.imgui@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.audio@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.director@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.director)
+    com.unity.modules.animation@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.animation)
+    com.unity.modules.particlesystem@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.particlesystem)
+    com.unity.ext.nunit@2.0.5 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.ext.nunit@d8c07649098d)
+    com.unity.render-pipelines.core@17.3.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.render-pipelines.core@0bb36005e9ba)
+    com.unity.shadergraph@17.3.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.shadergraph@30c2e3926b79)
+    com.unity.render-pipelines.universal-config@17.0.3 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.render-pipelines.universal-config@8dc1aab4af1d)
+    com.unity.modules.uielements@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.uielements)
+    com.unity.modules.ai@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.ai)
+    com.unity.modules.physics@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.terrain@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.modules.hierarchycore@1.0.0 (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\game\Library\PackageCache\com.unity.modules.hierarchycore)
+  Local packages:
+    com.palimpseste.contracts@file:E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\shared\Palimpseste.Contracts (location: E:\Palimpseste\Palimpseste_Unity_Dossier_Luna_Codex\Palimpseste_Unity_Dossier\shared\Palimpseste.Contracts)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.01 seconds
+[ScriptCompilation] Requested script compilation because: Assetdatabase observed changes in script compilation related files
+Starting: C:\ProgramData\6000.3.24f1-x86_64\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game
+DisplayProgressbar: Compiling Scripts
+Starting: C:\ProgramData\6000.3.24f1-x86_64\Editor\Data\netcorerun\netcorerun.exe "C:\ProgramData\6000.3.24f1-x86_64\Editor\Data\Tools\BuildPipeline\ScriptCompilationBuildProgram.exe" "Library/Bee/1900b0aE.dag.json" "Library/Bee/1900b0aE-inputdata.json" "Library\Bee\buildprogram0.traceevents"
+WorkingDir: E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game
+ExitCode: 4 Duration: 1s232ms
+[484/865    0s] WriteResponseFile Library/Bee/artifacts/rsp/4747638433968585886.rsp
+Rebuilding DAG because FileSignature timestamp changed: Library/Bee/1900b0aE-inputdata.json
+[674/865    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+[675/865    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Contracts.dll (+2 others)
+[           0s] Csc Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Contracts.dll (+2 others) [CacheWrite 00000000000000000000000000000005]
+*** Tundra requires additional run (1.20 seconds), 3 items updated, 673 evaluated
+ExitCode: 0 Duration: 1s244ms
+Starting: C:\ProgramData\6000.3.24f1-x86_64\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --dagfilejson="Library\Bee\1900b0aE.dag.json" --profile="Library/Bee/backend2.traceevents" ScriptAssemblies
+WorkingDir: E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game
+ExitCode: 0 Duration: 3s463ms
+Finished compiling graph: 869 nodes, 15068 flattened edges (12320 ToBuild, 134 ToUse), maximum node priority 936
+[483/865    0s] WriteText Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.PlayModeTests.rsp
+[484/865    0s] WriteText Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.rsp
+[675/865    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+[838/865    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Palimpseste.Contracts.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Contracts.dll, with 140 defines and 134 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[839/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Contracts.dll
+[840/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Contracts.pdb
+[841/865    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.dll (+2 others)
+[842/865    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.PlayModeTests.dll (+2 others)
+[843/865    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.Tests.dll (+2 others)
+[844/865    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.Editor.dll (+2 others)
+[845/865    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Palimpseste.Game.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.dll, with 140 defines and 252 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[846/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Game.pdb
+[847/865    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Palimpseste.Game.Editor.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.Editor.dll, with 138 defines and 283 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[848/865    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Palimpseste.Game.Tests.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.Tests.dll, with 138 defines and 272 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[849/865    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Palimpseste.Game.PlayModeTests.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Palimpseste.Game.PlayModeTests.dll, with 140 defines and 244 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[850/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Game.Editor.pdb
+[851/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Game.Editor.dll
+[852/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Game.Tests.pdb
+[853/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Game.PlayModeTests.pdb
+[854/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Game.PlayModeTests.dll
+[855/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Game.Tests.dll
+[856/865    0s] CopyFiles Library/ScriptAssemblies/Palimpseste.Game.dll
+[857/865    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.dll (+2 others)
+[858/865    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp-Editor.dll (+2 others)
+[859/865    1s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Assembly-CSharp-Editor.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp-Editor.dll, with 138 defines and 332 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[860/865    1s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Assembly-CSharp.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.dll, with 140 defines and 291 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[861/865    0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp-Editor.pdb
+[862/865    0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp-Editor.dll
+[863/865    0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp.pdb
+[864/865    0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp.dll
+*** Tundra build success (3.44 seconds), 30 items updated, 865 evaluated
+AssetDatabase: script compilation time: 6.518053s
+[ScriptCompilation] Requested script compilation because: Assetdatabase observed changes in script compilation related files
+AssetDatabase: script compilation time: 0.000061s
+Total cache size 105807985
+Total cache size after purge 105807985, took 00:00:00.1295323
+Starting: C:\ProgramData\6000.3.24f1-x86_64\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game
+ExitCode: 0 Duration: 0s178ms
+[681/865    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+*** Tundra build success (0.15 seconds), 1 items updated, 865 evaluated
+Begin MonoManager ReloadAssembly
+Total cache size 105807985
+Total cache size after purge 105807985, took 00:00:00.0737764
+- Loaded All Assemblies, in  3.326 seconds
+Refreshing native plugins compatible for Editor in 27.09 ms, found 3 plugins.
+Native extension for WindowsStandalone target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  3.965 seconds
+Domain Reload Profiling: 7288ms
+	BeginReloadAssembly (232ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (63ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (40ms)
+	RebuildCommonClasses (31ms)
+	RebuildNativeTypeToScriptingClass (10ms)
+	initialDomainReloadingComplete (27ms)
+	LoadAllAssembliesAndSetupDomain (3023ms)
+		LoadAssemblies (2432ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (682ms)
+			TypeCache.Refresh (622ms)
+				TypeCache.ScanAssembly (575ms)
+			BuildScriptInfoCaches (49ms)
+			ResolveRequiredComponents (8ms)
+	FinalizeReload (3965ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (2958ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (15ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (135ms)
+			ProcessInitializeOnLoadAttributes (2735ms)
+			ProcessInitializeOnLoadMethodAttributes (60ms)
+			AfterProcessingInitializeOnLoad (10ms)
+			EditorAssembliesLoaded (1ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (41ms)
+Start importing Assets/Palimpseste/Resources/SpellSpectralCloth.shader using Guid(e9614bddcffd4dee9b567033ab22fefb) (ShaderImporter)Launched and connected shader compiler UnityShaderCompiler.exe after 0.03 seconds
+ -> (artifact id: '2bb93f15a56f0d2644ed214799d31634') in 0.2842255 seconds
+Start importing Assets/Palimpseste/Resources/SpellComposition.shader using Guid(af66eec8fb1343ccbb2bfeb4974230b1) (ShaderImporter) -> (artifact id: 'ad49b780a2bed52553805b03823da22f') in 0.0051469 seconds
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.01 seconds
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.01 seconds
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.01 seconds
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.01 seconds
+Refreshing native plugins compatible for Editor in 0.67 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=5790bc006c02b16478831d46e69c4503): Total: 16.891 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	Summary:
+		Imports: total=2 (actual=2, local cache=0, cache server=0)
+		Asset DB Process Time: managed=2 ms, native=5748 ms
+		Asset DB Callback time: managed=404 ms, native=565 ms
+		Scripting: domain reloads=1, domain reload time=3326 ms, compile time=6797 ms, other=46 ms
+		Project Asset Count: scripts=1177, non-scripts=2153
+		Asset File Changes: new=5, changed=17, moved=0, deleted=1
+		Scan Filter Count: 0
+	InvokeCustomDependenciesCallbacks: 0.002ms
+	InvokePackagesCallback: 35.503ms
+	ApplyChangesToAssetFolders: 0.555ms
+	Scan: 199.192ms
+	OnSourceAssetsModified: 1.276ms
+	CategorizeAssetsWithTransientArtifact: 485.891ms
+	ProcessAssetsWithTransientArtifactChanges: 59.075ms
+	UnregisterDeletedAssets: 0.001ms
+	CategorizeAssets: 46.619ms
+	ImportOutOfDateAssets: 4291.294ms (-2799.559ms without children)
+		ImportManagerImport: 291.791ms (1.043ms without children)
+			ImportInProcess: 290.623ms
+			UpdateCategorizedAssets: 0.125ms
+		CompileScripts: 6797.232ms
+		ReloadNativeAssets: 0.019ms
+		UnloadImportedAssets: 0.810ms
+		ReloadImportedAssets: 0.000ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.553ms
+		InitializingProgressBar: 0.005ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.000ms
+		OnDemandSchedulerStart: 0.443ms
+	PostProcessAllAssets: 933.546ms
+	Hotreload: 2.921ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.002ms
+	UnloadStreamsBegin: 1.396ms
+	PersistCurrentRevisions: 0.205ms
+	UnloadStreamsEnd: 0.001ms
+	GenerateScriptTypeHashes: 1.925ms
+	Untracked: 10833.880ms
+
+Application.AssetDatabase Initial Refresh End
+Scanning for USB devices : 38.921ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-Palimpseste Spell Lab
+Unloading 57 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6023 unused Assets / (12.8 MB). Loaded Objects now: 6807.
+Memory consumption went from 208.5 MB to 195.7 MB.
+Total: 16.211600 ms (FindLiveObjects: 0.707300 ms CreateObjectMapping: 0.628600 ms MarkObjects: 6.546800 ms  DeleteObjects: 8.327600 ms)
+
+Start importing Assets/Palimpseste/Resources/LabEmissive.mat using Guid(c8a1e18090a1473cad20f1a8283300ad) (NativeFormatImporter) -> (artifact id: 'b5c32ffb2fb68af5a626690b24c8bd3a') in 0.0093232 seconds
+Start importing Assets/Palimpseste/Resources/LabOpaque.mat using Guid(9cd4dfb7e36ceda4794c362b927883a6) (NativeFormatImporter) -> (artifact id: '21206e30c7991f2950d4225569780655') in 0.00696 seconds
+Start importing Assets/Palimpseste/Resources/LabVfxVolume.asset using Guid(7ed75ac8ffa8ae443b2109c672df0a75) (NativeFormatImporter) -> (artifact id: '0de7ed5a5668a172899d0da1bbaba2aa') in 0.0051878 seconds
+Refreshing native plugins compatible for Editor in 0.62 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=df3b46506e0cb5d43abc2bf60d15f1e7): Total: 0.079 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+PALIMPSESTE_LIT_MATERIAL_OK Assets/Palimpseste/Resources/LabOpaque.mat
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+Palimpseste.Game.Editor.BuildPalimpseste:PrepareMaterials () (at Assets/Palimpseste/Editor/BuildPalimpseste.cs:81)
+
+(Filename: Assets/Palimpseste/Editor/BuildPalimpseste.cs Line: 81)
+
+Batchmode quit successfully invoked - shutting down!
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input System polling thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-REDACTED channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-REDACTED channel disconnected successfully.
+AcceleratorClientConnectionCallback - disconnected - :0
+Cleanup mono
+Exiting batchmode successfully now!
+Exiting without the bug reporter. Application will terminate with return code 0

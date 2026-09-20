@@ -28,8 +28,8 @@ public sealed record CodexSettings(
     bool RuntimeFeaturesCompatibilityVerified = false,
     string RuntimeFeaturesEvidencePath = "",
     string RuntimeFeaturesEvidenceSha256 = "",
-    string InterpreterModel = "gpt-6-astra",
-    string InterpreterEffort = "max",
+    string InterpreterModel = LunaCodexProvider.InterpreterModel,
+    string InterpreterEffort = LunaCodexProvider.InterpreterEffort,
     bool InterpreterCompatibilityVerified = false,
     string InterpreterEvidencePath = "",
     string InterpreterEvidenceSha256 = "")
@@ -55,10 +55,10 @@ public sealed record CodexSettings(
         Read("PALIMPSESTE_CODEX_HOME"),
         Read("PALIMPSESTE_ATTEMPT_ROOT", "PALIMPSESTE_CODEX_JOB_ROOT"),
         Read("PALIMPSESTE_SERVICE_USER"),
-        // The runtime has one deliberately fixed model. A missing value is
-        // represented as empty so the doctor reports a configuration error.
-        Read("PALIMPSESTE_LUNA_MODEL", "PALIMPSESTE_LUNA_MODEL_A") is { Length: > 0 } model ? model : "gpt-5.6-luna",
-        Read("PALIMPSESTE_LUNA_EFFORT", "PALIMPSESTE_LUNA_RESOLVED_EFFORT") is { Length: > 0 } effort ? effort : "max",
+        // Explicit D10 stage policy. Legacy aliases are read for migration,
+        // but their old Luna/max values fail the checks below.
+        Read("PALIMPSESTE_PLANNER_MODEL", "PALIMPSESTE_LUNA_MODEL") is { Length: > 0 } model ? model : LunaCodexProvider.PlannerModel,
+        Read("PALIMPSESTE_PLANNER_EFFORT", "PALIMPSESTE_LUNA_EFFORT") is { Length: > 0 } effort ? effort : LunaCodexProvider.PlannerEffort,
         ParseBool("PALIMPSESTE_EFFORT_VERIFIED"),
         TimeSpan.FromSeconds(ParseInt("PALIMPSESTE_ATTEMPT_SECONDS", "PALIMPSESTE_PROVIDER_ATTEMPT_TIMEOUT_SECONDS", 1800)),
         ParseInt("PALIMPSESTE_MAX_OUTPUT_BYTES", defaultValue: 2_000_000),
@@ -70,11 +70,11 @@ public sealed record CodexSettings(
         ParseBool("PALIMPSESTE_RUNTIME_FEATURES_VERIFIED"),
         Read("PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_PATH"),
         Read("PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_SHA256"),
-        Read("PALIMPSESTE_ASTRA_MODEL") is { Length: > 0 } interpreterModel ? interpreterModel : "gpt-6-astra",
-        Read("PALIMPSESTE_ASTRA_EFFORT") is { Length: > 0 } interpreterEffort ? interpreterEffort : "max",
-        ParseBool("PALIMPSESTE_ASTRA_VERIFIED"),
-        Read("PALIMPSESTE_ASTRA_EVIDENCE_PATH"),
-        Read("PALIMPSESTE_ASTRA_EVIDENCE_SHA256"));
+        Read("PALIMPSESTE_INTERPRETER_MODEL", "PALIMPSESTE_ASTRA_MODEL") is { Length: > 0 } interpreterModel ? interpreterModel : LunaCodexProvider.InterpreterModel,
+        Read("PALIMPSESTE_INTERPRETER_EFFORT", "PALIMPSESTE_ASTRA_EFFORT") is { Length: > 0 } interpreterEffort ? interpreterEffort : LunaCodexProvider.InterpreterEffort,
+        ParseBool("PALIMPSESTE_INTERPRETER_VERIFIED"),
+        Read("PALIMPSESTE_INTERPRETER_EVIDENCE_PATH"),
+        Read("PALIMPSESTE_INTERPRETER_EVIDENCE_SHA256"));
 
     /// <summary>
     /// Performs the checks that must pass before a process can be started.
@@ -102,13 +102,13 @@ public sealed record CodexSettings(
             !string.Equals(Environment.UserName, ExpectedServiceUser, StringComparison.OrdinalIgnoreCase))
             issues.Add("service_identity_mismatch");
 
-        if (Model != "gpt-5.6-luna") issues.Add("model_mismatch");
-        if (InterpreterModel != "gpt-6-astra") issues.Add("interpreter_model_mismatch");
+        if (Model != LunaCodexProvider.PlannerModel) issues.Add("model_mismatch");
+        if (InterpreterModel != LunaCodexProvider.InterpreterModel) issues.Add("interpreter_model_mismatch");
         if (Effort is not ("low" or "medium" or "high" or "xhigh" or "max")) issues.Add("invalid_effort");
-        else if (Effort != "max") issues.Add("effort_below_documented_max");
+        else if (Effort != LunaCodexProvider.PlannerEffort) issues.Add("planner_effort_policy_mismatch");
         if (InterpreterEffort is not ("low" or "medium" or "high" or "xhigh" or "max"))
             issues.Add("invalid_interpreter_effort");
-        else if (InterpreterEffort != "max") issues.Add("interpreter_effort_below_documented_max");
+        else if (InterpreterEffort != LunaCodexProvider.InterpreterEffort) issues.Add("interpreter_effort_policy_mismatch");
         // The active doctor may establish this one fact. All other production
         // checks remain enabled for its ProbeAsync path.
         if (production && !EffortCompatibilityVerified && !compatibilityProbe) issues.Add("effort_not_verified");
@@ -126,10 +126,10 @@ public sealed record CodexSettings(
         if (production && RuntimeFeaturesCompatibilityVerified && executableHash is not null &&
             !TryVerifyRuntimeFeatureEvidence(executableHash, out var featureEvidenceIssue))
             issues.Add(featureEvidenceIssue ?? "runtime_feature_evidence_invalid");
-        if (production && EffortCompatibilityVerified && executableHash is not null &&
+        if (production && !compatibilityProbe && EffortCompatibilityVerified && executableHash is not null &&
             !TryVerifyCompatibilityEvidence(executableHash, out var evidenceIssue))
             issues.Add(evidenceIssue ?? "effort_evidence_invalid");
-        if (production && interpreterStage && InterpreterCompatibilityVerified && executableHash is not null &&
+        if (production && !compatibilityProbe && interpreterStage && InterpreterCompatibilityVerified && executableHash is not null &&
             !TryVerifyInterpreterEvidence(executableHash, out var interpreterIssue))
             issues.Add(interpreterIssue ?? "interpreter_evidence_invalid");
         if (AttemptTimeout <= TimeSpan.Zero || AttemptTimeout > TimeSpan.FromHours(2)) issues.Add("invalid_timeout");
@@ -486,7 +486,10 @@ public sealed record CodexSettings(
             using var json = JsonDocument.Parse(File.ReadAllText(InterpreterEvidencePath),
                 new JsonDocumentOptions { MaxDepth = 16 });
             var root = json.RootElement;
-            if (!StringProperty(root, "kind", "astra_multimodal_probe") ||
+            // One validated active pair may prove both stages. Its exact stage
+            // identities and executable hash are checked by ValidActiveEvidence.
+            if (ValidActiveEvidence(root, executableHash)) return true;
+            if (!StringProperty(root, "kind", "interpreter_multimodal_probe") ||
                 !StringProperty(root, "result", "success") ||
                 !StringProperty(root, "service_identity", ExpectedServiceUser) ||
                 !StringProperty(root, "requested_model", InterpreterModel) ||
@@ -526,7 +529,7 @@ public sealed record CodexSettings(
         StringProperty(root, "compiler_version", "sp.compiler/1.0") &&
         ShaProperty(root, "compiled_probe_sha256") &&
         CommonDoctorEvidence(root, executableHash) &&
-        StageMetadata(root, "stage_a", Model, Effort) &&
+        StageMetadata(root, "stage_a", InterpreterModel, InterpreterEffort) &&
         StageMetadata(root, "stage_b", Model, Effort) &&
         StageStarted(root, "stage_a") && StageStarted(root, "stage_b") &&
         GeometryFromResolvedInk(root) &&
@@ -552,7 +555,8 @@ public sealed record CodexSettings(
 
     private static bool GeometryFromResolvedInk(JsonElement root) =>
         root.TryGetProperty("geometry", out var geometry) && geometry.ValueKind == JsonValueKind.Object &&
-        StringProperty(geometry, "source", "resolver_from_ink_and_description") &&
+        (StringProperty(geometry, "source", "resolver_from_ink_and_description") ||
+         StringProperty(geometry, "source", "controlled_geometry_from_interpretation")) &&
         ShaProperty(geometry, "description_sha256") && ShaProperty(geometry, "ink_sha256") &&
         ShaProperty(geometry, "context_sha256");
 
@@ -586,7 +590,7 @@ public sealed record CodexSettings(
             if (!StringProperty(active, "kind", "provider_doctor") ||
                 !StringProperty(active, "mode", "active") ||
                 !CommonDoctorEvidence(active, executableHash) ||
-                !StageMetadata(active, "stage_a", Model, Effort) ||
+                !StageMetadata(active, "stage_a", InterpreterModel, InterpreterEffort) ||
                 !StageStarted(active, "stage_a") ||
                 !StringProperty(plan, "kind", "provider_doctor") ||
                 !StringProperty(plan, "mode", "plan") ||

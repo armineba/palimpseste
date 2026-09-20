@@ -97,7 +97,36 @@ namespace Palimpseste.Contracts
         public string palette;
         // Controlled semantic 3D form selected by A and copied by B. Null is legacy pixel rendering.
         public string form;
+        // Decorative, bounded VFX layers. Null preserves all earlier compiled packets.
+        public SpellVfxProfile vfx;
         public string signature_geometry_id;
+    }
+
+    public sealed class SpellVfxProfile
+    {
+        public string style;
+        public string motif;
+        public int density;
+        public int aura_cm;
+        public int charge_ms;
+        public string impact;
+    }
+
+    public static class SpellVfxProfiles
+    {
+        public static readonly string[] Styles = {
+            "arcane", "fire", "frost", "lightning", "earth", "poison", "holy", "shadow", "nature", "water"
+        };
+        public static readonly string[] Motifs = {
+            "runic", "orbital", "vortex", "fracture", "storm", "petal"
+        };
+        public static readonly string[] Impacts = { "nova", "shatter", "ripple", "pillar" };
+        public const int MinimumDensity = 1;
+        public const int MaximumDensity = 3;
+        public const int MinimumAuraCm = 80;
+        public const int MaximumAuraCm = 400;
+        public const int MinimumChargeMs = 100;
+        public const int MaximumChargeMs = 800;
     }
 
     public sealed class SpellEffect

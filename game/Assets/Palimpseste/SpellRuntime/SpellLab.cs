@@ -253,7 +253,7 @@ namespace Palimpseste.Game.SpellRuntime
         private Camera camera3d;
         private Transform caster;
         private Vector3 aim = new Vector3(0, 0, 5);
-        private float yaw = 20f, pitch = 31f, distance = 18f;
+        private float yaw = -22f, pitch = 25f, distance = 17f;
         private int shots;
         private Vector3[] initialPositions;
         private string loadError;
@@ -318,8 +318,8 @@ namespace Palimpseste.Game.SpellRuntime
             cameraObject.transform.SetParent(transform, false);
             camera3d = cameraObject.AddComponent<Camera>();
             camera3d.clearFlags = CameraClearFlags.SolidColor;
-            camera3d.backgroundColor = new Color(.045f, .078f, .1f);
-            camera3d.fieldOfView = 55f;
+            camera3d.backgroundColor = new Color(.014f, .019f, .035f);
+            camera3d.fieldOfView = 44f;
             camera3d.allowHDR = true;
             var cameraData = cameraObject.AddComponent<UniversalAdditionalCameraData>();
             cameraData.renderPostProcessing = true;
@@ -434,8 +434,12 @@ namespace Palimpseste.Game.SpellRuntime
         private void UpdateCamera()
         {
             if (camera3d == null) return;
+            // Keep the spell arena centered in the actual visible viewport,
+            // rather than hiding its left third behind the parchment panel.
+            var panelFraction = Mathf.Clamp(390f / Mathf.Max(1, Screen.width), 0, .45f);
+            camera3d.rect = new Rect(panelFraction, 0, 1 - panelFraction, 1);
             var rot = Quaternion.Euler(pitch, yaw, 0);
-            var focus = new Vector3(0, 1.2f, 3);
+            var focus = new Vector3(0, 1.1f, 1.2f);
             camera3d.transform.position = focus + rot * new Vector3(0, 0, -distance);
             camera3d.transform.LookAt(focus);
         }

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Encodings.Web;
 
 namespace Palimpseste.Provider;
 
@@ -42,10 +43,13 @@ public sealed record ProviderDocument(CodexResult Transport, byte[]? Utf8, strin
 
 public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlanner, ITechnicalRepairProvider
 {
-    public const string InterpreterModel = "gpt-6-astra";
-    public const string PlannerModel = "gpt-5.6-luna";
-    public const string PromptAVersion = "sp.prompt.a/2.1";
-    public const string PromptBVersion = "sp.prompt.b/1.8";
+    private static readonly JsonSerializerOptions PromptJsonOptions = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+    public const string InterpreterModel = "gpt-5.6-sol";
+    public const string PlannerModel = "gpt-6-astra";
+    public const string InterpreterEffort = "high";
+    public const string PlannerEffort = "high";
+    public const string PromptAVersion = "sp.prompt.a/2.2";
+    public const string PromptBVersion = "sp.prompt.b/1.9";
     private readonly CodexProcessRunner runner;
     private readonly string promptA;
     private readonly string promptB;
@@ -96,7 +100,7 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
 
     public async Task<ProviderDocument> InterpretAsync(string jobId, string attemptId, string referencePng, string drawingPng, string layoutJson, string capabilitiesJson, CancellationToken ct)
     {
-        var prompt = promptA + "\n\nLAYOUT_CONTEXT\n" + layoutJson + "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson +
+        var prompt = promptA + "\n\nLAYOUT_CONTEXT\n" + CompactJson(layoutJson) + "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilitiesJson, null) +
             "\nEFFECT_RECIPES_CONTEXT\n" + effectRecipesAContext +
             "\nIMAGE 1 = référence neutre. IMAGE 2 = dessin engagé. Réponds avec le seul contrat JSON.\n";
         var result = await runner.RunAsync(new(attemptId, "A", prompt, schemaA,
@@ -113,7 +117,7 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
     public async Task<ProviderDocument> ProbeInterpretAsync(string jobId, string attemptId, string referencePng, string drawingPng,
         string layoutJson, string capabilitiesJson, CancellationToken ct)
     {
-        var prompt = promptA + "\n\nLAYOUT_CONTEXT\n" + layoutJson + "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson +
+        var prompt = promptA + "\n\nLAYOUT_CONTEXT\n" + CompactJson(layoutJson) + "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilitiesJson, null) +
             "\nEFFECT_RECIPES_CONTEXT\n" + effectRecipesAContext +
             "\nIMAGE 1 = reference. IMAGE 2 = drawing. Return only the JSON contract.\n";
         var result = await runner.ProbeAsync(new(attemptId, "A", prompt, schemaA,
@@ -126,8 +130,8 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
         if (frozenDescriptionUtf8.Length == 0 || frozenDescriptionUtf8.Length > 250_000) throw new ArgumentOutOfRangeException(nameof(frozenDescriptionUtf8));
         var hash = Convert.ToHexStringLower(SHA256.HashData(frozenDescriptionUtf8));
         var prompt = promptB + "\n\nDESCRIPTION_SHA256\n" + hash + "\nSPELL_DESCRIPTION\n" +
-            Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + geometryJson +
-            "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson + "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(frozenDescriptionUtf8) +
+            Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + CompactJson(geometryJson) +
+            "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilitiesJson, frozenDescriptionUtf8) + "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(frozenDescriptionUtf8) +
             "\nRéponds avec le seul contrat JSON.\n";
         var result = await runner.RunAsync(new(attemptId, "B", prompt, schemaB,
             [], jobId), ct);
@@ -142,8 +146,8 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
         if (frozenDescriptionUtf8.Length == 0 || frozenDescriptionUtf8.Length > 250_000) throw new ArgumentOutOfRangeException(nameof(frozenDescriptionUtf8));
         var hash = Convert.ToHexStringLower(SHA256.HashData(frozenDescriptionUtf8));
         var prompt = promptB + "\n\nDESCRIPTION_SHA256\n" + hash + "\nSPELL_DESCRIPTION\n" +
-            Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + geometryJson +
-            "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson + "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(frozenDescriptionUtf8) +
+            Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + CompactJson(geometryJson) +
+            "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilitiesJson, frozenDescriptionUtf8) + "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(frozenDescriptionUtf8) +
             "\nReturn only the JSON contract.\n";
         var result = await runner.ProbeAsync(new(attemptId, "B", prompt, schemaB, [], jobId), ct);
         var document = Parse(result, "sp.plan/1.0");
@@ -169,7 +173,8 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
             .Append("\nPREVIOUS_OUTPUT\n").Append(attempt.PreviousOutput)
             .Append("\nVALIDATION_ERRORS\n").Append(string.Join("\n", attempt.ValidationErrors.Select(error => "- " + error)))
             .Append("\nATTEMPT_NUMBER\n").Append(attempt.AttemptNumber)
-            .Append("\nCAPABILITIES_CONTEXT\n").Append(attempt.CapabilitiesJson)
+            .Append("\nCAPABILITIES_CONTEXT\n").Append(CapabilityContext(attempt.CapabilitiesJson,
+                attempt.Stage == "A" ? null : Encoding.UTF8.GetBytes(attempt.OriginalAuthorizedInput)))
             .Append("\nEFFECT_RECIPES_CONTEXT\n").Append(attempt.Stage == "A" ? effectRecipesAContext :
                 SelectedRecipeContext(Encoding.UTF8.GetBytes(attempt.OriginalAuthorizedInput)))
             .Append('\n');
@@ -216,7 +221,54 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
                     selected.Add(fact.GetProperty("value").GetString()!);
         var rows = selected.Select(id => recipeDefinitions.TryGetValue(id, out var recipe) ? recipe :
             throw new InvalidDataException("effect_recipe_unknown_in_frozen_description")).ToArray();
-        return JsonSerializer.Serialize(new { schema_version = "sp.effect-recipes/1.0", recipes = rows });
+        return JsonSerializer.Serialize(new { schema_version = "sp.effect-recipes/1.0", recipes = rows }, PromptJsonOptions);
+    }
+
+    private static string CompactJson(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        return JsonSerializer.Serialize(document.RootElement, PromptJsonOptions);
+    }
+
+    // A chooses an interpretation and needs the available families, not all
+    // numeric implementation details. B already has immutable choices: only
+    // retain the corresponding rule definitions, while keeping global limits.
+    // This projection changes prompt size; the full compiler catalog remains
+    // authoritative and is still included in the durable input fingerprint.
+    private static string CapabilityContext(string json, byte[]? frozenDescription)
+    {
+        using var catalog = JsonDocument.Parse(json);
+        var values = catalog.RootElement.EnumerateObject()
+            .ToDictionary(p => p.Name, p => (object?)p.Value.Clone(), StringComparer.Ordinal);
+        if (frozenDescription is null)
+        {
+            values["effects"] = catalog.RootElement.GetProperty("effects").EnumerateArray()
+                .Select(effect => new { id = effect.GetProperty("id").GetString() }).ToArray();
+        }
+        else
+        {
+            using var description = JsonDocument.Parse(frozenDescription);
+            var facts = description.RootElement.GetProperty("clauses").EnumerateArray()
+                .SelectMany(clause => clause.GetProperty("facts").EnumerateArray()).ToArray();
+            HashSet<string?> Choices(string dimension) => facts
+                .Where(fact => fact.GetProperty("dimension").GetString() == dimension)
+                .Select(fact => fact.GetProperty("value").GetString()).ToHashSet(StringComparer.Ordinal);
+            foreach (var (property, dimension) in new[] { ("effects", "effect"), ("carriers", "carrier") })
+            {
+                var choices = Choices(dimension);
+                values[property] = catalog.RootElement.GetProperty(property).EnumerateArray()
+                    .Where(item => choices.Contains(item.GetProperty("id").GetString())).Select(item => item.Clone()).ToArray();
+            }
+            if (catalog.RootElement.TryGetProperty("visual_forms", out var forms))
+            {
+                var choices = Choices("visual_form");
+                var visual = forms.EnumerateObject().ToDictionary(p => p.Name, p => (object?)p.Value.Clone(), StringComparer.Ordinal);
+                visual["forms"] = forms.GetProperty("forms").EnumerateArray()
+                    .Where(form => choices.Contains(form.GetProperty("id").GetString())).Select(form => form.Clone()).ToArray();
+                values["visual_forms"] = visual;
+            }
+        }
+        return JsonSerializer.Serialize(values, PromptJsonOptions);
     }
 
     private static ProviderDocument Parse(CodexResult transport, string version)

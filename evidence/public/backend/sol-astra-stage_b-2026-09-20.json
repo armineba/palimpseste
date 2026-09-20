@@ -1,0 +1,84 @@
+{
+  "schema_version": "sp.plan/1.0",
+  "description_sha256": "17ab71e6e86ef2acb1aea0f149db83a68afc881d53cd1321e7a8dc625a95d22d",
+  "catalog_version": "sp.capabilities/1.0",
+  "rules_profile": "lab_v1",
+  "nodes": [
+    {
+      "node_id": "n0",
+      "subject_id": "s0",
+      "clause_ids": ["c0", "c1"],
+      "carrier": "projectile",
+      "activation": {
+        "parent_id": null,
+        "event": "cast",
+        "delay_ticks": 0,
+        "max_activations": 1,
+        "copies": 1,
+        "spread_mdeg": 0
+      },
+      "anchor": "caster",
+      "geometry_id": "semantic.ec18eac8d758b1eb.path",
+      "scale_cm": 140,
+      "rotation_mdeg": 0,
+      "appearance": {
+        "affinity": "air",
+        "pattern": "solid",
+        "palette": "storm",
+        "signature_geometry_id": null,
+        "form": "bird",
+        "vfx": {
+          "style": "lightning",
+          "motif": "storm",
+          "density": 2,
+          "aura_cm": 180,
+          "charge_ms": 350,
+          "impact": "shatter"
+        }
+      },
+      "effects": [
+        {
+          "id": "e0",
+          "clause_ids": ["c0"],
+          "event": "hit",
+          "kind": "damage",
+          "target_filter": "hostile",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "id": "e1",
+          "clause_ids": ["c0"],
+          "event": "hit",
+          "kind": "bleed",
+          "target_filter": "hostile",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "id": "e2",
+          "clause_ids": ["c0"],
+          "event": "hit",
+          "kind": "impulse",
+          "target_filter": "hostile",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        }
+      ],
+      "options": {
+        "lifetime_ticks": 150,
+        "range_cm": 2400,
+        "speed_cm_s": 1800,
+        "radius_cm": 30,
+        "motion": "homing",
+        "turn_mdeg_s": 180000,
+        "contact_filter": "hostile",
+        "bounces": 0,
+        "pierces": 0
+      }
+    }
+  ]
+}

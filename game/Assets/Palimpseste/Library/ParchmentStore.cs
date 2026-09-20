@@ -31,6 +31,8 @@ namespace Palimpseste.Game.Library
         public string last_job_error_code;
         public bool job_retryable;
         public int last_job_attempt_count;
+        public long generation_elapsed_ms;
+        public string elapsed_observed_at;
         public string resume_key;
         public bool server_issued;
         public bool requires_description_before_lab;

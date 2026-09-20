@@ -2,6 +2,10 @@
 
 Version SP-1.1-LUNA · 19 septembre 2026. Mission de développement, pas preuve d'un logiciel déjà réalisé.
 
+> **Priorité actuelle D10, 20 septembre 2026 :** la dernière demande utilisateur choisit `gpt-5.6-sol` / `high` pour A (`sp.prompt.a/2.2`), puis `gpt-6-astra` / `high` pour B (`sp.prompt.b/1.9`). Elle remplace les anciens choix Luna/max et Astra/max → Luna/max du texte historique. Sol interprète le dessin entier ; Astra conserve cette description et compose un plan déclaratif, dont le profil décoratif borné `appearance.vfx`. Un paquet avec ce profil exige le client `1.2.0` ; les anciens paquets restent lisibles. Voir [D10](../docs/DECISIONS.md) et l'[état réellement prouvé](../docs/IMPLEMENTATION_STATUS.md).
+>
+> Réduire les données envoyées et mesurer le temps réel par étape. Aucune génération joueur ne lance de test, de build Unity ou d'appel de génération d'image. La validation du couple modèle/effort installé reste une étape technique explicite ; ne pas annoncer son activation ni un gain de temps avant preuve. Les portes d'acceptation artistique restent séparées et ne bloquent pas les travaux indépendants.
+
 > Décisions utilisateur ultérieures : D07–D08 imposent le dessin libre, le bouton « Dessin terminé » et Astra pour A puis Luna pour B. D09 demande des objets 3D représentant l'interprétation, sans reproduction systématique du contour d'encre. Ces décisions remplacent les passages contraires ci-dessous ; voir `docs/DECISIONS.md`. La compilation de données contrôlées et l'isolation du worker demeurent obligatoires.
 
 ## 0. Mission et niveau d'exigence

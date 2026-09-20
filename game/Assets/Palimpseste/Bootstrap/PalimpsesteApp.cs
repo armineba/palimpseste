@@ -207,7 +207,7 @@ namespace Palimpseste.Game.Bootstrap
             GUI.DrawTexture(new Rect(guideX + 18, 325, guideWidth - 36, 2), goldBar);
             GUI.Label(new Rect(guideX + 18, 340, guideWidth - 36, 44), "01  Dessiner librement", textStyle);
             GUI.Label(new Rect(guideX + 18, 390, guideWidth - 36, 44), "02  Transmettre votre trace", textStyle);
-            GUI.Label(new Rect(guideX + 18, 440, guideWidth - 36, 48), "03  Lire l'idée de sort d'Astra", textStyle);
+            GUI.Label(new Rect(guideX + 18, 440, guideWidth - 36, 48), "03  Lire l'interprétation du dessin", textStyle);
             GUI.Label(new Rect(guideX + 18, 485, guideWidth - 36, 48), "04  Essayer le sort dans le labo", textStyle);
             GUI.Label(new Rect(guideX + 18, 532, guideWidth - 36, 34), "Sorts téléchargés : accessibles hors ligne.", textStyle);
             var listWidth = width * .55f;
@@ -245,7 +245,7 @@ namespace Palimpseste.Game.Bootstrap
             var width = Screen.width - x - 26;
             GUI.Box(new Rect(x, 125, width, Mathf.Min(610, Screen.height - 150)), GUIContent.none, panelStyle);
             GUI.Label(new Rect(x + 16, 139, width - 32, 34), "Atelier de dessin", titleStyle);
-            GUI.Label(new Rect(x + 16, 185, width - 32, 58), "Dessinez sur tout le parchemin. Astra imagine un sort à partir de son apparence, puis Luna en construit le plan.", textStyle);
+            GUI.Label(new Rect(x + 16, 185, width - 32, 58), "Dessinez librement. Sol imagine le sort, puis Astra compose ses effets et son rendu 3D.", textStyle);
             GUI.Label(new Rect(x + 16, 248, width - 32, 27), "Traces", textStyle);
             brush = (BrushStyle)GUI.Toolbar(new Rect(x + 16, 280, width - 32, 34), (int)brush, new[] { "Plein", "Double", "Pointillé" });
             GUI.Label(new Rect(x + 16, 329, width - 32, 27), "Encre : " + inkNames[inkIndex], textStyle);
@@ -361,7 +361,7 @@ namespace Palimpseste.Game.Bootstrap
 
         private void DrawProcessingSteps(Rect area)
         {
-            var names = new[] { "Dessin", "Astra imagine", "Luna planifie", "Compilation", "Sort" };
+            var names = new[] { "Dessin", "Interprétation", "Création du sort", "Compilation", "Sort" };
             var current = ProcessingStep(selected);
             var gap = 7f;
             var itemWidth = (area.width - gap * (names.Length - 1)) / names.Length;
@@ -400,15 +400,21 @@ namespace Palimpseste.Game.Bootstrap
             var state = record.state switch
             {
                 "queued" => "En file d'attente pour la lecture du dessin",
-                "interpreting" => "Astra lit le dessin et imagine un sort",
-                "resolving_geometry" => "Interprétation reçue · préparation des formes du dessin",
-                "planning" => "Luna construit le plan du sort",
+                "interpreting" => "Lecture du dessin et création de son interprétation",
+                "resolving_geometry" => "Interprétation reçue · préparation des volumes 3D",
+                "planning" => "Composition du sort et de ses effets visuels",
                 "validating" => "Plan compilé et ressources contrôlées avant publication",
                 "ready" => "Sort validé · téléchargement et contrôle local",
                 "waiting_retry" => "Nouvel essai de création prévu par le laboratoire",
                 _ => "Traitement du sort en cours"
             };
-            return string.IsNullOrEmpty(record.last_job_message) ? state : state + " · " + record.last_job_message;
+            var elapsed = record.generation_elapsed_ms;
+            if (record.state != "ready" && record.state != "needs_operator" &&
+                DateTimeOffset.TryParse(record.elapsed_observed_at, out var observed))
+                elapsed += (long)Math.Max(0, (DateTimeOffset.UtcNow - observed).TotalMilliseconds);
+            var duration = TimeSpan.FromMilliseconds(Math.Max(0, elapsed));
+            var timing = elapsed > 0 ? ((int)duration.TotalMinutes).ToString() + " min " + duration.Seconds.ToString("00") + " s · " : "";
+            return timing + state;
         }
 
         private static bool CanResumeJob(ParchmentRecord record) =>
@@ -418,7 +424,7 @@ namespace Palimpseste.Game.Bootstrap
         private void DrawInterpretationPanel(Rect area)
         {
             GUI.Box(area, GUIContent.none);
-            GUI.Label(new Rect(area.x + 15, area.y + 12, area.width - 30, 35), "Interprétation d'Astra", titleStyle);
+            GUI.Label(new Rect(area.x + 15, area.y + 12, area.width - 30, 35), "Interprétation du dessin", titleStyle);
             GUI.DrawTexture(new Rect(area.x + 15, area.y + 52, area.width - 30, 2), goldBar);
             if (descriptionView == null)
             {
@@ -428,7 +434,7 @@ namespace Palimpseste.Game.Bootstrap
             }
             var content = new StringBuilder();
             content.AppendLine(descriptionView.Title).AppendLine().AppendLine(descriptionView.Summary)
-                .AppendLine().AppendLine("Ce qu'Astra voit dans le dessin");
+                .AppendLine().AppendLine("Ce qui a inspiré ce sort");
             foreach (var line in descriptionView.Observations) content.Append("• ").AppendLine(line).AppendLine();
             content.AppendLine("Idées de sort proposées");
             foreach (var line in descriptionView.Clauses) content.Append("• ").AppendLine(line).AppendLine();
@@ -1086,6 +1092,8 @@ namespace Palimpseste.Game.Bootstrap
                     if (job.state != "needs_operator" || job.attempt_count > record.last_job_attempt_count)
                         record.resume_key = null;
                     record.last_job_attempt_count = job.attempt_count;
+                    record.generation_elapsed_ms = job.elapsed_ms;
+                    record.elapsed_observed_at = DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture);
                     if (!string.IsNullOrEmpty(job.spell_id)) record.spell_id = job.spell_id;
                     store.Save(record);
                     if (selected == record && !string.IsNullOrEmpty(job.message)) notice = job.message;

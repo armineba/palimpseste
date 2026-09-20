@@ -92,15 +92,18 @@ namespace Palimpseste.Core
             CheckArtifactIds(input, issues);
             if (issues.Count != 0) return new CompilationResult { Issues = issues };
 
+            var minimumClient = input.MinimumClientVersion;
+            if (!System.Version.TryParse(minimumClient, out var parsedClient)) parsedClient = new System.Version(0, 0, 0);
+            if (plan.nodes.Any(node => node.appearance.vfx != null) && parsedClient < new System.Version(1, 2, 0))
+                minimumClient = "1.2.0";
+            else if (plan.nodes.Any(node => node.appearance.form != null) && parsedClient < new System.Version(1, 1, 0))
+                minimumClient = "1.1.0";
             var spell = new CompiledSpell {
                 schema_version = "sp.compiled/1.0", spell_id = input.SpellId,
                 parchment_id = input.ParchmentId,
                 created_at = input.CreatedAt ?? DateTimeOffset.UtcNow.ToString("o", CultureInfo.InvariantCulture),
                 versions = new SpellVersions { catalog = "sp.capabilities/1.0", compiler = Version,
-                    geometry = "sp.geometry/1.0", rules_profile = "lab_v1",
-                    min_client = plan.nodes.Any(node => node.appearance.form != null) &&
-                        (!System.Version.TryParse(input.MinimumClientVersion, out var minimum) || minimum < new System.Version(1, 1, 0))
-                        ? "1.1.0" : input.MinimumClientVersion },
+                    geometry = "sp.geometry/1.0", rules_profile = "lab_v1", min_client = minimumClient },
                 provenance = input.Provenance, signature_seed_hex = input.SignatureSeedHex,
                 description_sha256 = plan.description_sha256, plan = plan,
                 geometry_manifest = input.GeometryJson.OrderBy(x => x.Key, StringComparer.Ordinal)
@@ -132,6 +135,8 @@ namespace Palimpseste.Core
                     appearance.Property("palette")?.Remove();
                 if (appearance["form"]?.Type == JTokenType.Null)
                     appearance.Property("form")?.Remove();
+                if (appearance["vfx"]?.Type == JTokenType.Null)
+                    appearance.Property("vfx")?.Remove();
                 if (appearance["signature_geometry_id"]?.Type == JTokenType.Null)
                     appearance.Property("signature_geometry_id")?.Remove();
             }
@@ -435,6 +440,15 @@ namespace Palimpseste.Core
                 if (formFacts.Length == 0 && node.appearance.form != null ||
                     formFacts.Length == 1 && node.appearance.form != formFacts[0])
                     Add(issues, "visual_form_trace", p, "Visual form must exactly match interpreter text");
+                var vfx = node.appearance.vfx;
+                if (vfx != null &&
+                    (!SpellVfxProfiles.Styles.Contains(vfx.style) ||
+                     !SpellVfxProfiles.Motifs.Contains(vfx.motif) ||
+                     !SpellVfxProfiles.Impacts.Contains(vfx.impact) ||
+                     vfx.density < SpellVfxProfiles.MinimumDensity || vfx.density > SpellVfxProfiles.MaximumDensity ||
+                     vfx.aura_cm < SpellVfxProfiles.MinimumAuraCm || vfx.aura_cm > SpellVfxProfiles.MaximumAuraCm ||
+                     vfx.charge_ms < SpellVfxProfiles.MinimumChargeMs || vfx.charge_ms > SpellVfxProfiles.MaximumChargeMs))
+                    Add(issues, "vfx_profile", p + ".appearance.vfx", "Decorative VFX profile exceeds controlled bounds");
                 if (node.carrier == "projectile" && node.appearance.form != null &&
                     node.options.radius_cm < SpellVisualForms.MinimumProjectileRadiusCm(node.appearance.form))
                     Add(issues, "semantic_projectile_size", p + ".options.radius_cm",

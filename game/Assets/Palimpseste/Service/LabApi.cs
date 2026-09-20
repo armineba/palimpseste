@@ -16,6 +16,8 @@ namespace Palimpseste.Game.Service
     {
         public string job_id, parchment_id, state, resume_stage, spell_id, message, error_code, description_artifact_id;
         public int attempt_count, poll_after_ms;
+        public long elapsed_ms;
+        public string created_at, updated_at, stage_started_at;
         public bool retryable;
     }
     [Serializable] public sealed class CapabilitiesDto

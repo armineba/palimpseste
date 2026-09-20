@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Encodings.Web;
 
 namespace Palimpseste.Provider;
 
@@ -81,13 +82,19 @@ public sealed class CodexProcessRunner
         var outputPath = Path.Combine(directory, "final.json");
         try
         {
-            File.Copy(attempt.SchemaPath, schemaPath);
+            // Whitespace and escaped French text inflated each isolated call.
+            // Compact the same schema without removing any constraint.
+            using var schema = JsonDocument.Parse(await File.ReadAllTextAsync(attempt.SchemaPath, cancellationToken));
+            await File.WriteAllTextAsync(schemaPath, JsonSerializer.Serialize(schema.RootElement,
+                new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }), new UTF8Encoding(false), cancellationToken);
             await File.WriteAllTextAsync(Path.Combine(directory, "prompt.txt"), attempt.Prompt, Encoding.UTF8, cancellationToken);
             await File.WriteAllTextAsync(Path.Combine(directory, "attempt.json"), JsonSerializer.Serialize(new
             {
                 attempt.AttemptId, attempt.JobId, attempt.Stage, started,
                 requested_model = requestedModel, requested_effort = requestedEffort,
                 reported_model = (string?)null, reported_effort = (string?)null,
+                prompt_utf8_bytes = Encoding.UTF8.GetByteCount(attempt.Prompt),
+                schema_utf8_bytes = new FileInfo(schemaPath).Length,
                 prompt_sha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(attempt.Prompt)))
             }), Encoding.UTF8, cancellationToken);
         }
@@ -343,6 +350,7 @@ public sealed class CodexProcessRunner
             values["event_error_truncated"] = result.DiagnosticEventErrorTruncated;
             values["diagnostic_category"] = result.DiagnosticCategory;
             values["ended_at"] = result.EndedAt;
+            values["elapsed_ms"] = Math.Max(0, (long)(result.EndedAt - result.StartedAt).TotalMilliseconds);
             await File.WriteAllTextAsync(path, JsonSerializer.Serialize(values), Encoding.UTF8, cancellationToken);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or OperationCanceledException)
