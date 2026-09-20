@@ -613,7 +613,11 @@ public sealed record CodexSettings(
         if (bytes.Length is <= 0 or > 100_000 ||
             !string.Equals(Convert.ToHexStringLower(SHA256.HashData(bytes)), sha,
                 StringComparison.OrdinalIgnoreCase)) return false;
-        document = JsonDocument.Parse(bytes, new JsonDocumentOptions { MaxDepth = 32 });
+        // ProviderDoctor writes UTF-8 with a BOM on Windows PowerShell. Hash the
+        // exact signed bytes above, then skip only that marker for JSON parsing.
+        var offset = bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF
+            ? 3 : 0;
+        document = JsonDocument.Parse(bytes.AsMemory(offset), new JsonDocumentOptions { MaxDepth = 32 });
         if (document.RootElement.ValueKind == JsonValueKind.Object) return true;
         document.Dispose();
         document = null!;

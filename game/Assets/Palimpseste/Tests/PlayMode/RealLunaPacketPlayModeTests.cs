@@ -68,7 +68,7 @@ namespace Palimpseste.Game.PlayModeTests
                 var framePath = Environment.GetEnvironmentVariable("PALIMPSESTE_REAL_PROBE_FRAME");
                 if (!string.IsNullOrWhiteSpace(framePath)) File.WriteAllBytes(framePath, pixels.EncodeToPNG());
 
-                yield return new WaitForSecondsRealtime(.25f);
+                yield return new WaitForSecondsRealtime(.7f);
                 yield return null;
                 Assert.IsTrue(beam == null, "The afterimage must be cleaned after the display window.");
                 Assert.AreEqual(0, FirePixels(camera, target, pixels), "No beam pixels may remain after cleanup.");
@@ -146,7 +146,7 @@ namespace Palimpseste.Game.PlayModeTests
                 Assert.IsTrue(beam != null, "The visual must survive one render opportunity after logical expiry.");
                 Assert.AreEqual(0, lab.ActiveCarriers, "The visual tail cannot reactivate the carrier.");
                 Assert.AreEqual(0, lab.DamageMilli, "The visual tail cannot apply damage.");
-                yield return new WaitForSecondsRealtime(.25f);
+                yield return new WaitForSecondsRealtime(.7f);
                 yield return null;
                 Assert.IsTrue(beam == null, "The visual tail must clean itself up promptly.");
                 TestContext.WriteLine("real_luna_beam: packet=" + packet.description_sha256 +

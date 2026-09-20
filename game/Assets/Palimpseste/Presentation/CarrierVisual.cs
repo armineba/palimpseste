@@ -18,7 +18,9 @@ namespace Palimpseste.Game.SpellRuntime
     // has already removed the carrier and cannot apply another effect or hit.
     internal sealed class BeamAfterimage : MonoBehaviour
     {
-        private const float MinimumSeconds = .16f;
+        // A one-tick beam is a valid instantaneous mechanic, but its trace
+        // needs enough screen time for a player to perceive the drawing.
+        private const float MinimumSeconds = .6f;
         private float retireAt;
         private int lateUpdates;
 

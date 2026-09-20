@@ -2,6 +2,24 @@
 
 Ce protocole applique le cahier et `contracts/human-review.schema.json`. Il ne constitue aucune approbation. Le 20 septembre 2026, l'utilisateur a rejeté dans la conversation la lecture A « faisceau de feu visuel, sans cible ni dégâts » d'un trait rouge-brun diagonal. Ce verdict oriente le recalibrage ; il n'a pas été soumis comme revue signée à l'API et ne vaut pas campagne M7.
 
+## Essai propriétaire observé hors campagne M7
+
+Le [rapport de bout en bout](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md)
+documente un vrai dessin rouge-brun courbe transmis par le Player : deux appels
+Luna A/B réussis, job `production` passé à `ready`, texte A affiché, paquet
+compilé téléchargé et vérifié, fiche puis laboratoire ouverts. Le faisceau est
+visible dans la caméra du Player ; le lancer observé indique **1 lancer et
+0 dégât**. Une copie exacte du paquet joueur a passé **2/2 tests PlayMode
+Direct3D12** avec **1 377 pixels rouges** puis zéro après nettoyage. Le build
+Windows x64 IL2CPP/URP `WindowsPlayerBeamVisibleReady` a réussi avec code de
+sortie **0**. Après arrêt de l'API et redémarrage du Player, le même sort a
+été rouvert et lancé **hors ligne**.
+
+Cet essai démontre la boucle technique sur ce cas. La fidélité artistique,
+la qualité de la scène et l'écoute humaine du son attendent encore leurs
+verdicts. Il ne remplace ni les 30 cas inédits, ni les revues signées des deux
+créateurs, ni les autres portes de la campagne M7.
+
 ## Préparer la série
 
 1. Authentifier le compte Codex dédié au worker, puis exécuter le doctor actif avec les deux images de la capture Unity. Garder le JSON complet, son SHA-256 et les dossiers de tentative hors du dépôt public. Ne lever la porte `PALIMPSESTE_EFFORT_VERIFIED` qu'après vérification du modèle `gpt-5.6-luna`, de l'effort `max` **retournés** et des restrictions d'outils observées pour A et B.

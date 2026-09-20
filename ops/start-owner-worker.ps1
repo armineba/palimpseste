@@ -4,8 +4,8 @@ param([string]$RuntimeRoot = 'E:\PalimpsesteRuntime')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$expectedWorkerSha256 = '987946213762B3E4052D1218377F3CFA748EF3F42BD7FF935E52BBE48CFF2F4A'
-$expectedChildSha256 = 'D776764F843BC2B2BD2D6A39FAFB6D3B77006C92ECCAA915DC8909E4B124CCC8'
+$expectedWorkerSha256 = '9243F9600973B1AAF5F97F07AD0983FF60A7EFA2EB0A7F7D42D142C05015847D'
+$expectedChildSha256 = '03CE0108D67A4AC27B332A41F36F1F12B2B362FA9A2AEBCF25EB21E8BDB4C104'
 $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\', '/')
 if (-not [string]::Equals($runtime, 'E:\PalimpsesteRuntime', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab worker accepts only E:\PalimpsesteRuntime.'
@@ -99,7 +99,7 @@ if (-not [string]::Equals((Get-FileHash -LiteralPath $worker -Algorithm SHA256).
 $gate = @(Get-Content -LiteralPath $envFile -Encoding UTF8 |
     Where-Object { $_.StartsWith('PALIMPSESTE_EFFORT_VERIFIED=', [StringComparison]::Ordinal) })
 if ($gate.Count -ne 1 -or $gate[0] -cne 'PALIMPSESTE_EFFORT_VERIFIED=true') {
-    throw 'Owner lab fidelity and effort gate remains closed.'
+    throw 'Owner lab technical effort gate remains closed.'
 }
 
 $running = @(Get-CimInstance Win32_Process -Filter "Name = 'Palimpseste.Worker.exe'")

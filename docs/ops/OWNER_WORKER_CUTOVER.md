@@ -1,18 +1,18 @@
 # Bascule du worker du laboratoire propriétaire
 
-État observé le 20 septembre 2026 : l'API locale tourne sous `PalRuntimeSvc`, un job `production` issu du Player est `queued`, et **aucun worker ne tourne**. Le dernier candidat `E:\Palimpseste\.runtime\operator-staging\worker-offline-compiled-20260920\Palimpseste.Worker.exe` a pour SHA-256 `987946213762B3E4052D1218377F3CFA748EF3F42BD7FF935E52BBE48CFF2F4A`. Le doctor correspondant, candidat `doctor-offline-compiled-20260920`, a pour SHA-256 `2F323942747724AAC599052854947C8C4341A561BD40F075F15989A24B7E527A` et est installé dans `E:\PalimpsesteRuntime\bin`. Le worker reste non installé. Dans `runtime.env`, `PALIMPSESTE_EFFORT_VERIFIED=false` et les deux champs de preuve d'effort sont vides. Le coffre PostgreSQL et les identifiants Windows restent hors du dépôt.
+État observé le 20 septembre 2026 : l'API locale et le worker isolé tournent sous `PalRuntimeSvc` (PID `16420` et `8180` après redémarrage de l'API). Le job `production` capturé dans le Player est passé de `queued` à `interpreting`, puis à `ready`. La base indique deux tentatives fournisseur réussies, une description, un plan et un `compiled_spell`, sans tentative en échec. Le Player a montré la description A « Faisceau courbe de lave », téléchargé et vérifié la fiche du sort, ouvert le laboratoire et enregistré un lancement (`Lancers : 1`, `Dégâts : 0`). Après arrêt de l'API précédente (PID `25848`), le Player `WindowsPlayerBeamVisibleReady` a été relancé hors service (PID `35804`) : bibliothèque, fiche, laboratoire et lancement du même sort sont restés accessibles. L'API a ensuite été redémarrée et `/health/ready` a répondu 200.
 
-Le [prompt maître](../../prompts/00_AGENT_BUILD.md) réserve aux créateurs le jugement de fidélité du dessin. Le dessin droit de calibration a reçu une nouvelle description A `1.3`, mais son verdict humain n'est pas encore enregistré. Le dessin courbe actuellement en file est une autre capture. Aucune lecture A ni aucun sort de ce job n'a encore été produit. Ne pas ouvrir le worker en traitant une preuve technique isolée comme une acceptation humaine.
+La demande actuelle du propriétaire de faire fonctionner la boucle autorise ce **test technique privé** sur son dessin. Le [prompt maître](../../prompts/00_AGENT_BUILD.md) réserve toujours aux créateurs le jugement de fidélité et de qualité. Le trait droit de calibration A `1.3` attend leur verdict ; la capture courbe du Player est différente et son texte ainsi que son sort doivent recevoir leur propre verdict. L'ouverture du verrou technique de compatibilité modèle/effort et le job `ready` ne valent pas acceptation artistique ou recette M7.
 
-## Conditions avant le premier démarrage
+## Preuves techniques et état de l'installation
 
-1. Consigner la réponse humaine à la lecture A `1.3` et l'identifiant de la capture évaluée. Si elle est rejetée, recalibrer A et reprendre les contrôles. La lecture du dessin droit ne préjuge pas du résultat du dessin courbe en file.
-2. Examiner les deux rapports réels déjà produits. Le premier `active` a appelé A `1.3` et B `1.1` sous `PalRuntimeSvc`, mais son B a été ensuite rejeté pour géométrie provisoire. Utiliser **seulement son A**, sortie SHA-256 `E54DEC5810E00AABD0FFCB8F152DF06468DD8505593B6718C5B806C46B3254B4`. Le second rapport `plan` a réutilisé cette A exacte et appelé seulement B sur la géométrie résolue depuis l'encre, avec `active_result=success`. Vérifier les deux rapports, leurs hashes d'origine publiés dans les preuves, le même SHA de `codex.exe`, l'identité `PalRuntimeSvc`, le modèle `gpt-5.6-luna` et l'effort rapporté `max`. Le vérificateur composite lie les deux rapports et le hash A ; aucun nouvel appel modèle n'est nécessaire pour cette preuve si elle passe.
-3. `ProviderDoctor validate` a été exécuté sous `PalRuntimeSvc` sur **les octets A/B réels** et `artifacts\ink.png`. Ce mode ne lance aucun modèle : il revérifie les hashes, résout la géométrie depuis l'encre, valide le plan et compile un paquet de contrôle en mémoire avec des identifiants synthétiques. Le rapport privé `evidence\pending\doctor-validate-ab13-b11-20260920.json`, SHA-256 `D78451754EEBDC32624E4EF4771D6928CBC0D6A8FD162909B5208B047E35FEFA`, indique `validation_status=success`, `compilation_status=success` et `model_calls_executed=false`. Il reste en attente tant que le verdict humain n'est pas enregistré.
-4. Après revue humaine, copier les trois **rapports intégraux** (actif A, plan B, validation hors ligne) dans `E:\PalimpsesteRuntime\approved-evidence` ; y créer un manifeste `provider_doctor_composite` version 2 contenant leurs chemins absolus et leurs SHA-256. Le manifeste ne prétend pas être une nouvelle sortie de Luna : il lie les deux sorties réelles et leur compilation contrôlée. Appliquer Administrateurs/SYSTEM `FullControl` et `PalRuntimeSvc` `ReadAndExecute`, sans droit de modification du service. Le nouveau `CodexSettings.Check(production: true)` exige le hash de chaque rapport, les fichiers originaux A/B et encre encore présents avec leurs hashes, A et B lancés réellement, la correspondance A figée / A active, la validation/compilation hors ligne et les métadonnées identiques. Il rejette l'ancien rapport actif seul, même si son champ historique `active_result` vaut `success`. Dans le fichier protégé `runtime.env`, changer uniquement `PALIMPSESTE_EFFORT_EVIDENCE_PATH`, `PALIMPSESTE_EFFORT_EVIDENCE_SHA256` et `PALIMPSESTE_EFFORT_VERIFIED=true`. Garder la preuve locale de désactivation des outils inchangée si ses hashes et ACL restent valides. Vérifier que `CodexSettings.Check(production: true)` ne rapporte aucun problème sous le compte de service.
-5. Vérifier la migration `006`, la sauvegarde, la file et les baux avec les outils de `ops/`. Le job déjà en file sera acquis automatiquement au démarrage du worker ; un test de lancement est donc un vrai appel fournisseur possible, pas un démarrage neutre.
+1. Le diagnostic `active` a réellement appelé A `1.3` et B `1.1` sous `PalRuntimeSvc`. Son premier B utilisait une géométrie provisoire et n'est pas retenu. Seule son A figée est réutilisée, SHA-256 `E54DEC5810E00AABD0FFCB8F152DF06468DD8505593B6718C5B806C46B3254B4`.
+2. Le diagnostic `plan` a appelé B seul sur cette A et sur la géométrie calculée depuis l'encre. `ProviderDoctor validate` a ensuite revérifié les octets A/B et l'encre, validé le plan et compilé un paquet de contrôle en mémoire **sans appel modèle**. Son rapport privé a pour SHA-256 `D78451754EEBDC32624E4EF4771D6928CBC0D6A8FD162909B5208B047E35FEFA` ; il indique `validation_status=success`, `compilation_status=success`, `model_calls_executed=false`.
+3. Les trois rapports intégraux ont été copiés dans `E:\PalimpsesteRuntime\approved-evidence` avec leurs hashes et ACL protégés. Le manifeste `provider_doctor_composite` version 2, `doctor-composite-ab13-b11.json`, a pour SHA-256 `56F349016A5B63D352DD37225AF9253889D496C2399F58F97F70D0DAAC353E3F`. Il lie les appels réels A/B à la compilation contrôlée ; il ne contient aucune nouvelle sortie Luna. `runtime.env` est en UTF-8 sans BOM, pointe vers ce manifeste et porte `PALIMPSESTE_EFFORT_VERIFIED=true`. La preuve locale de désactivation des outils reste séparée.
+4. Le Doctor installé dans `E:\PalimpsesteRuntime\bin` a pour SHA-256 `AAAAB2686CD9A33ADB6130B205D10596A63AF8207CBAE580ACD723C862196811`. Son diagnostic local après le correctif BOM a quitté avec le code 0, sans appel modèle et sans `production_issues` ; rapport privé SHA-256 `4FAF8EE53CA5DA823A53038D7DB3407FBA3349CAE9A164EA11C52B59ECA195AE`.
+5. Le worker installé et le candidat `operator-staging/worker-composite-bom-20260920/Palimpseste.Worker.exe` ont pour SHA-256 `9243F9600973B1AAF5F97F07AD0983FF60A7EFA2EB0A7F7D42D142C05015847D`. Le script enfant installé et celui du dépôt ont pour SHA-256 `03CE0108D67A4AC27B332A41F36F1F12B2B362FA9A2AEBCF25EB21E8BDB4C104`. Le coffre PostgreSQL et les identifiants Windows restent hors du dépôt.
 
-Commande de validation hors ligne, après installation du doctor candidat et du script `ProviderDoctor.Service.ps1` correspondant :
+Commande historique utilisée pour la validation hors ligne de la calibration. Le rapport indiqué existe déjà : ne pas l'écraser.
 
 ```powershell
 .\ops\run-service-doctor.ps1 `
@@ -29,7 +29,7 @@ Commande de validation hors ligne, après installation du doctor candidat et du 
 
 Conserver ces deux `final.json` et `ink.png` ainsi que leurs sauvegardes privées. Le verrou de production les relit à chaque démarrage et échoue si un fichier manque, change ou devient un point de jonction. `gc-artifacts.ps1` ne nettoie pas le dossier `attempts`, mais toute purge opérateur de ces fichiers rendrait la preuve inutilisable. Les hashes sont A `E54DEC5810E00AABD0FFCB8F152DF06468DD8505593B6718C5B806C46B3254B4`, B `E8164D8D654F470101BDCE77A4B0AF46476FF7AE48EA9DF1A92A5B9A84D9AEA1`, encre `18CDA98D1EF7E2A6F2148CFB81998D0B4494EA1E46BC288477459E33F1482AFC`.
 
-Forme du manifeste après copie et calcul des trois hashes réels :
+Contenu vérifié du manifeste technique installé (les chemins restent privés) :
 
 ```json
 {
@@ -50,41 +50,14 @@ Forme du manifeste après copie et calcul des trois hashes réels :
 }
 ```
 
-Les trois hashes portent sur les rapports originaux observés. Recalculer les hashes des copies et arrêter la bascule s'ils diffèrent. Le hash du manifeste lui-même est ensuite la valeur de `PALIMPSESTE_EFFORT_EVIDENCE_SHA256`. Le doctor final marque explicitement la validation **et** la compilation du plan pour les futurs rapports actifs ; voir la [preuve](../../evidence/public/backend/composite-worker-prep-2026-09-20.md).
+Les trois hashes portent sur les rapports originaux observés. Le hash du manifeste installé est la valeur actuelle de `PALIMPSESTE_EFFORT_EVIDENCE_SHA256`. Le doctor final marque explicitement la validation **et** la compilation du plan pour les futurs rapports actifs ; voir la [preuve](../../evidence/public/backend/composite-worker-prep-2026-09-20.md).
 
-## Installation et lancement après ces conditions
+## Vérifications après le premier sort joueur
 
-Depuis une console opérateur administrateur, copier les deux scripts et le binaire *après* avoir vérifié le hash du candidat et sauvegardé l'ancien exécutable et son ACL s'il existe. `E:\PalimpsesteRuntime\bin` possède déjà des ACE héritables : Administrateurs/SYSTEM `FullControl`, `PalRuntimeSvc` `ReadAndExecute`. Vérifier les ACL effectives des fichiers copiés ; ne pas accorder l'écriture au service. Les chemins ci-dessous restent privés et ne doivent pas être envoyés au Player.
+Le lanceur `ops/start-owner-worker.ps1` a été exécuté. Son enfant a contrôlé sous `PalRuntimeSvc` les preuves immuables, le modèle `gpt-5.6-luna`, l'effort `max`, la concurrence `1` et le coffre de base privé. Il efface les variables de clés API connues avant de démarrer le worker. Le job joueur a ensuite terminé A/B et la compilation ; cette observation est distincte du diagnostic de calibration.
 
-```powershell
-$source = 'E:\Palimpseste\.runtime\operator-staging\worker-offline-compiled-20260920\Palimpseste.Worker.exe'
-$runtime = 'E:\PalimpsesteRuntime'
-$expected = '987946213762B3E4052D1218377F3CFA748EF3F42BD7FF935E52BBE48CFF2F4A'
-$childSource = '.\ops\worker-service-child.ps1'
-$expectedChild = 'D776764F843BC2B2BD2D6A39FAFB6D3B77006C92ECCAA915DC8909E4B124CCC8'
-if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -cne $expected) {
-    throw 'Candidate SHA-256 mismatch.'
-}
-if ((Get-FileHash -LiteralPath $childSource -Algorithm SHA256).Hash -cne $expectedChild) {
-    throw 'Worker child script SHA-256 mismatch.'
-}
-Copy-Item -LiteralPath $source -Destination (Join-Path $runtime 'bin\Palimpseste.Worker.exe')
-Copy-Item -LiteralPath $childSource `
-    -Destination (Join-Path $runtime 'bin\WorkerService.Child.ps1')
-if ((Get-FileHash -LiteralPath (Join-Path $runtime 'bin\Palimpseste.Worker.exe') -Algorithm SHA256).Hash -cne $expected -or
-    (Get-FileHash -LiteralPath (Join-Path $runtime 'bin\WorkerService.Child.ps1') -Algorithm SHA256).Hash -cne $expectedChild) {
-    throw 'Installed worker or child script hash mismatch.'
-}
-icacls.exe (Join-Path $runtime 'bin\Palimpseste.Worker.exe')
-icacls.exe (Join-Path $runtime 'bin\WorkerService.Child.ps1')
-```
+Le **même** job a publié sa description A et son paquet compilé. Le Player a affiché A « Faisceau courbe de lave », puis la fiche téléchargée et vérifiée. Le laboratoire s'est ouvert ; un clic a porté le compteur à `Lancers : 1` et `Dégâts : 0`, conforme au plan visuel sans dégâts. Le correctif de visibilité à `0,6 s` a passé 2/2 tests PlayMode sur le paquet joueur. Unity a terminé avec le code 0 le build Windows `WindowsPlayerBeamVisibleReady` (29 fichiers, 122 093 149 octets ; EXE SHA-256 `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`, `GameAssembly.dll` SHA-256 `9FB651D09680CAF09B0A8668BEF2A914EFDE6B61F930EDBAE1CE90AF3B5C18C9`). Dans ce Player, une capture de l'effet visible puis disparu a été observée. Après arrêt de l'API, le même paquet a été rouvert et lancé depuis le laboratoire du Player relancé : la réutilisation sans service a été observée. L'écoute humaine du son et les verdicts humains sur la lecture, le rendu et l'intérêt du sort restent à consigner.
 
-Le lanceur `ops/start-owner-worker.ps1` exige le SHA du binaire et le verrou d'effort ouvert avant de créer le processus. Son enfant vérifie sous `PalRuntimeSvc` les deux preuves immuables, le modèle, l'effort et la concurrence, lit `DATABASE_URL` dans `C:\ProgramData\Palimpseste\lab-db.env`, efface les variables de clés API connues et démarre le worker sans secret dans sa ligne de commande. Il refuse une preuve hors de `approved-evidence`. Il ne s'agit pas d'une route HTTP ni d'une commande déclenchée par le parchemin.
+La [preuve du parcours joueur](../../evidence/public/unity/owner-player-end-to-end-2026-09-20.md) détaille les captures, les hashes du paquet, le rapport PlayMode et l'essai sans API. Une commande ultérieure de confort pour fermer puis relancer le Player après restauration de l'API a été refusée avant exécution (`blocked by policy`, sans motif détaillé) ; aucun essai équivalent n'a suivi. Le Player PID `35804` est resté ouvert dans sa session issue de l'essai sans API.
 
-```powershell
-.\ops\start-owner-worker.ps1 -RuntimeRoot 'E:\PalimpsesteRuntime'
-```
-
-Une sortie `ready=true` signifie seulement que le processus worker attendu tourne sous le compte prévu. Contrôler ensuite les journaux privés, la transition du **même** job `queued` vers une description A visible, puis B, compilation et publication. Réouvrir ce sort dans le Player et le rejouer hors ligne avant de conclure à une boucle terminée. Ne pas déclarer le dessin courbe accepté sans verdict humain sur sa description et son sort. Un échec ou une tentative fournisseur incertaine impose inspection des traces avant reprise ; ne pas relancer automatiquement un appel qui a peut-être consommé du quota.
-
-Les scripts de lancement ont été seulement analysés syntaxiquement dans le dépôt. Ils n'ont pas été copiés dans le runtime ni exécutés au 20 septembre 2026 ; le worker et le job Player restent arrêtés/en attente.
+Pour les prochains jobs, si le processus s'arrête ou si une tentative fournisseur devient incertaine, inspecter les journaux et l'état durable avant tout redémarrage : un appel Codex peut avoir consommé du quota même sans réponse publiée. Ne pas lancer un second worker ou une reprise aveugle. Les ACL du runtime accordent à Administrateurs/SYSTEM le contrôle total et à `PalRuntimeSvc` seulement la lecture/exécution des binaires et des preuves approuvées. Ce laboratoire reste local au propriétaire ; aucune route de génération publique n'est ouverte.

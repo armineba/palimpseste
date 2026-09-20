@@ -1,6 +1,27 @@
 # Preuves Unity — 20 septembre 2026
 
-## Build actuel : trajectoire de faisceau issue de l'encre
+## Build actuel : sort joueur Luna dans le Player et hors ligne
+
+Le [rapport de bout en bout du propriétaire](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md)
+lie une vraie capture rouge-brun courbe du Player à deux tentatives Luna A/B
+réussies, un job `production` passé à `ready`, une description affichée, puis un
+paquet téléchargé et vérifié. La fiche et le laboratoire du Player ont été
+ouverts. Le faisceau incurvé est visible dans la caméra du jeu ; un clic a
+donné **1 lancer et 0 dégât**, conformément au plan sans effet mécanique.
+
+Une copie exacte du paquet de ce joueur et de ses artefacts a passé **2/2
+tests PlayMode Direct3D12**, avec **1 377 pixels rouges** puis zéro après
+nettoyage et aucune application de dégâts. Ces tests ont vérifié la création
+d'une source sonore procédurale, sans écoute humaine. Unity 6000.3.24f1 a
+construit `game/Build/WindowsPlayerBeamVisibleReady/` en Windows x64 IL2CPP/URP
+avec sortie **0** et `PALIMPSESTE_BUILD_OK` ; le Player a été lancé en fenêtre
+visible. Après arrêt de l'API et redémarrage de ce même build, la fiche, le
+laboratoire et un lancer du même sort ont fonctionné **hors ligne**. Les
+captures, hashes et journaux sont dans le rapport lié ci-dessus. Le verdict
+artistique du créateur, l'écoute humaine du son, un second PC et l'ouverture
+publique restent en attente ; M7 n'est pas accepté.
+
+## Build précédent : trajectoire de faisceau issue de l'encre
 
 Unity 6000.3.24f1 a construit `game/Build/WindowsPlayerBeamGeometryReady/` en
 Windows x64 IL2CPP/URP : 29 fichiers, 122 093 149 octets. Le SHA-256 de
@@ -31,10 +52,10 @@ La base contient un job `production`
 encre et journal. Le dessin est une courbe rouge-brun différente du trait
 droit du corpus de calibration. Voir la
 [preuve de la capture propriétaire](../evidence/public/unity/owner-player-capture-queued-2026-09-20.md).
-Le worker reste arrêté : aucun appel A/B, aucun texte interprété, aucun plan
-et aucun sort n'existent pour **ce job joueur**. La caméra du Player n'a pas
-affiché le paquet Luna de vérification ; aucun son n'a été écouté. Il n'existe
-pas de ZIP de ce build et M7 n'est pas accepté.
+À ce stade antérieur, le worker restait arrêté : aucun appel A/B, aucun texte
+interprété, aucun plan et aucun sort n'existaient pour **ce job joueur**. La
+caméra du Player n'avait pas affiché le paquet Luna de vérification ; aucun son
+n'avait été écouté. Il n'existe pas de ZIP de ce build et M7 n'est pas accepté.
 
 ## Passe UI antérieure : parcours joueur et accès privé
 
@@ -143,8 +164,8 @@ Le [rapport de l'archive finale](../evidence/public/unity/b28-final-endurance.md
 Le [log filtré](../evidence/public/unity/player-b28-final-excerpt.log) contient 79 fenêtres de dix secondes de boucle Unity, entre 1 245,8 et 1 633,6 frames calculées par seconde, avec au plus deux instances actives. Ce compteur n'est pas une mesure des FPS présentés à l'écran. Aucune trace Unity Profiler ni mesure du coût CPU p95 de la logique des sorts n'a été produite ; la croissance mémoire constatée sur onze minutes ne suffit pas à établir une stabilité durable, et la charge n'a pas saturé de nombreuses instances. **B28 reste partiel.** L'essai initial de 77,68 s et ses [13 anciens échantillons](../evidence/public/unity/b28-samples.csv) concernent une archive précédente.
 
 La boucle complète dessin → Luna A → Luna B → compilation → sort issu de ce
-dessin n'a pas été observée. Le job réel créé avant le build LavaReady, puis affiché par celui-ci, est
-toujours en file d'attente, sans tentative fournisseur ; voir la
-[preuve actuelle](../evidence/public/unity/owner-player-capture-queued-2026-09-20.md).
-L'écoute du son, les scénarios physiques exhaustifs, l'installation sur une
-autre machine et l'acceptation humaine restent ouverts.
+dessin a ensuite été observée sur le job propriétaire, y compris la reprise
+hors ligne ; voir la
+[preuve actuelle](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md).
+L'écoute humaine du son, les scénarios physiques exhaustifs, l'installation
+sur une autre machine et l'acceptation artistique restent ouverts.

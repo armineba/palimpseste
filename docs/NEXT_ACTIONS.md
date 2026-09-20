@@ -1,151 +1,34 @@
 # Point de reprise immédiat
 
-Mis à jour le 20 septembre 2026.
+Mis à jour le 20 septembre 2026 après un essai joueur réel sur le laboratoire propriétaire.
 
-Le CLI Codex patché et le doctor publié sont maintenant installés dans le
-runtime. Le doctor local a réussi sous `PalRuntimeSvc` sans appel modèle,
-sa preuve de fonctionnalités a été approuvée et référencée par le runtime.
-Une première sonde active a ensuite réussi A puis B avec `gpt-5.6-luna` et
-`max` rapportés pour chaque étape. Preuve :
-`evidence/public/backend/codex-cutover-active-ab-2026-09-20.md`.
-Le premier rapport actif atteste des appels et métadonnées réels, mais son B
-échoue sur la géométrie provisoire et le nouveau vérificateur refuse ce rapport
-seul. Le rapport B repris sur A `1.3` figée a été validé séparément ; le doctor
-FINAL a revérifié et compilé hors ligne les sorties A/B réelles avec l'encre,
-sans appel modèle. Le manifeste composite v2 exige trois rapports et les
-fichiers originaux A/B/encre. Le verdict humain sur A `1.3` manque encore, et
-`PALIMPSESTE_EFFORT_VERIFIED=false`. Une vérification séparée a recalculé la
-géométrie depuis A et l'encre réelle et compilé B en mémoire, sans appel
-modèle supplémentaire. Le paquet de vérification n'a pas été publié ni chargé
-dans le Player joueur. Le nouveau rendu suit le chemin de pixels de la
-silhouette principale du cahier §10 : tests de géométrie ciblés 2/2, puis
-tests du paquet Luna réel en Direct3D 12 2/2, avec 111 points source dont
-94 visibles et 36 440 pixels rouges, puis zéro après nettoyage, sans dégât.
-La rémanence graphique de 0,16 s ne prolonge pas le porteur physique. La suite
-PlayMode complète du code final a passé 4 tests et ignoré 2 sondes facultatives.
-La caméra du Player et l'écoute du son restent à vérifier. L'API actualisée est installée dans
-`E:\PalimpsesteRuntime\api` et tourne sous `PalRuntimeSvc` sur
-`http://127.0.0.1:18080` via `ops/start-owner-api.ps1` ; `/health/ready`
-répond 200. Le Player BeamGeometryReady a été ouvert visiblement et répondait
-au contrôle (PID 35552). La session propriétaire et la vraie capture en file
-avaient été observées dans le Player précédent ; la base
-contient un job `production` `queued` et quatre artefacts (référence, dessin,
-encre, journal), sans tentative fournisseur pour ce job. Voir
-`evidence/public/unity/owner-player-capture-queued-2026-09-20.md`. Le retour de lecture A
-a passé 9/9 contrôles HTTP/DB synthétiques sur l'API locale, avec nettoyage
-vérifié ; voir
-`evidence/public/backend/interpretation-feedback-owner-lab-2026-09-20.md`.
-Le dernier worker FINAL reste en staging opérateur, non installé ni démarré :
-`operator-staging/worker-offline-compiled-20260920/Palimpseste.Worker.exe`,
-76 231 207 octets, SHA-256
-`987946213762B3E4052D1218377F3CFA748EF3F42BD7FF935E52BBE48CFF2F4A`.
-Son script enfant candidat a pour SHA-256
-`D776764F843BC2B2BD2D6A39FAFB6D3B77006C92ECCAA915DC8909E4B124CCC8`.
-Le doctor FINAL, SHA-256
-`2F323942747724AAC599052854947C8C4341A561BD40F075F15989A24B7E527A`,
-est installé sous `E:\PalimpsesteRuntime\bin` après sauvegarde privée. Son
-mode `validate` sous `PalRuntimeSvc` a quitté avec le code 0 sur A/B réels et
-encre : validation et compilation hors ligne réussies, aucun appel modèle ;
-rapport privé SHA-256
-`D78451754EEBDC32624E4EF4771D6928CBC0D6A8FD162909B5208B047E35FEFA`.
-Les candidats composite précédents (worker SHA-256
-`93DA3D403E14A01BFF5BF1DA96E3551C1DB21EFCCF5072EF17A01B1997B719AC`,
-doctor SHA-256 `B054C91BD2DD09B2811FFD93024E11A50397DAD62D76DA02ABA0C02A15E821E1`)
-sont historiques. Les tests de sécurité synthétiques du vérificateur FINAL
-ont quitté avec le code 0, sans nouvel appel Luna ; voir
-`evidence/public/backend/composite-worker-prep-2026-09-20.md` et
-`docs/ops/OWNER_WORKER_CUTOVER.md`.
-Le doctor précédent, maintenant historique, avait pour SHA-256
-`210090E05E6978284C3C841141F10FE0D6D9B963D91B3E365A1FA693124479BC`,
-qui calcule les géométries depuis A et le PNG d'encre et contrôle B. Son
-diagnostic local sous `PalRuntimeSvc` avait réussi sans appel modèle ; voir
-`evidence/public/backend/doctor-geometry-build-2026-09-20.md`. Le mode `plan`
-a réutilisé A `1.3` figée sans nouvel appel A, recalculé les géométries depuis
-son texte et l'encre, puis obtenu un nouveau B `1.1` réel `gpt-5.6-luna`/`max`
-(SHA-256 `E8164D8D654F470101BDCE77A4B0AF46476FF7AE48EA9DF1A92A5B9A84D9AEA1`).
-Le doctor a validé le plan et `RealProbe` l'a compilé en mémoire avec le code
-de sortie 0 ; paquet de test SHA-256
-`8DAC5FEB3293184564623C1F259567CB025078563F8BC788A9928806BC7672E2`,
-un tick et zéro effet. Voir
-`evidence/public/backend/doctor-plan-b11-resolved-2026-09-20.md`.
-Le rendu de géométrie du faisceau a passé 2/2 tests ciblés et le paquet Luna
-réel a passé 2/2 tests Direct3D 12 : 111 points source, 94 visibles,
-36 440 pixels rouges puis zéro après nettoyage, sans dégât. La suite PlayMode
-complète a passé 4 tests, ignoré 2 sondes facultatives, sans échec. Le Player joueur
-n'a ni téléchargé ni lancé ce paquet.
-Le Player actuel IL2CPP/URP avec rémanence, formulaire de retour et shader
-`LavaBeam` est `game/Build/WindowsPlayerBeamGeometryReady/` : 29 fichiers,
-122 093 149 octets, exécutable SHA-256
-`049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`,
-`GameAssembly.dll` SHA-256
-`200BB3A65EC799D316C769D54CDB4F03A90BB7627B58B22FECA8A2CFEEB81A9E`.
-Il a été lancé visiblement, PID 35552 répondant. Le build précédent
-`WindowsPlayerLavaReady` avait affiché la capture propriétaire en file avec
-session conservée ; la base garde ce job. Aucun texte A ou sort Luna n'y a
-été reçu. Le build `WindowsPlayerFeedbackPlayable` est historique.
-Le dernier candidat API est `operator-staging/api-feedback-2026-09-20/Palimpseste.Api.exe`
-(SHA-256 `B9A5AD2EF920C1955333CD2F21B47E567DCBE7E3396CA123C971B4F8D2219545`) ;
-l'ancien `operator-staging/api-core-2026-09-20/` n'inclut pas la route de
-retour humain. L'API inclut
-un plafond transactionnel de 3 nouvelles générations par joueur et 12 au
-total par 24 heures, testé sous concurrence dans `palimpseste_test`.
-Les migrations 003 à 006 sont appliquées au laboratoire local après
-sauvegardes vérifiées. Le formulaire de retour est présent dans le nouveau
-Player, mais son envoi depuis Unity n'a pas été testé. La route API a passé
-son smoke synthétique ; HTTPS public reste à préparer.
+Preuve détaillée : [essai joueur, build et relecture sans API](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md).
 
-**Verdict reçu le 20 septembre : l'utilisateur juge incorrecte la lecture A
-« faisceau de feu visuel, sans cible ni dégâts » du trait rouge-brun diagonal.**
-L'intention précisée ensuite est « laser unidirectionnel de lave (car rouge /
-brun) ». La première sonde reste une preuve technique d'appel A/B et de
-réglage modèle/effort, mais échoue à la porte de fidélité du cahier. Un essai
-actif du prompt A `1.2` et de B `1.0` a ensuite nommé un faisceau de lave dans
-un seul sens. A a ajouté des dégâts sans observation distincte ; B a inventé
-la cible `hostile` et une cadence d'un tick pour un faisceau entretenu. Le
-compilateur contrôlé a rejeté ce plan (`carrier_target`/`target_fact`,
-`beam_interval`). Voir `docs/PROMPT_A_CALIBRATION_1_2.md` et
-`docs/PROMPT_B_CALIBRATION_1_1.md`. Une troisième sonde A `1.3`/B `1.1` a
-réellement obtenu `gpt-5.6-luna`/`max` pour les deux étapes. A décrit un
-faisceau de lave sans effet ni cible et B un faisceau visuel sans effet ;
-`RealProbe` a toutefois refusé `signature_geometry`, car le doctor avait
-encore reçu une géométrie provisoire. Voir
-`evidence/public/backend/doctor-ab13-b11-2026-09-20.md`. Ce refus historique
-a été traité par la reprise B seule ci-dessus, sans réinterpréter A : le
-nouveau B a été compilé et exécuté dans des tests Unity isolés. Aucun verdict
-humain d'acceptation ni traitement A/B du job Player désormais `queued` n'est
-prouvé. Le worker demeure désactivé et
-`PALIMPSESTE_EFFORT_VERIFIED=false`.
+## Chaîne exécutée
 
-Avant toute ouverture à plusieurs joueurs, clarifier le type de compte et
-l'autorisation d'un usage serveur partagé. La capture actuelle indique
-« Usage personnel » ; les [conditions OpenAI Europe](https://openai.com/policies/eu-terms-of-use/)
-interdisent de mettre un compte individuel à la disposition d'autrui. Notre
-lecture selon laquelle la génération pour des tiers via ce backend pourrait
-entrer dans cette interdiction est une **inférence à confirmer**, même si les
-identifiants restent secrets. Les essais locaux du propriétaire ne constituent
-pas une validation du déploiement public.
+Le Player Windows a envoyé une vraie capture rouge-brun courbe, distincte du trait droit utilisé pour la calibration des prompts. Le job `production` de cette capture est `ready` : deux tentatives fournisseur réussies, une description A, un plan B et un `compiled_spell`, aucune tentative en échec. Le worker isolé sous `PalRuntimeSvc` a utilisé `codex exec` avec `gpt-5.6-luna` et l'effort `max` attesté par les contrôles préalables. Le Player a affiché A « Faisceau courbe de lave », téléchargé et vérifié la fiche, ouvert le laboratoire et compté un lancement (`Lancers : 1`, `Dégâts : 0`). Ce plan ne prévoit pas de dégâts.
 
-1. Le premier couple A/B réel et l'encre du dessin de calibration ont passé `Palimpseste.Core.RealProbe`, puis PlayMode isolé ; la lecture A de ce cas a été rejetée humainement. Le couple A `1.3`/B `1.1` repris avec géométries réelles a depuis produit un autre paquet de vérification SHA-256 `8DAC5FEB3293184564623C1F259567CB025078563F8BC788A9928806BC7672E2`, compilé et lancé dans des tests Unity isolés, sans acceptation humaine. Le nouveau rendu suit la silhouette principale dans les tests géométriques et Direct3D 12 ; ses identifiants d'artefacts restent synthétiques. Une capture rouge-brun **courbe**, différente du trait droit de calibration, a été reçue avant le build LavaReady ; celui-ci l'a reprise et affichée : son job réel est `queued` avec quatre artefacts et zéro appel fournisseur. Le Player BeamGeometryReady a été lancé visiblement après son build, sans essai de sort joueur. La prochaine vérification exige la revue humaine de A `1.3`, puis l'activation contrôlée du worker et le traitement de cette capture sans la remplacer, avec artefacts publiés, paquet téléchargé et sort lancé depuis la caméra du Player.
-2. L'intention du cas rejeté est consignée : laser unidirectionnel de lave. A `1.2`/B `1.0` a été rejeté pour faits de cible et cadence inventés. A `1.3`/B `1.1` a ensuite été exécuté réellement, mais son premier B utilisait encore un contexte géométrique provisoire ; `RealProbe` a refusé `signature_geometry`. Le doctor actuel accepte `-InkPng` pour calculer la géométrie depuis A et l'encre. Son mode `plan` a réutilisé la sortie A `1.3` figée, vérifié son SHA-256, résolu la géométrie, appelé seulement B et obtenu un nouveau plan accepté par le compilateur. Comparer au plus deux configurations sur le même corpus de conception et obtenir une revue humaine de la lecture et du sort avant de toucher au worker. La route `POST /v1/authoring/plan` teste B avec une description structurée de concepteur ; elle ne recalibre pas A et n'est pas une fonction de reroll du parchemin joueur. Les 30 dessins inédits de recette restent séparés et ne servent pas au réglage.
-3. Conserver l'ancienne preuve active privée A/B SHA-256 `FD39E1220BF540C543184D56E3F3314FF0E2BF440BB65073EF219B031CD3E6F5` comme diagnostic historique : le vérificateur FINAL refuse un rapport actif isolé. Après verdict humain sur A `1.3`, examiner les deux rapports réels liés par le hash de cette A et le rapport de validation hors ligne, puis suivre `docs/ops/OWNER_WORKER_CUTOVER.md` pour le manifeste composite v2 approuvé. Garder les fichiers A/B/encre originaux hashés accessibles en lecture au vérificateur. `PALIMPSESTE_EFFORT_VERIFIED=false` reste fermé jusque-là. Ne pas copier `auth.json` du profil personnel ni les preuves privées dans Git. Le compte commun ne doit utiliser que son quota et ses crédits existants : aucun achat, aucune recharge, aucun modèle de secours ni effort inférieur. Le plafond applicatif de jobs ne constitue pas une limite monétaire OpenAI.
-   À l'activation du worker, injecter `DATABASE_URL` dans son environnement privé puis vérifier sa lecture sous le compte de service : `runtime.env` ne contient pas cette clé, requise par `Palimpseste.Worker/Program.cs`. La chaîne est disponible dans le coffre privé `C:\ProgramData\Palimpseste\lab-db.env` ; elle ne doit pas être copiée dans le dépôt ni donnée au worker tant que la porte humaine demeure fermée.
-4. L'exposition propriétaire de la description A, l'UI Unity dessin → texte → labo et le formulaire de retour sur la lecture sont codés. Le contrat API a passé le smoke 18/18 avant l'ajout de `principal_id` et de la route de retour ; la réponse `capabilities` compile. Le code Unity du Player BeamGeometryReady a passé les tests géométriques ciblés 2/2, les tests Direct3D 12 du paquet Luna réel 2/2 et la suite PlayMode complète 4 réussis, 2 sondes ignorées. Son lancement visible répondait ; le Player LavaReady précédent avait montré la capture propriétaire et le job `queued` avec session conservée. Le smoke du retour API a passé 9/9 avec des données synthétiques, sans envoi depuis Unity. L'essai joueur avec une vraie description A et un sort publié reste à faire ; aucun rendu depuis la caméra du Player ni écoute humaine du son n'est attesté.
-5. Les migrations `003_player_invitations.sql`,
-   `004_generation_quota.sql`, `005_interpretation_feedback.sql` et
-   `006_plan_prompt_version.sql` ont été
-   appliquées à `palimpseste_lab` après sauvegardes vérifiées. L'échange
-   d'invitation a été testé sur `palimpseste_test` ; le contrôle concurrent de
-   004 a été testé dans un schéma isolé de cette même base. L'API candidate est
-   maintenant installée et prête sur loopback, l'invitation a été échangée dans
-   le Player visible, et la route de retour a passé 9/9 contrôles synthétiques
-   sur `palimpseste_lab`. Garder l'invitation privée ; aucune URL publique
-   HTTPS n'est déployée. La migration 006 a été vérifiée également sur
-   `palimpseste_test` ; voir
-   `evidence/public/backend/migration006-owner-lab-2026-09-20.md` pour le
-   laboratoire.
-6. Une première commande de lancement de l'API avec son environnement privé et la création du ZIP joueur actualisé avaient été refusées avant exécution par la revue automatique de l'outil (`blocked by policy`, sans motif plus précis communiqué). Le lanceur `ops/start-owner-api.ps1` lit ensuite les fichiers privés dans le processus `PalRuntimeSvc` et a démarré l'API locale sans secret dans la ligne de commande. Les archives dans `deliverables/` sont historiques ; aucun nouveau ZIP n'a été créé. Après la revue humaine du résultat de calibration A `1.3`/B `1.1` compilé en vérification, activer le worker selon la porte prévue, traiter le job joueur déjà `queued`, télécharger son sort et le lancer depuis le Player, puis consigner la preuve et un verdict distinct sur cette nouvelle capture. Mettre à jour le manifeste après la dernière modification du dépôt.
+Le correctif de visibilité du rayon à `0,6 s` a passé 2/2 tests PlayMode sur le **paquet du joueur**, puis Unity 6000.3.24f1 a terminé le build Windows IL2CPP/URP avec le code 0. Le build actuel est `game/Build/WindowsPlayerBeamVisibleReady/` : 29 fichiers, 122 093 149 octets ; EXE SHA-256 `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`, `GameAssembly.dll` SHA-256 `9FB651D09680CAF09B0A8668BEF2A914EFDE6B61F930EDBAE1CE90AF3B5C18C9`. Une capture du Player montre l'effet visible puis disparu.
 
-Le dépôt contient les sources et un Player IL2CPP jouable hors ligne, connecté
-au laboratoire local avec une capture réelle et un job `queued`. Les archives ZIP restent
-antérieures au nouveau parcours joueur. La boucle de génération et M7 ne sont
-pas acceptés.
+L'API précédente (PID `25848`) a été arrêtée. Le nouveau Player a été relancé (PID `35804`) et la bibliothèque, la fiche, le laboratoire ainsi qu'un lancement du même sort sont restés accessibles **sans API**. L'API a ensuite redémarré sous `PalRuntimeSvc` (PID `16420`) ; `http://127.0.0.1:18080/health/ready` a répondu 200. Le worker PID `8180` est resté actif. Cet essai démontre la relecture locale lors d'une indisponibilité de l'API ; il ne mesure pas la qualité artistique ni l'écoute du son.
+
+Une commande de confort pour fermer puis relancer le Player avec l'API restaurée a été refusée **avant exécution** par la revue automatique (`blocked by policy`, sans motif détaillé). Elle n'a pas été réessayée par un moyen équivalent. Le Player PID `35804` reste ouvert dans la session issue de l'essai sans API ; l'API PID `16420` répond 200 et le worker PID `8180` reste actif. Aucune relance du Player en ligne après cette restauration n'est revendiquée.
+
+## Sécurité et preuves de génération
+
+Le Doctor installé a pour SHA-256 `AAAAB2686CD9A33ADB6130B205D10596A63AF8207CBAE580ACD723C862196811`. Son diagnostic local après correction du BOM a réussi sous le compte de service, sans appel modèle ni `production_issues`. Le worker installé a pour SHA-256 `9243F9600973B1AAF5F97F07AD0983FF60A7EFA2EB0A7F7D42D142C05015847D` et son script enfant `03CE0108D67A4AC27B332A41F36F1F12B2B362FA9A2AEBCF25EB21E8BDB4C104`.
+
+Le verrou technique `PALIMPSESTE_EFFORT_VERIFIED=true` référence le manifeste composite v2 SHA-256 `56F349016A5B63D352DD37225AF9253889D496C2399F58F97F70D0DAAC353E3F` dans `E:\PalimpsesteRuntime\approved-evidence`. Il lie trois rapports intégraux : appel A réel, B réel repris sur l'A figée et géométrie issue de l'encre, puis validation et compilation hors ligne de leurs octets. Les fichiers A/B/encre originaux et leurs hashes restent nécessaires au démarrage. Les ACL donnent au service la lecture/exécution des preuves et binaires, sans modification. `runtime.env` est en UTF-8 sans BOM ; `DATABASE_URL` est lue dans le coffre privé par le processus enfant, sans secret dans le dépôt, le Player ou la ligne de commande.
+
+La première lecture A « faisceau de feu visuel » du trait de calibration a été rejetée par l'auteur. A `1.3` décrit un faisceau de lave sans cible ni dégâts ; B `1.1` repris sur la géométrie réelle a été validé et compilé. Ces diagnostics servent à la compatibilité technique et restent distincts du job joueur. Le verdict humain de fidélité sur A `1.3`, puis celui sur la nouvelle capture courbe et son sort, ne sont **pas enregistrés**. Le passage du job à `ready` n'est pas un accord artistique.
+
+Le laboratoire reste privé sur `127.0.0.1` avec invitation propriétaire ; aucun proxy Codex public n'est ouvert. Les migrations 003 à 006 et les contrôles d'accès sont en place. Le compte Codex commun n'a déclenché aucun achat ou rechargement par le code ; l'état des réglages de recharge du compte n'est pas vérifié. Les [conditions OpenAI Europe](https://openai.com/fr-FR/policies/eu-terms-of-use/) et la [documentation Codex](https://developers.openai.com/fr-FR/docs/auth) demandent une clarification de l'usage de ce compte individuel pour des tiers avant toute ouverture à plusieurs joueurs. Cette lecture de leur application au backend partagé est une inférence à confirmer.
+
+## Travaux restants
+
+1. Faire écouter le son et recueillir les verdicts des créateurs sur le texte A, le rendu, l'intérêt du sort et l'expérience de dessin ; enregistrer ces décisions séparément de la preuve technique.
+2. Exécuter la recette finale sur les 30 dessins inédits, avec le second créateur et une machine Windows propre. Le seul job propriétaire réussi ne satisfait pas M7.
+3. Vérifier l'installation et le parcours sur un autre poste, puis décider de la livraison publique, de l'HTTPS et du cadre d'usage du compte avant ouverture à des joueurs externes.
+4. Livrer le dossier Windows actuel. La création du ZIP actualisé a été refusée avant exécution par la revue automatique (`blocked by policy`) ; les ZIP existants restent historiques. Le démarrage de l'API, lui, fonctionne via `ops/start-owner-api.ps1` sans secret dans l'appel de l'outil.
+
+Les détails du worker et les hashes des preuves sont dans [OWNER_WORKER_CUTOVER.md](ops/OWNER_WORKER_CUTOVER.md). Le parcours sur ce PC est dans [TESTER_MAINTENANT.md](TESTER_MAINTENANT.md). Les statuts par ticket et limites sont dans [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
