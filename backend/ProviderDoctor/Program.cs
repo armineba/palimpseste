@@ -2,12 +2,14 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Palimpseste.Contracts;
+using Palimpseste.Core;
 using Palimpseste.Provider;
 
 var settings = CodexSettings.FromEnvironment();
-if (args.Length == 0 || args[0] is not ("local" or "active"))
+if (args.Length == 0 || args[0] is not ("local" or "active" or "plan" or "validate"))
 {
-    Console.Error.WriteLine("Usage: ProviderDoctor local [--write <evidence.json>] | active <spec-root> <reference.png> <drawing.png> <geometry.json> [--write <evidence.json>]");
+    Console.Error.WriteLine("Usage: ProviderDoctor local | active <spec-root> <reference.png> <drawing.png> --ink <ink.png> | plan <spec-root> <frozen-a.json> --a-sha256 <sha256> --ink <ink.png> | validate <spec-root> <a-final.json> <b-final.json> --a-sha256 <sha256> --b-sha256 <sha256> --ink <ink.png>; all modes accept --write <evidence.json>.");
     return 2;
 }
 
@@ -127,9 +129,130 @@ if (mode == "local")
     return localExit;
 }
 
-if (args.Length < 5)
+if (mode == "validate")
 {
-    Console.Error.WriteLine("Active doctor requires spec-root, reference.png, drawing.png and geometry.json.");
+    local["kind"] = "provider_offline_validation";
+    local["model_calls_executed"] = false;
+    local["validation_status"] = "rejected";
+    local["compilation_status"] = "not_run";
+    local["doctor_executable_sha256"] = Environment.ProcessPath is { Length: > 0 } doctorExecutable
+        ? CodexSettings.ComputeExecutableSha256(doctorExecutable) : null;
+    var ink = ReadOption(args, "--ink");
+    var expectedA = ReadStringOption(args, "--a-sha256");
+    var expectedB = ReadStringOption(args, "--b-sha256");
+    if (args.Length < 4 || ink is null || !IsSha256(expectedA) || !IsSha256(expectedB) ||
+        localExit != 0 || auth.Status != "authenticated")
+    {
+        local["result"] = "preflight_rejected";
+        await EmitAsync(local, writePath);
+        return 2;
+    }
+    var specRoot = Path.GetFullPath(args[1]);
+    var aPath = Path.GetFullPath(args[2]);
+    var bPath = Path.GetFullPath(args[3]);
+    if (!string.Equals(specRoot.TrimEnd(Path.DirectorySeparatorChar),
+            Path.GetFullPath(settings.TrustedSpecificationRoot).TrimEnd(Path.DirectorySeparatorChar),
+            StringComparison.OrdinalIgnoreCase) ||
+        !CodexSettings.IsTrustedFile(aPath, settings.AttemptRoot) ||
+        !CodexSettings.IsTrustedFile(bPath, settings.AttemptRoot) ||
+        !settings.IsTrustedInputFile(ink))
+    {
+        local["result"] = "input_path_rejected";
+        await EmitAsync(local, writePath);
+        return 2;
+    }
+    try
+    {
+        var aInfo = new FileInfo(aPath);
+        var bInfo = new FileInfo(bPath);
+        var inkInfo = new FileInfo(ink);
+        if (aInfo.Length is <= 0 or > ContractJson.MaxDocumentBytes ||
+            bInfo.Length is <= 0 or > ContractJson.MaxDocumentBytes ||
+            inkInfo.Length is <= 0 or > ContractJson.MaxDocumentBytes)
+            throw new InvalidDataException("input_size_invalid");
+        var aBytes = await File.ReadAllBytesAsync(aPath);
+        var bBytes = await File.ReadAllBytesAsync(bPath);
+        var inkBytes = await File.ReadAllBytesAsync(ink);
+        var aSha = Hash(aBytes);
+        var bSha = Hash(bBytes);
+        var inkSha = Hash(inkBytes);
+        local["description_file"] = aPath;
+        local["plan_file"] = bPath;
+        local["ink_file"] = ink;
+        local["description_sha256"] = aSha;
+        local["plan_sha256"] = bSha;
+        local["ink_sha256"] = inkSha;
+        if (!string.Equals(aSha, expectedA, StringComparison.OrdinalIgnoreCase) ||
+            !string.Equals(bSha, expectedB, StringComparison.OrdinalIgnoreCase))
+        {
+            local["result"] = "hash_mismatch";
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        var offlineDescriptionIssues = SpellCompiler.ValidateDescriptionJson(aBytes);
+        if (offlineDescriptionIssues.Count != 0)
+        {
+            local["result"] = "description_rejected";
+            local["issue_codes"] = offlineDescriptionIssues.Select(issue => issue.Code).Distinct().ToArray();
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        var decoded = ContractJson.DeserializeStrict<SpellDescription>(aBytes, "spell-description");
+        var resolved = GeometryResolver.Resolve(inkBytes, decoded);
+        if (!resolved.Success)
+        {
+            local["result"] = "geometry_rejected";
+            local["issue_codes"] = resolved.Issues.Select(issue => issue.Code).Distinct().ToArray();
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        var context = "[" + string.Join(",", resolved.GeometryJson.OrderBy(item => item.Key, StringComparer.Ordinal)
+            .Select(item => Encoding.UTF8.GetString(item.Value))) + "]";
+        local["geometry_source"] = "resolver_from_ink_and_description";
+        local["geometry_resolver_version"] = GeometryResolver.Version;
+        local["geometry_context_sha256"] = Hash(Encoding.UTF8.GetBytes(context));
+        var offlinePlanIssues = SpellCompiler.ValidatePlanJson(aBytes, bBytes, resolved.GeometryJson, resolved.MaskPng);
+        if (offlinePlanIssues.Count != 0)
+        {
+            local["result"] = "plan_rejected";
+            local["issue_codes"] = offlinePlanIssues.Select(issue => issue.Code).Distinct().ToArray();
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        local["validation_status"] = "success";
+        var compilation = CompileDoctorProbe(aBytes, bBytes, resolved.GeometryJson, resolved.MaskPng);
+        local["compiler_version"] = SpellCompiler.Version;
+        if (!compilation.Success)
+        {
+            local["result"] = "compilation_rejected";
+            local["issue_codes"] = compilation.Issues.Select(issue => issue.Code).Distinct().ToArray();
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        local["compilation_status"] = "success";
+        local["compiled_probe_sha256"] = compilation.PayloadSha256;
+        local["result"] = "success";
+        await EmitAsync(local, writePath);
+        return 0;
+    }
+    catch (Exception error) when (error is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
+    {
+        local["result"] = "input_unreadable";
+        local["error_type"] = error.GetType().Name;
+        await EmitAsync(local, writePath);
+        return 1;
+    }
+}
+
+var requiredPositionals = mode == "active" ? 4 : 3;
+var inkArgument = ReadOption(args, "--ink");
+var aHashArgument = ReadStringOption(args, "--a-sha256");
+if (args.Length < requiredPositionals || inkArgument is null ||
+    (mode == "plan" && (aHashArgument is null || !IsSha256(aHashArgument))) ||
+    (mode == "active" && args.Length > 4 && !args[4].StartsWith("--", StringComparison.Ordinal)) ||
+    (mode == "plan" && args.Length > 3 && !args[3].StartsWith("--", StringComparison.Ordinal)))
+{
+    Console.Error.WriteLine("Active doctor requires reference, drawing and --ink. Plan doctor requires frozen A, --a-sha256 and --ink.");
     await EmitAsync(local, writePath);
     return 2;
 }
@@ -148,14 +271,16 @@ if (localExit != 0 || auth.Status != "authenticated")
 // input, output and tool restrictions. The worker still requires
 // PALIMPSESTE_EFFORT_VERIFIED=true afterwards.
 var root = Path.GetFullPath(args[1]);
-var reference = Path.GetFullPath(args[2]);
-var drawing = Path.GetFullPath(args[3]);
-var geometryPath = Path.GetFullPath(args[4]);
+var inkPath = inkArgument;
+var reference = mode == "active" ? Path.GetFullPath(args[2]) : null;
+var drawing = mode == "active" ? Path.GetFullPath(args[3]) : null;
+var frozenAPath = mode == "plan" ? Path.GetFullPath(args[2]) : null;
 if (!string.Equals(Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar),
         Path.GetFullPath(settings.TrustedSpecificationRoot).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase) ||
-    (!CodexSettings.IsTrustedFile(geometryPath, settings.TrustedSpecificationRoot) &&
-     !settings.IsTrustedInputFile(geometryPath)) ||
-    !settings.IsTrustedInputFile(reference) || !settings.IsTrustedInputFile(drawing))
+    !settings.IsTrustedInputFile(inkPath) ||
+    (mode == "active" && (!settings.IsTrustedInputFile(reference!) || !settings.IsTrustedInputFile(drawing!))) ||
+    (mode == "plan" && !settings.IsTrustedInputFile(frozenAPath!) &&
+     !CodexSettings.IsTrustedFile(frozenAPath!, settings.AttemptRoot)))
 {
     local["active_blocked"] = true;
     local["active_block_reason"] = "active_inputs_outside_declared_roots";
@@ -164,29 +289,100 @@ if (!string.Equals(Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar),
 }
 
 var provider = new LunaCodexProvider(new CodexProcessRunner(settings), root);
-var layout = await File.ReadAllTextAsync(Path.Combine(root, "reference", "layout-v1.json"));
 var capabilities = await File.ReadAllTextAsync(Path.Combine(root, "contracts", "capability-catalog.json"));
-var geometry = await File.ReadAllTextAsync(geometryPath);
-var a = await provider.ProbeInterpretAsync("operator-doctor", Guid.NewGuid().ToString("N"), reference, drawing, layout, capabilities, CancellationToken.None);
-local["model_calls_executed"] = a.Transport.ProcessStarted;
-local["stage_a"] = StageEvidence(a);
-if (a.Utf8 is null)
+byte[] description;
+var stageAProcessStarted = false;
+if (mode == "active")
 {
-    local["active_result"] = "stage_a_failed";
+    var layout = await File.ReadAllTextAsync(Path.Combine(root, "reference", "layout-v1.json"));
+    var a = await provider.ProbeInterpretAsync("operator-doctor", Guid.NewGuid().ToString("N"), reference!, drawing!, layout, capabilities, CancellationToken.None);
+    local["model_calls_executed"] = a.Transport.ProcessStarted;
+    stageAProcessStarted = a.Transport.ProcessStarted;
+    local["stage_a_model_call_executed"] = stageAProcessStarted;
+    local["stage_a"] = StageEvidence(a);
+    if (a.Utf8 is null)
+    {
+        local["active_result"] = "stage_a_failed";
+        await EmitAsync(local, writePath);
+        return 1;
+    }
+    if (!MatchesRequestedMetadata(a.Transport, settings))
+    {
+        local["active_result"] = "stage_a_metadata_unverified";
+        local["active_blocked"] = true;
+        local["active_block_reason"] = "model_or_effort_not_reported_exactly";
+        await EmitAsync(local, writePath);
+        return 1;
+    }
+    description = a.Utf8;
+}
+else
+{
+    var aFile = new FileInfo(frozenAPath!);
+    if (aFile.Length is <= 0 or > ContractJson.MaxDocumentBytes)
+    {
+        local["active_result"] = "frozen_a_size_invalid";
+        await EmitAsync(local, writePath);
+        return 1;
+    }
+    description = await File.ReadAllBytesAsync(frozenAPath!);
+    var actualHash = Hash(description);
+    if (!string.Equals(actualHash, aHashArgument, StringComparison.OrdinalIgnoreCase))
+    {
+        local["active_result"] = "frozen_a_hash_mismatch";
+        await EmitAsync(local, writePath);
+        return 1;
+    }
+    local["stage_a_reuse"] = new { source_file = frozenAPath, sha256 = actualHash, hash_verified = true,
+        model_call_executed = false };
+}
+
+var descriptionIssues = SpellCompiler.ValidateDescriptionJson(description);
+if (descriptionIssues.Count != 0)
+{
+    local["active_result"] = "description_invalid";
+    local["description_issue_codes"] = descriptionIssues.Select(issue => issue.Code).Distinct().ToArray();
     await EmitAsync(local, writePath);
     return 1;
 }
-if (!MatchesRequestedMetadata(a.Transport, settings))
+string geometry;
+Dictionary<string, byte[]> geometryJson;
+Dictionary<string, byte[]> maskPng;
+try
 {
-    local["active_result"] = "stage_a_metadata_unverified";
-    local["active_blocked"] = true;
-    local["active_block_reason"] = "model_or_effort_not_reported_exactly";
+    var inkFile = new FileInfo(inkPath);
+    if (inkFile.Length is <= 0 or > ContractJson.MaxDocumentBytes)
+        throw new InvalidDataException("ink_size_invalid");
+    var ink = await File.ReadAllBytesAsync(inkPath);
+    var decoded = ContractJson.DeserializeStrict<SpellDescription>(description, "spell-description");
+    var resolved = GeometryResolver.Resolve(ink, decoded);
+    if (!resolved.Success)
+    {
+        local["active_result"] = "geometry_unavailable";
+        local["geometry_issue_codes"] = resolved.Issues.Select(issue => issue.Code).Distinct().ToArray();
+        await EmitAsync(local, writePath);
+        return 1;
+    }
+    geometryJson = resolved.GeometryJson;
+    maskPng = resolved.MaskPng;
+    geometry = "[" + string.Join(",", resolved.GeometryJson.OrderBy(item => item.Key, StringComparer.Ordinal)
+        .Select(item => Encoding.UTF8.GetString(item.Value))) + "]";
+    local["geometry"] = new { source = "resolver_from_ink_and_description", resolver_version = GeometryResolver.Version,
+        description_sha256 = Hash(description), ink_sha256 = Hash(ink), context_sha256 = Hash(Encoding.UTF8.GetBytes(geometry)),
+        geometry_ids = resolved.GeometryJson.Keys.OrderBy(id => id, StringComparer.Ordinal).ToArray(),
+        mask_ids = resolved.MaskPng.Keys.OrderBy(id => id, StringComparer.Ordinal).ToArray() };
+}
+catch (Exception error) when (error is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
+{
+    local["active_result"] = "geometry_input_invalid";
+    local["geometry_error_type"] = error.GetType().Name;
     await EmitAsync(local, writePath);
     return 1;
 }
 
-var b = await provider.ProbePlanAsync("operator-doctor", Guid.NewGuid().ToString("N"), a.Utf8, geometry, capabilities, CancellationToken.None);
-local["model_calls_executed"] = a.Transport.ProcessStarted || b.Transport.ProcessStarted;
+var b = await provider.ProbePlanAsync("operator-doctor", Guid.NewGuid().ToString("N"), description, geometry, capabilities, CancellationToken.None);
+local["model_calls_executed"] = stageAProcessStarted || b.Transport.ProcessStarted;
+local["stage_b_model_call_executed"] = b.Transport.ProcessStarted;
 local["stage_b"] = StageEvidence(b);
 if (b.Utf8 is null)
     local["active_result"] = "stage_b_failed";
@@ -197,15 +393,68 @@ else if (!MatchesRequestedMetadata(b.Transport, settings))
     local["active_block_reason"] = "model_or_effort_not_reported_exactly";
 }
 else
-    local["active_result"] = "success";
+{
+    var planIssues = SpellCompiler.ValidatePlanJson(description, b.Utf8, geometryJson, maskPng);
+    local["plan_validation_status"] = planIssues.Count == 0 ? "success" : "rejected";
+    if (planIssues.Count != 0)
+    {
+        local["active_result"] = "plan_rejected";
+        local["plan_issue_codes"] = planIssues.Select(issue => issue.Code).Distinct().ToArray();
+    }
+    else
+    {
+        var compilation = CompileDoctorProbe(description, b.Utf8, geometryJson, maskPng);
+        local["compiler_version"] = SpellCompiler.Version;
+        local["compilation_status"] = compilation.Success ? "success" : "rejected";
+        local["active_result"] = compilation.Success ? "success" : "compilation_rejected";
+        if (compilation.Success) local["compiled_probe_sha256"] = compilation.PayloadSha256;
+        else local["compilation_issue_codes"] = compilation.Issues.Select(issue => issue.Code).Distinct().ToArray();
+    }
+}
 await EmitAsync(local, writePath);
-return b.Utf8 is null || !MatchesRequestedMetadata(b.Transport, settings) ? 1 : 0;
+return string.Equals(local["active_result"] as string, "success", StringComparison.Ordinal) ? 0 : 1;
 
 static string? ReadOption(string[] values, string name)
 {
     for (var i = 0; i < values.Length - 1; i++)
         if (values[i] == name) return Path.GetFullPath(values[i + 1]);
     return null;
+}
+
+static string? ReadStringOption(string[] values, string name)
+{
+    for (var i = 0; i < values.Length - 1; i++)
+        if (values[i] == name) return values[i + 1];
+    return null;
+}
+
+static bool IsSha256(string? value) => value?.Length == 64 && value.All(Uri.IsHexDigit);
+static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
+
+static CompilationResult CompileDoctorProbe(byte[] description, byte[] plan,
+    IReadOnlyDictionary<string, byte[]> geometry, IReadOnlyDictionary<string, byte[]> masks)
+{
+    var geometryIds = geometry.Keys.OrderBy(key => key, StringComparer.Ordinal)
+        .Select((key, index) => (key, index))
+        .ToDictionary(item => item.key, item => "doctor-geometry-" + item.index, StringComparer.Ordinal);
+    var maskIds = masks.Keys.OrderBy(key => key, StringComparer.Ordinal)
+        .Select((key, index) => (key, index))
+        .ToDictionary(item => item.key, item => "doctor-mask-" + item.index, StringComparer.Ordinal);
+    return SpellCompiler.Compile(new CompilationInput
+    {
+        DescriptionJson = description, PlanJson = plan,
+        GeometryJson = geometry, MaskPng = masks,
+        GeometryArtifactIds = geometryIds, MaskArtifactIds = maskIds,
+        SpellId = "doctor-only", ParchmentId = "doctor-only",
+        SignatureSeedHex = "0000000000000000", CreatedAt = "2026-09-20T00:00:00Z",
+        Provenance = new SpellProvenance
+        {
+            mode = "fixture", capture_sha256 = null, reference_sha256 = null,
+            model_a = null, model_b = null,
+            prompt_a_version = "doctor.offline", prompt_b_version = "doctor.offline",
+            response_a_id = null, response_b_id = null
+        }
+    });
 }
 
 static object StageEvidence(ProviderDocument document) => new

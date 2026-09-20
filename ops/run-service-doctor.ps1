@@ -1,12 +1,17 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('local', 'active')]
+    [ValidateSet('local', 'active', 'plan', 'validate')]
     [string]$Mode = 'local',
     [Parameter(Mandatory = $true)]
     [string]$CredentialFile,
     [string]$RuntimeRoot = 'E:\PalimpsesteRuntime',
     [string]$ReferencePng = '',
     [string]$DrawingPng = '',
+    [string]$InkPng = '',
+    [string]$FrozenAJson = '',
+    [string]$FrozenASha256 = '',
+    [string]$FrozenBJson = '',
+    [string]$FrozenBSha256 = '',
     [string]$GeometryJson = '',
     [string]$EvidencePath = ''
 )
@@ -27,6 +32,7 @@ function IsInside([string]$Candidate, [string]$Root) {
 $runtime = FullPath $RuntimeRoot
 $pending = FullPath (Join-Path $runtime 'evidence\pending')
 $artifactRoot = FullPath (Join-Path $runtime 'artifacts')
+$attemptRoot = FullPath (Join-Path $runtime 'attempts')
 $credentialPath = FullPath $CredentialFile
 $doctor = FullPath (Join-Path $runtime 'bin\ProviderDoctor.exe')
 $childScript = FullPath (Join-Path $runtime 'bin\ProviderDoctor.Service.ps1')
@@ -44,13 +50,37 @@ $EvidencePath = FullPath $EvidencePath
 if (-not (IsInside $EvidencePath $pending) -or (Test-Path -LiteralPath $EvidencePath)) {
     throw 'Evidence must be a new file under evidence/pending.'
 }
-if ($Mode -eq 'active') {
-    foreach ($path in @($ReferencePng, $DrawingPng, $GeometryJson)) {
+if (-not [string]::IsNullOrWhiteSpace($GeometryJson)) {
+    throw 'GeometryJson is deprecated. Supply InkPng so geometry is resolved from the frozen description.'
+}
+if ($Mode -in @('active', 'plan', 'validate')) {
+    $requiredArtifacts = if ($Mode -eq 'active') { @($ReferencePng, $DrawingPng, $InkPng) } else { @($InkPng) }
+    foreach ($path in $requiredArtifacts) {
         if ([string]::IsNullOrWhiteSpace($path) -or
             -not (IsInside $path $artifactRoot) -or
             -not (Test-Path -LiteralPath $path -PathType Leaf)) {
-            throw 'Active doctor requires three existing files under artifacts.'
+            throw 'Doctor input must be an existing file under artifacts.'
         }
+    }
+}
+if ($Mode -eq 'plan') {
+    if ([string]::IsNullOrWhiteSpace($FrozenAJson) -or
+        -not ((IsInside $FrozenAJson $artifactRoot) -or (IsInside $FrozenAJson $attemptRoot)) -or
+        -not (Test-Path -LiteralPath $FrozenAJson -PathType Leaf) -or
+        $FrozenASha256 -notmatch '^[0-9A-Fa-f]{64}$') {
+        throw 'Plan doctor requires frozen A under artifacts or attempts and its exact SHA-256.'
+    }
+}
+if ($Mode -eq 'validate') {
+    if ([string]::IsNullOrWhiteSpace($FrozenAJson) -or
+        [string]::IsNullOrWhiteSpace($FrozenBJson) -or
+        -not (IsInside $FrozenAJson $attemptRoot) -or
+        -not (IsInside $FrozenBJson $attemptRoot) -or
+        -not (Test-Path -LiteralPath $FrozenAJson -PathType Leaf) -or
+        -not (Test-Path -LiteralPath $FrozenBJson -PathType Leaf) -or
+        $FrozenASha256 -notmatch '^[0-9A-Fa-f]{64}$' -or
+        $FrozenBSha256 -notmatch '^[0-9A-Fa-f]{64}$') {
+        throw 'Offline validation requires frozen A/B final files under attempts and exact SHA-256 values.'
     }
 }
 $credential = Import-Clixml -LiteralPath $credentialPath
@@ -70,7 +100,17 @@ $arguments = @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
 if ($Mode -eq 'active') {
     $arguments += @('-ReferencePng', ('"' + (FullPath $ReferencePng) + '"'),
         '-DrawingPng', ('"' + (FullPath $DrawingPng) + '"'),
-        '-GeometryJson', ('"' + (FullPath $GeometryJson) + '"'))
+        '-InkPng', ('"' + (FullPath $InkPng) + '"'))
+} elseif ($Mode -eq 'plan') {
+    $arguments += @('-FrozenAJson', ('"' + (FullPath $FrozenAJson) + '"'),
+        '-FrozenASha256', $FrozenASha256,
+        '-InkPng', ('"' + (FullPath $InkPng) + '"'))
+} elseif ($Mode -eq 'validate') {
+    $arguments += @('-FrozenAJson', ('"' + (FullPath $FrozenAJson) + '"'),
+        '-FrozenASha256', $FrozenASha256,
+        '-FrozenBJson', ('"' + (FullPath $FrozenBJson) + '"'),
+        '-FrozenBSha256', $FrozenBSha256,
+        '-InkPng', ('"' + (FullPath $InkPng) + '"'))
 }
 $process = Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments `
     -Credential $credential -LoadUserProfile -WindowStyle Hidden -Wait -PassThru `

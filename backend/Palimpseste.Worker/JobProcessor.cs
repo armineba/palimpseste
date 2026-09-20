@@ -106,7 +106,7 @@ public sealed class JobProcessor
         var reference = await ReadCheckedAsync(capture.ReferenceKey, capture.ReferenceSha, ct);
         var layout = await File.ReadAllTextAsync(Path.Combine(specRoot, "reference", "layout-v1.json"), ct);
         var capabilities = await File.ReadAllTextAsync(Path.Combine(specRoot, "contracts", "capability-catalog.json"), ct);
-        var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities));
+        var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + provider.PromptASha256));
 
         var descriptionRecord = await jobs.GetDescriptionAsync(job, ct);
         byte[] description;
@@ -152,7 +152,7 @@ public sealed class JobProcessor
             }
             var artifact = await files.PutAsync(result.Utf8, "json", "application/json", ct);
             await jobs.SaveDescriptionAsync(job, attempt, artifact, Encoding.UTF8.GetString(result.Utf8), inputHash,
-                result.Transport, ct);
+                LunaCodexProvider.PromptAVersion, result.Transport, ct);
             description = result.Utf8;
         }
         else description = await ReadCheckedAsync(descriptionRecord.StorageKey, descriptionRecord.Sha256, ct);
@@ -184,6 +184,7 @@ public sealed class JobProcessor
         foreach (var item in geometryRecords.Masks) maskPng[item.FileName] = await ReadCheckedAsync(item.StorageKey, item.Sha256, ct);
         var geometryContext = "[" + string.Join(",", geometryJson.OrderBy(x => x.Key, StringComparer.Ordinal)
             .Select(x => Encoding.UTF8.GetString(x.Value))) + "]";
+        var planInputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities + provider.PromptBSha256));
 
         var planRecord = await jobs.GetPlanAsync(job, ct);
         byte[] plan;
@@ -191,7 +192,7 @@ public sealed class JobProcessor
         {
             await jobs.SetStateAsync(job, "planning", null, "Traduction des règles", false, ct);
             var attempt = await jobs.BeginAttemptAsync(job, "B", settings.Model, settings.Effort,
-                Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities)), ct);
+                planInputHash, ct);
             var result = await provider.PlanAsync(job.Id.ToString("N"), attempt.ToString("N"),
                 description, geometryContext, capabilities, ct);
             IReadOnlyList<ValidationIssue> issues = result.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, result.Utf8, geometryJson, maskPng);
@@ -201,7 +202,7 @@ public sealed class JobProcessor
                 await jobs.CompleteAttemptAsync(job, attempt, "invalid", result.Sha256, result.Transport.CliVersion,
                     result.Transport.SessionId, result.Transport.UsageJson, "plan_invalid", ct);
                 attempt = await jobs.BeginAttemptAsync(job, "repair_B", settings.Model, settings.Effort,
-                    Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities)), ct);
+                    planInputHash, ct);
                 result = await provider.RepairAsync(new RepairAttempt(
                     job.Id.ToString("N"), attempt.ToString("N"), "B", Encoding.UTF8.GetString(description),
                     result.Transport.FinalJson!, RepairErrors(result, issues), repairNumber,
@@ -228,7 +229,8 @@ public sealed class JobProcessor
                 return;
             }
             var artifact = await files.PutAsync(result.Utf8, "json", "application/json", ct);
-            await jobs.SavePlanAsync(job, attempt, artifact, Encoding.UTF8.GetString(result.Utf8), result.Transport, ct);
+            await jobs.SavePlanAsync(job, attempt, artifact, Encoding.UTF8.GetString(result.Utf8),
+                LunaCodexProvider.PromptBVersion, result.Transport, ct);
             plan = result.Utf8;
         }
         else plan = await ReadCheckedAsync(planRecord.StorageKey, planRecord.Sha256, ct);
@@ -246,7 +248,8 @@ public sealed class JobProcessor
             {
                 mode = "drawing", capture_sha256 = capture.ManifestSha, reference_sha256 = capture.ReferenceSha,
                 model_a = settings.Model, model_b = settings.Model,
-                prompt_a_version = "sp.prompt.a/1.1", prompt_b_version = "sp.prompt.b/1.0",
+                prompt_a_version = descriptionRecord?.PromptVersion ?? LunaCodexProvider.PromptAVersion,
+                prompt_b_version = planRecord?.PromptVersion ?? LunaCodexProvider.PromptBVersion,
                 // Codex JSONL exposes a thread ID, not a provider response ID.
                 response_a_id = null, response_b_id = null
             }
@@ -284,12 +287,13 @@ public sealed class JobProcessor
         var geometryContext = "[" + string.Join(",", geometryJson.OrderBy(x => x.Key, StringComparer.Ordinal)
             .Select(x => Encoding.UTF8.GetString(x.Value))) + "]";
         var capabilities = await File.ReadAllTextAsync(Path.Combine(specRoot, "contracts", "capability-catalog.json"), ct);
+        var planInputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities + provider.PromptBSha256));
         var planRecord = await jobs.GetPlanAsync(job, ct);
         if (planRecord is null)
         {
             await jobs.SetStateAsync(job, "planning", null, "Diagnostic de traduction", false, ct);
             var attempt = await jobs.BeginAttemptAsync(job, "B", settings.Model, settings.Effort,
-                Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities)), ct);
+                planInputHash, ct);
             var result = await provider.PlanAsync(job.Id.ToString("N"), attempt.ToString("N"),
                 description, geometryContext, capabilities, ct);
             IReadOnlyList<ValidationIssue> issues = result.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, result.Utf8, geometryJson, maskPng);
@@ -299,7 +303,7 @@ public sealed class JobProcessor
                 await jobs.CompleteAttemptAsync(job, attempt, "invalid", result.Sha256, result.Transport.CliVersion,
                     result.Transport.SessionId, result.Transport.UsageJson, "plan_invalid", ct);
                 attempt = await jobs.BeginAttemptAsync(job, "repair_B", settings.Model, settings.Effort,
-                    Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities)), ct);
+                    planInputHash, ct);
                 result = await provider.RepairAsync(new RepairAttempt(
                     job.Id.ToString("N"), attempt.ToString("N"), "B", Encoding.UTF8.GetString(description),
                     result.Transport.FinalJson!, RepairErrors(result, issues), repairNumber,
@@ -326,7 +330,8 @@ public sealed class JobProcessor
                 return;
             }
             var artifact = await files.PutAsync(result.Utf8, "json", "application/json", ct);
-            await jobs.SavePlanAsync(job, attempt, artifact, Encoding.UTF8.GetString(result.Utf8), result.Transport, ct);
+            await jobs.SavePlanAsync(job, attempt, artifact, Encoding.UTF8.GetString(result.Utf8),
+                LunaCodexProvider.PromptBVersion, result.Transport, ct);
         }
         await jobs.SetStateAsync(job, "ready", null, "Plan de diagnostic disponible", false, ct);
     }

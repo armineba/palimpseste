@@ -7,5 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Palimpseste.Provider/Palimpseste.Provider.csproj" />
+    <ProjectReference Include="../../shared/Palimpseste.Core/Palimpseste.Core.csproj" />
+    <ProjectReference Include="../../shared/Palimpseste.Contracts/Palimpseste.Contracts.csproj" />
   </ItemGroup>
 </Project>

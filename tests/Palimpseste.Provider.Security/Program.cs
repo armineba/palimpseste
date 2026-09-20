@@ -124,18 +124,43 @@ try
     Assert((featureSettings with { Executable = otherExecutable }).Check(true).Contains("runtime_feature_evidence_content_invalid"),
         "a replaced CLI must invalidate its previous doctor evidence");
     var effortEvidence = Path.Combine(root, "effort-evidence.json");
-    var stage = new
+    var aAttemptDirectory = Path.Combine(attempts, "active-a-attempt");
+    var bAttemptDirectory = Path.Combine(attempts, "plan-b-attempt");
+    Directory.CreateDirectory(aAttemptDirectory);
+    Directory.CreateDirectory(bAttemptDirectory);
+    var aFinal = Path.Combine(aAttemptDirectory, "final.json");
+    var bFinal = Path.Combine(bAttemptDirectory, "final.json");
+    await File.WriteAllTextAsync(aFinal, "{\"synthetic_a\":true}");
+    await File.WriteAllTextAsync(bFinal, "{\"synthetic_b\":true}");
+    var aSha = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(aFinal)));
+    var bSha = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(bFinal)));
+    var inkSha = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(drawing)));
+    var contextSha = new string('c', 64);
+    var stageA = new
     {
         outcome = "Success", requested_model = "gpt-5.6-luna", requested_effort = "max",
-        reported_model = "gpt-5.6-luna", reported_effort = "max"
+        reported_model = "gpt-5.6-luna", reported_effort = "max",
+        process_started = true, exit_code = 0, final_sha256 = aSha,
+        attempt_directory = aAttemptDirectory
+    };
+    var stageB = new
+    {
+        outcome = "Success", requested_model = "gpt-5.6-luna", requested_effort = "max",
+        reported_model = "gpt-5.6-luna", reported_effort = "max",
+        process_started = true, exit_code = 0, final_sha256 = bSha,
+        attempt_directory = bAttemptDirectory
     };
     await File.WriteAllTextAsync(effortEvidence, JsonSerializer.Serialize(new
     {
-        kind = "provider_doctor", mode = "active", active_result = "success",
+        kind = "provider_doctor", mode = "active", active_result = "success", plan_validation_status = "success",
+        compilation_status = "success", compiler_version = "sp.compiler/1.0",
+        compiled_probe_sha256 = contextSha,
         requested_model = "gpt-5.6-luna", requested_effort = "max",
         cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
         expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
-        stage_a = stage, stage_b = stage
+        stage_a = stageA, stage_b = stageB,
+        geometry = new { source = "resolver_from_ink_and_description",
+            description_sha256 = aSha, ink_sha256 = inkSha, context_sha256 = contextSha }
     }));
     var effortSettings = settings with
     {
@@ -146,6 +171,132 @@ try
         "an active doctor evidence hash must bind to the configured executable");
     Assert((effortSettings with { Executable = otherExecutable }).Check(true).Contains("effort_evidence_content_invalid"),
         "a replaced CLI must invalidate its previous active effort evidence");
+
+    var approvedEvidence = Path.Combine(root, "approved-evidence");
+    Directory.CreateDirectory(approvedEvidence);
+    var activeAReport = Path.Combine(approvedEvidence, "active-a.json");
+    await File.WriteAllTextAsync(activeAReport, JsonSerializer.Serialize(new
+    {
+        kind = "provider_doctor", mode = "active", active_result = "success",
+        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
+        expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
+        stage_a = stageA,
+        // This obsolete doctor's apparent B success must never count as B proof.
+        stage_b = new { outcome = "Success", reported_effort = "max" }
+    }));
+    Assert((effortSettings with
+    {
+        CompatibilityEvidencePath = activeAReport,
+        CompatibilityEvidenceSha256 = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(activeAReport)))
+    }).Check(true).Contains("effort_evidence_content_invalid"),
+        "old active doctor success without validated resolved geometry must not open the worker");
+    var planBReport = Path.Combine(approvedEvidence, "plan-b.json");
+    var geometryEvidence = new { source = "resolver_from_ink_and_description",
+        description_sha256 = aSha, ink_sha256 = inkSha, context_sha256 = contextSha };
+    var validPlanEvidence = new
+    {
+        kind = "provider_doctor", mode = "plan", active_result = "success",
+        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
+        expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
+        stage_a_reuse = new { source_file = aFinal,
+            sha256 = aSha, hash_verified = true, model_call_executed = false },
+        stage_b_model_call_executed = true, stage_b = stageB, geometry = geometryEvidence
+    };
+    await File.WriteAllTextAsync(planBReport, JsonSerializer.Serialize(validPlanEvidence));
+    Assert((effortSettings with
+    {
+        CompatibilityEvidencePath = planBReport,
+        CompatibilityEvidenceSha256 = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(planBReport)))
+    }).Check(true).Contains("effort_evidence_content_invalid"),
+        "B-only report cannot stand alone as proof of two real model calls");
+    var offlineReport = Path.Combine(approvedEvidence, "offline-validation.json");
+    var validOfflineEvidence = new
+    {
+        kind = "provider_offline_validation", mode = "validate", result = "success",
+        validation_status = "success", compilation_status = "success",
+        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
+        expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
+        model_calls_executed = false,
+        description_file = aFinal, plan_file = bFinal, ink_file = drawing,
+        description_sha256 = aSha, plan_sha256 = bSha, ink_sha256 = inkSha,
+        geometry_source = "resolver_from_ink_and_description",
+        geometry_resolver_version = "sp.geometry.resolver/1.0",
+        geometry_context_sha256 = contextSha,
+        compiler_version = "sp.compiler/1.0", compiled_probe_sha256 = contextSha,
+        doctor_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand)
+    };
+    await File.WriteAllTextAsync(offlineReport, JsonSerializer.Serialize(validOfflineEvidence));
+    var compositeEvidence = Path.Combine(approvedEvidence, "composite.json");
+    async Task WriteCompositeAsync(string planReportSha, string offlineReportSha)
+    {
+        await File.WriteAllTextAsync(compositeEvidence, JsonSerializer.Serialize(new
+        {
+            kind = "provider_doctor_composite", format_version = 2,
+            active_a_report = new { path = activeAReport,
+                sha256 = Convert.ToHexStringLower(SHA256.HashData(await File.ReadAllBytesAsync(activeAReport))) },
+            plan_b_report = new { path = planBReport,
+                sha256 = planReportSha },
+            offline_validation_report = new { path = offlineReport,
+                sha256 = offlineReportSha }
+        }));
+    }
+    string PlanReportSha() => Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(planBReport)));
+    string OfflineReportSha() => Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(offlineReport)));
+    await WriteCompositeAsync(PlanReportSha(), OfflineReportSha());
+    CodexSettings WithComposite() => effortSettings with
+    {
+        CompatibilityEvidencePath = compositeEvidence,
+        CompatibilityEvidenceSha256 = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(compositeEvidence)))
+    };
+    Assert(!WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
+        "hash-linked A/B reports and offline compiled validation must pass the composite gate");
+    await File.WriteAllTextAsync(aFinal, "tampered A");
+    Assert(WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
+        "composite proof must reject changed A final bytes");
+    await File.WriteAllTextAsync(aFinal, "{\"synthetic_a\":true}");
+    await File.WriteAllTextAsync(bFinal, "tampered B");
+    Assert(WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
+        "composite proof must reject changed B final bytes");
+    await File.WriteAllTextAsync(bFinal, "{\"synthetic_b\":true}");
+    await WriteCompositeAsync(new string('b', 64), OfflineReportSha());
+    Assert(WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
+        "composite proof must reject a mismatched source report hash");
+    await File.WriteAllTextAsync(offlineReport, JsonSerializer.Serialize(new
+    {
+        kind = "provider_offline_validation", mode = "validate", result = "success",
+        validation_status = "success", compilation_status = "not_run",
+        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
+        expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
+        model_calls_executed = false,
+        description_file = aFinal, plan_file = bFinal, ink_file = drawing,
+        description_sha256 = aSha, plan_sha256 = bSha, ink_sha256 = inkSha,
+        geometry_source = "resolver_from_ink_and_description",
+        geometry_resolver_version = "sp.geometry.resolver/1.0",
+        geometry_context_sha256 = contextSha,
+        compiler_version = "sp.compiler/1.0", compiled_probe_sha256 = contextSha,
+        doctor_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand)
+    }));
+    await WriteCompositeAsync(PlanReportSha(), OfflineReportSha());
+    Assert(WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
+        "a report without actual controlled compilation must not open the worker");
+    await File.WriteAllTextAsync(offlineReport, JsonSerializer.Serialize(validOfflineEvidence));
+    await File.WriteAllTextAsync(planBReport, JsonSerializer.Serialize(new
+    {
+        kind = "provider_doctor", mode = "plan", active_result = "success",
+        requested_model = "gpt-5.6-luna", requested_effort = "max",
+        cli_executable_sha256 = CodexSettings.ComputeExecutableSha256(fakeCommand),
+        expected_service_identity = Environment.UserName, service_identity = Environment.UserName,
+        stage_a_reuse = new { source_file = aFinal,
+            sha256 = new string('c', 64), hash_verified = true, model_call_executed = false },
+        stage_b_model_call_executed = true, stage_b = stageB, geometry = geometryEvidence
+    }));
+    await WriteCompositeAsync(PlanReportSha(), OfflineReportSha());
+    Assert(WithComposite().Check(true).Contains("effort_evidence_content_invalid"),
+        "composite proof must reject a B report bound to another A output");
     Assert(settings.Check(false).Count == 0, "transport fixture must pass non-production isolation check: " + string.Join(',', settings.Check(false)));
     Assert((settings with { Effort = "xhigh" }).Check(false).Contains("effort_below_documented_max"),
         "the worker must reject a configured effort below the documented maximum");

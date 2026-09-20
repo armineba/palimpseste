@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Palimpseste.Game.SpellRuntime;
 using UnityEngine;
 
@@ -32,6 +33,24 @@ namespace Palimpseste.Game.SpellRuntime
         }
     }
 
+    internal sealed class BeamVisualResources : MonoBehaviour
+    {
+        private readonly List<Material> owned = new List<Material>();
+
+        public Material Own(Material material)
+        {
+            owned.Add(material);
+            return material;
+        }
+
+        private void OnDestroy()
+        {
+            foreach (var material in owned)
+                if (material != null) Destroy(material);
+            owned.Clear();
+        }
+    }
+
     internal static class CarrierVisual
     {
         public static void KeepOneTickBeamVisible(GameObject visual)
@@ -49,7 +68,7 @@ namespace Palimpseste.Game.SpellRuntime
             switch (node.carrier)
             {
                 case "projectile": Projectile(root, state, tint); break;
-                case "beam": Beam(root, tint, node.options.width_cm ?? 4); break;
+                case "beam": Beam(root, tint, node.options.width_cm ?? 4, node.appearance?.affinity == "fire"); break;
                 case "field": Footprint(root, mask, node.scale_cm, tint, false); break;
                 case "pulse": Pulse(root, mask, node.scale_cm, tint); break;
                 case "barrier": Barrier(root, state, tint); break;
@@ -107,14 +126,20 @@ namespace Palimpseste.Game.SpellRuntime
             }
         }
 
-        private static void Beam(GameObject root, Color tint, int widthCm)
+        private static void Beam(GameObject root, Color tint, int widthCm, bool fire)
         {
+            var resources = root.AddComponent<BeamVisualResources>();
             var line = root.AddComponent<LineRenderer>();
             line.useWorldSpace = true;
             line.positionCount = 2;
-            line.startWidth = line.endWidth = Mathf.Max(.02f, widthCm / 100f);
             line.numCapVertices = 6;
-            line.material = SpellLab.MaterialFor(Color.white, true);
+            if (fire)
+            {
+                LavaBeam(root, line, resources, widthCm);
+                return;
+            }
+            line.startWidth = line.endWidth = Mathf.Max(.02f, widthCm / 100f);
+            line.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
             line.startColor = tint;
             line.endColor = new Color(tint.r, tint.g, tint.b, .25f);
             var glow = new GameObject("Lueur du faisceau");
@@ -124,9 +149,52 @@ namespace Palimpseste.Game.SpellRuntime
             corona.positionCount = 2;
             corona.startWidth = corona.endWidth = Mathf.Max(.09f, widthCm / 40f);
             corona.numCapVertices = 6;
-            corona.material = SpellLab.MaterialFor(Color.white, true);
+            corona.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
             corona.startColor = new Color(tint.r, tint.g, tint.b, .18f);
             corona.endColor = new Color(tint.r, tint.g, tint.b, .06f);
+        }
+
+        private static void LavaBeam(GameObject root, LineRenderer lava, BeamVisualResources resources, int widthCm)
+        {
+            // Only the compiled affinity and width select this preauthored visual.
+            // Every layer follows the exact points resolved by the fixed beam engine.
+            var width = Mathf.Max(.04f, widthCm / 100f);
+            var shader = Resources.Load<Shader>("LavaBeam");
+            if (shader == null) throw new InvalidOperationException("Shader du faisceau de lave absent du lecteur");
+
+            var halo = BeamLayer(root, resources, "Halo thermique", Mathf.Max(.3f, width * 7f),
+                new Color(1f, .19f, .025f, .14f), 0);
+            halo.numCapVertices = 8;
+            var crust = BeamLayer(root, resources, "Croûte de lave", Mathf.Max(.04f, width),
+                new Color(.28f, .075f, .018f, .88f), 1);
+            crust.numCapVertices = 8;
+
+            lava.startWidth = lava.endWidth = Mathf.Max(.03f, width * .8f);
+            lava.numCapVertices = 8;
+            lava.textureMode = LineTextureMode.Stretch;
+            lava.sortingOrder = 2;
+            lava.sharedMaterial = resources.Own(new Material(shader));
+            lava.startColor = new Color(1f, .52f, .15f, .98f);
+            lava.endColor = new Color(1f, .38f, .1f, .92f);
+
+            var filament = BeamLayer(root, resources, "Filament incandescent", Mathf.Max(.01f, width * .35f),
+                new Color(1f, .82f, .44f, .68f), 3);
+            filament.numCapVertices = 8;
+        }
+
+        private static LineRenderer BeamLayer(GameObject root, BeamVisualResources resources, string name, float width, Color color, int order)
+        {
+            var child = new GameObject(name);
+            child.transform.SetParent(root.transform, false);
+            var line = child.AddComponent<LineRenderer>();
+            line.useWorldSpace = true;
+            line.positionCount = 2;
+            line.startWidth = line.endWidth = width;
+            line.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
+            line.startColor = color;
+            line.endColor = color;
+            line.sortingOrder = order;
+            return line;
         }
 
         public static void BeamSegments(CarrierState state, System.Collections.Generic.List<Vector3> points)

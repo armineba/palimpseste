@@ -42,18 +42,28 @@ public sealed record ProviderDocument(CodexResult Transport, byte[]? Utf8, strin
 
 public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlanner, ITechnicalRepairProvider
 {
+    public const string PromptAVersion = "sp.prompt.a/1.3";
+    public const string PromptBVersion = "sp.prompt.b/1.1";
     private readonly CodexProcessRunner runner;
     private readonly string promptA;
     private readonly string promptB;
     private readonly string promptRepair;
     private readonly string schemaA;
     private readonly string schemaB;
+    public string PromptASha256 { get; }
+    public string PromptBSha256 { get; }
 
     public LunaCodexProvider(CodexProcessRunner runner, string trustedSpecificationRoot)
     {
         this.runner = runner;
         promptA = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "01_MODEL_A_INTERPRETE.md"), Encoding.UTF8);
+        if (!promptA.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + PromptAVersion, StringComparison.Ordinal))
+            throw new InvalidDataException("prompt_a_version_mismatch");
+        PromptASha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(promptA)));
         promptB = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "02_MODEL_B_TRADUCTEUR.md"), Encoding.UTF8);
+        if (!promptB.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + PromptBVersion, StringComparison.Ordinal))
+            throw new InvalidDataException("prompt_b_version_mismatch");
+        PromptBSha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(promptB)));
         promptRepair = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "03_REPARATION_TECHNIQUE.md"), Encoding.UTF8);
         schemaA = Path.Combine(trustedSpecificationRoot, "contracts", "codex", "model-a.output-schema.json");
         schemaB = Path.Combine(trustedSpecificationRoot, "contracts", "codex", "model-b.output-schema.json");

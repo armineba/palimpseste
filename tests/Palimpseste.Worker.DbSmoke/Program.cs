@@ -135,15 +135,18 @@ try
         new string('2', 64), descriptionJson.Length, "application/json");
     var successTransport = new CodexResult(ProviderOutcome.Success, descriptionJson, 0, "synthetic-a", null,
         DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, "synthetic", "gpt-5.6-luna", "max", "gpt-5.6-luna", "max", "{}");
-    await repository.SaveDescriptionAsync(afterA!, aAttempt, description, descriptionJson, new string('3', 64), successTransport, CancellationToken.None);
-    Require(await repository.GetDescriptionAsync(afterA!, CancellationToken.None) is not null, "Description was not frozen after A");
+    await repository.SaveDescriptionAsync(afterA!, aAttempt, description, descriptionJson, new string('3', 64),
+        LunaCodexProvider.PromptAVersion, successTransport, CancellationToken.None);
+    Require((await repository.GetDescriptionAsync(afterA!, CancellationToken.None))?.PromptVersion == LunaCodexProvider.PromptAVersion,
+        "Description or its prompt version was not frozen after A");
     await using (var conn = await db.OpenConnectionAsync())
     await using (var expire = new NpgsqlCommand("UPDATE jobs SET lease_until=now()-interval '1 second' WHERE id=$1", conn))
     { expire.Parameters.AddWithValue(recoveryJob); await expire.ExecuteNonQueryAsync(); }
     var afterAResume = await repository.ClaimAsync("recovery-a-resume", CancellationToken.None);
     Require(afterAResume?.Id == recoveryJob && afterAResume.Fence == 2 && afterAResume.State == "resolving_geometry",
         "After-A resume did not retain the frozen stage");
-    Require(await repository.GetDescriptionAsync(afterAResume!, CancellationToken.None) is not null, "After-A resume lost description");
+    Require((await repository.GetDescriptionAsync(afterAResume!, CancellationToken.None))?.PromptVersion == LunaCodexProvider.PromptAVersion,
+        "After-A resume lost the description prompt version");
     var staleRejected = false;
     try { await repository.SetStateAsync(afterA!, "planning", null, "stale", false, CancellationToken.None); }
     catch (InvalidOperationException e) when (e.Message == "fence_lost_on_state_change") { staleRejected = true; }

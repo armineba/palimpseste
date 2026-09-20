@@ -1,12 +1,17 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('local', 'active')]
+    [ValidateSet('local', 'active', 'plan', 'validate')]
     [string]$Mode = 'local',
     [Parameter(Mandatory = $true)]
     [string]$EnvFile,
     [string]$SpecRoot = '',
     [string]$ReferencePng = '',
     [string]$DrawingPng = '',
+    [string]$InkPng = '',
+    [string]$FrozenAJson = '',
+    [string]$FrozenASha256 = '',
+    [string]$FrozenBJson = '',
+    [string]$FrozenBSha256 = '',
     [string]$GeometryJson = '',
     [string]$EvidencePath = '',
     [string]$DoctorExecutable = ''
@@ -61,19 +66,33 @@ if ([string]::IsNullOrWhiteSpace($EvidencePath)) {
 $EvidencePath = Resolve-FullPath $EvidencePath
 
 $doctorArgs = @($Mode, '--write', $EvidencePath)
+if (-not [string]::IsNullOrWhiteSpace($GeometryJson)) {
+    throw 'GeometryJson est obsolète. Fournir InkPng pour recalculer la géométrie.'
+}
 if ($Mode -eq 'active') {
     if ([string]::IsNullOrWhiteSpace($SpecRoot) -or [string]::IsNullOrWhiteSpace($ReferencePng) -or
-        [string]::IsNullOrWhiteSpace($DrawingPng) -or [string]::IsNullOrWhiteSpace($GeometryJson)) {
-        throw 'Le mode active exige SpecRoot, ReferencePng, DrawingPng et GeometryJson.'
+        [string]::IsNullOrWhiteSpace($DrawingPng) -or [string]::IsNullOrWhiteSpace($InkPng)) {
+        throw 'Le mode active exige SpecRoot, ReferencePng, DrawingPng et InkPng.'
     }
-    $doctorArgs += @(
-        (Resolve-FullPath $SpecRoot),
-        (Resolve-FullPath $ReferencePng),
-        (Resolve-FullPath $DrawingPng),
-        (Resolve-FullPath $GeometryJson)
-    )
-    # The doctor parser accepts --write after positional arguments too.
-    $doctorArgs = @('active', (Resolve-FullPath $SpecRoot), (Resolve-FullPath $ReferencePng), (Resolve-FullPath $DrawingPng), (Resolve-FullPath $GeometryJson), '--write', $EvidencePath)
+    $doctorArgs = @('active', (Resolve-FullPath $SpecRoot), (Resolve-FullPath $ReferencePng),
+        (Resolve-FullPath $DrawingPng), '--ink', (Resolve-FullPath $InkPng), '--write', $EvidencePath)
+} elseif ($Mode -eq 'plan') {
+    if ([string]::IsNullOrWhiteSpace($SpecRoot) -or [string]::IsNullOrWhiteSpace($FrozenAJson) -or
+        [string]::IsNullOrWhiteSpace($InkPng) -or $FrozenASha256 -notmatch '^[0-9A-Fa-f]{64}$') {
+        throw 'Le mode plan exige SpecRoot, FrozenAJson, FrozenASha256 et InkPng.'
+    }
+    $doctorArgs = @('plan', (Resolve-FullPath $SpecRoot), (Resolve-FullPath $FrozenAJson),
+        '--a-sha256', $FrozenASha256, '--ink', (Resolve-FullPath $InkPng), '--write', $EvidencePath)
+} elseif ($Mode -eq 'validate') {
+    if ([string]::IsNullOrWhiteSpace($SpecRoot) -or [string]::IsNullOrWhiteSpace($FrozenAJson) -or
+        [string]::IsNullOrWhiteSpace($FrozenBJson) -or [string]::IsNullOrWhiteSpace($InkPng) -or
+        $FrozenASha256 -notmatch '^[0-9A-Fa-f]{64}$' -or
+        $FrozenBSha256 -notmatch '^[0-9A-Fa-f]{64}$') {
+        throw 'Le mode validate exige SpecRoot, A/B figés, leurs SHA-256 et InkPng.'
+    }
+    $doctorArgs = @('validate', (Resolve-FullPath $SpecRoot), (Resolve-FullPath $FrozenAJson),
+        (Resolve-FullPath $FrozenBJson), '--a-sha256', $FrozenASha256,
+        '--b-sha256', $FrozenBSha256, '--ink', (Resolve-FullPath $InkPng), '--write', $EvidencePath)
 }
 
 Push-Location ([IO.Path]::GetDirectoryName($DoctorExecutable))

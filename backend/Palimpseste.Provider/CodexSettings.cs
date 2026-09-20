@@ -422,27 +422,202 @@ public sealed record CodexSettings(
             using var json = JsonDocument.Parse(File.ReadAllText(CompatibilityEvidencePath), new JsonDocumentOptions { MaxDepth = 32 });
             var root = json.RootElement;
             if (root.ValueKind != JsonValueKind.Object ||
-                !StringProperty(root, "kind", "provider_doctor") ||
-                !StringProperty(root, "mode", "active") ||
-                !StringProperty(root, "active_result", "success") ||
-                !StringProperty(root, "requested_model", Model) ||
-                !StringProperty(root, "requested_effort", Effort) ||
-                !StringProperty(root, "cli_executable_sha256", executableHash) ||
-                !StringProperty(root, "expected_service_identity", ExpectedServiceUser) ||
-                !StringProperty(root, "service_identity", ExpectedServiceUser) ||
-                !StageMetadata(root, "stage_a", Model, Effort) ||
-                !StageMetadata(root, "stage_b", Model, Effort))
+                !(StringProperty(root, "kind", "provider_doctor_composite")
+                    ? TryVerifyCompositeEvidence(root, executableHash)
+                    : ValidActiveEvidence(root, executableHash)))
             {
                 issue = "effort_evidence_content_invalid";
                 return false;
             }
             return true;
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or ArgumentException)
         {
             issue = "effort_evidence_unreadable";
             return false;
         }
+    }
+
+    private bool ValidActiveEvidence(JsonElement root, string executableHash) =>
+        StringProperty(root, "kind", "provider_doctor") &&
+        StringProperty(root, "mode", "active") &&
+        StringProperty(root, "active_result", "success") &&
+        StringProperty(root, "plan_validation_status", "success") &&
+        StringProperty(root, "compilation_status", "success") &&
+        StringProperty(root, "compiler_version", "sp.compiler/1.0") &&
+        ShaProperty(root, "compiled_probe_sha256") &&
+        CommonDoctorEvidence(root, executableHash) &&
+        StageMetadata(root, "stage_a", Model, Effort) &&
+        StageMetadata(root, "stage_b", Model, Effort) &&
+        StageStarted(root, "stage_a") && StageStarted(root, "stage_b") &&
+        GeometryFromResolvedInk(root) &&
+        StringProperty(root.GetProperty("geometry"), "description_sha256",
+            root.GetProperty("stage_a").GetProperty("final_sha256").GetString()!) &&
+        StageFinalMatches(root, "stage_a", out _, out _) &&
+        StageFinalMatches(root, "stage_b", out _, out _);
+
+    private bool CommonDoctorEvidence(JsonElement root, string executableHash) =>
+        StringProperty(root, "requested_model", Model) &&
+        StringProperty(root, "requested_effort", Effort) &&
+        StringProperty(root, "cli_executable_sha256", executableHash) &&
+        StringProperty(root, "expected_service_identity", ExpectedServiceUser) &&
+        StringProperty(root, "service_identity", ExpectedServiceUser);
+
+    private static bool StageStarted(JsonElement root, string name) =>
+        root.TryGetProperty(name, out var stage) && stage.ValueKind == JsonValueKind.Object &&
+        stage.TryGetProperty("process_started", out var started) && started.ValueKind == JsonValueKind.True &&
+        stage.TryGetProperty("exit_code", out var exit) && exit.ValueKind == JsonValueKind.Number &&
+        exit.TryGetInt32(out var code) && code == 0 &&
+        stage.TryGetProperty("final_sha256", out var finalSha) &&
+        finalSha.ValueKind == JsonValueKind.String && RegexSha256(finalSha.GetString() ?? "");
+
+    private static bool GeometryFromResolvedInk(JsonElement root) =>
+        root.TryGetProperty("geometry", out var geometry) && geometry.ValueKind == JsonValueKind.Object &&
+        StringProperty(geometry, "source", "resolver_from_ink_and_description") &&
+        ShaProperty(geometry, "description_sha256") && ShaProperty(geometry, "ink_sha256") &&
+        ShaProperty(geometry, "context_sha256");
+
+    private static bool ShaProperty(JsonElement root, string name) =>
+        root.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String &&
+        RegexSha256(value.GetString() ?? "");
+
+    // A real active A and a later real B-only plan may be reviewed together.
+    // The first B is never used. The independent offline doctor revalidates and
+    // compiles their exact final files with ink before the three reports can gate.
+    private bool TryVerifyCompositeEvidence(JsonElement composite, string executableHash)
+    {
+        if (!composite.TryGetProperty("format_version", out var version) ||
+            version.ValueKind != JsonValueKind.Number || !version.TryGetInt32(out var versionNumber) ||
+            versionNumber != 2 ||
+            !TryReadCompositeSource(composite, "active_a_report", out var activeDocument))
+            return false;
+
+        using (activeDocument)
+        {
+            if (!TryReadCompositeSource(composite, "plan_b_report", out var planDocument)) return false;
+            using (planDocument)
+            {
+            if (!TryReadCompositeSource(composite, "offline_validation_report", out var validationDocument))
+                return false;
+            using (validationDocument)
+            {
+            var active = activeDocument.RootElement;
+            var plan = planDocument.RootElement;
+            var validation = validationDocument.RootElement;
+            if (!StringProperty(active, "kind", "provider_doctor") ||
+                !StringProperty(active, "mode", "active") ||
+                !CommonDoctorEvidence(active, executableHash) ||
+                !StageMetadata(active, "stage_a", Model, Effort) ||
+                !StageStarted(active, "stage_a") ||
+                !StringProperty(plan, "kind", "provider_doctor") ||
+                !StringProperty(plan, "mode", "plan") ||
+                !StringProperty(plan, "active_result", "success") ||
+                !CommonDoctorEvidence(plan, executableHash) ||
+                !StageMetadata(plan, "stage_b", Model, Effort) ||
+                !StageStarted(plan, "stage_b") ||
+                !GeometryFromResolvedInk(plan) ||
+                !plan.TryGetProperty("stage_a_reuse", out var reuse) ||
+                reuse.ValueKind != JsonValueKind.Object ||
+                !reuse.TryGetProperty("hash_verified", out var verified) || verified.ValueKind != JsonValueKind.True ||
+                !reuse.TryGetProperty("model_call_executed", out var reuseCall) || reuseCall.ValueKind != JsonValueKind.False ||
+                !plan.TryGetProperty("stage_b_model_call_executed", out var bCall) || bCall.ValueKind != JsonValueKind.True)
+                return false;
+
+            var aSha = active.GetProperty("stage_a").GetProperty("final_sha256").GetString()!;
+            var bSha = plan.GetProperty("stage_b").GetProperty("final_sha256").GetString()!;
+            var geometry = plan.GetProperty("geometry");
+            if (!StringProperty(reuse, "sha256", aSha) ||
+                !StringProperty(geometry, "description_sha256", aSha)) return false;
+
+            if (!StageFinalMatches(active, "stage_a", out var aFinal, out var checkedASha) ||
+                !StageFinalMatches(plan, "stage_b", out var bFinal, out var checkedBSha) ||
+                !string.Equals(checkedASha, aSha, StringComparison.OrdinalIgnoreCase) ||
+                !string.Equals(checkedBSha, bSha, StringComparison.OrdinalIgnoreCase) ||
+                !StringProperty(reuse, "source_file", aFinal)) return false;
+
+            if (!StringProperty(validation, "kind", "provider_offline_validation") ||
+                !StringProperty(validation, "mode", "validate") ||
+                !StringProperty(validation, "result", "success") ||
+                !StringProperty(validation, "validation_status", "success") ||
+                !StringProperty(validation, "compilation_status", "success") ||
+                !CommonDoctorEvidence(validation, executableHash) ||
+                !validation.TryGetProperty("model_calls_executed", out var calls) ||
+                calls.ValueKind != JsonValueKind.False ||
+                !StringProperty(validation, "description_file", aFinal) ||
+                !StringProperty(validation, "plan_file", bFinal) ||
+                !StringProperty(validation, "description_sha256", aSha) ||
+                !StringProperty(validation, "plan_sha256", bSha) ||
+                !StringProperty(validation, "ink_sha256", geometry.GetProperty("ink_sha256").GetString()!) ||
+                !StringProperty(validation, "geometry_source", "resolver_from_ink_and_description") ||
+                !StringProperty(validation, "geometry_resolver_version", "sp.geometry.resolver/1.0") ||
+                !StringProperty(validation, "geometry_context_sha256",
+                    geometry.GetProperty("context_sha256").GetString()!) ||
+                !StringProperty(validation, "compiler_version", "sp.compiler/1.0") ||
+                !ShaProperty(validation, "compiled_probe_sha256") ||
+                !ShaProperty(validation, "doctor_executable_sha256") ||
+                !validation.TryGetProperty("ink_file", out var inkFileElement) ||
+                inkFileElement.ValueKind != JsonValueKind.String) return false;
+            var inkFile = inkFileElement.GetString() ?? "";
+            return IsTrustedInputFile(inkFile) &&
+                FileHashMatches(inkFile, geometry.GetProperty("ink_sha256").GetString()!,
+                    ContractEvidenceMaxBytes);
+            }
+            }
+        }
+    }
+
+    private const long ContractEvidenceMaxBytes = 5_000_000;
+
+    private bool StageFinalMatches(JsonElement report, string stageName, out string finalPath, out string finalSha)
+    {
+        finalPath = "";
+        finalSha = "";
+        if (!report.TryGetProperty(stageName, out var stage) || stage.ValueKind != JsonValueKind.Object ||
+            !stage.TryGetProperty("attempt_directory", out var attempt) ||
+            attempt.ValueKind != JsonValueKind.String ||
+            !ShaProperty(stage, "final_sha256")) return false;
+        var attemptDirectory = attempt.GetString() ?? "";
+        if (!IsPathInside(attemptDirectory, AttemptRoot, allowEqual: false)) return false;
+        finalPath = Path.GetFullPath(Path.Combine(attemptDirectory, "final.json"));
+        finalSha = stage.GetProperty("final_sha256").GetString()!;
+        return IsPathInside(finalPath, AttemptRoot, allowEqual: false) &&
+            FileHashMatches(finalPath, finalSha, ContractEvidenceMaxBytes);
+    }
+
+    private static bool FileHashMatches(string path, string expectedSha, long maxBytes)
+    {
+        if (!IsFullyQualified(path) || HasReparsePoint(path) || !File.Exists(path) ||
+            !RegexSha256(expectedSha)) return false;
+        var info = new FileInfo(path);
+        if (info.Length is <= 0 || info.Length > maxBytes) return false;
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read,
+            FileShare.Read, 128 * 1024, FileOptions.SequentialScan);
+        return string.Equals(Convert.ToHexStringLower(SHA256.HashData(stream)), expectedSha,
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool TryReadCompositeSource(JsonElement composite, string name, out JsonDocument document)
+    {
+        document = null!;
+        if (!composite.TryGetProperty(name, out var source) || source.ValueKind != JsonValueKind.Object ||
+            !source.TryGetProperty("path", out var pathElement) || pathElement.ValueKind != JsonValueKind.String ||
+            !source.TryGetProperty("sha256", out var shaElement) || shaElement.ValueKind != JsonValueKind.String)
+            return false;
+        var path = pathElement.GetString() ?? "";
+        var sha = shaElement.GetString() ?? "";
+        var approvedDirectory = Path.GetDirectoryName(CompatibilityEvidencePath);
+        if (!RegexSha256(sha) || !IsPathInside(path, approvedDirectory, allowEqual: false) ||
+            HasReparsePoint(path) || !File.Exists(path) ||
+            string.Equals(path, CompatibilityEvidencePath, StringComparison.OrdinalIgnoreCase)) return false;
+        var bytes = File.ReadAllBytes(path);
+        if (bytes.Length is <= 0 or > 100_000 ||
+            !string.Equals(Convert.ToHexStringLower(SHA256.HashData(bytes)), sha,
+                StringComparison.OrdinalIgnoreCase)) return false;
+        document = JsonDocument.Parse(bytes, new JsonDocumentOptions { MaxDepth = 32 });
+        if (document.RootElement.ValueKind == JsonValueKind.Object) return true;
+        document.Dispose();
+        document = null!;
+        return false;
     }
 
     private bool TryVerifyRuntimeFeatureEvidence(string executableHash, out string? issue)

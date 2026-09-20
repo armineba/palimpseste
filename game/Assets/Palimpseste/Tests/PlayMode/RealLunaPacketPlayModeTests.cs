@@ -25,8 +25,8 @@ namespace Palimpseste.Game.PlayModeTests
             var packetJson = File.ReadAllText(Path.Combine(directory, "packet.json"));
             var packet = JsonConvert.DeserializeObject<CompiledSpell>(packetJson);
             Assert.NotNull(packet);
-            Assert.AreEqual("83c173816320c022a6c02a84c8ded3398f0b75987909d19c98f6e95eb6b36ccc",
-                packet.description_sha256, "This pixel probe must use the accepted real Luna A description.");
+            Assert.AreEqual(ExpectedDescriptionSha(), packet.description_sha256,
+                "This pixel probe must use the selected frozen real Luna A description.");
             Assert.AreEqual(1, packet.plan.nodes.Count);
             Assert.AreEqual("beam", packet.plan.nodes[0].carrier);
             Assert.AreEqual(1, packet.plan.nodes[0].options.lifetime_ticks);
@@ -98,12 +98,17 @@ namespace Palimpseste.Game.PlayModeTests
             var packet = JsonConvert.DeserializeObject<CompiledSpell>(packetJson);
             Assert.NotNull(packet);
             Assert.AreEqual("sp.compiled/1.0", packet.schema_version);
-            Assert.AreEqual("83c173816320c022a6c02a84c8ded3398f0b75987909d19c98f6e95eb6b36ccc",
-                packet.description_sha256, "This probe must use the actual accepted Luna A description.");
+            Assert.AreEqual(ExpectedDescriptionSha(), packet.description_sha256,
+                "This probe must use the selected frozen real Luna A description.");
             Assert.AreEqual(1, packet.plan.nodes.Count);
             Assert.AreEqual("beam", packet.plan.nodes[0].carrier);
             Assert.AreEqual(0, packet.plan.nodes[0].effects.Count,
                 "The drawing and Luna B did not justify damage or another gameplay effect.");
+            var pathEntry = packet.geometry_manifest.Find(entry => entry.id == packet.plan.nodes[0].geometry_id);
+            Assert.NotNull(pathEntry, "The compiled beam must carry its painted path.");
+            var pathAsset = JsonConvert.DeserializeObject<GeometryAsset>(
+                File.ReadAllText(Path.Combine(directory, "artifacts", pathEntry.artifact_id)));
+            Assert.Greater(pathAsset.points.Count, 2, "The real drawing must supply a sampled beam path.");
 
             var birthSourcesBefore = BirthSources();
             var host = new GameObject("Isolated real Luna packet probe");
@@ -121,7 +126,9 @@ namespace Palimpseste.Game.PlayModeTests
                     line => line != null && line.gameObject.name.StartsWith("beam ", StringComparison.Ordinal));
                 Assert.NotNull(beam, "A beam LineRenderer must be instantiated in the Unity scene.");
                 Assert.NotNull(beam.material.shader, "The beam must use a real material shader.");
-                Assert.GreaterOrEqual(beam.positionCount, 2);
+                Assert.Greater(beam.positionCount, 2,
+                    "The main line must use the real drawing's path, not a generic two-point ray.");
+                var realLinePositions = beam.positionCount;
                 Assert.Greater(Vector3.Distance(beam.GetPosition(0), beam.GetPosition(beam.positionCount - 1)), .1f,
                     "The beam must have visible world-space length.");
                 Assert.Greater(beam.startColor.r, beam.startColor.b, "The inferred fire affinity must tint the beam.");
@@ -143,7 +150,8 @@ namespace Palimpseste.Game.PlayModeTests
                 yield return null;
                 Assert.IsTrue(beam == null, "The visual tail must clean itself up promptly.");
                 TestContext.WriteLine("real_luna_beam: packet=" + packet.description_sha256 +
-                    " cast=true line_positions=2 damage_milli=" + lab.DamageMilli +
+                    " cast=true source_path_points=" + pathAsset.points.Count +
+                    " line_positions=" + realLinePositions + " damage_milli=" + lab.DamageMilli +
                     " expired=true afterimage_cleaned=true");
             }
             finally
@@ -159,6 +167,17 @@ namespace Palimpseste.Game.PlayModeTests
             foreach (var source in UnityEngine.Object.FindObjectsByType<AudioSource>(FindObjectsSortMode.None))
                 if (source.clip != null && source.clip.name == "palimpseste-birth") count++;
             return count;
+        }
+
+        private static string ExpectedDescriptionSha()
+        {
+            var value = Environment.GetEnvironmentVariable("PALIMPSESTE_REAL_PROBE_DESCRIPTION_SHA256");
+            Assert.IsFalse(string.IsNullOrWhiteSpace(value),
+                "Set PALIMPSESTE_REAL_PROBE_DESCRIPTION_SHA256 to the frozen A output hash.");
+            Assert.AreEqual(64, value.Length, "The frozen A output hash must be SHA-256.");
+            foreach (var character in value)
+                Assert.IsTrue(Uri.IsHexDigit(character), "The frozen A output hash must be hexadecimal.");
+            return value.ToLowerInvariant();
         }
 
         private static int FirePixels(Camera camera, RenderTexture target, Texture2D pixels)

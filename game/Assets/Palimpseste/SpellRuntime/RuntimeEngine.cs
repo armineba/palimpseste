@@ -165,14 +165,16 @@ namespace Palimpseste.Game.SpellRuntime
             }
         }
 
-        private void Emit(CarrierState state, string kind, LabReceiver receiver, Vector3 position, Vector3 normal)
+        private void Emit(CarrierState state, string kind, LabReceiver receiver, Vector3 position, Vector3 normal,
+            Vector3? effectForward = null)
         {
             if (state.expired && kind != "expire") return;
             if (receiver != null) Hits++;
             if (kind == "hit" || kind == "block" || kind == "trigger") Play(position, impactClip, .22f);
             if (state.node.effects != null)
                 foreach (var effect in state.node.effects)
-                    if (effect.@event == kind && receiver != null && Matches(effect.target_filter, receiver)) Apply(effect, receiver, position, state.direction);
+                    if (effect.@event == kind && receiver != null && Matches(effect.target_filter, receiver))
+                        Apply(effect, receiver, position, effectForward ?? state.direction);
             foreach (var child in spell.plan.nodes)
                 if (child.activation.parent_id == state.node.node_id && child.activation.@event == kind)
                     Schedule(child, state.castId, position, state.direction, TickCount);
@@ -339,49 +341,155 @@ namespace Palimpseste.Game.SpellRuntime
             var direction = state.direction;
             var visited = new HashSet<int>();
             var segments = new List<Vector3> { from };
-            for (var hop = 0; hop <= Option(opts.chain_hops, 0); hop++)
+            var trace = BeamTrace(state, Option(opts.range_cm, 100) / 100f);
+            if (trace.Count < 2)
             {
-                var reach = (hop == 0 ? Option(opts.range_cm, 100) : Option(opts.chain_radius_cm, 0)) / 100f;
-                if (reach <= 0) break;
-                RaycastHit chosenHit = default;
-                LabReceiver chosen = null;
-                if (hop == 0)
+                if (state.visual != null) state.visual.SetActive(false);
+                return;
+            }
+            // The cast begins inside its own collider, so a swept ray cannot
+            // represent an explicit self receiver. Apply that contact once
+            // at the origin, then ignore the caster collider along the path.
+            if (opts.chain_filter == "self" || opts.chain_filter == "all_actors")
+                foreach (var target in targets)
+                    if (target != null && target.transform.IsChildOf(caster) && Matches(opts.chain_filter, target) &&
+                        visited.Add(target.StableId))
+                        Emit(state, "hit", target, state.position, direction);
+            LabReceiver chosen = null;
+            var hitDirection = direction;
+            for (var i = 1; i < trace.Count; i++)
+            {
+                var delta = trace[i] - from;
+                if (delta.sqrMagnitude < .000001f) continue;
+                var hits = Sorted(Physics.SphereCastAll(from, Option(opts.width_cm, 1) / 200f,
+                    delta.normalized, delta.magnitude, ~0, QueryTriggerInteraction.Ignore));
+                RaycastHit firstHit = default;
+                foreach (var hit in hits)
                 {
-                    var hits = Sorted(Physics.SphereCastAll(from, Option(opts.width_cm, 1) / 200f, direction, reach, ~0, QueryTriggerInteraction.Ignore));
-                    foreach (var hit in hits)
-                    {
-                        var candidate = Receiver(hit.collider);
-                        if (candidate != null && candidate.transform.IsChildOf(caster)) continue;
-                        chosenHit = hit; chosen = candidate; break;
-                    }
+                    var candidate = Receiver(hit.collider);
+                    if (candidate != null && candidate.transform.IsChildOf(caster)) continue;
+                    firstHit = hit; chosen = candidate; break;
                 }
-                else
+                if (firstHit.collider != null)
                 {
-                    var best = float.MaxValue;
-                    foreach (var target in targets)
-                    {
-                        if (visited.Contains(target.StableId) || !Matches(opts.chain_filter, target)) continue;
-                        var delta = target.transform.position - from;
-                        var d = delta.magnitude;
-                        if (d > reach || d >= best) continue;
-                        var occluded = Physics.Raycast(from + Vector3.up * .08f, delta.normalized, out var rayHit, d - .05f) && Receiver(rayHit.collider) != target;
-                        if (occluded) continue;
-                        best = d; chosen = target;
-                    }
-                }
-                if (chosen == null || !Matches(opts.chain_filter, chosen))
-                {
-                    segments.Add(hop == 0 && chosenHit.collider != null ? chosenHit.point : from + direction * reach);
+                    // SphereCast reports the collider surface, while the
+                    // rendered line is the beam centerline. Stop its center
+                    // at the same swept distance used by the physics query.
+                    segments.Add(from + delta.normalized * firstHit.distance);
+                    hitDirection = delta.normalized;
                     break;
                 }
+                segments.Add(trace[i]);
+                from = trace[i];
+            }
+            if (chosen == null || !Matches(opts.chain_filter, chosen))
+            {
+                CarrierVisual.BeamSegments(state, segments);
+                return;
+            }
+            visited.Add(chosen.StableId);
+            var position = chosen.transform.position;
+            Emit(state, "hit", chosen, position, hitDirection, hitDirection);
+            direction = hitDirection;
+            from = position + direction * .08f;
+            for (var hop = 1; hop <= Option(opts.chain_hops, 0); hop++)
+            {
+                var reach = Option(opts.chain_radius_cm, 0) / 100f;
+                if (reach <= 0) break;
+                var sourceReceiver = chosen;
+                chosen = null;
+                var best = float.MaxValue;
+                foreach (var target in targets)
+                {
+                    if (visited.Contains(target.StableId) || !Matches(opts.chain_filter, target)) continue;
+                    var delta = target.transform.position - from;
+                    var d = delta.magnitude;
+                    if (d > reach || d >= best) continue;
+                    var occluded = false;
+                    var hits = Sorted(Physics.SphereCastAll(from, Option(opts.width_cm, 1) / 200f,
+                        delta.normalized, Mathf.Max(0, d - .05f), ~0, QueryTriggerInteraction.Ignore));
+                    foreach (var hit in hits)
+                    {
+                        var receiver = Receiver(hit.collider);
+                        if (receiver == sourceReceiver) continue;
+                        if (receiver != target) occluded = true;
+                        break;
+                    }
+                    if (occluded) continue;
+                    best = d; chosen = target;
+                }
+                if (chosen == null) break;
                 visited.Add(chosen.StableId);
-                var position = chosen.transform.position;
+                position = chosen.transform.position;
                 segments.Add(position);
-                Emit(state, "hit", chosen, position, direction);
                 direction = (position - from).normalized;
+                Emit(state, "hit", chosen, position, direction, direction);
                 from = position + direction * .08f;
             }
             CarrierVisual.BeamSegments(state, segments);
+        }
+
+        // A beam's main trajectory and collision use the same pixel-derived path.
+        // The endpoints define an axis, never an observed stroke start: casting
+        // chooses the forward direction and the drawing supplies lateral bends.
+        private static List<Vector3> BeamTrace(CarrierState state, float range)
+        {
+            var output = new List<Vector3> { state.position };
+            if (range <= 0) return output;
+            var path = state.path;
+            // A missing or collapsed geometry is an invalid packet: do not
+            // silently turn it into a generic straight beam.
+            if (path == null || path.Count < 2) return output;
+            var reverse = path[0].z > path[path.Count - 1].z ||
+                (Mathf.Approximately(path[0].z, path[path.Count - 1].z) && path[0].x > path[path.Count - 1].x);
+            var start = reverse ? path[path.Count - 1] : path[0];
+            var end = reverse ? path[0] : path[path.Count - 1];
+            var axis = end - start;
+            var axisLengthSquared = axis.sqrMagnitude;
+            if (axisLengthSquared < .000001f)
+            {
+                // Closed paths have coincident endpoints. Choose the most
+                // distant sampled point as a stable axis; the actual points
+                // still control the traced silhouette and collisions.
+                var farthest = start;
+                foreach (var candidate in path)
+                    if ((candidate - start).sqrMagnitude > (farthest - start).sqrMagnitude)
+                        farthest = candidate;
+                axis = farthest - start;
+                axisLengthSquared = axis.sqrMagnitude;
+                if (axisLengthSquared < .000001f) return output;
+            }
+            var forward = axis.normalized;
+            var sideways = new Vector3(-axis.z, 0, axis.x).normalized;
+            var travelled = 0f;
+            var forwardDistance = 0f;
+            for (var sample = 1; sample < path.Count; sample++)
+            {
+                var previous = path[reverse ? path.Count - sample : sample - 1];
+                var current = path[reverse ? path.Count - 1 - sample : sample];
+                var step = current - previous;
+                // Unfold any return stroke into cast-forward distance. This
+                // preserves each source segment's length and sideways bend
+                // without allowing the beam to run back toward the caster.
+                forwardDistance += Mathf.Abs(Vector3.Dot(step, forward));
+                var lateral = Vector3.Dot(current - start, sideways);
+                var next = state.position + state.rotation * new Vector3(lateral, 0, forwardDistance);
+                var delta = next - output[output.Count - 1];
+                var length = delta.magnitude;
+                if (length < .0001f) continue;
+                if (travelled + length >= range)
+                {
+                    output.Add(output[output.Count - 1] + delta * ((range - travelled) / length));
+                    return output;
+                }
+                output.Add(next);
+                travelled += length;
+            }
+            // The painted path determines the first part of the beam. Any
+            // remaining range continues straight from its endpoint.
+            if (travelled < range && output.Count > 1)
+                output.Add(output[output.Count - 1] + state.rotation * Vector3.forward * (range - travelled));
+            return output;
         }
 
         private void StepField(CarrierState state, int age)

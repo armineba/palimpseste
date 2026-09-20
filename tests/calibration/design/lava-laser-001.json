@@ -1,0 +1,29 @@
+{
+  "case_id": "design-lava-laser-001",
+  "split": "design",
+  "source": "real_unity_drawing",
+  "reference_sha256": "54320124ebb110898f5d0337fc2ff128c80a03165dbf414c7d9715f9ad8009e5",
+  "drawing_sha256": "36ae7e09e8b1abfb2107bc75a3db9318e02f143a8e69610e4d698790ff68759c",
+  "ink_sha256": "18cda98d1ef7e2a6f2148cfb81998d0b4494ea1e46bc288477459e33f1482afc",
+  "previous_description_sha256": "83c173816320c022a6c02a84c8ded3398f0b75987909d19c98f6e95eb6b36ccc",
+  "previous_verdict": "rejected_in_conversation_not_signed_review",
+  "diagnostic_a_1_2_sha256": "d0c29d6fc344fdfa420abcbcb0af303bf0761b9d7c339d1fd033ccd25d004055",
+  "diagnostic_a_1_3_sha256": "e54dec5810e00aabd0ffcb8f152df06468dd8505593b6718c5b806c46b3254b4",
+  "author_intent": "Laser unidirectionnel de lave, évoqué par le rouge et le brun du trait.",
+  "design_assessment": "Une seule trace sans marque distincte de contact, impact ou récepteur ; lecture conservatrice de faisceau de lave visuel pour D01, à juger humainement sur l'image.",
+  "structural_expectations": {
+    "primary_carrier": "beam",
+    "primary_affinity": "fire",
+    "primary_shape_role": "path",
+    "subject_count": 1,
+    "relation_count": 0,
+    "forbidden_fact_dimensions": ["effect", "target"],
+    "forbidden_event_values": ["hit"]
+  },
+  "human_review": [
+    "Comparer l'image et les observations : le trait rouge-brun, sa continuité et son orientation doivent être décrits sans détail inventé.",
+    "Le texte doit évoquer une matière de lave ou de roche en fusion et une émission vers l'avant en une direction. Le seul fait affinity=fire ne suffit pas à rendre la lave.",
+    "Pour D01, vérifier qu'aucun détail distinct ne montre un contact, un impact ou un récepteur ; la seule couleur lave et le mot laser ne justifient pas un effet ni une cible.",
+    "Regarder le cast Unity, le rendu, le son, la collision et la sauvegarde hors ligne avant toute acceptation du sort."
+  ]
+}

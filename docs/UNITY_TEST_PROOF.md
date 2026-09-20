@@ -1,8 +1,44 @@
 # Preuves Unity — 20 septembre 2026
 
-## Passe actuelle : parcours joueur et accès privé
+## Build actuel : trajectoire de faisceau issue de l'encre
 
-Les sources courantes affichent le dessin après échange automatique d'une invitation
+Unity 6000.3.24f1 a construit `game/Build/WindowsPlayerBeamGeometryReady/` en
+Windows x64 IL2CPP/URP : 29 fichiers, 122 093 149 octets. Le SHA-256 de
+`Palimpseste.exe` est
+`049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`,
+celui de `GameAssembly.dll`
+`200BB3A65EC799D316C769D54CDB4F03A90BB7627B58B22FECA8A2CFEEB81A9E`
+et celui de `resources.assets`
+`62F6544B03BD5E70F556ACE80EDC282E684073B5DE6E8C7CF0998E2C2D072F5F`.
+Le shader URP `LavaBeam` préautorisé y est inclus. Les tests ciblés du chemin
+de pixels de la silhouette principale ont passé **2/2**. Le paquet de
+vérification compilé à partir de A `1.3`/B `1.1` et de l'encre réelle a passé
+les tests Direct3D 12 **2/2** : 111 points source, 94 points visibles,
+**36 440 pixels rouges** puis zéro après nettoyage, sans dégât. La suite
+PlayMode complète a donné **4 tests passés, 2 sondes facultatives ignorées,
+0 échec**. Les XML, journaux, hashes et limites sont détaillés dans la
+[preuve du rendu géométrique](../evidence/public/unity/beam-geometry-luna-build-2026-09-20.md).
+Ces tests lancent un paquet privé de vérification avec identifiants
+synthétiques, pas un sort publié dans le Player.
+
+Le Player BeamGeometryReady a été inspecté en fenêtre visible, PID 35552
+répondant au contrôle. Le Player LavaReady précédent, avec session propriétaire
+conservée dans le coffre Windows, affichait « Capture reçue / En file d'attente »
+pour un job créé à 06:17 avant son build. Ce Player précédent a repris et
+affiché la capture existante ; son envoi par cette version n'est pas établi.
+La base contient un job `production`
+`queued`, un parchemin `processing` et quatre artefacts : référence, dessin,
+encre et journal. Le dessin est une courbe rouge-brun différente du trait
+droit du corpus de calibration. Voir la
+[preuve de la capture propriétaire](../evidence/public/unity/owner-player-capture-queued-2026-09-20.md).
+Le worker reste arrêté : aucun appel A/B, aucun texte interprété, aucun plan
+et aucun sort n'existent pour **ce job joueur**. La caméra du Player n'a pas
+affiché le paquet Luna de vérification ; aucun son n'a été écouté. Il n'existe
+pas de ZIP de ce build et M7 n'est pas accepté.
+
+## Passe UI antérieure : parcours joueur et accès privé
+
+Les sources de cette passe affichaient le dessin après échange automatique d'une invitation
 privée contre une session joueur, puis les états du job et **le texte réel** de
 l'artefact Luna A validé. L'accès au laboratoire attend le paquet compilé et,
 pour un nouveau parchemin, cette description A vérifiée. La bibliothèque
@@ -15,8 +51,8 @@ dans `StreamingAssets/service.json` contient seulement une URL vide à renseigne
 par l'opérateur ; aucun secret n'est inclus.
 
 Unity **6000.3.24f1**, Windows x64 **IL2CPP**, Universal 3D/URP : EditMode
-**11/11**, PlayMode **2/2** et build IL2CPP réussis. Le dernier journal
-Unity du build indique `Build Finished, Result: Success` puis
+**11/11**, PlayMode **2/2** et build IL2CPP réussis. Le journal
+Unity de ce build indique `Build Finished, Result: Success` puis
 `PALIMPSESTE_BUILD_OK` et une sortie Unity 0 ; le shell qui attendait le
 processus est resté ouvert après l'arrêt de Unity et a été interrompu.
 Les preuves expurgées sont [EditMode XML](../evidence/public/unity/player-flow/editmode.xml),
@@ -26,7 +62,7 @@ Les preuves expurgées sont [EditMode XML](../evidence/public/unity/player-flow/
 restent hors dépôt dans la zone privée de preuves Unity. La compilation finale
 a été relancée après le retour de `preloadedAssets` à la valeur du dépôt.
 
-Le build courant est dans `game/Build/WindowsPlayerFlowOwnerFinal/` : **30 fichiers,
+Le build de cette passe antérieure est dans `game/Build/WindowsPlayerFlowOwnerFinal/` : **30 fichiers,
 122 203 713 octets** hors dossier de sauvegarde Unity. L'exécutable
 `Palimpseste.exe` fait **667 136 octets** ; SHA-256
 `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`.
@@ -51,7 +87,8 @@ archive actuelle n'est revendiquée. Le démarrage d'une API locale de test a
 également été rejeté avant exécution. Après correction du schéma strict,
 une passe doctor a obtenu un JSON A réel conforme au contrat, mais l'a refusé
 faute de métadonnées prouvant le modèle et l'effort effectifs ; B n'a pas démarré.
-Aucun parcours Luna A/B abouti dans Unity n'a eu lieu.
+À cette date de la passe UI, aucun parcours Luna A/B abouti dans Unity
+n'avait eu lieu. Les tests isolés ultérieurs sont consignés ci-dessus.
 Les sections suivantes consignent les essais de l'archive antérieure
 SHA-256 `343A585873220C1511C53C30D37412208FDBC5AD29845F6060C817E4833791C2`.
 
@@ -105,4 +142,9 @@ Le [rapport de l'archive finale](../evidence/public/unity/b28-final-endurance.md
 
 Le [log filtré](../evidence/public/unity/player-b28-final-excerpt.log) contient 79 fenêtres de dix secondes de boucle Unity, entre 1 245,8 et 1 633,6 frames calculées par seconde, avec au plus deux instances actives. Ce compteur n'est pas une mesure des FPS présentés à l'écran. Aucune trace Unity Profiler ni mesure du coût CPU p95 de la logique des sorts n'a été produite ; la croissance mémoire constatée sur onze minutes ne suffit pas à établir une stabilité durable, et la charge n'a pas saturé de nombreuses instances. **B28 reste partiel.** L'essai initial de 77,68 s et ses [13 anciens échantillons](../evidence/public/unity/b28-samples.csv) concernent une archive précédente.
 
-La boucle complète dessin → Luna A → Luna B → compilation → sort issu de ce dessin n'a pas été observée. Le job réel est resté en file d'attente. L'écoute du son, les scénarios physiques exhaustifs, l'installation sur une autre machine et l'acceptation humaine restent ouverts.
+La boucle complète dessin → Luna A → Luna B → compilation → sort issu de ce
+dessin n'a pas été observée. Le job réel créé avant le build LavaReady, puis affiché par celui-ci, est
+toujours en file d'attente, sans tentative fournisseur ; voir la
+[preuve actuelle](../evidence/public/unity/owner-player-capture-queued-2026-09-20.md).
+L'écoute du son, les scénarios physiques exhaustifs, l'installation sur une
+autre machine et l'acceptation humaine restent ouverts.

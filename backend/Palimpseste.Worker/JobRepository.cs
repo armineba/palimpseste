@@ -8,7 +8,7 @@ namespace Palimpseste.Worker;
 public sealed record ClaimedJob(Guid Id, Guid? ParchmentId, Guid? CaptureId, long Fence, string Kind, string State);
 public sealed record CaptureFiles(string ManifestJson, string ManifestSha, string SignatureSeedHex, string DrawingKey, string DrawingSha, string InkKey, string InkSha,
     string ReferenceKey, string ReferenceSha);
-public sealed record StoredDocument(string StorageKey, string Sha256, Guid ArtifactId);
+public sealed record StoredDocument(string StorageKey, string Sha256, Guid ArtifactId, string? PromptVersion = null);
 public sealed record StoredGeometry(string GeometryId, Guid ArtifactId, string StorageKey, string Sha256);
 public sealed record StoredMask(string FileName, Guid ArtifactId, string StorageKey, string Sha256);
 public sealed record AuthoringInput(string DescriptionKey, string DescriptionSha, IReadOnlyList<Guid> GeometryArtifactIds);
@@ -139,24 +139,24 @@ public sealed class JobRepository
     public async Task<StoredDocument?> GetDescriptionAsync(ClaimedJob job, CancellationToken ct)
     {
         await using var cmd = source.CreateCommand("""
-            SELECT a.storage_key,i.description_sha256,a.id FROM interpretations i
+            SELECT a.storage_key,i.description_sha256,a.id,i.prompt_version FROM interpretations i
             JOIN artifacts a ON a.id=i.description_artifact_id WHERE i.job_id=$1
             """);
         cmd.Parameters.AddWithValue(job.Id);
         await using var reader = await cmd.ExecuteReaderAsync(ct);
-        return await reader.ReadAsync(ct) ? new(reader.GetString(0), reader.GetString(1), reader.GetGuid(2)) : null;
+        return await reader.ReadAsync(ct) ? new(reader.GetString(0), reader.GetString(1), reader.GetGuid(2), reader.GetString(3)) : null;
     }
 
     public async Task<StoredDocument?> GetPlanAsync(ClaimedJob job, CancellationToken ct)
     {
         await using var cmd = source.CreateCommand("""
-            SELECT a.storage_key,p.plan_sha256,a.id FROM spell_plans p
+            SELECT a.storage_key,p.plan_sha256,a.id,p.prompt_version FROM spell_plans p
             JOIN artifacts a ON a.id=p.plan_artifact_id
             WHERE p.job_id=$1 AND p.validation_errors IS NULL ORDER BY p.revision LIMIT 1
             """);
         cmd.Parameters.AddWithValue(job.Id);
         await using var reader = await cmd.ExecuteReaderAsync(ct);
-        return await reader.ReadAsync(ct) ? new(reader.GetString(0), reader.GetString(1), reader.GetGuid(2)) : null;
+        return await reader.ReadAsync(ct) ? new(reader.GetString(0), reader.GetString(1), reader.GetGuid(2), reader.GetString(3)) : null;
     }
 
     public async Task<AuthoringInput> GetAuthoringInputAsync(ClaimedJob job, CancellationToken ct)
@@ -336,7 +336,7 @@ public sealed class JobRepository
     }
 
     public async Task SaveDescriptionAsync(ClaimedJob job, Guid attemptId, StoredArtifact artifact,
-        string descriptionJson, string inputHash, CodexResult transport, CancellationToken ct)
+        string descriptionJson, string inputHash, string promptVersion, CodexResult transport, CancellationToken ct)
     {
         await using var conn = await source.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
@@ -344,14 +344,14 @@ public sealed class JobRepository
         await using (var cmd = new NpgsqlCommand("""
             INSERT INTO interpretations(id,job_id,provider_attempt_id,description,description_artifact_id,
                 description_sha256,prompt_version,input_sha256)
-            VALUES($1,$2,$3,$4::jsonb,$5,$6,'sp.prompt.a/1.1',$7)
+            VALUES($1,$2,$3,$4::jsonb,$5,$6,$7,$8)
             ON CONFLICT(job_id) DO NOTHING
             """, conn, tx))
         {
             cmd.Parameters.AddWithValue(Guid.NewGuid()); cmd.Parameters.AddWithValue(job.Id);
             cmd.Parameters.AddWithValue(attemptId); cmd.Parameters.AddWithValue(descriptionJson);
             cmd.Parameters.AddWithValue(artifact.Id); cmd.Parameters.AddWithValue(artifact.Sha256);
-            cmd.Parameters.AddWithValue(inputHash);
+            cmd.Parameters.AddWithValue(promptVersion); cmd.Parameters.AddWithValue(inputHash);
             if (await cmd.ExecuteNonQueryAsync(ct) != 1) throw new InvalidOperationException("description_already_frozen");
         }
         await CompleteSuccessfulAttemptInTransactionAsync(conn, tx, job, attemptId, artifact.Sha256, transport, ct);
@@ -391,20 +391,21 @@ public sealed class JobRepository
     }
 
     public async Task SavePlanAsync(ClaimedJob job, Guid attemptId, StoredArtifact artifact,
-        string planJson, CodexResult transport, CancellationToken ct)
+        string planJson, string promptVersion, CodexResult transport, CancellationToken ct)
     {
         await using var conn = await source.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
         await InsertArtifactAsync(conn, tx, job, artifact, "plan", ct);
         await using (var cmd = new NpgsqlCommand("""
-            INSERT INTO spell_plans(id,job_id,provider_attempt_id,revision,plan,plan_artifact_id,plan_sha256)
-            VALUES($1,$2,$3,0,$4::jsonb,$5,$6)
+            INSERT INTO spell_plans(id,job_id,provider_attempt_id,revision,plan,plan_artifact_id,plan_sha256,prompt_version)
+            VALUES($1,$2,$3,0,$4::jsonb,$5,$6,$7)
             ON CONFLICT(job_id,revision) DO NOTHING
             """, conn, tx))
         {
             cmd.Parameters.AddWithValue(Guid.NewGuid()); cmd.Parameters.AddWithValue(job.Id);
             cmd.Parameters.AddWithValue(attemptId); cmd.Parameters.AddWithValue(planJson);
             cmd.Parameters.AddWithValue(artifact.Id); cmd.Parameters.AddWithValue(artifact.Sha256);
+            cmd.Parameters.AddWithValue(promptVersion);
             if (await cmd.ExecuteNonQueryAsync(ct) != 1) throw new InvalidOperationException("plan_already_frozen");
         }
         await CompleteSuccessfulAttemptInTransactionAsync(conn, tx, job, attemptId, artifact.Sha256, transport, ct);

@@ -1,0 +1,7 @@
+# Lecteur connecté au laboratoire local — 20 septembre 2026
+
+Le lecteur Windows `game/Build/WindowsPlayerFeedbackPlayable/Palimpseste.exe` a été lancé en fenêtre visible sur le compte `DESKTOP-457AH3U\Utilisateur`. Le processus `Palimpseste.exe` PID 30444 était encore actif et répondant au contrôle. L'API `Palimpseste.Api.exe` PID 25848 et son parent PowerShell PID 22372 tournaient sous `DESKTOP-457AH3U\PalRuntimeSvc`; `GET http://127.0.0.1:18080/health/ready` a répondu HTTP 200.
+
+Une invitation locale à usage unique a été consommée. Le fichier d'invitation a été retiré du répertoire du lecteur, et le journal privé du Player contient le marqueur `PALIMPSESTE_CREDENTIAL_WRITE_OK`; aucun jeton n'est recopié ici. Le contrôle de la base a trouvé l'identité propriétaire liée à un parchemin `blank`. L'écran a été inspecté visuellement : « Laboratoire prêt. Votre dessin peut commencer », parchemin vierge à trois régions, outils de pinceau et d'encre visibles. La capture privée `E:\Palimpseste\.runtime\operator-staging\player-owner-visible-20260920.png` a pour SHA-256 `BC147A6407B47DA2F86EF7BDEB5613561CCE34F61423C0043F7560E2C7AD6466`; elle n'est pas publiée dans le dépôt.
+
+Cette observation prouve l'entrée dans le dessin connecté sur ce PC. Elle ne prouve pas une capture engagée, la réponse d'un job joueur, le formulaire de retour envoyé depuis Unity, un sort téléchargé ou son lancement. Le worker Luna joueur est encore fermé, et aucune exposition publique du service n'a été effectuée.

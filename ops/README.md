@@ -115,14 +115,21 @@ normaux :
   -SpecRoot 'E:\PalimpsesteRuntime\spec' `
   -ReferencePng 'E:\PalimpsesteRuntime\artifacts\reference.png' `
   -DrawingPng 'E:\PalimpsesteRuntime\artifacts\drawing.png' `
-  -GeometryJson 'E:\PalimpsesteRuntime\artifacts\geometry.json' `
+  -InkPng 'E:\PalimpsesteRuntime\artifacts\ink.png' `
   -EvidencePath 'E:\PalimpsesteRuntime\evidence\pending\doctor-active.json'
 ```
 
 Le mode actif exige que les fichiers soient sous les racines dÃ©clarÃ©es, envoie
-les deux images Ã  A puis la description figÃ©e Ã  B, valide les versions de
-schÃ©ma et archive les rÃ©pertoires de tentative. Il nâ€™est jamais appelÃ© par les
-routes `/health`.
+les deux images Ã  A, rÃ©sout la gÃ©omÃ©trie depuis sa description et l'encre avec
+le mÃªme `GeometryResolver` que le worker, puis envoie cette gÃ©omÃ©trie Ã  B.
+`GeometryJson` est refusÃ© pour Ã©viter une gÃ©omÃ©trie provisoire dÃ©synchronisÃ©e.
+Il nâ€™est jamais appelÃ© par les routes `/health`.
+
+Pour ajuster B sans rÃ©pÃ©ter un appel A, `-Mode plan` prend le fichier JSON A
+figÃ© sous `artifacts` ou `attempts`, son SHA-256 exact avec `-FrozenASha256`,
+et la mÃªme encre avec `-InkPng`. Seul B appelle Luna. La preuve indique
+explicitement que A a Ã©tÃ© rÃ©utilisÃ©e; ce mode ne constitue pas une nouvelle
+preuve A/B de compatibilitÃ© d'effort.
 
 Apres un actif reussi, l'operateur examine les preuves A/B et l'attestation
 fournisseur, copie le JSON dans `approved-evidence`, calcule le SHA-256 de la copie et
@@ -236,3 +243,10 @@ PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_SHA256=$hash
 
 Le JSON doit rester immuable apres son hash; relancer le doctor avec `--write`
 sur le meme chemin exige une nouvelle revue et un nouveau hash.
+
+Pour le laboratoire proprietaire actuel, `start-owner-api.ps1` lance l'API
+sur `127.0.0.1:18080` sous `PalRuntimeSvc`. Le worker reste arrete tant que
+la revue humaine et la preuve A/B composite ne sont pas admises. La procedure
+exacte, le binaire candidat et ses hashes sont dans
+[`OWNER_WORKER_CUTOVER.md`](../docs/ops/OWNER_WORKER_CUTOVER.md) ;
+`start-owner-worker.ps1` refuse le verrou ferme avant tout lancement.
