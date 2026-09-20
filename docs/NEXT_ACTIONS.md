@@ -1,6 +1,16 @@
 # Point de reprise immédiat
 
-## Priorité actuelle — laisser le créateur tester D14 dans le jeu ouvert
+## Priorité actuelle — laisser finir l'affinage du sort repris en 1.4.1
+
+L'essai utilisateur `7ed4561feffd43ebbafe48d9b960716d` a réussi A/G/B, puis échoué dans la capture : processus Unity code 0, **quatre PNG noirs identiques**, mesure **11915,2178 FPS** rejetée par la borne `10000`, état remonté `worker_exception`. L'image générée et le plan existent ; ce blocage ne justifie pas de les régénérer.
+
+**Le correctif `1.4.1` est construit, empaqueté, déployé et ouvert**, PID `2140`, API `25220`, worker `21488`. Le [manifeste](../evidence/public/unity/lifecycle-delivery.json) atteste le ZIP de 44 367 955 octets, SHA-256 `15e056a3e21ae1549c3af857ca03cbdaf3a1394b4e0369511c9da77ce3489416`. Seul le job bloqué a été repris, avec dessin, description, image et plan conservés. Sa capture runtime s'est achevée avec quatre SHA distincts ; **aucun nouvel A/G/B initial**.
+
+1. Laisser la reprise suivre son cours sans lancer de campagne indépendante. À **23:28:06 Paris le 20 septembre 2026**, le job est `refining_visuals`, J réussi avec **2250/10000** et `lifecycle_faithful=false`, correction B en cours. Il n'est pas encore `ready`. [Preuve et limites](../evidence/public/backend/lifecycle-capture-fix-2026-09-20.json).
+2. Quand le sort devient disponible, laisser le créateur le lancer dans le laboratoire et recueillir son verdict. Une capture techniquement achevée et une critique réussie ne valent pas acceptation artistique ; le score actuellement observé ne permet pas d'annoncer la fidélité corrigée.
+3. Consigner le résultat effectivement atteint et la latence. Ne pas régénérer l'image ou la description conservées, ne pas relancer de test, diagnostic ou capture indépendante.
+
+## Historique — laisser le créateur tester D14 dans le jeu ouvert
 
 **Le Player `1.4.0` est ouvert, PID `36512` ; le service D14 est déployé localement.** Build et packaging réussis, code 0 ; le [manifeste Player](../evidence/public/unity/lifecycle-delivery.json) atteste 29 fichiers, 122 857 102 octets et un ZIP de 44 366 062 octets, SHA-256 `98a3dd7315ea6f1c327ab7bba38b5464923e65ed19dd4a7ee4da8efe7895da36`. Migration `009` appliquée, renderer protégé installé, API `16768` et worker `26260` démarrés. [Preuve D14](../evidence/public/backend/lifecycle-2026-09-20.json). Le CoreSmoke déjà réussi précède la dernière consigne du créateur : **plus de tests, appels modèle ni captures de validation par le développement pour cette livraison**.
 

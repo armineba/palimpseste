@@ -1,12 +1,12 @@
 {
-    "observed_at":  "2026-09-20T21:11:07.6284489+00:00",
-    "version":  "1.4.0",
+    "observed_at":  "2026-09-20T21:32:31.8227914+00:00",
+    "version":  "1.4.1",
     "file":  "deliverables/Palimpseste-Backend-Windows-x64.zip",
-    "bytes":  243834389,
-    "sha256":  "1e6d24b17f7d17620e5c8c8376bc1eee7bdc3b202c7e06feea266c581717467c",
+    "bytes":  243840885,
+    "sha256":  "eb0d79847d6bb16b01516646c8cd1f62126ceeea5968e512036fe47a377d8637",
     "publish_exit":  0,
-    "model_calls_by_development":  0,
-    "gameplay_tested_by_development":  false,
-    "runtime_deployment":  "evidence/public/backend/lifecycle-2026-09-20.json",
-    "notes":  "Previously published binaries retained; operator scripts and final documentation refreshed without rebuilding."
+    "independent_tests_executed":  false,
+    "independent_diagnostics_executed":  false,
+    "runtime_deployment":  "evidence/public/backend/lifecycle-capture-fix-2026-09-20.json",
+    "notes":  "The user job resumed from frozen A/G/B checkpoints; runtime visual refinement is distinct from independent development tests."
 }

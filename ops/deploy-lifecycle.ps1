@@ -11,7 +11,7 @@ $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\')
 $stage = [IO.Path]::GetFullPath($StageRoot).TrimEnd('\')
 if ($runtime -ine 'E:\PalimpsesteRuntime') { throw 'Unexpected runtime root.' }
-if (-not $PlayerRoot) { $PlayerRoot = Join-Path $repo 'game\Build\WindowsLifecyclePlayable' }
+if (-not $PlayerRoot) { $PlayerRoot = Join-Path $repo 'game\Build\WindowsLifecycleCaptureFixPlayable' }
 $player = [IO.Path]::GetFullPath($PlayerRoot).TrimEnd('\')
 $utf8 = [Text.UTF8Encoding]::new($false)
 $service = "$env:COMPUTERNAME\PalRuntimeSvc"
@@ -82,7 +82,7 @@ foreach ($relative in @('worker\Palimpseste.Worker.exe','api\Palimpseste.Api.exe
     if (-not (Test-Path -LiteralPath (Join-Path $stage $relative) -PathType Leaf)) { throw 'D14 stage incomplete.' }
 }
 $delivery = Get-Content -LiteralPath (Join-Path $repo 'evidence\public\unity\lifecycle-delivery.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ($delivery.client_version -cne '1.4.0' -or $delivery.build_exit -ne 0) { throw 'Successful D14 build required.' }
+if ($delivery.client_version -cne '1.4.1' -or $delivery.build_exit -ne 0) { throw 'Successful 1.4.1 capture-fix build required.' }
 foreach ($file in $delivery.files) {
     $source = Join-Path $player $file.file; Under $source $player
     if ((Digest $source) -cne $file.sha256) { throw 'Player differs from compiled delivery.' }
@@ -93,7 +93,7 @@ $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid(
 $logRoot = Join-Path $runtime ('evidence\pending\lifecycle-install-' + $stamp)
 New-Item -ItemType Directory -Path $logRoot | Out-Null
 Protect $logRoot
-$record = [ordered]@{version='1.4.0'; started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
+$record = [ordered]@{version='1.4.1'; started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
     spell_generations=0; diagnostics_executed=$false; gameplay_tested=$false; visual_acceptance='pending_owner'; native_sha256=$originalNative}
 function Save-Record { [IO.File]::WriteAllText((Join-Path $logRoot 'installation.json'),($record | ConvertTo-Json -Depth 7),$utf8) }
 Save-Record
@@ -103,7 +103,7 @@ $renderFiles = @(Get-ChildItem -LiteralPath $render -Recurse -File | Sort-Object
     [ordered]@{file=$_.FullName.Substring($render.Length+1).Replace('\','/');sha256=Digest $_.FullName}
 })
 $renderManifest = Join-Path $render 'renderer-manifest.json'
-[IO.File]::WriteAllText($renderManifest,([ordered]@{version='1.4.0';files=$renderFiles} | ConvertTo-Json -Depth 5),$utf8)
+[IO.File]::WriteAllText($renderManifest,([ordered]@{version='1.4.1';files=$renderFiles} | ConvertTo-Json -Depth 5),$utf8)
 Protect $renderManifest
 $record.renderer_manifest_sha256 = Digest $renderManifest
 $record.renderer = Join-Path $render 'Palimpseste.exe'; Save-Record

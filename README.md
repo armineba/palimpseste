@@ -2,7 +2,13 @@
 
 Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le parcours est : **dessin libre → description → image générée → composition 3D/VFX contrôlée → sort jouable dans le laboratoire**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
-## D14 livré localement — cycle de vie et critique visuelle
+## Correctif actuel — Player 1.4.1, sort joueur en affinage
+
+Le Player **1.4.1** est construit, empaqueté, déployé et ouvert sur le poste d'origine. Il corrige la capture URP qui produisait quatre PNG noirs après la réussite A/G/B d'un vrai dessin joueur. Le job concerné a repris avec sa description, son image et son plan conservés ; la nouvelle capture s'est terminée et le critique J a réellement répondu. À **23:28:06 Paris, le 20 septembre 2026**, son score est **2250/10000**, le cycle encore jugé non fidèle et B poursuit la correction : **le sort n'est pas encore prêt ni accepté visuellement**. [Preuve](evidence/public/backend/lifecycle-capture-fix-2026-09-20.json), [livraison Player](evidence/public/unity/lifecycle-delivery.json), [reprise](docs/NEXT_ACTIONS.md).
+
+Les captures et appels observés appartiennent à la reprise de ce job joueur ; aucun test ou diagnostic indépendant n'a été ajouté. Le verdict humain et le rendu final dans le laboratoire restent à recueillir.
+
+## Historique D14 / 1.4.0 — cycle de vie et critique visuelle
 
 Le **Player `1.4.0` a été construit, empaqueté et ouvert sur le poste d'origine** ; son [manifeste](evidence/public/unity/lifecycle-delivery.json) atteste 29 fichiers et un ZIP de 44 366 062 octets. Le backend D14 est déployé, la migration `009` appliquée et le renderer protégé installé : [preuve de livraison locale](evidence/public/backend/lifecycle-2026-09-20.json). Le texte pilote quatre phases : apparition, activité, réaction au contact et disparition naturelle. L'image fixe la cible visuelle ; un renderer Unity précompilé réalise les captures runtime, puis une nouvelle session critique J guide les corrections bornées du plan. Les modèles n'ont aucun accès aux outils de code, aux builds ou au lancement du renderer.
 

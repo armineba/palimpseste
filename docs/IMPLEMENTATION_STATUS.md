@@ -1,6 +1,16 @@
 # État de réalisation et point de reprise
 
-## État courant — D14 / 1.4.0 déployé localement et ouvert pour le créateur
+## État courant — correctif D14 / 1.4.1 livré, reprise du sort en affinage
+
+Le job joueur réel `7ed4561feffd43ebbafe48d9b960716d` a réussi **A, G et B**, puis s'est arrêté après l'image. Le processus de capture Unity a quitté avec le code 0, mais ses **quatre PNG sont noirs et identiques**. Son manifeste rapporte **11915,2178 FPS**, au-dessus de la borne `10000` du lecteur de capture ; le rejet est remonté sous le message générique `worker_exception`. Une sortie de processus réussie ne prouve donc pas qu'une image du sort a été rendue.
+
+Ces constats viennent de **l'essai demandé et lancé par le créateur**, pas d'une campagne de validation indépendante. Le correctif `1.4.1` utilise un rendu URP explicite, identifie les erreurs de capture et permet une reprise authentifiée par le propriétaire. **Build, packaging et déploiement ont réussi avec le code 0.** Le [manifeste Player](../evidence/public/unity/lifecycle-delivery.json) atteste 29 fichiers, 122 861 334 octets, ZIP 44 367 955 octets, SHA-256 `15e056a3e21ae1549c3af857ca03cbdaf3a1394b4e0369511c9da77ce3489416`. Le Player corrigé est ouvert, PID `2140` ; API `25220`, worker `21488`, renderer protégé déployé. [Preuve du correctif et de la reprise](../evidence/public/backend/lifecycle-capture-fix-2026-09-20.json).
+
+Seul le job bloqué a été repris après vérification de ses documents et de son verrou : une ligne réadmise en `refining_visuals`, entrée initiale conservée, **aucun nouvel A, G ou B initial**. La capture runtime suivante est terminée : quatre phases 1024 × 1024 aux SHA distincts, 59 rendus caméra achevés. La mesure est **71,1397 rendus/s**, sur 54 images et 0,7590697 s, avec lecture GPU synchrone ; elle exclut démarrage/encodage PNG et ne mesure pas les FPS de gameplay. Les images joueur ne sont pas publiées dans les preuves.
+
+**État observé le 20 septembre 2026 à 23:28:06, heure de Paris :** J a réellement réussi et donné **2250/10000**, `lifecycle_faithful=false` ; la correction B suivante est en cours, état `refining_visuals`, sans erreur. Le défaut de capture a donc été franchi, mais le sort n'est pas encore `ready` et sa fidélité reste insuffisante selon J. Aucun nouveau test ou diagnostic indépendant n'a été exécuté ; les captures et appels constatés appartiennent à la reprise du job joueur. L'achèvement, le rendu en laboratoire et le verdict humain restent ouverts.
+
+## Historique — D14 / 1.4.0 déployé localement et ouvert pour le créateur
 
 La description définit désormais **quatre phases par sujet : apparition, activité, réaction au contact et disparition naturelle sans contact**. L'image générée reste la cible du moment actif. A `sp.prompt.a/2.3` décrit ce cycle ; B `sp.prompt.b/2.2` le traduit en profils d'animation et de VFX bornés. Le renderer Unity, fixé et compilé par le développement, exécute ces données sans produire de code depuis les dessins.
 

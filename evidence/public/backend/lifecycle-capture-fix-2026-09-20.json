@@ -1,0 +1,99 @@
+{
+  "version": "1.4.1",
+  "scope": "Correction and guarded continuation of one real player job; no independent diagnostic or gameplay test",
+  "job_id": "7ed4561feffd43ebbafe48d9b960716d",
+  "original_failure": {
+    "initial_stages": { "A": "success", "G": "success", "B": "success" },
+    "renderer_exit_code": 0,
+    "frames": "Four identical black PNGs observed during the player's job",
+    "reported_fps": 11915.2178,
+    "fps_guard_maximum": 10000,
+    "reported_error": "worker_exception"
+  },
+  "delivery": {
+    "unity_build_exit_code": 0,
+    "unity_build_success_excerpt": "evidence/public/unity/lifecycle-capture-fix/build-result.log",
+    "unity_build_log_sha256": "24ff2a22620299dbeb2df3496d37799b182af9afdeabf70a230218bf61c4db21",
+    "game_assembly_sha256": "322ad65da191e158080448414f15f3034c419ce6f3e87bebd6051ae3b256b467",
+    "player_packaging_exit_code": 0,
+    "player_zip_bytes": 44367955,
+    "player_zip_sha256": "15e056a3e21ae1549c3af857ca03cbdaf3a1394b4e0369511c9da77ce3489416",
+    "player_files": 29,
+    "player_unpacked_bytes": 122861334,
+    "manifest": "evidence/public/unity/lifecycle-delivery.json",
+    "player_pid": 2140,
+    "player_opened_at": "2026-09-20T21:27:19.1918137Z"
+  },
+  "installation": {
+    "source_private_report_sha256": "9fd400c7b0c5dc5f98979a912655b84467ad6982a14bb84d31967a7050c5358b",
+    "started_at": "2026-09-20T21:25:43.1006318+00:00",
+    "completed_at": "2026-09-20T21:25:56.2803521+00:00",
+    "exit_code": 0,
+    "phase": "services_started",
+    "completed": true,
+    "migration_009_applied": true,
+    "renderer_manifest_sha256": "92cda9e0b7983cd7571106bcfc1aaffdedd91874ad81d5cb79c35fc39133196c",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "worker_sha256": "5508a1305027d6c13d9df17e36045acdcb5726752fc9625bbc0d99c2ea8d22f8",
+    "api_sha256": "c8814e7fbc4797ddcfd1d27a5574e65cba290f548e87f7c4c3ab113acc41fe8e",
+    "worker_pid": 21488,
+    "api_pid": 25220,
+    "diagnostics_executed": false,
+    "gameplay_tested": false
+  },
+  "guarded_resume": {
+    "source": "Operator observation of guarded database update",
+    "matching_rows_updated": 1,
+    "prior_fence": 1,
+    "state_after_readmission": "refining_visuals",
+    "description_plan_and_reference_guards_checked": true,
+    "original_input_preserved": true,
+    "new_A_calls": 0,
+    "new_G_calls": 0,
+    "new_initial_B_calls": 0
+  },
+  "runtime_capture": {
+    "source": "Metadata read from the completed capture manifest; player images not opened or copied",
+    "manifest_sha256": "2f69e241c9d98354cb0765f6544ad2b48d4dc2a842be05400701c03d08413065",
+    "manifest_last_write_utc": "2026-09-20T21:27:02.9211400Z",
+    "completed": true,
+    "presentation_only": true,
+    "gameplay_executed": false,
+    "provider_calls_by_capture": 0,
+    "measured_fps": 71.13971220297688,
+    "measured_frames": 54,
+    "measured_seconds": 0.7590697,
+    "completed_camera_renders": 59,
+    "measurement_scope": "Explicit 1024x1024 URP requests with synchronous full-frame GPU readback; excludes startup and PNG encoding; not gameplay FPS",
+    "capture_method": "URP StandardRequest, precompiled presentation stage, real lifecycle animation, separate contact and expiration replays",
+    "distinct_frame_sha256_count": 4,
+    "frames": [
+      { "phase": "appearance", "sha256": "9d607a29b777e7f56d5a92f93ba0facaba096e2180c327ba247982097979f603", "width_px": 1024, "height_px": 1024 },
+      { "phase": "active", "sha256": "db6503c700d03bd4d7b7ea0c2fedeb295e0e2db2d4808f4a78f0181a0f2a25c2", "width_px": 1024, "height_px": 1024 },
+      { "phase": "contact", "sha256": "3c733ceecf0c5a2e166b9044c640d9e8f49eec4a6e40ffc2fd078118b364d2b7", "width_px": 1024, "height_px": 1024 },
+      { "phase": "expiration", "sha256": "3b8c119d33859ec0d4fdedc376712598d4b7e947095de506250d9ee4c63dbafa", "width_px": 1024, "height_px": 1024 }
+    ]
+  },
+  "latest_job_observation": {
+    "source": "Operator database observation",
+    "observed_at": "2026-09-20T21:28:06Z",
+    "state": "refining_visuals",
+    "error": null,
+    "attempt_count": 5,
+    "J_outcome": "success",
+    "J_score": 2250,
+    "J_score_maximum": 10000,
+    "J_lifecycle_faithful": false,
+    "B_visual_correction": "running",
+    "ready": false,
+    "final_outcome": "not_yet_observed"
+  },
+  "validation_limits": {
+    "independent_tests_executed": false,
+    "independent_diagnostics_executed": false,
+    "player_images_published": false,
+    "visual_fidelity_accepted": false,
+    "human_acceptance": "pending_owner",
+    "gameplay_and_sound_in_final_lab": "not_yet_observed"
+  }
+}

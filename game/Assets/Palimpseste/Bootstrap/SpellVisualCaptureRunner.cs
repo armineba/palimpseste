@@ -30,10 +30,12 @@ namespace Palimpseste.Game.Bootstrap
         private readonly List<GameObject> carriers = new List<GameObject>();
         private readonly List<object> frames = new List<object>();
         private Camera captureCamera;
+        private RenderPipeline.StandardRequest renderRequest;
         private RenderTexture target;
         private Texture2D readback, srgb;
         private float startup;
         private int measuredFrames;
+        private int completedCameraRenders;
         private double measuredSeconds;
         private bool finished;
         private Bounds compositionBounds;
@@ -87,19 +89,22 @@ namespace Palimpseste.Game.Bootstrap
             var introDuration = packet.plan.nodes.Max(node => node.appearance.lifecycle.intro.duration_ms) / 1000f;
             var phaseStarted = Time.time;
             while (Time.time - phaseStarted < introDuration * .45f) yield return null;
-            yield return null; // the preceding GPU frame has completed
+            yield return null;
             Capture("appearance");
             while (Time.time - phaseStarted < introDuration + .1f) yield return null;
 
-            // Real uncapped rendered frames, without PNG encoding, startup or
-            // fixed captureFramerate. This is a presentation-stage measurement.
-            var measuredStart = Time.realtimeSinceStartup;
-            while (Time.realtimeSinceStartup - measuredStart < .75f)
+            // A batch player does not automatically render its enabled cameras.
+            // Count only explicit URP requests whose complete target has been
+            // read back from the GPU. Empty Update ticks are not rendered FPS.
+            RenderAndReadback(); // warm the renderer before measuring it
+            var measuredStart = System.Diagnostics.Stopwatch.GetTimestamp();
+            while (ElapsedSeconds(measuredStart) < .75)
             {
                 yield return null;
+                RenderAndReadback();
                 measuredFrames++;
             }
-            measuredSeconds = Time.realtimeSinceStartup - measuredStart;
+            measuredSeconds = ElapsedSeconds(measuredStart);
             Capture("active");
 
             var contactDelay = BeginEnding(true);
@@ -202,10 +207,14 @@ namespace Palimpseste.Game.Bootstrap
             var cameraObject = new GameObject("Independent visual comparison camera");
             cameraObject.transform.SetParent(transform,false);
             captureCamera = cameraObject.AddComponent<Camera>();
+            // All rendering is explicit, including in non-batch invocations.
+            // This avoids counting an automatic second render of the stage.
+            captureCamera.enabled = false;
             captureCamera.clearFlags = CameraClearFlags.SolidColor;
             captureCamera.backgroundColor = new Color(.018f,.023f,.034f);
             captureCamera.allowHDR = true;
             captureCamera.fieldOfView = 38;
+            captureCamera.aspect = 1;
             captureCamera.nearClipPlane = .03f;
             captureCamera.farClipPlane = 200;
             var cameraData = cameraObject.AddComponent<UniversalAdditionalCameraData>();
@@ -215,6 +224,8 @@ namespace Palimpseste.Game.Bootstrap
             cameraData.volumeTrigger = captureCamera.transform;
             target = new RenderTexture(Resolution,Resolution,24,RenderTextureFormat.ARGBHalf,RenderTextureReadWrite.Linear);
             target.Create(); captureCamera.targetTexture = target;
+            renderRequest = new RenderPipeline.StandardRequest { destination = target };
+            RenderPipelineManager.endCameraRendering += OnCameraRendered;
             readback = new Texture2D(Resolution,Resolution,TextureFormat.RGBAFloat,false,true);
             srgb = new Texture2D(Resolution,Resolution,TextureFormat.RGB24,false,false);
             var profile = Resources.Load<VolumeProfile>("LabVfxVolume");
@@ -307,25 +318,66 @@ namespace Palimpseste.Game.Bootstrap
 
         private void Capture(string phase)
         {
-            var previous = RenderTexture.active;
-            byte[] bytes;
-            try
+            RenderAndReadback();
+            var pixels = readback.GetPixels();
+            var minimum = new Vector3(float.MaxValue,float.MaxValue,float.MaxValue);
+            var maximum = new Vector3(float.MinValue,float.MinValue,float.MinValue);
+            for (var i = 0; i < pixels.Length; i++)
             {
-                RenderTexture.active = target;
-                readback.ReadPixels(new Rect(0,0,Resolution,Resolution),0,0);
-                readback.Apply(false,false);
-                var pixels = readback.GetPixels();
-                for (var i = 0; i < pixels.Length; i++) pixels[i] = pixels[i].gamma;
-                srgb.SetPixels(pixels); srgb.Apply(false,false);
-                bytes = srgb.EncodeToPNG();
+                var color = pixels[i];
+                if (!Finite(color.r) || !Finite(color.g) || !Finite(color.b))
+                    throw new InvalidDataException("GPU capture contains non-finite pixels: " + phase);
+                var rgb = new Vector3(color.r,color.g,color.b);
+                minimum = Vector3.Min(minimum,rgb); maximum = Vector3.Max(maximum,rgb);
+                // The render target retains linear HDR through URP's bloom
+                // and tone mapping. Encode display sRGB only after readback.
+                pixels[i] = QualitySettings.activeColorSpace == ColorSpace.Linear ? color.gamma : color;
             }
-            finally { RenderTexture.active = previous; }
+            var variation = maximum - minimum;
+            if (Mathf.Max(variation.x,Mathf.Max(variation.y,variation.z)) < .0001f)
+                throw new InvalidDataException("GPU capture is uniform; no visible spell rendered: " + phase);
+            srgb.SetPixels(pixels); srgb.Apply(false,false);
+            var bytes = srgb.EncodeToPNG();
             if (bytes == null || bytes.Length < 1000) throw new InvalidDataException("GPU capture produced no image");
             var file = phase + ".png";
             var path = Path.Combine(outputDirectory,file);
             EnsureOrdinaryPath(path);
             File.WriteAllBytes(path,bytes);
             frames.Add(new { phase,file,sha256 = ParchmentStore.Hash(bytes),width_px = Resolution,height_px = Resolution });
+        }
+
+        private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
+        private static double ElapsedSeconds(long started) =>
+            (System.Diagnostics.Stopwatch.GetTimestamp() - started) / (double)System.Diagnostics.Stopwatch.Frequency;
+
+        private void OnCameraRendered(ScriptableRenderContext context, Camera camera)
+        {
+            if (camera == captureCamera) completedCameraRenders++;
+        }
+
+        private void RenderAndReadback()
+        {
+            if (captureCamera == null || target == null || !target.IsCreated() || renderRequest == null)
+                throw new InvalidOperationException("Explicit GPU capture is not initialized");
+            var previous = RenderTexture.active;
+            var before = completedCameraRenders;
+            try
+            {
+                // A StandardRequest runs URP's full frame initialization and
+                // this single camera's postprocessing in batch mode. The stage
+                // has no overlay stack. Unlike SingleCameraRequest this also
+                // sets per-frame lighting, shader and renderer globals.
+                // SubmitRenderRequest also initializes the active pipeline
+                // when there has been no automatic camera frame yet.
+                RenderPipeline.SubmitRenderRequest(captureCamera,renderRequest);
+                if (completedCameraRenders <= before)
+                    throw new InvalidOperationException("URP did not complete the requested capture camera");
+                RenderTexture.active = target;
+                // Full-frame synchronous readback waits for submitted GPU
+                // work. A callback alone would only prove CPU submission.
+                readback.ReadPixels(new Rect(0,0,Resolution,Resolution),0,0,false);
+            }
+            finally { RenderTexture.active = previous; }
         }
 
         private void WriteManifest(bool completed, string error)
@@ -339,8 +391,10 @@ namespace Palimpseste.Game.Bootstrap
                 completed, presentation_only = true, gameplay_executed = false, provider_calls = 0,
                 measured_fps = measuredSeconds > 0 ? measuredFrames / measuredSeconds : 0,
                 measured_frames = measuredFrames, measured_seconds = measuredSeconds,
-                measurement_scope = "Uncapped 1024x1024 GPU presentation; excludes startup and PNG encoding; not a gameplay performance test",
-                capture_method = "Separate precompiled three-quarter stage; carrier positions fixed; real lifecycle animation; independent contact and expiration replay",
+                measurement_scope = "Explicit 1024x1024 URP requests completed with synchronous full-frame GPU readback; includes readback cost, excludes startup and PNG encoding; not gameplay FPS",
+                capture_method = "URP StandardRequest for one camera, including full frame initialization; separate precompiled three-quarter stage; carrier positions fixed; real lifecycle animation; independent contact and expiration replay",
+                completed_camera_renders = completedCameraRenders,
+                color_encoding = QualitySettings.activeColorSpace == ColorSpace.Linear ? "Linear HDR readback converted to display sRGB" : "Gamma project readback retained",
                 camera_position = captureCamera == null ? null : new[] { captureCamera.transform.position.x,captureCamera.transform.position.y,captureCamera.transform.position.z },
                 camera_field_of_view = captureCamera == null ? 0 : captureCamera.fieldOfView,
                 elapsed_seconds = Time.realtimeSinceStartup - startup, graphics_device = SystemInfo.graphicsDeviceName,
@@ -365,6 +419,7 @@ namespace Palimpseste.Game.Bootstrap
 
         private void OnDestroy()
         {
+            RenderPipelineManager.endCameraRendering -= OnCameraRendered;
             ClearComposition();
             if (target != null) { target.Release(); Destroy(target); }
             if (readback != null) Destroy(readback);

@@ -1,19 +1,19 @@
 {
-    "observed_at":  "2026-09-20T21:00:19.3799898Z",
-    "client_version":  "1.4.0",
+    "observed_at":  "2026-09-20T21:25:26.0812080Z",
+    "client_version":  "1.4.1",
     "unity":  "6000.3.24f1",
     "backend":  "IL2CPP",
     "build_exit":  0,
     "build_success_marker_observed":  true,
-    "build_log":  "game/Logs/lifecycle-build.log",
-    "build_log_sha256":  "51732e8f3d0cb62e58339bc59f6cd528aee27258d53369a0c22d489d538401b8",
-    "source":  "game/Build/WindowsLifecycleRelease",
-    "playable":  "game/Build/WindowsLifecyclePlayable",
+    "build_log":  "game/Logs/lifecycle-capture-fix-build.log",
+    "build_log_sha256":  "24ff2a22620299dbeb2df3496d37799b182af9afdeabf70a230218bf61c4db21",
+    "source":  "game/Build/WindowsLifecycleCaptureFixRelease",
+    "playable":  "game/Build/WindowsLifecycleCaptureFixPlayable",
     "zip":  "deliverables/Palimpseste-Windows-x64-IL2CPP.zip",
-    "zip_bytes":  44366062,
-    "zip_sha256":  "98a3dd7315ea6f1c327ab7bba38b5464923e65ed19dd4a7ee4da8efe7895da36",
+    "zip_bytes":  44367955,
+    "zip_sha256":  "15e056a3e21ae1549c3af857ca03cbdaf3a1394b4e0369511c9da77ce3489416",
     "files_verified":  29,
-    "playable_bytes":  122857102,
+    "playable_bytes":  122861334,
     "files":  [
                   {
                       "file":  "baselib.dll",
@@ -27,8 +27,8 @@
                   },
                   {
                       "file":  "GameAssembly.dll",
-                      "bytes":  51245056,
-                      "sha256":  "374dbbb0198f4a30076b6130516299d9d039d630b570e0be1ce86b91e5c06201"
+                      "bytes":  51246592,
+                      "sha256":  "322ad65da191e158080448414f15f3034c419ce6f3e87bebd6051ae3b256b467"
                   },
                   {
                       "file":  "Palimpseste.exe",
@@ -43,12 +43,12 @@
                   {
                       "file":  "Palimpseste_Data/boot.config",
                       "bytes":  156,
-                      "sha256":  "11d33ef38a2ca7b05d9eff5bfb56c3416c6d71d8fe562898265efe4c43b0a5ca"
+                      "sha256":  "471dc0be81eb0fdfd3b9871e3783bad88b2ce4ad7f40a0fdd0a48aab3cf41a4b"
                   },
                   {
                       "file":  "Palimpseste_Data/globalgamemanagers",
                       "bytes":  214980,
-                      "sha256":  "d5d5f0422b70a709b214b8eb33b2142529f1a9d2b20bb16caf56e4bb0fcb38f1"
+                      "sha256":  "f56dd85f60fd4ac71023df8e15651db3385ec2c18b0bb3de83b989952358b6e3"
                   },
                   {
                       "file":  "Palimpseste_Data/globalgamemanagers.assets",
@@ -62,8 +62,8 @@
                   },
                   {
                       "file":  "Palimpseste_Data/il2cpp_data/Metadata/global-metadata.dat",
-                      "bytes":  10587164,
-                      "sha256":  "6fe6982453eb04a95d7592d679800d9b4c9f765115cee3d7d5851b3af0940be2"
+                      "bytes":  10589860,
+                      "sha256":  "c96ff761678e2cdb9d3686c360b3472bb0289178dd4b18d94ae20512a389e289"
                   },
                   {
                       "file":  "Palimpseste_Data/il2cpp_data/Resources/mscorlib.dll-resources.dat",
@@ -98,12 +98,12 @@
                   {
                       "file":  "Palimpseste_Data/Plugins/x86_64/lib_burst_generated.dll",
                       "bytes":  381440,
-                      "sha256":  "4f9223882898886f4074215def1a79a09fb5069585db6821f2db1c8575b9e79c"
+                      "sha256":  "1519c6218564936f900f387371e10c15cdf87743f968e1420400332218417def"
                   },
                   {
                       "file":  "Palimpseste_Data/resources.assets",
                       "bytes":  565272,
-                      "sha256":  "57edc4023eaae1ba5768b8fabdde67f59fbc06e0d16755d36da74358f138183f"
+                      "sha256":  "c8803856ca187a87048cf2aa60ea605f7a6cf18a173e608168860669556b46be"
                   },
                   {
                       "file":  "Palimpseste_Data/resources.assets.resS",
@@ -161,8 +161,8 @@
                       "sha256":  "79a54af1c83b5b3bfa34936be18899de49fa88eea6a33ba7351c2163f95f6613"
                   }
               ],
-    "source_commit":  "126c2f8a69bd62560644073e14e97e35b51788d1",
-    "source_snapshot_sha256":  "ccdd34cf6ccf3f1312fae1d2769757198ee8f28bca2a5859bd60e0e19efe9047",
+    "source_commit":  "9341357594d165087a2d83b92c88e566949592e8",
+    "source_snapshot_sha256":  "f032899fc3d0211c60cdeeaa6930b430d7a1033bee7dd1c129092db44bea1b39",
     "source_files":  [
                          {
                              "file":  "game/Assets/InputSystem_Actions.inputactions",
@@ -211,8 +211,8 @@
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Bootstrap/SpellVisualCaptureRunner.cs",
-                             "bytes":  19676,
-                             "sha256":  "d24525cb4c25887a5ec6331999adf39bf8b9188da4ce98390f9f604bbd4c518b"
+                             "bytes":  23384,
+                             "sha256":  "36b2e3913b501039e175e9b652accc1d644eb9867874159a2c5f9fc4355d260c"
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Bootstrap/SpellVisualCaptureRunner.cs.meta",
@@ -242,7 +242,7 @@
                          {
                              "file":  "game/Assets/Palimpseste/Editor/BuildPalimpseste.cs",
                              "bytes":  5731,
-                             "sha256":  "865f2fe87bfec1ca05ac3e2dbf48cabf337fe757cef4bb35855e35bdf03e6367"
+                             "sha256":  "9ffccb0be2cc311fec4094fdf88e73514b26e3d3da71b36300755434919bf1cc"
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Editor/BuildPalimpseste.cs.meta",
@@ -1127,7 +1127,7 @@
                          {
                              "file":  "game/ProjectSettings/ProjectSettings.asset",
                              "bytes":  25565,
-                             "sha256":  "27f50daa9d06cd39c5bcf63455dce9b5a1707592bb0672a416a6854f16c1332a"
+                             "sha256":  "e5e29e1a486ac0f292db39f8355e7181bd20972be77afcb4cd27c3168a385469"
                          },
                          {
                              "file":  "game/ProjectSettings/ProjectVersion.txt",
@@ -1240,20 +1240,20 @@
                               "*DoNotShip*",
                               "*DontShipItWithYourGame*"
                           ],
-    "previous_delivery_backup":  "game/Build/LifecycleDeliveryBackups/20260920-210011-1ce5c793",
+    "previous_delivery_backup":  "game/Build/LifecycleDeliveryBackups/20260920-212518-f250205b",
     "model_calls":  0,
     "tests_executed_by_packager":  false,
     "art_acceptance":  "not_claimed",
     "player_launch":  {
-                          "pid":  36512,
-                          "requested_at":  "2026-09-20T21:06:22.1856828Z",
+                          "pid":  2140,
+                          "requested_at":  "2026-09-20T21:27:19.1918137Z",
                           "shortcut_updated":  true,
                           "gameplay_tested_by_agent":  false
                       },
     "desktop_shortcut":  {
-                             "updated_at":  "2026-09-20T21:00:19.6051634Z",
+                             "updated_at":  "2026-09-20T21:25:26.2893605Z",
                              "name":  "Palimpseste Spell Lab.lnk",
-                             "target":  "game/Build/WindowsLifecyclePlayable/Palimpseste.exe",
+                             "target":  "game/Build/WindowsLifecycleCaptureFixPlayable/Palimpseste.exe",
                              "launch_executed":  false
                          }
 }

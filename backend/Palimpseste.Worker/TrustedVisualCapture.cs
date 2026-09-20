@@ -11,10 +11,31 @@ namespace Palimpseste.Worker;
 
 public sealed record VisualCaptureOutput(byte[] Manifest, IReadOnlyList<RenderedSpellFrame> Frames, double MeasuredFps);
 
+public sealed class VisualCaptureException(string reason, Exception inner) : Exception(reason, inner)
+{
+    public string Reason { get; } = reason;
+}
+
 /// <summary>A fixed, prebuilt renderer. This is application code, never a model tool or a software build.</summary>
 public sealed class TrustedVisualCapture(CodexSettings settings)
 {
     public async Task<VisualCaptureOutput> CaptureAsync(Guid jobId, byte[] packet, byte[] description,
+        IReadOnlyDictionary<string, byte[]> artifacts, CancellationToken ct)
+    {
+        try { return await CaptureCoreAsync(jobId, packet, description, artifacts, ct); }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException or InvalidOperationException or ArgumentException or
+            KeyNotFoundException or JsonException or System.ComponentModel.Win32Exception or OperationCanceledException)
+        {
+            // Only application-defined codes reach logs; arbitrary exception text can contain private paths.
+            var reason = System.Text.RegularExpressions.Regex.IsMatch(e.Message,
+                "^visual_(capture|renderer)_[a-z0-9_]{1,100}$") ? e.Message :
+                e is OperationCanceledException ? "visual_renderer_timeout" : "visual_capture_failed";
+            throw new VisualCaptureException(reason, e);
+        }
+    }
+
+    private async Task<VisualCaptureOutput> CaptureCoreAsync(Guid jobId, byte[] packet, byte[] description,
         IReadOnlyDictionary<string, byte[]> artifacts, CancellationToken ct)
     {
         var executable = Environment.GetEnvironmentVariable("PALIMPSESTE_VISUAL_RENDERER_EXE") ?? "";
@@ -133,7 +154,7 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
                     throw new InvalidDataException("visual_renderer_writable_by_worker");
         }
         using var manifest = JsonDocument.Parse(bytes);
-        if (manifest.RootElement.GetProperty("version").GetString() != "1.4.0") throw new InvalidDataException("visual_renderer_version");
+        if (manifest.RootElement.GetProperty("version").GetString() != "1.4.1") throw new InvalidDataException("visual_renderer_version");
         var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var file in manifest.RootElement.GetProperty("files").EnumerateArray())
         {

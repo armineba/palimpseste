@@ -195,7 +195,9 @@ public static partial class ApiHandlers
         Guid? descriptionArtifactId = reader.IsDBNull(8) ? null : reader.GetGuid(8);
         var retryable = reader.GetBoolean(7) || CanOwnerResumePlanningFailure(
             state, reader.IsDBNull(6) ? null : reader.GetString(6), reader.GetString(9),
-            descriptionArtifactId, reader.GetInt64(10), reader.GetBoolean(11), reader.GetBoolean(12), reader.GetInt32(4));
+            descriptionArtifactId, reader.GetInt64(10), reader.GetBoolean(11), reader.GetBoolean(12), reader.GetInt32(4)) ||
+            CanOwnerResumeVisualCaptureFailure(state, reader.IsDBNull(6) ? null : reader.GetString(6), reader.GetString(9),
+                descriptionArtifactId, reader.GetBoolean(11), reader.GetBoolean(12), reader.GetInt32(4));
         return Results.Json(Job(jobId, reader.IsDBNull(0) ? null : reader.GetGuid(0), state, reader.IsDBNull(2) ? null : reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetGuid(3), reader.GetInt32(4), reader.GetString(5), reader.IsDBNull(6) ? null : reader.GetString(6), retryable, state == "waiting_retry" ? 10000 : 2000, descriptionArtifactId,
             reader.GetDateTime(13), reader.GetDateTime(14), reader.GetInt64(15), reader.IsDBNull(16) ? null : reader.GetDateTime(16),
             reader.IsDBNull(17) ? null : reader.GetGuid(17), reader.IsDBNull(18) ? null : reader.GetString(18)));
@@ -217,7 +219,7 @@ public static partial class ApiHandlers
         Guid? spellId;
         Guid? descriptionArtifactId;
         string state, message, kind;
-        string? errorCode;
+        string? errorCode, resumeStage;
         int attempts;
         long bAttempts;
         bool hasPlan, hasUncertainAttempt;
@@ -232,7 +234,8 @@ public static partial class ApiHandlers
                    j.error_code,j.kind,
                    (SELECT count(*) FROM provider_attempts pa WHERE pa.job_id=j.id AND pa.stage='B'),
                    EXISTS(SELECT 1 FROM spell_plans sp WHERE sp.job_id=j.id),
-                   EXISTS(SELECT 1 FROM provider_attempts pa WHERE pa.job_id=j.id AND pa.status IN ('running','transport_uncertain'))
+                   EXISTS(SELECT 1 FROM provider_attempts pa WHERE pa.job_id=j.id AND pa.status IN ('running','transport_uncertain')),
+                   j.resume_stage
             FROM jobs j WHERE j.id=@id AND j.owner_id=@owner FOR UPDATE
             """, connection, transaction))
         {
@@ -252,22 +255,35 @@ public static partial class ApiHandlers
             bAttempts = reader.GetInt64(9);
             hasPlan = reader.GetBoolean(10);
             hasUncertainAttempt = reader.GetBoolean(11);
+            resumeStage = reader.IsDBNull(12) ? null : reader.GetString(12);
         }
         if (state != "ready")
         {
             var ownerPlanningRetry = CanOwnerResumePlanningFailure(state, errorCode, kind,
                 descriptionArtifactId, bAttempts, hasPlan, hasUncertainAttempt, attempts);
+            var ownerVisualRetry = CanOwnerResumeVisualCaptureFailure(state, errorCode, kind,
+                descriptionArtifactId, hasPlan, hasUncertainAttempt, attempts);
             if (state is not ("waiting_retry" or "needs_operator") ||
-                (!ownerPlanningRetry && (!retryable || attempts >= 10 || (state == "needs_operator" && principal.Role != "creator"))))
+                (!ownerPlanningRetry && !ownerVisualRetry &&
+                 (!retryable || attempts >= 10 || (state == "needs_operator" && principal.Role != "creator"))))
                 return ApiProblem.Result(context, 409, "resume_not_allowed", "Cette tâche ne peut pas être reprise par ce compte.");
-            await using var update = new NpgsqlCommand("UPDATE jobs SET state='queued',resume_stage=CASE WHEN @owner_planning_retry THEN 'B' ELSE resume_stage END,next_attempt_at=NULL,lease_until=NULL,leased_by=NULL,error_code=NULL,retryable=false,message='Reprise demandée',updated_at=now() WHERE id=@id AND owner_id=@owner", connection, transaction);
+            await using var update = new NpgsqlCommand("UPDATE jobs SET state='queued',resume_stage=CASE WHEN @owner_visual_retry THEN 'refining_visuals' WHEN @owner_planning_retry THEN 'B' ELSE resume_stage END,next_attempt_at=NULL,lease_until=NULL,leased_by=NULL,error_code=NULL,retryable=false,message='Reprise demandée',updated_at=now() WHERE id=@id AND owner_id=@owner", connection, transaction);
             update.Parameters.AddWithValue("id", jobId);
             update.Parameters.AddWithValue("owner", principal.Id);
             update.Parameters.AddWithValue("owner_planning_retry", ownerPlanningRetry);
+            update.Parameters.AddWithValue("owner_visual_retry", ownerVisualRetry);
             await update.ExecuteNonQueryAsync(ct);
+            if (kind == "production" && parchmentId is Guid resumedParchment)
+            {
+                await using var parchment = new NpgsqlCommand("UPDATE parchments SET state='processing',updated_at=now() WHERE id=@id AND owner_id=@owner AND state='incident'", connection, transaction);
+                parchment.Parameters.AddWithValue("id", resumedParchment);
+                parchment.Parameters.AddWithValue("owner", principal.Id);
+                await parchment.ExecuteNonQueryAsync(ct);
+            }
+            resumeStage = ownerVisualRetry ? "refining_visuals" : ownerPlanningRetry ? "B" : resumeStage;
             state = "queued"; message = "Reprise demandée"; retryable = false;
         }
-        var json = Json(Job(jobId, parchmentId, state, null, spellId, attempts, message, null, retryable, descriptionArtifactId: descriptionArtifactId));
+        var json = Json(Job(jobId, parchmentId, state, resumeStage, spellId, attempts, message, null, retryable, descriptionArtifactId: descriptionArtifactId));
         await SaveResponseAsync(connection, transaction, principal.Id, $"resume:{id}", key, requestHash, 202, json, ct);
         await transaction.CommitAsync(ct);
         return Results.Content(json, "application/json", Encoding.UTF8, 202);
@@ -277,6 +293,11 @@ public static partial class ApiHandlers
         Guid? descriptionArtifactId, long bAttempts, bool hasPlan, bool hasUncertainAttempt, int attempts)
         => state == "needs_operator" && errorCode == "provider_b_processfailure" && kind == "production" &&
            descriptionArtifactId != null && !hasPlan && !hasUncertainAttempt && bAttempts is > 0 and < 3 && attempts < 10;
+
+    private static bool CanOwnerResumeVisualCaptureFailure(string state, string? errorCode, string kind,
+        Guid? descriptionArtifactId, bool hasPlan, bool hasUncertainAttempt, int attempts)
+        => state == "needs_operator" && errorCode == "visual_capture_failed" && kind == "production" &&
+           descriptionArtifactId != null && hasPlan && !hasUncertainAttempt && attempts < 10;
 
     public static async Task<IResult> GetSpell(HttpContext context, string id, NpgsqlDataSource db, IArtifactStore store, CancellationToken ct)
     {

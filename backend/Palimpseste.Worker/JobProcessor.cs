@@ -46,6 +46,17 @@ public sealed partial class JobProcessor
             var heartbeat = HeartbeatAsync(job, leaseLost);
             try { await ProcessAsync(job, leaseLost.Token); }
             catch (OperationCanceledException) when (shutdown.IsCancellationRequested) { }
+            catch (VisualCaptureException e)
+            {
+                Console.Error.WriteLine($"job {job.Id:N} visual capture: {e.Reason} ({e.InnerException?.GetType().Name})");
+                try
+                {
+                    await jobs.SetStateAsync(job, "needs_operator", "visual_capture_failed",
+                        "Finition visuelle interrompue ; image et construction conservées. Réessaie la finition.",
+                        false, CancellationToken.None);
+                }
+                catch (Exception) { /* A lost lease may already belong to another worker. */ }
+            }
             catch (Exception e)
             {
                 Console.Error.WriteLine($"job {job.Id:N} incident: {e.GetType().Name}");
