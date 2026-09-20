@@ -97,6 +97,14 @@ namespace Palimpseste.Game.SpellRuntime
             root.transform.position = state.position;
             root.transform.rotation = state.rotation;
             var tint = ColorFor(node.appearance?.palette, node.appearance?.affinity);
+            if (SemanticSpellVisual.Supports(node.appearance?.form))
+            {
+                // Canonical paths and footprints still govern collisions. The
+                // rendered subject is a controlled 3D form, never the ink mask.
+                if (node.carrier == "barrier") Barrier(root, state, tint, false);
+                root.AddComponent<SemanticSpellVisual>().Initialize(node, tint);
+                return root;
+            }
             switch (node.carrier)
             {
                 case "projectile": Projectile(root, state, tint, signatureMask); break;
@@ -280,6 +288,13 @@ namespace Palimpseste.Game.SpellRuntime
         public static void ProjectileHit(CarrierState state, Vector3 point)
         {
             if (state.node.carrier != "projectile") return;
+            if (SemanticSpellVisual.Supports(state.node.appearance?.form))
+            {
+                SemanticSpellVisual.Impact(state.node.appearance.form, point, state.direction,
+                    ColorFor(state.node.appearance.palette, state.node.appearance.affinity),
+                    (state.node.options.radius_cm ?? 12) / 65f);
+                return;
+            }
             var impulse = state.node.effects != null && state.node.effects.Exists(
                 effect => effect.@event == "hit" && effect.kind == "impulse");
             var tint = ColorFor(state.node.appearance?.palette, state.node.appearance?.affinity);
@@ -452,6 +467,12 @@ namespace Palimpseste.Game.SpellRuntime
         public static void BeamSegments(CarrierState state, System.Collections.Generic.List<Vector3> points)
         {
             if (state.visual == null || points.Count < 2) return;
+            var semantic = state.visual.GetComponent<SemanticSpellVisual>();
+            if (semantic != null)
+            {
+                semantic.SetBeamPath(points);
+                return;
+            }
             var positions = points.ToArray();
             var pattern = state.visual.GetComponent<BeamPatternVisual>();
             foreach (var line in state.visual.GetComponentsInChildren<LineRenderer>())
@@ -547,6 +568,12 @@ namespace Palimpseste.Game.SpellRuntime
 
         public static void PulseRadius(CarrierState state, float outerRadius)
         {
+            var semantic = state.visual?.GetComponent<SemanticSpellVisual>();
+            if (semantic != null)
+            {
+                semantic.SetPulseRadius(outerRadius);
+                return;
+            }
             var visual = state.visual?.GetComponent<PulseVisual>();
             if (visual == null || visual.source == null || visual.live == null) return;
             var pixels = new Color32[128 * 128];
@@ -565,7 +592,7 @@ namespace Palimpseste.Game.SpellRuntime
             visual.live.Apply(false, false);
         }
 
-        private static void Barrier(GameObject root, CarrierState state, Color tint)
+        private static void Barrier(GameObject root, CarrierState state, Color tint, bool showSegments = true)
         {
             var receiver = root.AddComponent<BarrierReceiver>();
             receiver.StructureMilli = state.node.options.structure_milli ?? 100000;
@@ -585,12 +612,19 @@ namespace Palimpseste.Game.SpellRuntime
                 segment.transform.localPosition = (a + b) * .5f + Vector3.up * (state.node.options.height_cm ?? 100) / 200f;
                 segment.transform.localRotation = Quaternion.LookRotation(delta.normalized, Vector3.up);
                 segment.transform.localScale = new Vector3((state.node.options.thickness_cm ?? 10) / 100f, (state.node.options.height_cm ?? 100) / 100f, delta.magnitude);
-                segment.GetComponent<Renderer>().material = SpellLab.MaterialFor(tint, true);
+                if (showSegments) segment.GetComponent<Renderer>().material = SpellLab.MaterialFor(tint, true);
+                else segment.GetComponent<Renderer>().enabled = false;
             }
         }
 
         public static void TrapArmed(CarrierState state)
         {
+            var semantic = state.visual?.GetComponent<SemanticSpellVisual>();
+            if (semantic != null)
+            {
+                semantic.Arm();
+                return;
+            }
             var renderer = state.visual?.GetComponentInChildren<Renderer>();
             if (renderer != null) renderer.material.color = new Color(1f, .82f, .4f, .75f);
         }

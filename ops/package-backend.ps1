@@ -58,6 +58,11 @@ Set-ArchiveHashPin $archiveWorkerChild 'expectedWorkerSha256' $archiveWorkerHash
 $archiveWorkerChildHash = (Get-FileHash -LiteralPath $archiveWorkerChild -Algorithm SHA256).Hash
 Set-ArchiveHashPin $archiveWorkerLauncher 'expectedWorkerSha256' $archiveWorkerHash
 Set-ArchiveHashPin $archiveWorkerLauncher 'expectedChildSha256' $archiveWorkerChildHash
+$archiveApiHash = (Get-FileHash -LiteralPath (Join-Path $stage 'api/Palimpseste.Api.exe') -Algorithm SHA256).Hash
+$archiveApiChildHash = (Get-FileHash -LiteralPath (Join-Path $stage 'ops/api-service-child.ps1') -Algorithm SHA256).Hash
+$archiveApiLauncher = Join-Path $stage 'ops/start-owner-api.ps1'
+Set-ArchiveHashPin $archiveApiLauncher 'expectedApiSha256' $archiveApiHash
+Set-ArchiveHashPin $archiveApiLauncher 'expectedChildSha256' $archiveApiChildHash
 
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/IMPLEMENTATION_STATUS.md') -Destination (Join-Path $stage 'IMPLEMENTATION_STATUS.md')
 Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Destination (Join-Path $stage 'evidence') -Recurse

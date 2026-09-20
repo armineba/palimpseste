@@ -588,3 +588,130 @@ var legacyCornerGeometry = GeometryResolver.ResolveRgba(cornerInk, 1024, 1024,
 Require(legacyCornerGeometry.Issues.Any(i => i.Code == "empty_region"),
     "Old explicit full-region extraction unexpectedly changed to rectangular canvas mode");
 Console.WriteLine("Core smoke passed: PNG and whole-image pixel geometry, controlled compilation, visual clause and lifecycle event checks, semantic and JSON rejection.");
+
+// New interpretations describe a controlled 3D object. Traced strokes must not
+// leak into its path, area, or visual signature; archived descriptions keep the
+// original pixel profile exercised above.
+var semanticDescription = (JObject)wholeDescription.DeepClone();
+foreach (var firstClause in ((JArray)semanticDescription["clauses"])
+    .GroupBy(clause => (string)clause["subject_id"]).Select(group => group.First()))
+    ((JArray)firstClause["facts"]).Add(new JObject { ["dimension"] = "visual_form", ["value"] = "boulder" });
+var semanticDescriptionBytes = JsonBytes(semanticDescription);
+var semanticTyped = ContractJson.DeserializeStrict<SpellDescription>(semanticDescriptionBytes, "spell-description");
+Require(SpellCompiler.ValidateWholeImageDescriptionJson(semanticDescriptionBytes, false, true).Count == 0,
+    "Semantic description rejected by new interpreter gate");
+Require(SpellCompiler.ValidateWholeImageDescriptionJson(wholeDescriptionBytes, false, true)
+    .Any(issue => issue.Code == "visual_form_required"), "New interpreter gate accepted missing visual forms");
+var semanticGeometry = GeometryResolver.Resolve(inkPng, semanticTyped);
+var otherInkSemantic = GeometryResolver.ResolveRgba(cornerInk, 1024, 1024, semanticTyped);
+Require(semanticGeometry.Success && otherInkSemantic.Success &&
+    semanticGeometry.Assets.Count == semanticTyped.clauses.Select(clause => clause.subject_id).Distinct().Count() &&
+    semanticGeometry.Assets.Values.All(asset => asset.algorithm == GeometryResolver.SemanticVersion &&
+        asset.kind != "silhouette" && asset.source_description_sha256 == GeometryResolver.SemanticDescriptionSha256(semanticTyped)),
+    "Semantic resolver emitted traced geometry or lost description provenance");
+foreach (var pair in semanticGeometry.Assets)
+{
+    var changed = otherInkSemantic.Assets[pair.Key];
+    Require(pair.Value.source_pixel_sha256 != changed.source_pixel_sha256 &&
+        JToken.DeepEquals(JToken.FromObject(pair.Value.points), JToken.FromObject(changed.points)),
+        "Semantic path copied ink contours or lost capture provenance");
+}
+foreach (var pair in semanticGeometry.MaskPng)
+    Require(pair.Value.SequenceEqual(otherInkSemantic.MaskPng[pair.Key]), "Semantic footprint changed with scribble contours");
+var semanticPlan = (JObject)wholePlan.DeepClone();
+semanticPlan["description_sha256"] = SpellCompiler.Sha256(semanticDescriptionBytes);
+foreach (var node in (JArray)semanticPlan["nodes"])
+{
+    node["appearance"]["form"] = "boulder";
+    node["appearance"]["signature_geometry_id"] = JValue.CreateNull();
+    if ((string)node["carrier"] == "projectile") node["options"]["radius_cm"] = 20;
+    node["geometry_id"] = semanticGeometry.Assets.Values.Single(asset => asset.source_subject_id == (string)node["subject_id"]).geometry_id;
+}
+var semanticPlanBytes = JsonBytes(semanticPlan);
+var semanticInput = new CompilationInput {
+    DescriptionJson = semanticDescriptionBytes, PlanJson = semanticPlanBytes,
+    GeometryJson = semanticGeometry.GeometryJson, MaskPng = semanticGeometry.MaskPng,
+    GeometryArtifactIds = semanticGeometry.GeometryJson.Keys.ToDictionary(key => key, key => "a" + Guid.NewGuid().ToString("N")),
+    MaskArtifactIds = semanticGeometry.MaskPng.Keys.ToDictionary(key => key, key => "a" + Guid.NewGuid().ToString("N")),
+    SpellId = "semantic-smoke", ParchmentId = "semantic-support", SignatureSeedHex = "e10a330a765bc981",
+    Provenance = input.Provenance
+};
+var semanticCompiled = SpellCompiler.Compile(semanticInput);
+Require(semanticCompiled.Success, "Semantic spell did not compile: " + string.Join("; ", semanticCompiled.Issues));
+var semanticPublished = ContractJson.ParseStrict(semanticCompiled.PayloadUtf8);
+Require(semanticCompiled.Spell.versions.min_client == "1.1.0" &&
+    ((JObject)semanticPublished["plan"]["nodes"][0]["appearance"]).Property("signature_geometry_id") == null &&
+    (string)semanticPublished["plan"]["nodes"][0]["appearance"]["form"] == "boulder",
+    "Published semantic packet leaked an ink signature or supports an incompatible old player");
+var mismatchedForm = (JObject)semanticPlan.DeepClone();
+mismatchedForm["nodes"][0]["appearance"]["form"] = "wolf";
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(mismatchedForm),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng).Any(issue => issue.Code == "visual_form_trace"),
+    "Luna changed Astra's interpreted visual form");
+var unknownForm = (JObject)semanticPlan.DeepClone();
+unknownForm["nodes"][0]["appearance"]["form"] = "load_custom_mesh";
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(unknownForm),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng).Any(issue => issue.Code == "plan_json"),
+    "Uncontrolled visual form escaped schema validation");
+var tracedSignature = (JObject)semanticPlan.DeepClone();
+tracedSignature["nodes"][0]["appearance"]["signature_geometry_id"] = "full.silhouette.0";
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(tracedSignature),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng).Any(issue => issue.Code == "semantic_signature"),
+    "Semantic form accepted a scribble signature");
+var pathKey = semanticGeometry.Assets.Single(pair => pair.Value.kind == "path").Key;
+foreach (var field in new[] { "source_description_sha256", "source_subject_id", "algorithm", "points" })
+{
+    var altered = ContractJson.ParseStrict(semanticGeometry.GeometryJson[pathKey]);
+    if (field == "points") altered["points"][0]["z"] = 9876;
+    else altered[field] = field == "source_description_sha256" ? new string('a', 64) : field == "algorithm" ? GeometryResolver.WholeCanvasVersion : "unrelated_subject";
+    var geometries = semanticGeometry.GeometryJson.ToDictionary(pair => pair.Key, pair => pair.Value);
+    geometries[pathKey] = JsonBytes(altered);
+    Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, semanticPlanBytes,
+        geometries, semanticGeometry.MaskPng).Any(issue => issue.Code == "semantic_geometry_source"),
+        "Semantic geometry accepted modified " + field);
+}
+var alteredMasks = semanticGeometry.MaskPng.ToDictionary(pair => pair.Key, pair => (byte[])pair.Value.Clone());
+alteredMasks[alteredMasks.Keys.First()][^1] ^= 1;
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, semanticPlanBytes,
+    semanticGeometry.GeometryJson, alteredMasks).Any(issue => issue.Code == "semantic_mask"),
+    "Semantic geometry accepted a modified collision mask");
+var absentFormPlan = JObject.Parse(Encoding.UTF8.GetString(planJson));
+foreach (var node in (JArray)absentFormPlan["nodes"]) node["appearance"]["form"] = JValue.CreateNull();
+Require(SpellCompiler.ValidatePlanJson(descriptionJson, JsonBytes(absentFormPlan), resolved.GeometryJson, resolved.MaskPng).Count == 0,
+    "Explicit null visual form broke a legacy description");
+var aForms = promptASchema.DescendantsAndSelf().OfType<JObject>()
+    .Single(obj => (string)obj["properties"]?["dimension"]?["const"] == "visual_form")["properties"]["value"]["enum"].Values<string>().ToHashSet();
+Require(aForms.SetEquals(SpellVisualForms.All) &&
+    ((JArray)catalog["visual_forms"]["forms"]).Select(form => (string)form["id"]).ToHashSet().SetEquals(aForms),
+    "A/runtime/capability visual form catalog differs");
+foreach (var form in (JArray)catalog["visual_forms"]["forms"])
+    Require((int)form["minimum_projectile_radius_cm"] == SpellVisualForms.MinimumProjectileRadiusCm((string)form["id"]) &&
+        (int)form["minimum_projectile_radius_cm"] > 0 && (int)form["minimum_projectile_radius_cm"] <= 100,
+        "Catalog and compiler projectile size bounds differ for " + (string)form["id"]);
+var golemDescription = (JObject)semanticDescription.DeepClone();
+foreach (var fact in ((JArray)golemDescription["clauses"]).SelectMany(clause => (JArray)clause["facts"])
+    .Where(fact => (string)fact["dimension"] == "visual_form")) fact["value"] = "golem";
+var golemDescriptionBytes = JsonBytes(golemDescription);
+var golemGeometry = GeometryResolver.Resolve(inkPng,
+    ContractJson.DeserializeStrict<SpellDescription>(golemDescriptionBytes, "spell-description"));
+var golemPlan = (JObject)semanticPlan.DeepClone();
+golemPlan["description_sha256"] = SpellCompiler.Sha256(golemDescriptionBytes);
+foreach (var node in (JArray)golemPlan["nodes"])
+{
+    node["appearance"]["form"] = "golem";
+    if ((string)node["carrier"] == "projectile") node["options"]["radius_cm"] = 1;
+}
+Require(SpellCompiler.ValidatePlanJson(golemDescriptionBytes, JsonBytes(golemPlan),
+    golemGeometry.GeometryJson, golemGeometry.MaskPng).Any(issue => issue.Code == "semantic_projectile_size"),
+    "A one-centimeter golem projectile was accepted");
+foreach (var node in (JArray)golemPlan["nodes"])
+    if ((string)node["carrier"] == "projectile") node["options"]["radius_cm"] = 45;
+Require(SpellCompiler.ValidatePlanJson(golemDescriptionBytes, JsonBytes(golemPlan),
+    golemGeometry.GeometryJson, golemGeometry.MaskPng).Count == 0,
+    "A golem projectile at its controlled 45 cm radius was rejected");
+foreach (var appearance in plannerSchema.DescendantsAndSelf().OfType<JObject>()
+    .Where(obj => obj["properties"]?["signature_geometry_id"] != null))
+    Require(((JArray)appearance["required"]).Values<string>().Contains("form") &&
+        ((JArray)appearance["properties"]["form"]["enum"]).Where(value => value.Type == JTokenType.String)
+            .Values<string>().ToHashSet().SetEquals(aForms), "Codex B visual forms differ from A");
+Console.WriteLine("Semantic forms passed: controlled A-to-B mapping, clean geometry independent of ink contours, provenance and mask tamper rejection, client 1.1 requirement, and legacy compatibility.");

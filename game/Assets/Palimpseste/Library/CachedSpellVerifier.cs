@@ -34,7 +34,7 @@ namespace Palimpseste.Game.Library
                     Value(packet, "versions", "compiler") != "sp.compiler/1.0" ||
                     Value(packet, "versions", "geometry") != "sp.geometry/1.0" ||
                     Value(packet, "versions", "rules_profile") != "lab_v1" ||
-                    Value(packet, "versions", "min_client") != "1.0.0" ||
+                    !SupportedMinimumClient(Value(packet, "versions", "min_client")) ||
                     Value(packet, "plan", "schema_version") != "sp.plan/1.0")
                     return false;
                 if (!(packet["geometry_manifest"] is JArray geometries) ||
@@ -62,6 +62,8 @@ namespace Palimpseste.Game.Library
             }
             return root.Type == JTokenType.String ? root.Value<string>() : null;
         }
+
+        private static bool SupportedMinimumClient(string version) => version == "1.0.0" || version == "1.1.0";
 
         private static bool VerifyArtifact(JToken item, string root, HashSet<string> seen)
         {

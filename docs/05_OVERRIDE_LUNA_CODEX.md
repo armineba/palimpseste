@@ -1,5 +1,7 @@
 # Avenant prioritaire — SP-1.1-LUNA
 
+> **Décision ultérieure D09, 20 septembre 2026 :** la forme 3D du sort doit représenter l'objet imaginé par Astra (rocher, arme, créature, énergie), sans copie systématique du contour du dessin. Les passages historiques imposant une silhouette ou une emprise issue de l'encre sont remplacés pour les nouveaux sorts par le rendu contrôlé issu de la description. Voir [D09](DECISIONS.md).
+
 > **Décision utilisateur ultérieure, 20 septembre 2026 :** pour les nouveaux parchemins, l'auteur a remplacé le découpage en trois régions par un dessin libre sur tout le carré, terminé uniquement par un bouton « Dessin terminé ». Il a ensuite choisi `gpt-6-astra` pour interpréter l'image entière et concevoir la description, puis `gpt-5.6-luna` pour construire le plan du sort sous ses consignes. Voir [D07–D08](DECISIONS.md). Les passages ci-dessous qui imposent Luna pour l'étape A ou la fermeture au relâchement sont historiques ; le transport `codex exec`, l'isolation du worker et la compilation de données contrôlées restent applicables.
 
 ## Décision utilisateur

@@ -473,6 +473,46 @@
                       "value"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "dimension": {
+                        "type": "string",
+                        "const": "visual_form"
+                      },
+                      "value": {
+                        "type": "string",
+                        "enum": [
+                          "boulder",
+                          "meteor",
+                          "crystal",
+                          "blade",
+                          "spear",
+                          "hammer",
+                          "orb",
+                          "fireball",
+                          "lightning",
+                          "wave",
+                          "vortex",
+                          "chain",
+                          "vine",
+                          "tentacle",
+                          "shield",
+                          "skull",
+                          "spirit",
+                          "wolf",
+                          "bird",
+                          "serpent",
+                          "golem"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "dimension",
+                      "value"
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               },

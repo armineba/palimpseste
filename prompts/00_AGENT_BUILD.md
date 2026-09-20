@@ -2,6 +2,8 @@
 
 Version SP-1.1-LUNA · 19 septembre 2026. Mission de développement, pas preuve d'un logiciel déjà réalisé.
 
+> Décisions utilisateur ultérieures : D07–D08 imposent le dessin libre, le bouton « Dessin terminé » et Astra pour A puis Luna pour B. D09 demande des objets 3D représentant l'interprétation, sans reproduction systématique du contour d'encre. Ces décisions remplacent les passages contraires ci-dessous ; voir `docs/DECISIONS.md`. La compilation de données contrôlées et l'isolation du worker demeurent obligatoires.
+
 ## 0. Mission et niveau d'exigence
 
 Réalise intégralement le sous-système final décrit dans ce dossier : dessin réel sur un parchemin → interprétation multimodale réelle → description structurée → plan de sort → compilation contrôlée → sort réellement lançable dans Unity → sauvegarde et relecture hors ligne.

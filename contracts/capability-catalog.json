@@ -325,5 +325,117 @@
     "prompt_projection_file": "effect-recipes-prompt.json",
     "count": 141,
     "execution": "fixed_composition_of_catalog_effects"
+  },
+  "visual_forms": {
+    "schema_version": "sp.visual-forms/1.0",
+    "selection": "Exactly one visual_form fact per subject. Luna copies it to appearance.form. This is a reusable rendered form, not a complete predefined spell. Creature forms are visual manifestations on the chosen carrier; they do not imply autonomous companion AI.",
+    "geometry": "sp.geometry.resolver/2.0.semantic produces clean paths or circular footprints from interpreted carrier/motion; no ink contours or signature mask.",
+    "forms": [
+      {
+        "id": "boulder",
+        "description": "Rock volume with clean facets",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "meteor",
+        "description": "Falling or flying meteor with core and trail",
+        "minimum_projectile_radius_cm": 30
+      },
+      {
+        "id": "crystal",
+        "description": "Faceted crystal cluster",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "blade",
+        "description": "Forged blade",
+        "minimum_projectile_radius_cm": 10
+      },
+      {
+        "id": "spear",
+        "description": "Long spear and point",
+        "minimum_projectile_radius_cm": 10
+      },
+      {
+        "id": "hammer",
+        "description": "Hammer head and handle",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "orb",
+        "description": "Layered magical orb",
+        "minimum_projectile_radius_cm": 10
+      },
+      {
+        "id": "fireball",
+        "description": "Flame core and tongues",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "lightning",
+        "description": "Branching electric arcs",
+        "minimum_projectile_radius_cm": 5
+      },
+      {
+        "id": "wave",
+        "description": "Water or energy crest",
+        "minimum_projectile_radius_cm": 30
+      },
+      {
+        "id": "vortex",
+        "description": "Spiral funnel",
+        "minimum_projectile_radius_cm": 30
+      },
+      {
+        "id": "chain",
+        "description": "Connected metal links",
+        "minimum_projectile_radius_cm": 12
+      },
+      {
+        "id": "vine",
+        "description": "Branching organic vines",
+        "minimum_projectile_radius_cm": 12
+      },
+      {
+        "id": "tentacle",
+        "description": "Curved tapered tentacle",
+        "minimum_projectile_radius_cm": 15
+      },
+      {
+        "id": "shield",
+        "description": "Solid shield volume",
+        "minimum_projectile_radius_cm": 25
+      },
+      {
+        "id": "skull",
+        "description": "Skull with visible jaw and eye sockets",
+        "minimum_projectile_radius_cm": 15
+      },
+      {
+        "id": "spirit",
+        "description": "Floating spectral body",
+        "minimum_projectile_radius_cm": 25
+      },
+      {
+        "id": "wolf",
+        "description": "Spectral quadruped wolf",
+        "minimum_projectile_radius_cm": 35
+      },
+      {
+        "id": "bird",
+        "description": "Bird with wings and body",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "serpent",
+        "description": "Serpentine body and head",
+        "minimum_projectile_radius_cm": 25
+      },
+      {
+        "id": "golem",
+        "description": "Massive articulated stone humanoid",
+        "minimum_projectile_radius_cm": 45
+      }
+    ]
   }
 }

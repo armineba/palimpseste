@@ -111,7 +111,7 @@ public sealed class JobProcessor
         // role hints must not dictate what the player's drawing means.
         const string layout = "{\"canvas_width\":1024,\"canvas_height\":1024,\"reference_purpose\":\"identify_printed_guides_only\",\"semantic_regions\":false}";
         var capabilities = await File.ReadAllTextAsync(Path.Combine(specRoot, "contracts", "capability-catalog.json"), ct);
-        var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + provider.PromptASha256));
+        var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + provider.PromptASha256 + provider.EffectRecipesPromptSha256));
 
         var descriptionRecord = await jobs.GetDescriptionAsync(job, ct);
         byte[] description;
@@ -165,7 +165,7 @@ public sealed class JobProcessor
         var geometryRecords = await jobs.GetGeometryAsync(job, ct);
         if (geometryRecords.Geometry.Count == 0)
         {
-            await jobs.SetStateAsync(job, "resolving_geometry", null, "Lecture des formes du dessin entier", false, ct);
+            await jobs.SetStateAsync(job, "resolving_geometry", null, "Préparation de la forme du sort", false, ct);
             var decoded = ContractJson.DeserializeStrict<SpellDescription>(description, "spell-description");
             var resolved = GeometryResolver.Resolve(ink, decoded);
             if (!resolved.Success)
@@ -189,7 +189,7 @@ public sealed class JobProcessor
         foreach (var item in geometryRecords.Masks) maskPng[item.FileName] = await ReadCheckedAsync(item.StorageKey, item.Sha256, ct);
         var geometryContext = "[" + string.Join(",", geometryJson.OrderBy(x => x.Key, StringComparer.Ordinal)
             .Select(x => Encoding.UTF8.GetString(x.Value))) + "]";
-        var planInputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities + provider.PromptBSha256));
+        var planInputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities + provider.PromptBSha256 + provider.EffectRecipesSha256));
 
         var planRecord = await jobs.GetPlanAsync(job, ct);
         byte[] plan;
@@ -296,7 +296,7 @@ public sealed class JobProcessor
         var geometryContext = "[" + string.Join(",", geometryJson.OrderBy(x => x.Key, StringComparer.Ordinal)
             .Select(x => Encoding.UTF8.GetString(x.Value))) + "]";
         var capabilities = await File.ReadAllTextAsync(Path.Combine(specRoot, "contracts", "capability-catalog.json"), ct);
-        var planInputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities + provider.PromptBSha256));
+        var planInputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities + provider.PromptBSha256 + provider.EffectRecipesSha256));
         var planRecord = await jobs.GetPlanAsync(job, ct);
         if (planRecord is null)
         {
@@ -373,7 +373,7 @@ public sealed class JobProcessor
     private static IReadOnlyList<ValidationIssue> ValidateNewInterpretation(byte[]? utf8, bool requirePalette)
     {
         if (utf8 is null) return [];
-        return SpellCompiler.ValidateWholeImageDescriptionJson(utf8, requirePalette);
+        return SpellCompiler.ValidateWholeImageDescriptionJson(utf8, requirePalette, requireVisualForm: true);
     }
 
     private static string Sha256(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));

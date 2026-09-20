@@ -84,6 +84,20 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 600
+    },
+    "source_subject_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+    },
+    "source_description_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
     }
   },
   "required": [

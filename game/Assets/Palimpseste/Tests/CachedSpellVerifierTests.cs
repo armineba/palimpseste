@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
+using Newtonsoft.Json.Linq;
 using Palimpseste.Game.Library;
 using UnityEngine;
 
@@ -37,6 +38,22 @@ namespace Palimpseste.Game.Tests
                 };
                 Assert.IsTrue(CachedSpellVerifier.TryLoad(record, directory, out var verified));
                 Assert.IsNotEmpty(verified);
+
+                var semanticVersion = JObject.Parse(Encoding.UTF8.GetString(packet));
+                semanticVersion["versions"]["min_client"] = "1.1.0";
+                var semanticBytes = Encoding.UTF8.GetBytes(semanticVersion.ToString());
+                File.WriteAllBytes(spellPath, semanticBytes);
+                File.WriteAllText(marker, ParchmentStore.Hash(semanticBytes), Encoding.ASCII);
+                Assert.IsTrue(CachedSpellVerifier.TryLoad(record, directory, out verified),
+                    "This Player understands packets requiring semantic 3D rendering");
+                semanticVersion["versions"]["min_client"] = "2.0.0";
+                var futureBytes = Encoding.UTF8.GetBytes(semanticVersion.ToString());
+                File.WriteAllBytes(spellPath, futureBytes);
+                File.WriteAllText(marker, ParchmentStore.Hash(futureBytes), Encoding.ASCII);
+                Assert.IsFalse(CachedSpellVerifier.TryLoad(record, directory, out verified),
+                    "A future client requirement must not load with a partial renderer");
+                File.WriteAllBytes(spellPath, packet);
+                File.WriteAllText(marker, ParchmentStore.Hash(packet), Encoding.ASCII);
 
                 var maskPath = Path.Combine(artifacts, "fixture.mask.outer_mask");
                 var mask = File.ReadAllBytes(maskPath);

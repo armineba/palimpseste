@@ -95,6 +95,8 @@ namespace Palimpseste.Contracts
         public string pattern;
         // Optional controlled VFX palette; null preserves legacy compiled spells.
         public string palette;
+        // Controlled semantic 3D form selected by A and copied by B. Null is legacy pixel rendering.
+        public string form;
         public string signature_geometry_id;
     }
 
@@ -145,6 +147,10 @@ namespace Palimpseste.Contracts
         public string source_region;
         public string kind;
         public string source_pixel_sha256;
+        // Semantic geometry records its interpreted subject and normalized description;
+        // source_pixel_sha256 remains input provenance, never a traced contour.
+        public string source_subject_id;
+        public string source_description_sha256;
         public string algorithm;
         public List<GeometryPoint> points;
         public string mask_file;
@@ -157,6 +163,34 @@ namespace Palimpseste.Contracts
     {
         public int x;
         public int z;
+    }
+
+    public static class SpellVisualForms
+    {
+        public static readonly string[] All = {
+            "boulder", "meteor", "crystal", "blade", "spear", "hammer", "orb",
+            "fireball", "lightning", "wave", "vortex", "chain", "vine", "tentacle",
+            "shield", "skull", "spirit", "wolf", "bird", "serpent", "golem"
+        };
+
+        // Semantic projectiles must remain legible at the laboratory camera distance.
+        // This bound also controls their physical contact radius; legacy forms return zero.
+        public static int MinimumProjectileRadiusCm(string form)
+        {
+            switch (form)
+            {
+                case "boulder": case "crystal": case "hammer": case "fireball": case "bird": return 20;
+                case "meteor": case "wave": case "vortex": return 30;
+                case "blade": case "spear": case "orb": return 10;
+                case "lightning": return 5;
+                case "chain": case "vine": return 12;
+                case "tentacle": case "skull": return 15;
+                case "shield": case "spirit": case "serpent": return 25;
+                case "wolf": return 35;
+                case "golem": return 45;
+                default: return 0;
+            }
+        }
     }
 
     public sealed class CompiledSpell

@@ -20,6 +20,7 @@ namespace Palimpseste.Core
     {
         public const string Version = "sp.geometry.resolver/1.0";
         public const string WholeCanvasVersion = "sp.geometry.resolver/1.1.whole_canvas";
+        public const string SemanticVersion = "sp.geometry.resolver/2.0.semantic";
         private static readonly int[] Dx4 = { -1, 1, 0, 0 };
         private static readonly int[] Dy4 = { 0, 0, -1, 1 };
 
@@ -36,6 +37,15 @@ namespace Palimpseste.Core
             if (description == null) throw new ArgumentNullException(nameof(description));
             var result = new GeometryResolution();
             var pixelHash = SpellCompiler.Sha256(inkRgba);
+            if (UsesSemanticForms(description))
+            {
+                if (!CanvasPixels(inkRgba, width, height).Any(pixel => pixel))
+                {
+                    result.Issues.Add(new ValidationIssue("empty_drawing", "$", "A semantic spell still requires a drawing"));
+                    return result;
+                }
+                return ResolveSemantic(description, pixelHash);
+            }
             // A can now interpret the complete image without assigning marks to fixed
             // parchment regions. Offer the same bounded pixel geometries to B for any
             // subject it creates. Existing descriptions keep their explicit requests.
@@ -114,6 +124,85 @@ namespace Palimpseste.Core
             return result;
         }
 
+        public static bool UsesSemanticForms(SpellDescription description) =>
+            description?.clauses?.Any(clause => clause.facts?.Any(fact => fact.dimension == "visual_form") == true) == true;
+
+        // This digest describes normalized contract data, independent of whitespace in
+        // A's frozen JSON. The plan still binds separately to those exact source bytes.
+        public static string SemanticDescriptionSha256(SpellDescription description) =>
+            SpellCompiler.Sha256(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(description, Formatting.None)));
+
+        public static string SemanticGeometryId(string subject, string kind) =>
+            "semantic." + SpellCompiler.Sha256(Encoding.UTF8.GetBytes(subject)).Substring(0, 16) + "." + kind;
+
+        internal static GeometryResolution ResolveSemantic(SpellDescription description, string pixelHash)
+        {
+            var result = new GeometryResolution();
+            var descriptionHash = SemanticDescriptionSha256(description);
+            foreach (var subject in description.clauses.GroupBy(clause => clause.subject_id, StringComparer.Ordinal)
+                .OrderBy(group => group.Key, StringComparer.Ordinal))
+            {
+                var allFacts = subject.SelectMany(clause => clause.facts).ToArray();
+                var forms = allFacts.Where(fact => fact.dimension == "visual_form").ToArray();
+                var mechanics = subject.Where(clause => clause.kind == "mechanical").SelectMany(clause => clause.facts).ToArray();
+                var carriers = mechanics.Where(fact => fact.dimension == "carrier").ToArray();
+                if (forms.Length != 1 || !SpellVisualForms.All.Contains(forms[0].value) || carriers.Length != 1)
+                {
+                    result.Issues.Add(new ValidationIssue("semantic_subject", subject.Key,
+                        "Semantic geometry requires one controlled visual form and one carrier per subject"));
+                    continue;
+                }
+                var carrier = carriers[0].value;
+                bool path = carrier == "projectile" || carrier == "beam" || carrier == "barrier";
+                string kind = path ? "path" : "footprint";
+                var id = SemanticGeometryId(subject.Key, kind);
+                var points = new List<GeometryPoint>();
+                string maskFile = null;
+                if (path)
+                {
+                    bool curve = carrier == "projectile" && mechanics.Any(fact => fact.dimension == "motion" && fact.value == "curve");
+                    // Barrier paths form a transverse wall; all travel paths advance
+                    // on X, matching GeometryRuntime's documented local frame.
+                    int count = curve ? 25 : 2;
+                    for (int i = 0; i < count; i++)
+                    {
+                        double t = (double)i / (count - 1);
+                        points.Add(new GeometryPoint {
+                            x = carrier == "barrier" ? 0 : (int)Math.Round(-10000 + 20000 * t),
+                            z = carrier == "barrier" ? (int)Math.Round(-10000 + 20000 * t) :
+                                curve ? (int)Math.Round(4000 * 4 * t * (1 - t)) : 0
+                        });
+                    }
+                }
+                else
+                {
+                    // Stable circular collision footprint. The artistic form is a
+                    // bounded 3D renderer, never this mask or the player's ink contour.
+                    const int size = 128;
+                    var rgba = new byte[size * size * 4];
+                    for (int y = 0; y < size; y++)
+                        for (int x = 0; x < size; x++)
+                        {
+                            double distance = Math.Sqrt(Math.Pow(x + .5 - size / 2d, 2) + Math.Pow(y + .5 - size / 2d, 2));
+                            int at = (y * size + x) * 4;
+                            rgba[at] = rgba[at + 1] = rgba[at + 2] = 255;
+                            rgba[at + 3] = (byte)Math.Round(Math.Max(0, Math.Min(1, size / 2d - distance)) * 255);
+                        }
+                    maskFile = id + ".png";
+                    result.MaskPng[maskFile] = PngCodec.EncodeRgba(rgba, size, size);
+                }
+                AddAsset(result, new GeometryAsset {
+                    schema_version = "sp.geometry/1.0", geometry_id = id, source_region = "full", kind = kind,
+                    source_pixel_sha256 = pixelHash, source_subject_id = subject.Key,
+                    source_description_sha256 = descriptionHash, algorithm = SemanticVersion,
+                    points = points, mask_file = maskFile, width_px = path ? 0 : 128, height_px = path ? 0 : 128,
+                    notes = "Clean geometry from interpreted carrier and motion. Pixel hash is input lineage only; no ink contour. " +
+                        "Visual form: " + forms[0].value + ". Description hash uses normalized SpellDescription JSON."
+                });
+            }
+            return result;
+        }
+
         private static GeometryAsset MakeAsset(string region, string kind, int index, string pixelHash,
             List<GeometryPoint> points, string maskFile, (int x, int y, int width, int height) bounds, string notes,
             bool wholeCanvas)
@@ -127,7 +216,10 @@ namespace Palimpseste.Core
         private static void AddAsset(GeometryResolution result, GeometryAsset asset)
         {
             result.Assets[asset.geometry_id] = asset;
-            var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(asset, Formatting.None));
+            var token = Newtonsoft.Json.Linq.JObject.FromObject(asset);
+            if (asset.source_subject_id == null) token.Remove("source_subject_id");
+            if (asset.source_description_sha256 == null) token.Remove("source_description_sha256");
+            var json = Encoding.UTF8.GetBytes(token.ToString(Formatting.None));
             var violations = ContractJson.Validate(ContractJson.ParseStrict(json), "geometry");
             foreach (var violation in violations) result.Issues.Add(violation);
             result.GeometryJson[asset.geometry_id] = json;

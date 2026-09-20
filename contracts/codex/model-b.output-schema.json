@@ -297,15 +297,49 @@
               ]
             },
             "signature_geometry_id": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
             }
           },
           "required": [
             "affinity",
             "pattern",
             "palette",
-            "signature_geometry_id"
+            "signature_geometry_id",
+            "form"
           ],
           "additionalProperties": false
         },
@@ -494,15 +528,49 @@
               ]
             },
             "signature_geometry_id": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
             }
           },
           "required": [
             "affinity",
             "pattern",
             "palette",
-            "signature_geometry_id"
+            "signature_geometry_id",
+            "form"
           ],
           "additionalProperties": false
         },
@@ -676,15 +744,49 @@
               ]
             },
             "signature_geometry_id": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
             }
           },
           "required": [
             "affinity",
             "pattern",
             "palette",
-            "signature_geometry_id"
+            "signature_geometry_id",
+            "form"
           ],
           "additionalProperties": false
         },
@@ -829,15 +931,49 @@
               ]
             },
             "signature_geometry_id": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
             }
           },
           "required": [
             "affinity",
             "pattern",
             "palette",
-            "signature_geometry_id"
+            "signature_geometry_id",
+            "form"
           ],
           "additionalProperties": false
         },
@@ -982,15 +1118,49 @@
               ]
             },
             "signature_geometry_id": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
             }
           },
           "required": [
             "affinity",
             "pattern",
             "palette",
-            "signature_geometry_id"
+            "signature_geometry_id",
+            "form"
           ],
           "additionalProperties": false
         },
@@ -1147,15 +1317,49 @@
               ]
             },
             "signature_geometry_id": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
             }
           },
           "required": [
             "affinity",
             "pattern",
             "palette",
-            "signature_geometry_id"
+            "signature_geometry_id",
+            "form"
           ],
           "additionalProperties": false
         },

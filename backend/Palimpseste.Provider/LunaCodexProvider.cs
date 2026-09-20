@@ -44,8 +44,8 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
 {
     public const string InterpreterModel = "gpt-6-astra";
     public const string PlannerModel = "gpt-5.6-luna";
-    public const string PromptAVersion = "sp.prompt.a/1.9";
-    public const string PromptBVersion = "sp.prompt.b/1.6";
+    public const string PromptAVersion = "sp.prompt.a/2.1";
+    public const string PromptBVersion = "sp.prompt.b/1.8";
     private readonly CodexProcessRunner runner;
     private readonly string promptA;
     private readonly string promptB;
@@ -56,6 +56,8 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
     private readonly string schemaB;
     public string PromptASha256 { get; }
     public string PromptBSha256 { get; }
+    public string EffectRecipesPromptSha256 { get; }
+    public string EffectRecipesSha256 { get; }
 
     public LunaCodexProvider(CodexProcessRunner runner, string trustedSpecificationRoot)
     {
@@ -70,7 +72,9 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
         PromptBSha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(promptB)));
         promptRepair = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "03_REPARATION_TECHNIQUE.md"), Encoding.UTF8);
         effectRecipesAContext = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "contracts", "effect-recipes-prompt.json"), Encoding.UTF8);
+        EffectRecipesPromptSha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(effectRecipesAContext)));
         var fullRecipes = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "contracts", "effect-recipes.json"), Encoding.UTF8);
+        EffectRecipesSha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(fullRecipes)));
         using (var catalog = JsonDocument.Parse(fullRecipes))
         {
             if (catalog.RootElement.GetProperty("schema_version").GetString() != "sp.effect-recipes/1.0" ||

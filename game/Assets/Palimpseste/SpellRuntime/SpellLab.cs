@@ -4,6 +4,8 @@ using System.IO;
 using Newtonsoft.Json;
 using Palimpseste.Contracts;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace Palimpseste.Game.SpellRuntime
 {
@@ -319,6 +321,20 @@ namespace Palimpseste.Game.SpellRuntime
             camera3d.backgroundColor = new Color(.045f, .078f, .1f);
             camera3d.fieldOfView = 55f;
             camera3d.allowHDR = true;
+            var cameraData = cameraObject.AddComponent<UniversalAdditionalCameraData>();
+            cameraData.renderPostProcessing = true;
+            cameraData.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+            cameraData.antialiasingQuality = AntialiasingQuality.High;
+            var profile = Resources.Load<VolumeProfile>("LabVfxVolume");
+            if (profile != null)
+            {
+                var volumeObject = new GameObject("Lumière des sorts");
+                volumeObject.transform.SetParent(transform, false);
+                var volume = volumeObject.AddComponent<Volume>();
+                volume.isGlobal = true;
+                volume.priority = 10;
+                volume.sharedProfile = profile;
+            }
             cameraObject.AddComponent<AudioListener>();
             LabSetDressing.BuildEnvironment(transform);
             caster = new GameObject("Lanceur").transform;

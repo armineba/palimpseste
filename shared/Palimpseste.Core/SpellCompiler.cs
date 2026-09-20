@@ -84,6 +84,7 @@ namespace Palimpseste.Core
                 Add(issues, "description_hash", "$.description_sha256", "Plan is not tied to the frozen description bytes");
             CheckDescription(description, issues);
             var geometry = LoadGeometry(input, issues);
+            CheckSemanticGeometry(description, geometry, input, issues);
             CheckPlan(description, plan, geometry, issues);
             if (input.GeometryJson == null || input.MaskPng == null) return new CompilationResult { Issues = issues };
             if (issues.Count != 0) return new CompilationResult { Issues = issues };
@@ -96,7 +97,10 @@ namespace Palimpseste.Core
                 parchment_id = input.ParchmentId,
                 created_at = input.CreatedAt ?? DateTimeOffset.UtcNow.ToString("o", CultureInfo.InvariantCulture),
                 versions = new SpellVersions { catalog = "sp.capabilities/1.0", compiler = Version,
-                    geometry = "sp.geometry/1.0", rules_profile = "lab_v1", min_client = input.MinimumClientVersion },
+                    geometry = "sp.geometry/1.0", rules_profile = "lab_v1",
+                    min_client = plan.nodes.Any(node => node.appearance.form != null) &&
+                        (!System.Version.TryParse(input.MinimumClientVersion, out var minimum) || minimum < new System.Version(1, 1, 0))
+                        ? "1.1.0" : input.MinimumClientVersion },
                 provenance = input.Provenance, signature_seed_hex = input.SignatureSeedHex,
                 description_sha256 = plan.description_sha256, plan = plan,
                 geometry_manifest = input.GeometryJson.OrderBy(x => x.Key, StringComparer.Ordinal)
@@ -126,6 +130,10 @@ namespace Palimpseste.Core
                 var appearance = (JObject)node["appearance"];
                 if (appearance["palette"]?.Type == JTokenType.Null)
                     appearance.Property("palette")?.Remove();
+                if (appearance["form"]?.Type == JTokenType.Null)
+                    appearance.Property("form")?.Remove();
+                if (appearance["signature_geometry_id"]?.Type == JTokenType.Null)
+                    appearance.Property("signature_geometry_id")?.Remove();
             }
             return new UTF8Encoding(false).GetBytes(token.ToString(Formatting.None));
         }
@@ -178,6 +186,38 @@ namespace Palimpseste.Core
             name.IndexOfAny(new[] { '/', '\\', ':', '\0' }) < 0 && !name.Contains("..") &&
             name.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
 
+        private static void CheckSemanticGeometry(SpellDescription description, Dictionary<string, GeometryAsset> geometry,
+            CompilationInput input, List<ValidationIssue> issues)
+        {
+            if (!GeometryResolver.UsesSemanticForms(description))
+            {
+                if (geometry.Values.Any(asset => asset.algorithm == GeometryResolver.SemanticVersion ||
+                    asset.source_subject_id != null || asset.source_description_sha256 != null))
+                    Add(issues, "semantic_geometry_source", "$.geometry", "Semantic geometry requires interpreted visual forms");
+                return;
+            }
+            if (geometry.Count == 0 || input.MaskPng == null) return;
+            var pixelHashes = geometry.Values.Select(asset => asset.source_pixel_sha256).Distinct(StringComparer.Ordinal).ToArray();
+            if (pixelHashes.Length != 1)
+                Add(issues, "semantic_pixel_source", "$.geometry", "Semantic geometry must share the captured ink provenance");
+            var expected = GeometryResolver.ResolveSemantic(description, pixelHashes[0]);
+            foreach (var issue in expected.Issues) issues.Add(issue);
+            if (!geometry.Keys.ToHashSet(StringComparer.Ordinal).SetEquals(expected.Assets.Keys) ||
+                !input.MaskPng.Keys.ToHashSet(StringComparer.Ordinal).SetEquals(expected.MaskPng.Keys))
+                Add(issues, "semantic_geometry_set", "$.geometry", "Semantic spells require only the generated subject geometry and masks");
+            foreach (var pair in expected.Assets)
+            {
+                if (!geometry.TryGetValue(pair.Key, out var actual)) continue;
+                if (!JToken.DeepEquals(JToken.FromObject(actual), JToken.FromObject(pair.Value)))
+                    Add(issues, "semantic_geometry_source", pair.Key,
+                        "Geometry differs from its interpreted subject, normalized description, or controlled resolver output");
+            }
+            foreach (var pair in expected.MaskPng)
+                if (input.MaskPng.TryGetValue(pair.Key, out var actual) &&
+                    (actual == null || !actual.SequenceEqual(pair.Value)))
+                    Add(issues, "semantic_mask", pair.Key, "Semantic footprint must be the controlled circular mask");
+        }
+
         private static void CheckArtifactIds(CompilationInput input, List<ValidationIssue> issues)
         {
             if (input.GeometryArtifactIds == null || input.MaskArtifactIds == null) {
@@ -208,7 +248,7 @@ namespace Palimpseste.Core
         // New player captures use one composition. The palette gate applies only
         // to free_canvas_v2; older saved descriptions remain compilable offline.
         public static IReadOnlyList<ValidationIssue> ValidateWholeImageDescriptionJson(byte[] descriptionJson,
-            bool requirePalette)
+            bool requirePalette, bool requireVisualForm = false)
         {
             var issues = ValidateDescriptionJson(descriptionJson).ToList();
             if (issues.Count != 0) return issues;
@@ -225,6 +265,12 @@ namespace Palimpseste.Core
                         .Count(f => f.dimension == "palette") != 1)
                         Add(issues, "palette_required", subject,
                             "New free-canvas spells require exactly one palette fact per subject");
+            if (requireVisualForm)
+                foreach (var subject in description.clauses.Select(c => c.subject_id).Distinct(StringComparer.Ordinal))
+                    if (description.clauses.Where(c => c.subject_id == subject).SelectMany(c => c.facts)
+                        .Count(f => f.dimension == "visual_form") != 1)
+                        Add(issues, "visual_form_required", subject,
+                            "New interpreted spells require exactly one controlled visual form per subject");
             return issues;
         }
 
@@ -240,6 +286,7 @@ namespace Palimpseste.Core
                     Add(issues, "description_hash", "$.description_sha256", "Plan is not tied to frozen description bytes");
                 var input = new CompilationInput { GeometryJson = geometryJson, MaskPng = maskPng };
                 var geometry = LoadGeometry(input, issues);
+                CheckSemanticGeometry(description, geometry, input, issues);
                 CheckPlan(description, plan, geometry, issues);
                 if (geometryJson != null && maskPng != null && issues.Count == 0)
                     ComputeBounds(plan, geometry, input, issues);
@@ -291,6 +338,10 @@ namespace Palimpseste.Core
                     .Where(f => f.dimension == "palette").Select(f => f.value).Distinct(StringComparer.Ordinal).ToArray();
                 if (palettes.Length > 1)
                     Add(issues, "palette_conflict", subject, "Subject has conflicting visual palettes");
+                var forms = d.clauses.Where(c => c.subject_id == subject).SelectMany(c => c.facts)
+                    .Where(f => f.dimension == "visual_form").ToArray();
+                if (GeometryResolver.UsesSemanticForms(d) && forms.Length != 1)
+                    Add(issues, "visual_form_required", subject, "A semantic description needs one visual form per subject");
                 var carriers = facts.Where(f => f.dimension == "carrier").Select(f => f.value).ToArray();
                 var motions = facts.Where(f => f.dimension == "motion").Select(f => f.value).ToArray();
                 if (carriers.Length != 1)
@@ -343,6 +394,8 @@ namespace Palimpseste.Core
             }
             foreach (var request in d.shape_requests ?? Enumerable.Empty<ShapeRequest>())
                 if (!subjects.Contains(request.subject_id)) Add(issues, "shape_subject", request.subject_id, "Unknown subject");
+            if (GeometryResolver.UsesSemanticForms(d) && d.shape_requests?.Count > 0)
+                Add(issues, "semantic_shape_request", "$.shape_requests", "Semantic forms cannot request traced ink geometry");
         }
 
         private static void CheckPlan(SpellDescription d, SpellPlan plan,
@@ -377,6 +430,16 @@ namespace Palimpseste.Core
                     Add(issues, "palette_trace", p, "Palette was not selected by interpreter text");
                 if (paletteFacts.Length == 1 && node.appearance.palette != paletteFacts[0])
                     Add(issues, "palette_trace", p, "Palette differs from interpreter text");
+                var formFacts = allSubjectClauses.SelectMany(c => c.facts)
+                    .Where(f => f.dimension == "visual_form").Select(f => f.value).ToArray();
+                if (formFacts.Length == 0 && node.appearance.form != null ||
+                    formFacts.Length == 1 && node.appearance.form != formFacts[0])
+                    Add(issues, "visual_form_trace", p, "Visual form must exactly match interpreter text");
+                if (node.carrier == "projectile" && node.appearance.form != null &&
+                    node.options.radius_cm < SpellVisualForms.MinimumProjectileRadiusCm(node.appearance.form))
+                    Add(issues, "semantic_projectile_size", p + ".options.radius_cm",
+                        "The interpreted " + node.appearance.form + " requires radius_cm >= " +
+                        SpellVisualForms.MinimumProjectileRadiusCm(node.appearance.form) + " for a legible 3D form");
                 if (!facts.Any(f => f.dimension == "carrier" && f.value == node.carrier))
                     Add(issues, "carrier_fact", p, "Carrier differs from description");
                 var expectedEffects = facts.Where(f => f.dimension == "effect").Select(f => f.value)
@@ -465,8 +528,16 @@ namespace Palimpseste.Core
                     Add(issues, "geometry_reference", p, "Unknown main geometry");
                 else if (request != null && (main.source_region != request.region || main.kind != request.role))
                     Add(issues, "geometry_role", p, "Geometry differs from requested region or role");
-                if (!geometry.TryGetValue(node.appearance.signature_geometry_id, out var signature) || signature.kind != "silhouette")
-                    Add(issues, "signature_geometry", p, "Visual signature needs existing silhouette");
+                if (node.appearance.form != null)
+                {
+                    if (node.appearance.signature_geometry_id != null)
+                        Add(issues, "semantic_signature", p, "Controlled 3D forms do not use an ink silhouette");
+                    if (main?.algorithm != GeometryResolver.SemanticVersion || main.source_subject_id != node.subject_id)
+                        Add(issues, "semantic_geometry_subject", p, "Controlled form requires its own interpreted subject geometry");
+                }
+                else if (node.appearance.signature_geometry_id == null ||
+                    !geometry.TryGetValue(node.appearance.signature_geometry_id, out var signature) || signature.kind != "silhouette")
+                    Add(issues, "signature_geometry", p, "Legacy visual signature needs existing silhouette");
                 if ((node.carrier == "barrier" || (node.carrier == "projectile" && node.options.motion == "curve")) && main?.kind != "path")
                     Add(issues, "path_required", p, "This carrier requires a drawn path");
                 if ((node.carrier == "field" || node.carrier == "trap") && main?.kind != "footprint")

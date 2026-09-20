@@ -5,6 +5,8 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace Palimpseste.Game.Editor
 {
@@ -25,6 +27,7 @@ namespace Palimpseste.Game.Editor
             EditorBuildSettings.scenes = Array.ConvertAll(Scenes, scene => new EditorBuildSettingsScene(scene, true));
             PlayerSettings.companyName = "Palimpseste";
             PlayerSettings.productName = "Palimpseste Spell Lab";
+            PlayerSettings.bundleVersion = "1.1.0";
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.IL2CPP);
             PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
             var directory = Environment.GetEnvironmentVariable("PALIMPSESTE_BUILD_DIR");
@@ -58,8 +61,59 @@ namespace Palimpseste.Game.Editor
             }
             else if (material.shader != shader) material.shader = shader;
             EditorUtility.SetDirty(material);
+            // A real Resources material keeps the _EMISSION shader_feature
+            // variant in the Player. Enabling it only on a runtime clone lets
+            // Unity strip the variant even when Editor previews look correct.
+            const string emissivePath = "Assets/Palimpseste/Resources/LabEmissive.mat";
+            var emissive = AssetDatabase.LoadAssetAtPath<Material>(emissivePath);
+            if (emissive == null)
+            {
+                emissive = new Material(material) { name = "LabEmissive" };
+                AssetDatabase.CreateAsset(emissive, emissivePath);
+            }
+            emissive.shader = shader;
+            emissive.EnableKeyword("_EMISSION");
+            emissive.SetColor("_EmissionColor", Color.white * 2f);
+            emissive.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+            EditorUtility.SetDirty(emissive);
+            PrepareVfxProfile();
             AssetDatabase.SaveAssets();
             UnityEngine.Debug.Log("PALIMPSESTE_LIT_MATERIAL_OK " + path);
+        }
+
+        private static void PrepareVfxProfile()
+        {
+            const string path = "Assets/Palimpseste/Resources/LabVfxVolume.asset";
+            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(path);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                profile.name = "LabVfxVolume";
+                AssetDatabase.CreateAsset(profile, path);
+            }
+            var bloom = Component<Bloom>(profile);
+            bloom.intensity.Override(.32f);
+            bloom.threshold.Override(1.1f);
+            bloom.scatter.Override(.65f);
+            bloom.clamp.Override(12f);
+            var tone = Component<Tonemapping>(profile);
+            tone.mode.Override(TonemappingMode.ACES);
+            var color = Component<ColorAdjustments>(profile);
+            color.postExposure.Override(.15f);
+            color.contrast.Override(7f);
+            color.saturation.Override(3f);
+            EditorUtility.SetDirty(profile);
+        }
+
+        private static T Component<T>(VolumeProfile profile) where T : VolumeComponent
+        {
+            if (!profile.TryGet<T>(out var component))
+            {
+                component = profile.Add<T>(true);
+                AssetDatabase.AddObjectToAsset(component, profile);
+            }
+            EditorUtility.SetDirty(component);
+            return component;
         }
     }
 }

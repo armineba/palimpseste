@@ -195,7 +195,7 @@ if (mode == "astra")
             await EmitAsync(local, writePath);
             return 1;
         }
-        var issues = SpellCompiler.ValidateDescriptionJson(a.Utf8);
+        var issues = SpellCompiler.ValidateWholeImageDescriptionJson(a.Utf8, requirePalette: true, requireVisualForm: true);
         local["description_issue_codes"] = issues.Select(issue => issue.Code).Distinct().ToArray();
         if (issues.Count != 0)
         {
@@ -391,7 +391,7 @@ byte[] description;
 var stageAProcessStarted = false;
 if (mode == "active")
 {
-    var layout = await File.ReadAllTextAsync(Path.Combine(root, "reference", "layout-v1.json"));
+    const string layout = "{\"canvas_width\":1024,\"canvas_height\":1024,\"reference_purpose\":\"identify_printed_guides_only\",\"semantic_regions\":false}";
     var a = await provider.ProbeInterpretAsync("operator-doctor", Guid.NewGuid().ToString("N"), reference!, drawing!, layout, capabilities, CancellationToken.None);
     local["model_calls_executed"] = a.Transport.ProcessStarted;
     stageAProcessStarted = a.Transport.ProcessStarted;
@@ -434,7 +434,9 @@ else
         model_call_executed = false };
 }
 
-var descriptionIssues = SpellCompiler.ValidateDescriptionJson(description);
+var descriptionIssues = mode == "active"
+    ? SpellCompiler.ValidateWholeImageDescriptionJson(description, requirePalette: true, requireVisualForm: true)
+    : SpellCompiler.ValidateDescriptionJson(description);
 if (descriptionIssues.Count != 0)
 {
     local["active_result"] = "description_invalid";
@@ -464,7 +466,9 @@ try
     maskPng = resolved.MaskPng;
     geometry = "[" + string.Join(",", resolved.GeometryJson.OrderBy(item => item.Key, StringComparer.Ordinal)
         .Select(item => Encoding.UTF8.GetString(item.Value))) + "]";
-    local["geometry"] = new { source = "resolver_from_ink_and_description", resolver_version = GeometryResolver.Version,
+    local["geometry"] = new { source = GeometryResolver.UsesSemanticForms(decoded)
+            ? "controlled_geometry_from_interpretation" : "resolver_from_ink_and_description",
+        resolver_versions = resolved.Assets.Values.Select(asset => asset.algorithm).Distinct().OrderBy(value => value).ToArray(),
         description_sha256 = Hash(description), ink_sha256 = Hash(ink), context_sha256 = Hash(Encoding.UTF8.GetBytes(geometry)),
         geometry_ids = resolved.GeometryJson.Keys.OrderBy(id => id, StringComparer.Ordinal).ToArray(),
         mask_ids = resolved.MaskPng.Keys.OrderBy(id => id, StringComparer.Ordinal).ToArray() };

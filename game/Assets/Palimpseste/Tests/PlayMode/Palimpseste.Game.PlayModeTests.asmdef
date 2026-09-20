@@ -1,7 +1,7 @@
 {
   "name": "Palimpseste.Game.PlayModeTests",
   "rootNamespace": "Palimpseste.Game.PlayModeTests",
-  "references": ["Palimpseste.Game", "Palimpseste.Contracts"],
+  "references": ["Palimpseste.Game", "Palimpseste.Contracts", "Unity.RenderPipelines.Universal.Runtime", "Unity.RenderPipelines.Core.Runtime"],
   "optionalUnityReferences": ["TestAssemblies"],
   "includePlatforms": [],
   "autoReferenced": false,

@@ -4,8 +4,8 @@ param([string]$RuntimeRoot = 'E:\PalimpsesteRuntime')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$expectedWorkerSha256 = '7FEEE56F6ECD63741B9AC129D16ACF721ADCF2EF6B869ECFFD5068429643FDC7'
-$expectedChildSha256 = 'AF173571702F8F3FC53A84550CABBAA3ED7D49A29D0F5B3AB57DE5ED1CB32971'
+$expectedWorkerSha256 = '19DBB0856F0504B4A51230E35086D4D44C9026135211B979A375890A9DCD7EDA'
+$expectedChildSha256 = 'CD0A11697FA3DCB8CBF59774A9C8C357E22F4BE18A0999FA20DF869CE7607FE8'
 $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\', '/')
 if (-not [string]::Equals($runtime, 'E:\PalimpsesteRuntime', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab worker accepts only E:\PalimpsesteRuntime.'

@@ -4,6 +4,9 @@ param([string]$RuntimeRoot = 'E:\PalimpsesteRuntime')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
+$expectedApiSha256 = 'E98D511270AC2E6722F1946A368730968F640EFE569B476073DC33C521F9E194'
+$expectedChildSha256 = '3655615CF544B6E757F33FC61B773C83943935E06B0C70559B7B20E2EA2D1762'
+
 $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\', '/')
 if (-not [string]::Equals($runtime, 'E:\PalimpsesteRuntime', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab runtime root differs from the reviewed path.'
@@ -28,10 +31,10 @@ foreach ($path in @($runtime, $child, $api)) {
     }
 }
 if (-not [string]::Equals((Get-FileHash -LiteralPath $child -Algorithm SHA256).Hash,
-        '3655615CF544B6E757F33FC61B773C83943935E06B0C70559B7B20E2EA2D1762',
+        $expectedChildSha256,
         [StringComparison]::OrdinalIgnoreCase) -or
     -not [string]::Equals((Get-FileHash -LiteralPath $api -Algorithm SHA256).Hash,
-        '1E530DAE4DB1680BBDB7E8388DF825D215C5BCF5B17DE50A7B5E4ACD4FA64B7C',
+        $expectedApiSha256,
         [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab API binaries differ from reviewed hashes.'
 }

@@ -1,7 +1,7 @@
 {
   "name": "Palimpseste.Game.Editor",
   "rootNamespace": "Palimpseste.Game.Editor",
-  "references": ["Palimpseste.Game"],
+  "references": ["Palimpseste.Game", "Unity.RenderPipelines.Universal.Runtime", "Unity.RenderPipelines.Core.Runtime"],
   "includePlatforms": ["Editor"],
   "autoReferenced": true,
   "overrideReferences": false,

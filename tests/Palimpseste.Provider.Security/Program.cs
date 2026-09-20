@@ -16,6 +16,11 @@ if (args.Length > 0 && string.Equals(args[0], "exec", StringComparison.Ordinal))
 // fixed full recipes. B receives only recipes named in the frozen description.
 var repositoryRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
 var recipeProvider = new LunaCodexProvider(null!, repositoryRoot);
+var compactRecipeBytes = await File.ReadAllBytesAsync(Path.Combine(repositoryRoot, "contracts", "effect-recipes-prompt.json"));
+var fullRecipeBytes = await File.ReadAllBytesAsync(Path.Combine(repositoryRoot, "contracts", "effect-recipes.json"));
+if (recipeProvider.EffectRecipesPromptSha256 != Convert.ToHexStringLower(SHA256.HashData(compactRecipeBytes)) ||
+    recipeProvider.EffectRecipesSha256 != Convert.ToHexStringLower(SHA256.HashData(fullRecipeBytes)))
+    throw new Exception("Recipe input provenance hashes must match the catalogs actually loaded by the provider");
 var selectedRecipeMethod = typeof(LunaCodexProvider).GetMethod("SelectedRecipeContext",
     BindingFlags.Instance | BindingFlags.NonPublic) ?? throw new Exception("Missing recipe selection method");
 var selectedPayload = (string)(selectedRecipeMethod.Invoke(recipeProvider, new object[] {
