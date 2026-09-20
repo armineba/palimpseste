@@ -1,5 +1,13 @@
 # Composition VFX URP — 20 septembre 2026
 
+## Finition D11 / client 1.2.1
+
+Les références de soin vert et de jaillissement violet conduisent à un vocabulaire plus stylisé : grandes spirales effilées, sceau et couronne en rotation inverse, jupe lumineuse ouverte, particules verticales, étoiles et brume. Les soins utilisent un mouvement ascendant plus calme ; les projectiles conservent une forme centrale distincte avec des traînées fines. Les volumes énergétiques ont un cœur compact et une enveloppe transparente ; les voiles sont plus lisses et moins criblés de découpes brillantes.
+
+Le shader original `SpellStylized` fournit sept familles de surfaces. Chaque composition peut avoir quatre couches de particules, au maximum 48 par couche. Les impacts s'éteignent et sont supprimés après 1,25 seconde. Les couleurs et motifs sont toujours déterminés par les données de sort validées ; aucun nouvel appel de génération n'est ajouté. Voir [la direction de revue D11](stylized-vfx-review.md) pour la distinction entre fixtures et vrais sorts conservés.
+
+Les captures D11 préservent le HDR avant bloom. Les anciennes captures D10 en ARGB32 coupaient l'intensité lumineuse dans le tampon de capture : elles ne décrivent pas fidèlement cet aspect du Player. Le jeu Windows utilisait déjà un tampon HDR ; 1.2.1 active en plus l'étalonnage HDR et affine le bloom.
+
 Cette note décrit le code source de la composition visuelle. Son intégration et le build Windows sont suivis dans [l'état de réalisation](../IMPLEMENTATION_STATUS.md). Les captures Unity et la recette artistique sont des preuves séparées : cette description ne vaut pas approbation du résultat visuel.
 
 ## Direction
@@ -22,10 +30,10 @@ La charge est une mise en scène visuelle au point de lancement ; elle ne retard
 
 ## Ressources bornées
 
-- Deux couches de particules au maximum, chacune limitée à 48 particules.
+- Quatre couches de particules au maximum, chacune limitée à 48 particules.
 - Quatre lumières ponctuelles décoratives simultanées au maximum ; aucune ombre supplémentaire.
 - 48 échantillons par filament de faisceau et deux filaments.
-- Impact autonome supprimé après 0,78 seconde.
+- Impact autonome supprimé après 1,25 seconde.
 - Chaque composition possède ses maillages et ses matériaux et les détruit avec le sort.
 - Aucun téléchargement, appel fournisseur ou génération d'image à l'exécution des effets.
 

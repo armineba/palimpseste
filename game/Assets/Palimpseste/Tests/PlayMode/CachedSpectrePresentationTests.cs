@@ -45,8 +45,9 @@ namespace Palimpseste.Game.PlayModeTests
             var previousFogEnd = RenderSettings.fogEndDistance;
             var host = new GameObject("Existing player spell replay");
             var targetTexture = new RenderTexture(1280, 1000, 24,
-                RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
-            var image = new Texture2D(targetTexture.width, targetTexture.height, TextureFormat.RGB24, false);
+                RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+            var image = new Texture2D(targetTexture.width, targetTexture.height, TextureFormat.RGB24, false, false);
+            var linearReadback = new Texture2D(targetTexture.width, targetTexture.height, TextureFormat.RGBAFloat, false, true);
             var frames = new List<object>();
             try
             {
@@ -79,16 +80,8 @@ namespace Palimpseste.Game.PlayModeTests
                     // Read the last completed GPU frame. WaitForEndOfFrame does
                     // not consistently resume in batch editor play-mode runs.
                     yield return null;
-                    var previousTarget = RenderTexture.active;
-                    try
-                    {
-                        RenderTexture.active = targetTexture;
-                        image.ReadPixels(new Rect(0, 0, image.width, image.height), 0, 0);
-                        image.Apply();
-                    }
-                    finally { RenderTexture.active = previousTarget; }
                     var fileName = "spectre-frame-" + index.ToString("D2") + ".png";
-                    var bytes = image.EncodeToPNG();
+                    var bytes = HdrPresentationCapture.Png(targetTexture, linearReadback, image);
                     File.WriteAllBytes(Path.Combine(output, fileName), bytes);
                     Assert.Greater(bytes.Length, 10000, "Capture must contain rendered arena data");
                     var visual = Object.FindFirstObjectByType<SemanticSpellVisual>();
@@ -108,6 +101,7 @@ namespace Palimpseste.Game.PlayModeTests
                     packet_sha256 = PacketSha256, spell_title = lab.SpellTitle,
                     art_acceptance = "not_claimed", model_calls = 0,
                     camera = "shipping lab pose and postprocessing; arena viewport without UI",
+                    capture = "ARGBHalf linear target; postprocessed image converted to sRGB PNG",
                     graphics_device = SystemInfo.graphicsDeviceName,
                     initial_target_position = Position(initialPosition), initial_target_health_milli = initialHealth,
                     final_target_health_milli = receiver.HealthMilli,
@@ -125,6 +119,7 @@ namespace Palimpseste.Game.PlayModeTests
             {
                 Object.Destroy(host);
                 Object.Destroy(image);
+                Object.Destroy(linearReadback);
                 targetTexture.Release();
                 Object.Destroy(targetTexture);
                 foreach (var camera in previousCameras)

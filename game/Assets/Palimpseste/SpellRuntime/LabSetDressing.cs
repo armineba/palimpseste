@@ -13,10 +13,10 @@ namespace Palimpseste.Game.SpellRuntime
         public static void BuildEnvironment(Transform root)
         {
             RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(.14f, .16f, .22f);
+            RenderSettings.ambientLight = new Color(.23f, .25f, .32f);
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = new Color(.021f, .027f, .046f);
+            RenderSettings.fogColor = new Color(.035f, .042f, .064f);
             RenderSettings.fogStartDistance = 19f;
             RenderSettings.fogEndDistance = 37f;
 
@@ -34,7 +34,7 @@ namespace Palimpseste.Game.SpellRuntime
             PointLight(root, "Reflet de cuivre", new Vector3(-8, 5, 8), new Color(.22f, .72f, .83f), 14f, 1.8f);
 
             var floor = Primitive(PrimitiveType.Cube, root, "Dalle d'épreuve",
-                new Vector3(0, -.18f, 4), new Vector3(26, .36f, 26), new Color(.062f, .072f, .092f), true);
+                new Vector3(0, -.18f, 4), new Vector3(26, .36f, 26), new Color(.095f, .108f, .14f), true);
             floor.GetComponent<Renderer>().receiveShadows = true;
             Primitive(PrimitiveType.Cube, root, "Bord nord", new Vector3(0, .11f, 17),
                 new Vector3(26.5f, .22f, .22f), Brass);

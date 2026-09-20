@@ -103,7 +103,7 @@ namespace Palimpseste.Game.PlayModeTests
             var particles = impact.GetComponentInChildren<ParticleSystem>();
             Assert.NotNull(particles);
             Assert.LessOrEqual(particles.main.maxParticles, 48);
-            yield return new WaitForSeconds(.85f);
+            yield return new WaitForSeconds(SpellVfxComposition.ImpactDuration + .1f);
             Assert.IsTrue(impact == null, "Impact afterimages must clean up without another cast");
         }
 

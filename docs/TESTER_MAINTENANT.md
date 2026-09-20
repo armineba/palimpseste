@@ -1,6 +1,14 @@
 # Tester le lecteur actuel
 
-## Essayer la version D10 livrée
+## Essayer la version stylisée D11 livrée — 1.2.1
+
+La finition ajoute des spirales, des couronnes et plusieurs couches de particules, avec un soin vert plus doux et des impacts plus développés. Les [captures Unity réelles](../evidence/public/unity/stylized-vfx-2026-09-20.md) sont disponibles ; trois compositions sont des fixtures de présentation, et le spectre provient d'un vrai sort conservé. Elles ne constituent pas une validation artistique humaine.
+
+Ouvrir le raccourci Bureau **Palimpseste Spell Lab** ou [ce Player `1.2.1`](../game/Build/WindowsStylizedVfxPlayable/Palimpseste.exe). Il a été construit avec le code 0 puis lancé sous le PID `30968`, fenêtre réactive ; le raccourci est actualisé. Reprendre **« Envol du spectre aux longs voiles »** dans la bibliothèque, puis lancer le sort au labo. Il n'est pas nécessaire de redessiner pour voir ce rendu amélioré. Conserver ensemble les 29 fichiers du dossier ; [preuves et empreintes de livraison](../evidence/public/unity/stylized-vfx-delivery.json).
+
+Pour créer un autre sort : dessiner librement, cliquer **Dessin terminé**, lire l'interprétation, puis lancer le sort prêt. La chaîne reste **Sol/high → Astra/high**. Cette finition graphique n'ajoute aucun appel modèle, test ou build à chaque génération joueur ; elle ne garantit pas un temps fixe de génération. Le service reste local ; l'accès de joueurs distants n'est pas livré.
+
+## Historique — essayer la version D10 livrée
 
 Ouvrir le raccourci Bureau **Palimpseste Spell Lab** ou [ce Player `1.2.0`](../game/Build/WindowsComposedVfxPlayable/Palimpseste.exe). Le jeu a déjà été lancé sous le PID `32064`. Conserver ensemble les 29 fichiers du dossier ; le [ZIP vérifié](../deliverables/Palimpseste-Windows-x64-IL2CPP.zip) permet de transporter ce dossier complet. Le build final Windows IL2CPP/URP a terminé avec le code 0 ; [preuves de livraison](../evidence/public/unity/composed-vfx-delivery.json).
 

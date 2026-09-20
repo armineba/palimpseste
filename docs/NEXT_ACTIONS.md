@@ -1,6 +1,16 @@
 # Point de reprise immédiat
 
-## Priorité actuelle — essai du Player D10 livré
+## Priorité actuelle — essayer le Player stylisé D11 livré
+
+Le renderer `1.2.1` et sa [galerie finale](../evidence/public/unity/stylized-vfx-2026-09-20.md) sont vérifiés : neuf images de fixtures, six images du vrai spectre conservé avec une touche, 12 000 unités internes de dégâts et une impulsion. Les corrections ciblées ont été suivies d'une reprise de la galerie seule, réussie **1/1**. Les cinq autres contrôles ont réussi lors de la deuxième exécution ; ne pas transformer ces deux résultats en un passage unique 6/6 ni recommencer une campagne sans problème concret.
+
+Le [Player `1.2.1`](../game/Build/WindowsStylizedVfxPlayable/Palimpseste.exe) a été construit avec le code 0, empaqueté en **29 fichiers vérifiés**, puis lancé sous le PID `30968`, fenêtre réactive. Le raccourci Bureau est actualisé. Le [manifeste](../evidence/public/unity/stylized-vfx-delivery.json) atteste le ZIP de **44 217 522 octets**, SHA-256 `8c92040e5abdbc8d690216010cafd9522f824dca7c9cd7db6aa42c4c82a32c0c`. La santé API répond 200.
+
+1. Faire apprécier au créateur le rendu et le son de ses sorts conservés, qui profitent de cette finition sans régénération. Le backend demeure Sol/high → Astra/high ; cette évolution graphique n'a fait aucun appel modèle.
+2. Recueillir un verdict sur des styles différents avant de déclarer toutes les combinaisons de recettes et d'apparences acceptées. Un nouveau parcours joueur dans le Player `1.2.1` reste à observer ; les fixtures ne remplacent pas ce parcours.
+3. Conserver ouverts les essais humains des 30 dessins, le second créateur, l'autre poste Windows, le benchmark de charge et le déploiement HTTPS distant. Répéter seulement les contrôles correspondant à un problème concret ou à une validation demandée.
+
+## Historique — essai du Player D10 livré
 
 Le backend **A `gpt-5.6-sol` / `high`, prompt `2.2`, puis B `gpt-6-astra` / `high`, prompt `1.9` est déployé**. Le [diagnostic réel](../evidence/public/backend/sol-astra-active-2026-09-20.json) a validé et compilé le plan : **60,403 s d'appels**, sans réparation, environ 63 s pour le diagnostic complet. Le worker PID `19656` tourne sous `PalRuntimeSvc`, la santé HTTP répond 200 et la porte technique est approuvée. La [relecture du spectre conservé dans Unity](../evidence/public/unity/composed-vfx-2026-09-20.md) a produit six images successives et les **5/5 tests ciblés ont passé**. Ne pas refaire ces contrôles sans nouveau problème concret.
 

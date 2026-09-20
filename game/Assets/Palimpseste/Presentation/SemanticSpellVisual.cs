@@ -67,6 +67,11 @@ namespace Palimpseste.Game.SpellRuntime
             // The spectral robe is a decorative wake. Its visible head remains
             // distinct from the energy envelope, even in archived small spells.
             if (Form == "spirit") size = Mathf.Max(size, 1.3f);
+            // Area magic is carried by the animated currents and ground layers.
+            // Keep the energy heart compact instead of filling the entire area
+            // with an opaque ball that masks the secondary motion.
+            if ((carrier == "field" || carrier == "pulse" || carrier == "trap") &&
+                (Form == "orb" || Form == "fireball")) size = Mathf.Clamp(size * .38f, .3f, .85f);
             body.localScale = Vector3.one * size;
             if (carrier == "field" || carrier == "trap" || carrier == "barrier")
                 body.localPosition = Vector3.up * (.08f - transform.position.y + size * .52f);
@@ -210,8 +215,14 @@ namespace Palimpseste.Game.SpellRuntime
                     Ring(parent, new Vector3(0, .26f, 0), .17f, .033f, bright, 24, Quaternion.Euler(90, 0, 0));
                     break;
                 case "orb": case "fireball":
-                    Round(parent, Vector3.zero, Vector3.one * .75f, energy);
-                    Round(parent, Vector3.zero, Vector3.one * .49f, bright);
+                    var plasmaShell = Own(new Material(Resources.Load<Shader>("SpellComposition")));
+                    plasmaShell.SetFloat("_Mode", 1);
+                    plasmaShell.SetColor("_Color", tint);
+                    plasmaShell.SetColor("_Accent", Color.Lerp(tint, Color.white, .72f));
+                    plasmaShell.SetFloat("_Intensity", 3.3f);
+                    plasmaShell.SetFloat("_Opacity", .68f);
+                    Round(parent, Vector3.zero, Vector3.one * .87f, plasmaShell);
+                    Round(parent, Vector3.zero, Vector3.one * .31f, bright);
                     var gyroscope = Child("Orbiting plasma", parent); orbiters.Add(gyroscope);
                     for (var i = 0; i < 3; i++)
                         Ring(gyroscope, Vector3.zero, .49f + i * .025f, .014f, i == 1 ? bright : energy, 48,
@@ -246,6 +257,10 @@ namespace Palimpseste.Game.SpellRuntime
                     }
                     break;
                 case "vortex":
+                    // Area vortices are represented by the swept translucent
+                    // spirals in the composition. Solid inner tubes obscure
+                    // the open silhouette and the rising particles.
+                    if (carrier == "field" || carrier == "pulse" || carrier == "trap") break;
                     var swirl = Child("Vortex rotation", parent); orbiters.Add(swirl);
                     for (var i = 0; i < 3; i++)
                     {

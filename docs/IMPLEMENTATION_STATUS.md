@@ -1,6 +1,16 @@
 # État de réalisation et point de reprise
 
-## État courant — D10, intégration Sol → Astra et VFX composés, 20 septembre 2026
+## État courant — D11, Player stylisé 1.2.1 livré
+
+Le retour du créateur est que 1.2.0 convient à une démonstration mais reste trop simple visuellement. La version 1.2.1 ajoute des compositions de zones, des spirales ascendantes et des couronnes, quatre familles de particules, des rubans translucides et un éclairage HDR maîtrisé. Le rythme visuel d'un soin exploite ses effets `heal`/`regen`. Le backend, les prompts et les données de sort ne changent pas ; **aucun appel fournisseur** n'a été effectué pour cette finition. Voir [D11](DECISIONS.md).
+
+Les [preuves Unity D11](../evidence/public/unity/stylized-vfx-2026-09-20.md) comprennent **neuf images de fixtures** (soin vert, impulsion violette, projectile de feu) et **six images du vrai spectre conservé**. Celui-ci conserve sa touche, ses 12 000 unités internes de dégâts et son impulsion. La deuxième exécution a donné **5 réussites sur 6** ; le seul échec de galerie a été corrigé, puis cette galerie seule a passé **1/1**, y compris après la dernière retouche des zones. Les erreurs initiales de courbes de particules et de borne de sinus sont consignées ; aucun passage unique 6/6 n'est revendiqué. Les captures sont produites sur RTX 3070 avec le postprocessing réel, et ne constituent pas un benchmark de FPS.
+
+**Le Player Windows IL2CPP `1.2.1` est livré** dans [WindowsStylizedVfxPlayable](../game/Build/WindowsStylizedVfxPlayable/Palimpseste.exe). Le build a terminé avec le code 0, sans avertissement ni erreur shader trouvés dans son journal. Ses **29 fichiers vérifiés totalisent 122 476 445 octets** ; le ZIP fait **44 217 522 octets**, SHA-256 `8c92040e5abdbc8d690216010cafd9522f824dca7c9cd7db6aa42c4c82a32c0c`. Voir le [manifeste de livraison](../evidence/public/unity/stylized-vfx-delivery.json). Le Player a été lancé sous le PID `30968`, fenêtre réactive ; le raccourci Bureau est actualisé. La santé API répond 200 et le backend reste celui de D10.
+
+**Point de reprise D11 : verdict du créateur dans le laboratoire.** Reprendre un sort conservé pour apprécier la finition sans nouvelle génération. Le verdict artistique et le son restent ouverts ; aucun essai exhaustif de toutes les combinaisons de styles et recettes, benchmark de charge, nouveau parcours joueur complet dans `1.2.1`, autre poste ou accès HTTPS distant n'est attesté. Les preuves D10 suivantes décrivent la version précédente.
+
+## Historique — D10, intégration Sol → Astra et VFX composés, 20 septembre 2026
 
 La dernière demande choisit **Sol/high pour interpréter le dessin, puis Astra/high pour composer le sort**, avec les prompts A `2.2` et B `1.9`. Elle demande aussi des VFX plus lisibles et spectaculaires et une attente plus courte. Le code ajoute le profil décoratif borné `appearance.vfx`, un client `1.2.0`, des couches animées autour des formes 3D et un affichage du temps écoulé réel. Les anciens sorts sans profil restent compatibles ; leur forme et leur palette déterminent une composition visuelle par défaut dans le nouveau renderer, sans régénérer leur description. Voir [D10](DECISIONS.md) et [la direction VFX](art-direction/VFX_COMPOSITION.md).
 

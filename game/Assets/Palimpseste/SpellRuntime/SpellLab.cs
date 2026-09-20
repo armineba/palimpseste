@@ -318,7 +318,7 @@ namespace Palimpseste.Game.SpellRuntime
             cameraObject.transform.SetParent(transform, false);
             camera3d = cameraObject.AddComponent<Camera>();
             camera3d.clearFlags = CameraClearFlags.SolidColor;
-            camera3d.backgroundColor = new Color(.014f, .019f, .035f);
+            camera3d.backgroundColor = new Color(.035f, .042f, .064f);
             camera3d.fieldOfView = 44f;
             camera3d.allowHDR = true;
             var cameraData = cameraObject.AddComponent<UniversalAdditionalCameraData>();

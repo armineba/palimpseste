@@ -1,5 +1,11 @@
 # Décisions de réalisation
 
+## D11 — Magie stylisée et mouvements superposés
+
+Le créateur juge le rendu 1.2.0 trop simple et fournit deux références : soin vert en spirale, puis jaillissement arcanique violet avec une couronne et des particules verticales. Le travail demandé porte sur des VFX plus complexes et stylisés : rubans larges et effilés, plusieurs rythmes de rotation et d'élévation, éclats en étoile, brumes légères, naissance et extinction soignées. La forme centrale reste celle de l'objet interprété ; les effets ne copient pas les pixels du dessin.
+
+Cette évolution est embarquée dans le renderer URP. Elle utilise les données contrôlées déjà disponibles et améliore aussi les sorts sauvegardés. Aucun appel modèle, test, build ou achat d'asset supplémentaire n'est ajouté au parcours joueur. La chaîne Sol/high → Astra/high et ses contrats demeurent ceux de D10. La ressemblance artistique aux références et le plaisir visuel restent à apprécier dans le jeu construit.
+
 Mis à jour le 20 septembre 2026. Les arbitrages P01–P10 du cahier restent des bases de réalisation, sans validation humaine implicite. Les décisions D07 et D08 ci-dessous remplacent le découpage en trois régions et le choix Luna A des versions antérieures pour les nouveaux parchemins.
 
 ## D10 — Interprétation rapide et VFX composés

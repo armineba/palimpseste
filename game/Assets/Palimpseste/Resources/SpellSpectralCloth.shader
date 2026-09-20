@@ -49,18 +49,19 @@ Shader "Palimpseste/SpellSpectralCloth"
             half4 frag(Varyings input):SV_Target
             {
                 float2 uv=input.uv;
-                float2 p=uv*float2(20,8)+float2(-_Time.y*.4,_Seed);
-                float n=noise(p)*.58+noise(p*2.1)*.28+noise(p*4.3)*.14;
+                // Broad flowing folds retain the silhouette instead of carving foil-like holes.
+                float2 p=uv*float2(5,2.5)+float2(-_Time.y*.28,_Seed);
+                float n=noise(p)*.78+noise(p*1.9+4.3)*.22;
                 float edge=abs(uv.y*2-1);
-                float threshold=_Torn*(.14+uv.x*.18+pow(edge,8)*.31);
-                float fabric=smoothstep(threshold-.024,threshold+.028,n);
-                float tears=(1-smoothstep(.013,.058,abs(n-threshold)))*_Torn;
-                float fres=pow(saturate(1-abs(dot(normalize(input.normalWS),GetWorldSpaceNormalizeViewDir(input.positionWS)))),2.5);
-                float folds=.5+.5*sin(uv.y*27+uv.x*9+n*5);
-                float tail=lerp(1,1-smoothstep(.92,1,uv.x),_Torn);
-                float a=fabric*tail*_Opacity*(.57+folds*.25+fres*.18);
-                half3 baseColor=_Color.rgb*(.28+n*.5+folds*.26);
-                half3 radiance=_Accent.rgb*(tears*1.1+pow(fres,2)*.38+pow(folds,8)*.10);
+                float threshold=_Torn*(.06+uv.x*.11+pow(edge,5)*.23);
+                float fabric=smoothstep(threshold-.10,threshold+.13,n);
+                float fres=pow(saturate(1-abs(dot(SafeNormalize(input.normalWS),GetWorldSpaceNormalizeViewDir(input.positionWS)))),2.5);
+                float folds=.5+.5*sin(uv.y*12+uv.x*5+n*1.8-_Time.y*.4);
+                float tail=lerp(1,1-smoothstep(.66,1,uv.x),_Torn);
+                float edgeFade=lerp(1,1-smoothstep(.55,1,edge),_Torn*.78);
+                float a=fabric*tail*edgeFade*_Opacity*(.43+folds*.25+fres*.22);
+                half3 baseColor=_Color.rgb*(.44+n*.24+folds*.16);
+                half3 radiance=_Accent.rgb*(pow(fres,2)*.47+pow(folds,6)*.14);
                 return half4((baseColor+radiance)*a,a);
             }
             ENDHLSL

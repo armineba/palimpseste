@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Failed(Child)" total="6" passed="2" failed="4" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-20 16:34:45Z" end-time="2026-09-20 16:34:47Z" duration="2,9031257">
+  <test-suite type="TestSuite" id="1037" name="Palimpseste Spell Lab" fullname="Palimpseste Spell Lab" runstate="Runnable" testcasecount="20" result="Failed" site="Child" start-time="2026-09-20 16:34:45Z" end-time="2026-09-20 16:34:47Z" duration="2.903126" total="6" passed="2" failed="4" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1030" name="Palimpseste.Game.PlayModeTests.dll" fullname="E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Library/ScriptAssemblies/Palimpseste.Game.PlayModeTests.dll" runstate="Runnable" testcasecount="20" result="Failed" site="Child" start-time="2026-09-20 16:34:45Z" end-time="2026-09-20 16:34:47Z" duration="2.837855" total="6" passed="2" failed="4" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="36004" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1031" name="Palimpseste" fullname="Palimpseste" runstate="Runnable" testcasecount="20" result="Failed" site="Child" start-time="2026-09-20 16:34:45Z" end-time="2026-09-20 16:34:47Z" duration="2.835942" total="6" passed="2" failed="4" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1032" name="Game" fullname="Palimpseste.Game" runstate="Runnable" testcasecount="20" result="Failed" site="Child" start-time="2026-09-20 16:34:45Z" end-time="2026-09-20 16:34:47Z" duration="2.835183" total="6" passed="2" failed="4" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1033" name="PlayModeTests" fullname="Palimpseste.Game.PlayModeTests" runstate="Runnable" testcasecount="20" result="Failed" site="Child" start-time="2026-09-20 16:34:45Z" end-time="2026-09-20 16:34:47Z" duration="2.834445" total="6" passed="2" failed="4" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1004" name="CachedSpectrePresentationTests" fullname="Palimpseste.Game.PlayModeTests.CachedSpectrePresentationTests" classname="Palimpseste.Game.PlayModeTests.CachedSpectrePresentationTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2026-09-20 16:34:45Z" end-time="2026-09-20 16:34:46Z" duration="1.185670" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1005" name="CaptureExistingSpectreInLab" fullname="Palimpseste.Game.PlayModeTests.CachedSpectrePresentationTests.CaptureExistingSpectreInLab" methodname="CaptureExistingSpectreInLab" classname="Palimpseste.Game.PlayModeTests.CachedSpectrePresentationTests" runstate="Runnable" seed="1201490680" result="Failed" start-time="2026-09-20 16:34:45Z" end-time="2026-09-20 16:34:46Z" duration="1.174462" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Error] Particle Velocity curves must all be in the same mode'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Particle Velocity curves must all be in the same mode
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1019" name="SemanticVisualPlayModeTests" fullname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests" classname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2026-09-20 16:34:46Z" end-time="2026-09-20 16:34:47Z" duration="1.402138" total="4" passed="2" failed="2" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1023" name="BarrierSurfaceShowsItsCompletePhysicalExtent" fullname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests.BarrierSurfaceShowsItsCompletePhysicalExtent" methodname="BarrierSurfaceShowsItsCompletePhysicalExtent" classname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests" runstate="Runnable" seed="2005207808" result="Failed" start-time="2026-09-20 16:34:46Z" end-time="2026-09-20 16:34:46Z" duration="0.016355" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Error] Particle Velocity curves must all be in the same mode'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Particle Velocity curves must all be in the same mode
+]]></output>
+              </test-case>
+              <test-case id="1020" name="EveryControlledFormHasBoundedVolumesAndReleasesResources" fullname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests.EveryControlledFormHasBoundedVolumesAndReleasesResources" methodname="EveryControlledFormHasBoundedVolumesAndReleasesResources" classname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests" runstate="Runnable" seed="1359911934" result="Failed" start-time="2026-09-20 16:34:46Z" end-time="2026-09-20 16:34:46Z" duration="0.011582" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Error] Particle Velocity curves must all be in the same mode'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Particle Velocity curves must all be in the same mode
+]]></output>
+              </test-case>
+              <test-case id="1021" name="RuntimeSemanticProjectileIgnoresAvailableDrawingSignature" fullname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests.RuntimeSemanticProjectileIgnoresAvailableDrawingSignature" methodname="RuntimeSemanticProjectileIgnoresAvailableDrawingSignature" classname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests" runstate="Runnable" seed="392383418" result="Passed" start-time="2026-09-20 16:34:46Z" end-time="2026-09-20 16:34:46Z" duration="0.014214" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1022" name="SemanticImpactExpiresAndHasNoGameplayComponents" fullname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests.SemanticImpactExpiresAndHasNoGameplayComponents" methodname="SemanticImpactExpiresAndHasNoGameplayComponents" classname="Palimpseste.Game.PlayModeTests.SemanticVisualPlayModeTests" runstate="Runnable" seed="1477506103" result="Passed" start-time="2026-09-20 16:34:46Z" end-time="2026-09-20 16:34:47Z" duration="1.356639" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1028" name="StylizedCompositionPresentationTests" fullname="Palimpseste.Game.PlayModeTests.StylizedCompositionPresentationTests" classname="Palimpseste.Game.PlayModeTests.StylizedCompositionPresentationTests" runstate="Runnable" testcasecount="1" result="Failed" site="Child" start-time="2026-09-20 16:34:47Z" end-time="2026-09-20 16:34:47Z" duration="0.243936" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1029" name="CaptureLayeredHealingPulseAndFire" fullname="Palimpseste.Game.PlayModeTests.StylizedCompositionPresentationTests.CaptureLayeredHealingPulseAndFire" methodname="CaptureLayeredHealingPulseAndFire" classname="Palimpseste.Game.PlayModeTests.StylizedCompositionPresentationTests" runstate="Runnable" seed="1260213294" result="Failed" start-time="2026-09-20 16:34:47Z" end-time="2026-09-20 16:34:47Z" duration="0.242001" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Error] Particle Velocity curves must all be in the same mode'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[Particle Velocity curves must all be in the same mode
+Particle Velocity curves must all be in the same mode
+Particle Velocity curves must all be in the same mode
+Saving results to: USER_PROFILE/AppData/LocalLow/Palimpseste/Palimpseste Spell Lab\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
