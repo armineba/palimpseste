@@ -1,47 +1,57 @@
-# PALIMPSESTE — Dossier de réalisation Unity + Luna/Codex
+# Palimpseste — dessin vers sort dans Unity
 
-**SP-1.1-LUNA · état au 20 septembre 2026.** Le dossier documentaire fourni est conservé. Une implémentation Unity 6.3 URP, un backend .NET/PostgreSQL, un worker et une passerelle `codex exec` ont été ajoutés. L'état exact, les preuves exécutées et le point de reprise figurent dans [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md). Un appel A réel a produit un JSON conforme mais a été refusé faute de preuve du modèle et de l'effort effectifs ; B, la boucle dans Unity et les validations humaines restent ouverts.
+Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le parcours D13 est : **dessin libre → description → image générée → composition 3D/VFX contrôlée → sort jouable dans le laboratoire**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
-## Démarrer
+## Reprendre le projet
 
-Pour reprendre la réalisation, commence par [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md), puis lis `prompts/00_AGENT_BUILD.md` et l'avenant `docs/05_OVERRIDE_LUNA_CODEX.md`. Pour ouvrir le jeu, utilise le projet [`game/`](game/) avec Unity 6000.3.24f1 et URP 17. Le Player Windows IL2CPP le plus récent est sous `game/Build/WindowsPlayerFlowOwnerFinal/` ; les ZIPs de [`deliverables/`](deliverables/) sont historiques et ne contiennent pas le parcours d'invitation et description A actuel.
+Commencer par **[la passation](docs/PASSATION.md)**, puis [l'état de réalisation](docs/IMPLEMENTATION_STATUS.md) et [le point de reprise](docs/NEXT_ACTIONS.md). Ces documents distinguent les résultats réellement observés des validations encore ouvertes.
 
-Le [test possible maintenant](docs/TESTER_MAINTENANT.md), l'installation vérifiée, l'usage du lecteur, la provenance des assets, la recette humaine à remplir et les hashes des archives sont décrits dans [`docs/SETUP.md`](docs/SETUP.md), [`docs/MANUEL_JOUEUR.md`](docs/MANUEL_JOUEUR.md), [`docs/ASSETS_ET_LICENCES.md`](docs/ASSETS_ET_LICENCES.md), [`docs/RECETTE_FINALE.md`](docs/RECETTE_FINALE.md) et [`evidence/public/release-2026-09-19.md`](evidence/public/release-2026-09-19.md).
+Installer Git LFS avant le clonage pour récupérer les archives exécutables :
 
-Le transport a changé : Unity → API métier du jeu → worker → Codex non interactif sur le serveur, utilisant Luna → données validées → Unity. Ne construis pas l'ancien branchement Responses direct comme chemin principal.
+```bash
+git lfs install
+git clone https://github.com/armineba/palimpseste.git
+cd palimpseste
+git lfs pull
+```
 
-Lire dans l'ordre :
-1. `prompts/00_AGENT_BUILD.md`.
-2. `docs/05_OVERRIDE_LUNA_CODEX.md` et `docs/03_INTEGRATION_FOURNISSEUR.md`.
-3. Le cahier principal, l'annexe de contrats et le backlog B01–B30.
-4. Contrats, catalogue, prompts A/B, références, exemples et QA.
+Ouvrir le dossier **`game/`** depuis Unity Hub avec **Unity 6000.3.24f1**, URP 17 et le module Windows IL2CPP. Le dépôt contient les assets et paramètres du projet ; Unity recrée `Library/` à l'ouverture.
 
-L'avenant ajoute les tickets L01–L10. L'objectif reste M0–M7 : une version finale de la boucle complète, avec validation humaine distincte des essais automatisés.
+Pour un agent de développement, lire d'abord `prompts/00_AGENT_BUILD.md`, puis `docs/05_OVERRIDE_LUNA_CODEX.md` et `docs/03_INTEGRATION_FOURNISSEUR.md`. Les avenants et décisions actuels prévalent sur les anciens instantanés du cahier.
 
-## Logiciel et preuves présents
+## Version livrée et limites
 
-- `game/` : projet Unity 6000.3.24f1 URP et Player Windows x64 IL2CPP brut dans `game/Build/WindowsPlayerFlowOwnerFinal/` ; source, dessin, bibliothèque, scène d'épreuve et sorts de données.
-- `backend/` et `shared/` : API ASP.NET, stockage, worker durable, passerelle `codex exec`, doctor et compilateur de contrats ; archive Windows autoportante historique dans `deliverables/`.
-- `ops/` : provisionnement du compte runtime, diagnostics, sauvegarde, restauration, statut et packaging. Les fichiers de connexion et d'authentification restent hors Git.
-- `evidence/public/` : résultats de build, API/PostgreSQL et Unity, avec leurs limites. Une sauvegarde privée du dessin capturé dans Unity attend la recette A/B réelle.
+Le **Player Windows 1.3.0** a été réellement construit et ouvert sur le poste d'origine. Le backend D13 y a été déployé et son diagnostic local est prêt. Les [instructions de jeu](docs/TESTER_MAINTENANT.md), la [preuve du déploiement](evidence/public/backend/image-reference-deployment-2026-09-20.json) et les [preuves Unity](evidence/public/unity/image-reference-2026-09-20.md) sont conservées.
 
-Le compte Codex partagé est connecté sous le profil du worker isolé, sans clé API ni mécanisme d'achat. Seuls le quota et les crédits déjà présents sont autorisés ; la désactivation de la recharge automatique reste un réglage du compte à vérifier par son titulaire. La boucle s'arrête encore avant la publication d'un sort Luna tant que le doctor actif A/B, l'essai intégré dans Unity et les validations humaines n'ont pas produit leur preuve. Les essais hors ligne du lecteur utilisent des fixtures manuelles et sont nommés comme tels.
+Les ZIP dans **[deliverables/](deliverables/README.md)** contiennent le Player et le backend Windows publiés. Un clone n'installe pas le backend sur une autre machine : les scripts de service actuels comportent des chemins, identités et empreintes propres au poste d'origine. Voir la passation avant de les adapter.
 
-## Ce qui a été ajouté ou remplacé
+Restent à constater ou accepter : nouveau parcours joueur D13 complet, relecture hors ligne de ce parcours, fidélité artistique et son, recette des 30 dessins, autre poste et accès distant/multijoueur. Le dernier réglage du matériau verre est inclus dans le build, mais postérieur à la dernière capture visuelle. Aucun rendu « 1 pour 1 » n'est annoncé comme accepté.
 
-Le prompt maître et l'intégration fournisseur ont été remplacés. Un avenant prioritaire, les sources Codex, une configuration applicative illustrative et deux schémas de sortie Codex ont été ajoutés. Les contrats métier n'ont pas été modifiés. Les fichiers remplacés sont conservés dans `archive/SP1.0/` pour traçabilité.
+## Organisation
 
-`site/index.html` et `Palimpseste_Unity_Cahier_de_realisation.pdf` restent les instantanés SP-1.0 déjà livrés. Leurs exemples de fournisseur ne sont plus les instructions actives : l'avenant Markdown prévaut pour Codex/Luna. Aucun nouveau site ou PDF n'est présenté comme réédité dans cette mise à jour.
+| Dossier | Contenu |
+| --- | --- |
+| `game/` | Projet Unity, dessin, bibliothèque, laboratoire, rendu et exécution des sorts. |
+| `backend/` | API, worker durable, passerelle `codex exec`, diagnostic fournisseur et migrations SQL. |
+| `shared/` | Contrats C# et compilation contrôlée. |
+| `contracts/`, `prompts/`, `reference/` | Schémas, catalogue de capacités, consignes A/G/B et références. |
+| `ops/` | Construction, publication, provisionnement, diagnostics et correctifs du CLI Codex. |
+| `docs/`, `evidence/public/` | Cahier, décisions, passation, résultats et limites des vérifications réalisées. |
+| `deliverables/` | Archives Windows du Player et du backend ; fichiers volumineux via Git LFS. |
 
-## Vérification
+Les réglages actuels documentés sont **Sol/high pour A**, **Astra/high pour G et B**. Les noms historiques Luna/Astra dans certains fichiers ne remplacent pas ces réglages. Le transport est Unity → API du jeu → worker → `codex exec` non interactif, avec un binaire durci : aucun outil exécutable en A/B, uniquement l'outil image en G.
 
-Les contrôles existants se lancent depuis ce dossier :
+Les identifiants Codex, clés, jetons joueur, secrets PostgreSQL et données privées du service ne font pas partie du dépôt. L'opérateur provisionne son environnement séparément. Aucun achat ou rechargement n'est ajouté au code ; les réglages de facturation restent ceux du compte utilisé.
 
-```sh
+## Vérification et provenance
+
+Les commandes et résultats déjà exécutés sont détaillés dans [IMPLEMENTATION_STATUS](docs/IMPLEMENTATION_STATUS.md). Ne pas confondre les tests automatisés et le verdict humain. Les contrôles documentaires existants se lancent ainsi :
+
+```bash
 python -m pip install -r qa/requirements.txt
 python qa/validate_contracts.py
 ```
 
-`archive/SP1.1-source-manifest.sha256` conserve les hashes du dossier documentaire initial. `MANIFEST.sha256` est régénéré depuis l'index Git pour la livraison actuelle par `ops/update-manifest.ps1`. Les rapports de QA documentaire ne prouvent ni un appel Luna ni un build. Les preuves d'exécution ajoutées sont détaillées dans `docs/IMPLEMENTATION_STATUS.md` et `docs/UNITY_TEST_PROOF.md`; elles gardent les tests automatisés distincts des recettes humaines.
+`MANIFEST.sha256` décrit les fichiers de livraison et se régénère avec `ops/update-manifest.ps1`. Avec Git LFS, vérifier les fichiers après `git lfs pull`. Les empreintes et identifiants de commit contenus dans les anciennes preuves désignent la réalisation locale observée ; ils restent des preuves historiques.
 
-La configuration `.env.example` contient des noms applicatifs proposés et aucun secret. Elle ne constitue pas une configuration native de Codex prête à exécuter. Les secrets doivent être provisionnés hors du dépôt par l'opérateur.
+`archive/SP1.0/`, `site/index.html` et le PDF du cahier conservent les documents initiaux. Les instructions Markdown actuelles prévalent sur leur ancien branchement fournisseur.

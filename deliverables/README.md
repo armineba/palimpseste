@@ -1,23 +1,33 @@
-# Livraison Windows — Palimpseste 1.2.2
+# Livraison Windows — Palimpseste 1.3.0 / D13
 
-Le [jeu Windows IL2CPP / URP](../game/Build/WindowsSpectralEnergyPlayable/Palimpseste.exe) est construit et lancé sur ce PC. Le raccourci **Palimpseste Spell Lab** du Bureau ouvre cette version. Conserver les 29 fichiers du dossier jouable ensemble.
+État du **20 septembre 2026**. Pour transmettre les sources et reprendre sur un autre poste, lire [la passation](../docs/PASSATION.md). Les archives ci-dessous ont été réellement produites ; leur installation sur un autre PC reste à vérifier.
 
 ## Player
 
-Le [ZIP du jeu](Palimpseste-Windows-x64-IL2CPP.zip) contient **29 fichiers**, vérifiés par SHA-256 contre le build Unity `WindowsSpectralEnergyRelease`. Taille : **44 089 295 octets**. SHA-256 : `6836f2cac5941a58d28b5a07c1b7f5e0b88cc5c51430320a6c9d9d199c1c542e`.
+Le [ZIP du jeu](Palimpseste-Windows-x64-IL2CPP.zip) contient **29 fichiers**, soit **122 734 785 octets** après extraction. Taille du ZIP : **44 320 872 octets**. SHA-256 :
 
-Unity 6000.3.24f1 a terminé le build Windows x64 IL2CPP avec retour 0. Le [journal final](../evidence/public/unity/spectral-fidelity/build-windows.log) et le [manifeste de livraison](../evidence/public/unity/spectral-energy-delivery.json) donnent les fichiers et empreintes exacts. Les dossiers de symboles `DoNotShip` sont exclus.
+```text
+0ca7d134f733632f23483726b70fbbeb1de750b046d1478efa94f18d4891ad7b
+```
 
-Après le refus artistique du spectre 1.2.1, quatre itérations ont repris son rendu. La tête devient une brume lumineuse sans visage ni capuche opaques. Six nappes d'énergie suivent la trajectoire déjà parcourue, ondulent avec des phases distinctes, puis se dissipent pendant 0,62 seconde après le contact. Un éclair court précède les fragments d'impact. La caméra du labo reste inchangée. Le sort sauvegardé bénéficie de ces changements sans nouvelle génération.
+Build **Unity 6000.3.24f1 / URP / Windows x64 IL2CPP**, terminé avec le code 0. Voir le [journal final](../evidence/public/unity/image-reference/build-final.log) et le [manifeste des fichiers](../evidence/public/unity/image-reference-delivery.json). Conserver tous les fichiers extraits ensemble, puis ouvrir `Palimpseste.exe`. Le Player correspondant a été lancé sur le poste d'origine depuis `game/Build/WindowsImageReferencePlayable/` ; ce dossier de build est ignoré par Git.
 
-Le [rapport de vérification](../evidence/public/unity/spectral-fidelity-2026-09-20.md) conserve les quatre itérations du vrai spectre : 1/1, 1/1, 5/5, puis 1/1 contrôles réussis. La [vidéo du labo](../evidence/public/unity/spectral-fidelity/iteration-04/spectre-lab.mp4) montre les 2,433 secondes capturées, sans son. Aucun appel fournisseur n'a été effectué pour cette reprise. La correspondance « 1 pour 1 » à la référence n'est pas démontrée ; le verdict artistique et le son restent ouverts. La cadence de capture ne constitue pas un benchmark de FPS. Les autres formes et recettes n'ont pas toutes fait l'objet de cette revue.
+Le parcours D13 est **dessin → description → image générée → construction du sort depuis l'image → laboratoire**. Pour l'essayer : **Dessiner un parchemin → Dessin terminé → Lancer dans le laboratoire**, lorsque la construction est prête. La génération peut prendre plusieurs minutes. Un nouveau dessin est nécessaire pour essayer cette nouvelle chaîne ; les anciens sorts conservés ne sont pas régénérés. [Instructions joueur](../docs/TESTER_MAINTENANT.md).
 
-## Génération et backend
+## Backend opérateur
 
-Pour les nouveaux dessins : **Sol/high → Astra/high**, prompts A `2.2` et B `1.9`, puis compilation de données contrôlées. Le [diagnostic réel précédent](../evidence/public/backend/sol-astra-active-2026-09-20.json) a pris **60,403 secondes d'appels**, sans réparation. Ce délai n'a pas été remesuré pour la finition 1.2.2 et ne garantit pas celui des prochains dessins. La génération ne lance aucun test ni build Unity.
+Le [ZIP backend](Palimpseste-Backend-Windows-x64.zip) contient **135 entrées**, pour **210 806 064 octets**. SHA-256 :
 
-L'[API et le worker](../evidence/public/backend/sol-astra-deployment-2026-09-20.json) sont déployés sous `PalRuntimeSvc`. Codex utilise le compte déjà connecté via `codex exec` isolé. Les dessins ne peuvent ni exécuter du code, ni modifier les sources, ni accéder aux secrets. Les 141 recettes reposent sur les 24 primitives contrôlées ; voir [la bibliothèque](../docs/EFFECT_LIBRARY.md).
+```text
+6c29f85430cf1d7a9caeec02c8625343b811c754ac831a69bec60379e10f56a2
+```
 
-Le [ZIP backend](Palimpseste-Backend-Windows-x64.zip) est réservé à l'opérateur. Il reste inchangé et compatible avec cette évolution du renderer. Il contient **114 fichiers vérifiés**, pour **111 461 849 octets**. SHA-256 : `3386c5b3f8ff9eebe0a672319ea82394ead743ecb661d7aedb7c8c3de38af007`. Voir le [contrôle de l'archive](../evidence/public/backend/sol-astra-package-2026-09-20.json). Aucun secret Codex, clé API, jeton joueur ou identifiant de base ne fait partie des archives.
+La [preuve du packaging](../evidence/public/image-reference-backend-package-2026-09-20.json) atteste la publication avec code 0 et les empreintes des entrées critiques. L'archive contient l'API, le worker et le doctor .NET autonomes, les contrats, prompts A/G/B, migrations `001` à `008`, scripts opérateur et le binaire natif durci `codex-image.exe`, avec ses correctifs et notices. Son SHA-256 est `0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f`.
 
-Le déploiement actuel est privé sur **127.0.0.1**. L'accès HTTPS public, plusieurs joueurs distants, la recette de 30 dessins, un second créateur et un autre poste restent non validés. Aucun nouveau parcours complet dessin → modèles → Player 1.2.2 n'a été effectué pour cette finition. Voir [comment tester](../docs/TESTER_MAINTENANT.md) et [l'état de réalisation](../docs/IMPLEMENTATION_STATUS.md).
+Configuration réellement déployée localement : **A `gpt-5.6-sol` / `high`, G et B `gpt-6-astra` / `high`**, prompts A `2.2` et B `2.1`. Les appels passent par `codex exec` avec la connexion ChatGPT du compte de service. A/B n'ont aucun outil exécutable ; G ne dispose que de l'image native. Les sorts produits restent des données bornées, sans code généré à exécuter. Voir [l'intégration native](../ops/codex-image-generation.md) et [la preuve du déploiement local](../evidence/public/backend/image-reference-deployment-2026-09-20.json).
+
+Cette archive est réservée à l'opérateur. L'extraire dans un dossier inaccessible au worker, puis suivre [la passation](../docs/PASSATION.md) et [les instructions d'exploitation](../ops/README.md). Elle ne contient ni authentification Codex, ni jetons joueur, ni secrets DB. Les lanceurs actuels sont liés aux chemins, comptes et empreintes du laboratoire d'origine : ils nécessitent une configuration revue sur le nouveau poste. Aucun accès HTTPS distant n'est préconfiguré.
+
+## Limites de validation
+
+Les [sondes fournisseur réelles](../evidence/public/backend/image-reference-2026-09-20.json) et la [capture Unity du vrai paquet](../evidence/public/unity/image-reference-2026-09-20.md) sont documentées séparément. Le dernier réglage du verre est inclus au build, mais postérieur à la capture. Un nouveau parcours joueur D13 complet, la relecture hors ligne de ce nouveau parcours, la qualité artistique et sonore, la fidélité « 1 pour 1 », les 30 dessins de recette et l'accès de joueurs distants restent non acceptés ou non observés. Voir [l'état détaillé](../docs/IMPLEMENTATION_STATUS.md).
