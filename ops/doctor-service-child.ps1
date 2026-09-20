@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('local', 'active', 'plan', 'validate')]
+    [ValidateSet('local', 'astra', 'active', 'plan', 'validate')]
     [string]$Mode,
     [Parameter(Mandatory = $true)]
     [string]$RuntimeRoot,
@@ -53,7 +53,8 @@ if (-not [string]::IsNullOrWhiteSpace($GeometryJson)) {
 if ($Mode -eq 'local') {
     & $doctor local --write $evidence
 } else {
-    $requiredArtifacts = if ($Mode -eq 'active') { @($ReferencePng, $DrawingPng, $InkPng) } else { @($InkPng) }
+    $requiredArtifacts = if ($Mode -eq 'astra') { @($ReferencePng, $DrawingPng) }
+        elseif ($Mode -eq 'active') { @($ReferencePng, $DrawingPng, $InkPng) } else { @($InkPng) }
     foreach ($path in $requiredArtifacts) {
         $full = [IO.Path]::GetFullPath($path)
         if (-not $full.StartsWith((Join-Path $runtime 'artifacts') + '\',
@@ -62,7 +63,9 @@ if ($Mode -eq 'local') {
             throw 'Active input must be a file under runtime/artifacts.'
         }
     }
-    if ($Mode -eq 'active') {
+    if ($Mode -eq 'astra') {
+        & $doctor astra $spec $ReferencePng $DrawingPng --write $evidence
+    } elseif ($Mode -eq 'active') {
         & $doctor active $spec $ReferencePng $DrawingPng --ink $InkPng --write $evidence
     } elseif ($Mode -eq 'plan') {
         $frozen = [IO.Path]::GetFullPath($FrozenAJson)

@@ -49,5 +49,13 @@ namespace Palimpseste.Game.SpellRuntime
             if (!assets.TryGetValue(node.geometry_id, out var asset) || asset.mask_file == null) return null;
             return masks.TryGetValue(asset.mask_file, out var mask) ? mask : null;
         }
+
+        public Texture2D SignatureMask(SpellNode node)
+        {
+            var id = node.appearance?.signature_geometry_id;
+            if (string.IsNullOrEmpty(id) || !assets.TryGetValue(id, out var asset) ||
+                asset.kind != "silhouette" || asset.mask_file == null) return null;
+            return masks.TryGetValue(asset.mask_file, out var mask) ? mask : null;
+        }
     }
 }

@@ -15,20 +15,27 @@ public static class CaptureValidation
     private static readonly byte[] Signature = [137, 80, 78, 71, 13, 10, 26, 10];
     private static readonly string[] Fields = ["schema_version", "capture_id", "parchment_id", "layout_version", "reference_sha256", "raster_version", "drawing_file_sha256", "drawing_pixel_sha256", "ink_file_sha256", "journal_file_sha256", "width", "height", "used_ink_micro_units", "closed_reason", "locked_regions", "created_at"];
 
-    public static CaptureManifest Validate(JsonElement root, Guid parchmentId, string referenceHash, byte[] referencePng, byte[] drawing, byte[] ink, byte[] journal, long budget, long firstSequence, string firstHash)
+    public static CaptureManifest Validate(JsonElement root, Guid parchmentId, string expectedLayout, string referenceHash, byte[] referencePng, byte[] drawing, byte[] ink, byte[] journal, long budget, long firstSequence, string firstHash)
     {
         if (root.ValueKind != JsonValueKind.Object || root.EnumerateObject().Count() != Fields.Length || Fields.Any(x => !root.TryGetProperty(x, out _))) throw new InvalidDataException("Capture manifest fields");
-        if (root.GetProperty("schema_version").GetString() != "sp.capture/1.0" || root.GetProperty("layout_version").GetString() != "three_regions_v1") throw new InvalidDataException("Capture version");
+        if (root.GetProperty("schema_version").GetString() != "sp.capture/1.0" ||
+            root.GetProperty("layout_version").GetString() != expectedLayout ||
+            expectedLayout is not ("three_regions_v1" or "free_canvas_v2"))
+            throw new InvalidDataException("Capture version");
         if (!Guid.TryParseExact(root.GetProperty("capture_id").GetString(), "N", out var captureId) || !Guid.TryParseExact(root.GetProperty("parchment_id").GetString(), "N", out var manifestParchment) || manifestParchment != parchmentId) throw new InvalidDataException("Capture identity");
         var rasterVersion = root.GetProperty("raster_version").GetString();
-        if (string.IsNullOrWhiteSpace(rasterVersion) || rasterVersion.Length > 80) throw new InvalidDataException("Raster version");
+        if (string.IsNullOrWhiteSpace(rasterVersion) || rasterVersion.Length > 80 ||
+            (expectedLayout == "free_canvas_v2" && rasterVersion != "cpu-brush/2.0"))
+            throw new InvalidDataException("Raster version");
         var refHash = root.GetProperty("reference_sha256").GetString() ?? "";
         if (refHash != referenceHash || ApiJson.Sha256(referencePng) != referenceHash) throw new InvalidDataException("Reference hash");
         if (root.GetProperty("width").GetInt32() != 1024 || root.GetProperty("height").GetInt32() != 1024) throw new InvalidDataException("Capture dimensions");
         var usedInk = root.GetProperty("used_ink_micro_units").GetInt64();
         if (usedInk is < 1 or > 1_000_000_000 || usedInk > budget) throw new InvalidDataException("Ink budget");
         var reason = root.GetProperty("closed_reason").GetString() ?? "";
-        if (reason is not ("all_regions_locked" or "window_closed" or "ink_exhausted" or "crash_recovered")) throw new InvalidDataException("Closed reason");
+        if (expectedLayout == "free_canvas_v2" ? reason != "user_finished" :
+            reason is not ("all_regions_locked" or "window_closed" or "ink_exhausted" or "crash_recovered"))
+            throw new InvalidDataException("Closed reason");
         var regions = root.GetProperty("locked_regions");
         if (regions.ValueKind != JsonValueKind.Array || regions.GetArrayLength() > 3) throw new InvalidDataException("Locked regions");
         var seen = new HashSet<string>(StringComparer.Ordinal);
@@ -37,6 +44,8 @@ public static class CaptureValidation
             var name = region.GetString() ?? "";
             if (name is not ("core" or "ring" or "outer") || !seen.Add(name)) throw new InvalidDataException("Locked regions");
         }
+        if (expectedLayout == "free_canvas_v2" && regions.GetArrayLength() != 0)
+            throw new InvalidDataException("Free canvas cannot lock regions");
         if (!DateTimeOffset.TryParse(root.GetProperty("created_at").GetString(), out _)) throw new InvalidDataException("Capture timestamp");
         var drawingHash = ApiJson.Sha256(drawing);
         var inkHash = ApiJson.Sha256(ink);
@@ -45,7 +54,7 @@ public static class CaptureValidation
         var drawingPixels = PngPixels(drawing, requireOpaque: true);
         var inkPixels = PngPixels(ink, requireOpaque: false);
         var referencePixels = PngPixels(referencePng, requireOpaque: true, allowRgb: true);
-        ValidateComposite(drawingPixels, inkPixels, referencePixels);
+        ValidateComposite(drawingPixels, inkPixels, referencePixels, expectedLayout == "three_regions_v1");
         var pixelHash = ApiJson.Sha256(drawingPixels);
         if (pixelHash != root.GetProperty("drawing_pixel_sha256").GetString()) throw new InvalidDataException("Capture pixel hash");
         ValidateJournal(journal, firstSequence, firstHash);
@@ -57,7 +66,7 @@ public static class CaptureValidation
 
     public static string PngPixelsHash(ReadOnlySpan<byte> bytes, bool requireOpaque) => ApiJson.Sha256(PngPixels(bytes, requireOpaque));
 
-    private static void ValidateComposite(byte[] drawing, byte[] ink, byte[] reference)
+    private static void ValidateComposite(byte[] drawing, byte[] ink, byte[] reference, bool radialBounds)
     {
         for (var y = 0; y < 1024; y++)
         for (var x = 0; x < 1024; x++)
@@ -70,7 +79,7 @@ public static class CaptureValidation
                 var v = (y + 0.5f) / 1024f;
                 var dx = 2f * u - 1f;
                 var dy = 2f * v - 1f;
-                if (dx * dx + dy * dy > 1f) throw new InvalidDataException("Ink outside parchment layout");
+                if (radialBounds && dx * dx + dy * dy > 1f) throw new InvalidDataException("Ink outside parchment layout");
             }
             var a = alpha / 255f;
             for (var channel = 0; channel < 3; channel++)

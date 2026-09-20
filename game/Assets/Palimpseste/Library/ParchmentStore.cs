@@ -37,6 +37,8 @@ namespace Palimpseste.Game.Library
         public string reference_sha256;
         public string reference_artifact_id;
         public string capture_id;
+        public string layout_version;
+        public string raster_version;
         public string created_at;
         public int sequence;
         public string last_hash = new string('0', 64);
@@ -84,6 +86,8 @@ namespace Palimpseste.Game.Library
                 begin_key = Guid.NewGuid().ToString("N"),
                 capture_key = Guid.NewGuid().ToString("N"),
                 capture_id = Guid.NewGuid().ToString("N"),
+                layout_version = "free_canvas_v2",
+                raster_version = DrawingCanvas.RasterVersion,
                 created_at = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture)
             };
             Save(record);
@@ -155,7 +159,18 @@ namespace Palimpseste.Game.Library
 
         public DrawingCanvas Replay(ParchmentRecord record)
         {
-            var canvas = new DrawingCanvas();
+            // Records created before free_canvas_v2 have no raster_version field.
+            // They must keep the historical circular clipping and region locks when replayed.
+            var raster = string.IsNullOrEmpty(record.raster_version)
+                ? DrawingCanvas.LegacyRasterVersion : record.raster_version;
+            if (raster != DrawingCanvas.RasterVersion && raster != DrawingCanvas.LegacyRasterVersion)
+            {
+                record.state = "capture_corrupted";
+                Save(record);
+                Debug.LogError("Version de journal de parchemin inconnue : " + raster);
+                return new DrawingCanvas();
+            }
+            var canvas = new DrawingCanvas(raster == DrawingCanvas.LegacyRasterVersion);
             var path = Path.Combine(DirectoryFor(record), "journal.jsonl");
             if (!File.Exists(path)) return canvas;
             var expected = new string('0', 64);
@@ -207,16 +222,42 @@ namespace Palimpseste.Game.Library
                 var checkpointAdvanced = record.sequence != sequence;
                 record.sequence = sequence;
                 record.last_hash = expected;
+                if (record.server_issued && sequence > 0 && string.IsNullOrEmpty(record.job_id) &&
+                    (record.state == "blank" || record.state == "writing" || record.needs_capture))
+                    record.needs_begin = true; // Idempotent if Begin already reached the server.
                 if ((record.state == "blank" || record.state == "writing") && canvas.Engaged)
                 {
-                    if (!canvas.Closed)
+                    if (canvas.UsesLegacyRegions)
                     {
-                        canvas.Close();
-                        Append(record, "close", Vector2.zero, BrushStyle.Solid, new Color32(0, 0, 0, 0), 0, 0);
+                        if (!canvas.Closed)
+                        {
+                            canvas.Close();
+                            Append(record, "close", Vector2.zero, BrushStyle.Solid, new Color32(0, 0, 0, 0), 0, 0);
+                        }
+                        record.closed_reason = "crash_recovered";
+                        record.state = "capture_pending";
+                        record.needs_capture = true;
                     }
-                    record.closed_reason = "crash_recovered";
-                    record.state = "capture_pending";
-                    record.needs_capture = true;
+                    else
+                    {
+                        // A free-canvas drawing is committed only by the explicit finish button.
+                        // A crashed gesture is ended durably so the player can add more strokes.
+                        if (canvas.Closed)
+                        {
+                            record.state = "capture_pending";
+                            record.closed_reason = "user_finished";
+                            record.needs_capture = true;
+                        }
+                        else
+                        {
+                            record.state = "writing";
+                            if (canvas.IsDrawing)
+                            {
+                                canvas.End();
+                                Append(record, "up", Vector2.zero, BrushStyle.Solid, new Color32(0, 0, 0, 0), 0, 0);
+                            }
+                        }
+                    }
                     Save(record);
                 }
                 else

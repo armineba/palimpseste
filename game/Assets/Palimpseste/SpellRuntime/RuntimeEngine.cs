@@ -157,7 +157,7 @@ namespace Palimpseste.Game.SpellRuntime
                     nextTick = TickCount + Option(node.options.tick_interval, 1)
                 };
                 state.path = geometry.Path(node);
-                state.visual = CarrierVisual.Create(state, geometry.Mask(node));
+                state.visual = CarrierVisual.Create(state, geometry.Mask(node), geometry.SignatureMask(node));
                 active.Add(state);
                 Play(state.position, birthClip, .17f);
                 Emit(state, "spawn", null, state.position, Vector3.up);
@@ -171,6 +171,7 @@ namespace Palimpseste.Game.SpellRuntime
             if (state.expired && kind != "expire") return;
             if (receiver != null) Hits++;
             if (kind == "hit" || kind == "block" || kind == "trigger") Play(position, impactClip, .22f);
+            if (kind == "hit" && receiver != null) CarrierVisual.ProjectileHit(state, position);
             if (state.node.effects != null)
                 foreach (var effect in state.node.effects)
                     if (effect.@event == kind && receiver != null && Matches(effect.target_filter, receiver))

@@ -18,7 +18,7 @@
       "maxLength": 80
     },
     "layout_version": {
-      "const": "three_regions_v1"
+      "enum": ["three_regions_v1", "free_canvas_v2"]
     },
     "reference_sha256": {
       "type": "string",
@@ -62,7 +62,8 @@
         "all_regions_locked",
         "window_closed",
         "ink_exhausted",
-        "crash_recovered"
+        "crash_recovered",
+        "user_finished"
       ]
     },
     "locked_regions": {
@@ -100,6 +101,18 @@
     "closed_reason",
     "locked_regions",
     "created_at"
+  ],
+  "allOf": [
+    {
+      "if": { "properties": { "layout_version": { "const": "free_canvas_v2" } }, "required": ["layout_version"] },
+      "then": {
+        "properties": {
+          "raster_version": { "const": "cpu-brush/2.0" },
+          "closed_reason": { "const": "user_finished" },
+          "locked_regions": { "maxItems": 0 }
+        }
+      }
+    }
   ],
   "additionalProperties": false
 }

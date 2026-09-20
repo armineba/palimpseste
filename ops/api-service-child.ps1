@@ -33,6 +33,8 @@ $artifactRoot = [IO.Path]::GetFullPath((Read-Value $runtimeEnv 'ARTIFACT_ROOT'))
 $specRoot = [IO.Path]::GetFullPath((Read-Value $runtimeEnv 'PALIMPSESTE_SPEC_ROOT'))
 if (-not (Test-Path -LiteralPath $artifactRoot -PathType Container) -or
     -not (Test-Path -LiteralPath (Join-Path $specRoot 'reference\reference_layout.png') -PathType Leaf) -or
+    -not (Test-Path -LiteralPath (Join-Path $specRoot 'reference\reference_free_canvas.png') -PathType Leaf) -or
+    -not (Test-Path -LiteralPath (Join-Path $specRoot 'reference\layout-v2.json') -PathType Leaf) -or
     -not (Test-Path -LiteralPath (Join-Path $specRoot 'contracts\capability-catalog.json') -PathType Leaf)) {
     throw 'Owner lab API assets missing.'
 }
@@ -43,12 +45,14 @@ if (-not (Test-Path -LiteralPath $artifactRoot -PathType Container) -or
 [Environment]::SetEnvironmentVariable('ASPNETCORE_URLS', 'http://127.0.0.1:18080', 'Process')
 [Environment]::SetEnvironmentVariable('REFERENCE_PNG',
     (Join-Path $specRoot 'reference\reference_layout.png'), 'Process')
+[Environment]::SetEnvironmentVariable('REFERENCE_FREE_PNG',
+    (Join-Path $specRoot 'reference\reference_free_canvas.png'), 'Process')
 [Environment]::SetEnvironmentVariable('CAPABILITY_CATALOG',
     (Join-Path $specRoot 'contracts\capability-catalog.json'), 'Process')
 [Environment]::SetEnvironmentVariable('CATALOG_VERSION', 'sp.capabilities/1.0', 'Process')
 [Environment]::SetEnvironmentVariable('RULES_PROFILE', 'lab_v1', 'Process')
 [Environment]::SetEnvironmentVariable('ALLOWED_CLIENT_VERSION', '0.1.0', 'Process')
-[Environment]::SetEnvironmentVariable('PALIMPSESTE_GENERATIONS_PER_PRINCIPAL_24H', '3', 'Process')
+[Environment]::SetEnvironmentVariable('PALIMPSESTE_GENERATIONS_PER_PRINCIPAL_24H', '5', 'Process')
 [Environment]::SetEnvironmentVariable('PALIMPSESTE_GENERATIONS_GLOBAL_24H', '12', 'Process')
 foreach ($name in @('OPENAI_API_KEY', 'CODEX_API_KEY', 'CODEX_ACCESS_TOKEN', 'CHATGPT_TOKEN')) {
     [Environment]::SetEnvironmentVariable($name, $null, 'Process')

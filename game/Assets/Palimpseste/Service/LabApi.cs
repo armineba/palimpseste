@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Palimpseste.Game.Library;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -38,13 +40,52 @@ namespace Palimpseste.Game.Service
     {
         public string schema_version = "sp.capture/1.0";
         public string capture_id, parchment_id;
-        public string layout_version = "three_regions_v1";
+        public string layout_version = "free_canvas_v2";
         public string reference_sha256, raster_version, drawing_file_sha256, drawing_pixel_sha256, ink_file_sha256, journal_file_sha256;
         public int width = 1024, height = 1024;
         public long used_ink_micro_units;
         public string closed_reason;
         public string[] locked_regions;
         public string created_at;
+    }
+
+    public static class ApiErrorText
+    {
+        private const int DisplayLimit = 300;
+
+        public static bool TryReadProblem(string body, out string code, out string message)
+        {
+            code = null;
+            message = null;
+            if (string.IsNullOrWhiteSpace(body) || body.Length > 8192) return false;
+            try
+            {
+                var root = JObject.Parse(body);
+                if (root["code"]?.Type != JTokenType.String || root["message"]?.Type != JTokenType.String)
+                    return false;
+                var parsedCode = root["code"].Value<string>();
+                var parsedMessage = root["message"].Value<string>();
+                if (string.IsNullOrWhiteSpace(parsedCode) || parsedCode.Length > 80 ||
+                    string.IsNullOrWhiteSpace(parsedMessage)) return false;
+                code = parsedCode;
+                message = Bound(parsedMessage);
+                return true;
+            }
+            catch (JsonException) { return false; }
+        }
+
+        public static string Display(string body, string transportError)
+        {
+            if (TryReadProblem(body, out _, out var message)) return message;
+            if (!string.IsNullOrWhiteSpace(body)) return Bound(body);
+            return string.IsNullOrWhiteSpace(transportError) ? "Erreur réseau" : Bound(transportError);
+        }
+
+        private static string Bound(string value)
+        {
+            var compact = value.Trim().Replace('\r', ' ').Replace('\n', ' ').Replace('\t', ' ');
+            return compact.Length > DisplayLimit ? compact.Substring(0, DisplayLimit) : compact;
+        }
     }
 
     public sealed class LabApi
@@ -125,7 +166,7 @@ namespace Palimpseste.Game.Service
 
         public IEnumerator Allocate(string key, Action<ParchmentDto, string> done)
         {
-            using (var req = Request("POST", "/v1/parchments", Json("{\"layout_version\":\"three_regions_v1\"}"), "application/json", key))
+            using (var req = Request("POST", "/v1/parchments", Json("{\"layout_version\":\"free_canvas_v2\"}"), "application/json", key))
             {
                 yield return req.SendWebRequest();
                 done(req.result == UnityWebRequest.Result.Success ? JsonUtility.FromJson<ParchmentDto>(req.downloadHandler.text) : null, Error(req));
@@ -164,7 +205,7 @@ namespace Palimpseste.Game.Service
             }
         }
 
-        public IEnumerator Upload(ParchmentRecord record, DrawingCaptureDto capture, byte[] drawing, byte[] ink, byte[] journal, Action<JobDto, string> done)
+        public IEnumerator Upload(ParchmentRecord record, DrawingCaptureDto capture, byte[] drawing, byte[] ink, byte[] journal, Action<JobDto, string, string> done)
         {
             var sections = new List<IMultipartFormSection>
             {
@@ -180,7 +221,9 @@ namespace Palimpseste.Game.Service
                 req.SetRequestHeader("Idempotency-Key", record.capture_key);
                 req.timeout = 60;
                 yield return req.SendWebRequest();
-                done(req.result == UnityWebRequest.Result.Success ? JsonUtility.FromJson<JobDto>(req.downloadHandler.text) : null, Error(req));
+                ApiErrorText.TryReadProblem(req.downloadHandler?.text, out var code, out _);
+                done(req.result == UnityWebRequest.Result.Success ? JsonUtility.FromJson<JobDto>(req.downloadHandler.text) : null,
+                    Error(req), code);
             }
         }
 
@@ -230,12 +273,7 @@ namespace Palimpseste.Game.Service
         private static string Error(UnityWebRequest req)
         {
             if (req.result == UnityWebRequest.Result.Success) return null;
-            if (!string.IsNullOrWhiteSpace(req.downloadHandler?.text))
-            {
-                var text = req.downloadHandler.text;
-                return text.Length > 300 ? text.Substring(0, 300) : text;
-            }
-            return req.error ?? "Erreur réseau";
+            return ApiErrorText.Display(req.downloadHandler?.text, req.error);
         }
     }
 }

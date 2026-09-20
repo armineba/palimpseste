@@ -146,14 +146,39 @@ namespace Palimpseste.Game.PlayModeTests
                 yield return null;
             }
             packet = JsonConvert.DeserializeObject<CompiledSpell>(File.ReadAllText(Path.Combine(examples, "03_paquet_illustratif.json")));
+            packet.plan.nodes[0].appearance.palette = "ember";
             var curveHost = new GameObject("Compiled sample curved projectile");
             var curveLab = curveHost.AddComponent<SpellLab>();
             curveLab.Initialize(JsonConvert.SerializeObject(packet), directory);
             Assert.IsTrue(curveLab.Ready, curveLab.Metrics);
             Assert.IsTrue(curveLab.Cast(new Vector3(0, 0, 8)));
-            curveLab.SimulateTicks(75);
+            curveLab.SimulateTicks(1);
+            var projectileVisual = GameObject.Find("projectile 1");
+            Assert.NotNull(projectileVisual, "The compiled projectile must create a real visual");
+            var paintedStroke = Array.Find(projectileVisual.GetComponentsInChildren<LineRenderer>(),
+                line => line.gameObject.name == "Trait du dessin");
+            Assert.NotNull(paintedStroke, "The projectile must carry its sampled painted trajectory");
+            Assert.Greater(paintedStroke.positionCount, 2, "A two-point generic streak loses the drawn curve");
+            Assert.Greater(Vector3.Distance(paintedStroke.GetPosition(0),
+                paintedStroke.GetPosition(paintedStroke.positionCount - 1)), .1f);
+            Assert.Greater(paintedStroke.startColor.r, paintedStroke.startColor.g,
+                "The controlled ember palette must tint the painted stroke red-brown");
+            Assert.Greater(paintedStroke.startColor.r, .7f);
+            var glyph = Array.Find(projectileVisual.GetComponentsInChildren<Renderer>(),
+                renderer => renderer.gameObject.name == "Glyphe du dessin complet");
+            Assert.NotNull(glyph, "The whole captured silhouette must remain visible before a child event");
+            Assert.NotNull(glyph.sharedMaterial.mainTexture);
+            foreach (var collider in projectileVisual.GetComponentsInChildren<Collider>())
+                Assert.IsFalse(collider.enabled, "Drawing visuals may not affect collision");
+            curveLab.SimulateTicks(74);
             Assert.Greater(curveLab.Hits, 0, "Curved projectile must reach a hostile receiver");
             Assert.Greater(curveLab.DamageMilli, 0, "Curved projectile must apply damage");
+            var impactVisual = GameObject.Find("Éclat d'impact");
+            Assert.NotNull(impactVisual,
+                "A real projectile hit should leave a short decorative impact cue");
+            Assert.IsNull(impactVisual.GetComponentInChildren<Collider>(),
+                "Impact graphics must not become physical receivers");
+            Assert.IsNull(impactVisual.GetComponentInChildren<LabReceiver>());
             Assert.IsTrue(Array.Exists(curveHost.GetComponentsInChildren<LabReceiver>(), receiver => receiver.BurnUntil > 0),
                 "Child field must apply a burn status after projectile contact");
             TestContext.WriteLine("compiled_curve: hits=" + curveLab.Hits + " damage_milli=" + curveLab.DamageMilli);

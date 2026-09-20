@@ -77,7 +77,8 @@ app.Use(async (context, next) =>
 app.MapGet("/health/live", () => Results.Ok(new { status = "live" }));
 app.MapGet("/health/ready", async (NpgsqlDataSource db, ApiConfig config, CancellationToken ct) =>
 {
-    if (!File.Exists(config.ReferencePath) || !File.Exists(config.CatalogPath)) return Results.StatusCode(503);
+    if (!File.Exists(config.ReferencePath) || !File.Exists(config.ReferenceFreePath) ||
+        !File.Exists(config.CatalogPath)) return Results.StatusCode(503);
     try
     {
         await using var connection = await db.OpenConnectionAsync(ct);

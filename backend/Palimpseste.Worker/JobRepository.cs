@@ -101,6 +101,20 @@ public sealed class JobRepository
         return checked((int)(long)(await cmd.ExecuteScalarAsync(ct) ?? 0L));
     }
 
+    public async Task<string?> GetSuccessfulRequestedModelAsync(ClaimedJob job, string stage, CancellationToken ct)
+    {
+        if (stage is not ("A" or "B")) throw new ArgumentOutOfRangeException(nameof(stage));
+        await using var cmd = source.CreateCommand("""
+            SELECT requested_model FROM provider_attempts
+            WHERE job_id=$1 AND status='success' AND stage IN ($2,$3)
+            ORDER BY finished_at DESC, id DESC LIMIT 1
+            """);
+        cmd.Parameters.AddWithValue(job.Id);
+        cmd.Parameters.AddWithValue(stage);
+        cmd.Parameters.AddWithValue("repair_" + stage);
+        return (string?)await cmd.ExecuteScalarAsync(ct);
+    }
+
     public async Task ScheduleRetryAsync(ClaimedJob job, string stage, string reason, CancellationToken ct)
     {
         if (stage is not ("A" or "B")) throw new ArgumentOutOfRangeException(nameof(stage));

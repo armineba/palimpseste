@@ -19,6 +19,7 @@ namespace Palimpseste.Core
     public static class GeometryResolver
     {
         public const string Version = "sp.geometry.resolver/1.0";
+        public const string WholeCanvasVersion = "sp.geometry.resolver/1.1.whole_canvas";
         private static readonly int[] Dx4 = { -1, 1, 0, 0 };
         private static readonly int[] Dy4 = { 0, 0, -1, 1 };
 
@@ -32,12 +33,20 @@ namespace Palimpseste.Core
         {
             if (width != 1024 || height != 1024 || inkRgba == null || inkRgba.Length != width * height * 4)
                 throw new ArgumentException("Expected canonical 1024² RGBA ink image");
-            if (description?.shape_requests == null) throw new ArgumentNullException(nameof(description));
+            if (description == null) throw new ArgumentNullException(nameof(description));
             var result = new GeometryResolution();
             var pixelHash = SpellCompiler.Sha256(inkRgba);
-            var requests = description.shape_requests
-                .Select(r => (r.region, r.role)).Distinct().ToList();
+            // A can now interpret the complete image without assigning marks to fixed
+            // parchment regions. Offer the same bounded pixel geometries to B for any
+            // subject it creates. Existing descriptions keep their explicit requests.
+            var imageDriven = description.shape_requests == null || description.shape_requests.Count == 0;
+            var requests = imageDriven
+                ? new List<(string region, string role)> {
+                    ("full", "path"), ("full", "footprint"),
+                    ("full", "silhouette"), ("full", "distribution") }
+                : description.shape_requests.Select(r => (r.region, r.role)).Distinct().ToList();
             if (!requests.Contains(("full", "silhouette"))) requests.Add(("full", "silhouette"));
+            bool[] fullImageMask = null;
             foreach (var request in requests)
             {
                 if (!new[] { "core", "ring", "outer", "full" }.Contains(request.region) ||
@@ -46,7 +55,9 @@ namespace Palimpseste.Core
                     result.Issues.Add(new ValidationIssue("shape_request", request.region + "/" + request.role, "Unknown region or role"));
                     continue;
                 }
-                var regionMask = RegionPixels(inkRgba, width, height, request.region);
+                var regionMask = imageDriven
+                    ? fullImageMask ?? (fullImageMask = CanvasPixels(inkRgba, width, height))
+                    : RegionPixels(inkRgba, width, height, request.region);
                 if (!regionMask.Any(x => x))
                 {
                     result.Issues.Add(new ValidationIssue("empty_region", request.region + "/" + request.role,
@@ -66,10 +77,13 @@ namespace Palimpseste.Core
                         var simplified = Resample(route, width, 128);
                         var asset = MakeAsset(request.region, request.role, index++, pixelHash,
                             ToNormalizedPoints(simplified, width), null, Bounds(component, width),
-                            "Chemin aminci puis échantillonné par longueur d’arc; composante conservée.");
+                            "Chemin aminci puis échantillonné par longueur d’arc; composante conservée.", imageDriven);
                         AddAsset(result, asset);
                     }
-                    if (index == 0) result.Issues.Add(new ValidationIssue("path_degenerate", request.region,
+                    // A dot or a group of dots can still become a field, trap, or pulse.
+                    // B only receives assets that actually exist, so it cannot select
+                    // a fabricated path for a carrier that requires one.
+                    if (index == 0 && !imageDriven) result.Issues.Add(new ValidationIssue("path_degenerate", request.region,
                         "The drawing has no usable path with two distinct points"));
                 }
                 else if (request.role == "distribution")
@@ -79,12 +93,12 @@ namespace Palimpseste.Core
                         width * (int)c.Average(i => i / width)).ToList();
                     var asset = MakeAsset(request.region, request.role, 0, pixelHash,
                         ToNormalizedPoints(centers, width), null, Bounds(regionMask, width),
-                        "Centres des composantes de pixels; aucune interprétation tactique.");
+                        "Centres des composantes de pixels; aucune interprétation tactique.", imageDriven);
                     AddAsset(result, asset);
                 }
                 else
                 {
-                    var mask = request.role == "footprint" ? FillClosed(regionMask, width, height, request.region) : regionMask;
+                    var mask = request.role == "footprint" ? FillClosed(regionMask, width, height, request.region, imageDriven) : regionMask;
                     var bounds = Bounds(mask, width);
                     var file = request.region + "." + request.role + ".0.png";
                     var crop = CropMask(mask, width, bounds);
@@ -93,7 +107,7 @@ namespace Palimpseste.Core
                         new List<GeometryPoint>(), file, bounds,
                         request.role == "footprint" ?
                             "Empreinte issue des pixels; les zones closes alternées restent trouées." :
-                            "Silhouette des pixels visibles, sans guides de référence.");
+                            "Silhouette des pixels visibles, sans guides de référence.", imageDriven);
                     AddAsset(result, asset);
                 }
             }
@@ -101,10 +115,12 @@ namespace Palimpseste.Core
         }
 
         private static GeometryAsset MakeAsset(string region, string kind, int index, string pixelHash,
-            List<GeometryPoint> points, string maskFile, (int x, int y, int width, int height) bounds, string notes)
+            List<GeometryPoint> points, string maskFile, (int x, int y, int width, int height) bounds, string notes,
+            bool wholeCanvas)
         {
             return new GeometryAsset { schema_version = "sp.geometry/1.0", geometry_id = region + "." + kind + "." + index,
-                source_region = region, kind = kind, source_pixel_sha256 = pixelHash, algorithm = Version,
+                source_region = region, kind = kind, source_pixel_sha256 = pixelHash,
+                algorithm = wholeCanvas ? WholeCanvasVersion : Version,
                 points = points, mask_file = maskFile, width_px = bounds.width, height_px = bounds.height, notes = notes };
         }
 
@@ -115,6 +131,13 @@ namespace Palimpseste.Core
             var violations = ContractJson.Validate(ContractJson.ParseStrict(json), "geometry");
             foreach (var violation in violations) result.Issues.Add(violation);
             result.GeometryJson[asset.geometry_id] = json;
+        }
+
+        private static bool[] CanvasPixels(byte[] rgba, int width, int height)
+        {
+            var pixels = new bool[width * height];
+            for (int i = 0; i < pixels.Length; i++) pixels[i] = rgba[i * 4 + 3] >= 32;
+            return pixels;
         }
 
         private static bool[] RegionPixels(byte[] rgba, int width, int height, string region)
@@ -137,7 +160,7 @@ namespace Palimpseste.Core
             return pixels;
         }
 
-        private static bool[] FillClosed(bool[] ink, int width, int height, string region)
+        private static bool[] FillClosed(bool[] ink, int width, int height, string region, bool wholeCanvas)
         {
             var output = (bool[])ink.Clone();
             var visited = new bool[ink.Length];
@@ -152,7 +175,7 @@ namespace Palimpseste.Core
                 {
                     int index = queue[head++], x = index % width, y = index / width;
                     if (x == 0 || y == 0 || x == width - 1 || y == height - 1 ||
-                        !InsideRegion(x, y, width, height, region)) touchesBoundary = true;
+                        !InsideRegion(x, y, width, height, region, wholeCanvas)) touchesBoundary = true;
                     for (int k = 0; k < 4; k++)
                     {
                         int nx = x + Dx4[k], ny = y + Dy4[k];
@@ -177,8 +200,9 @@ namespace Palimpseste.Core
             return output;
         }
 
-        private static bool InsideRegion(int x, int y, int width, int height, string region)
+        private static bool InsideRegion(int x, int y, int width, int height, string region, bool wholeCanvas)
         {
+            if (wholeCanvas) return true;
             double u = (x + .5) / width, v = (y + .5) / height;
             double r = (2 * u - 1) * (2 * u - 1) + (2 * v - 1) * (2 * v - 1);
             return r <= 1 && (region == "full" || region == "core" && r < .32 * .32 ||

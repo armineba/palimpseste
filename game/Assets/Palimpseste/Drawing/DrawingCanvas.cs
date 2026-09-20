@@ -11,11 +11,13 @@ namespace Palimpseste.Game.Drawing
     {
         public const int Size = 1024;
         public const long InkLimitMicro = 1000000000L;
-        public const string RasterVersion = "cpu-brush/1.0";
+        public const string RasterVersion = "cpu-brush/2.0";
+        public const string LegacyRasterVersion = "cpu-brush/1.0";
         private const int CostPerOpaquePixelMicro = 5000;
         private readonly Color32[] ink = new Color32[Size * Size];
         private readonly bool[] locked = new bool[3];
         private readonly bool[] touched = new bool[3];
+        private readonly bool legacyRegions;
         private Texture2D texture;
         private Vector2 previous;
         private float walked;
@@ -25,10 +27,11 @@ namespace Palimpseste.Game.Drawing
 
         public long UsedInkMicro { get; private set; }
         public bool Engaged => UsedInkMicro > 0;
+        public bool UsesLegacyRegions => legacyRegions;
         public bool Closed { get; private set; }
         public bool IsDrawing => active;
-        public bool IsLocked(InkRegion region) => region != InkRegion.Outside && locked[(int)region];
-        public bool AllLocked => locked[0] && locked[1] && locked[2];
+        public bool IsLocked(InkRegion region) => legacyRegions && region != InkRegion.Outside && locked[(int)region];
+        public bool AllLocked => legacyRegions && locked[0] && locked[1] && locked[2];
         public bool InkExhausted => UsedInkMicro >= InkLimitMicro;
         public Color32[] InkPixels => ink;
 
@@ -47,10 +50,14 @@ namespace Palimpseste.Game.Drawing
             }
         }
 
-        public DrawingCanvas()
+        public DrawingCanvas(bool legacyRegions = false)
         {
+            this.legacyRegions = legacyRegions;
             for (var i = 0; i < ink.Length; i++) ink[i] = new Color32(0, 0, 0, 0);
         }
+
+        private bool CanInk(int x, int y) => x >= 0 && x < Size && y >= 0 && y < Size &&
+            (!legacyRegions || (Region(x, y) != InkRegion.Outside && !IsLocked(Region(x, y))));
 
         public static InkRegion Region(int x, int y)
         {
@@ -66,9 +73,7 @@ namespace Palimpseste.Game.Drawing
 
         public bool Begin(Vector2 point, BrushStyle style, Color32 color, float diameter, float pressure)
         {
-            if (Closed || active || Region(Mathf.RoundToInt(point.x), Mathf.RoundToInt(point.y)) == InkRegion.Outside) return false;
-            var region = Region(Mathf.RoundToInt(point.x), Mathf.RoundToInt(point.y));
-            if (IsLocked(region)) return false;
+            if (Closed || active || InkExhausted || !CanInk(Mathf.RoundToInt(point.x), Mathf.RoundToInt(point.y))) return false;
             active = true;
             carry = 0f;
             anyStamp = false;
@@ -105,8 +110,9 @@ namespace Palimpseste.Game.Drawing
         {
             if (!active) return;
             active = false;
-            for (var i = 0; i < touched.Length; i++) if (touched[i]) locked[i] = true;
-            if (AllLocked || InkExhausted) Closed = true;
+            if (legacyRegions)
+                for (var i = 0; i < touched.Length; i++) if (touched[i]) locked[i] = true;
+            if (AllLocked || (legacyRegions && InkExhausted)) Closed = true;
             if (anyStamp) Refresh();
         }
 
@@ -138,11 +144,8 @@ namespace Palimpseste.Game.Drawing
             long fullCost = 0;
             for (var y = ymin; y <= ymax; y++)
                 for (var x = xmin; x <= xmax; x++)
-                    if ((x - point.x) * (x - point.x) + (y - point.y) * (y - point.y) <= rr && !IsLocked(Region(x, y)))
-                    {
-                        var region = Region(x, y);
-                        if (region != InkRegion.Outside) fullCost += (long)CostPerOpaquePixelMicro * color.a / 255;
-                    }
+                    if ((x - point.x) * (x - point.x) + (y - point.y) * (y - point.y) <= rr && CanInk(x, y))
+                        fullCost += (long)CostPerOpaquePixelMicro * color.a / 255;
             if (fullCost == 0) return;
             var remaining = InkLimitMicro - UsedInkMicro;
             if (remaining <= 0) return;
@@ -152,8 +155,7 @@ namespace Palimpseste.Game.Drawing
                 for (var x = xmin; x <= xmax; x++)
                 {
                     if ((x - point.x) * (x - point.x) + (y - point.y) * (y - point.y) > rr) continue;
-                    var region = Region(x, y);
-                    if (region == InkRegion.Outside || IsLocked(region)) continue;
+                    if (!CanInk(x, y)) continue;
                     var sourceA = (byte)Mathf.Clamp(Mathf.RoundToInt((float)(color.a * fraction)), 0, 255);
                     if (sourceA == 0) continue;
                     var index = y * Size + x;
@@ -166,7 +168,7 @@ namespace Palimpseste.Game.Drawing
                         (byte)Mathf.RoundToInt((color.g * a + old.g * oa * (1 - a)) / resultA),
                         (byte)Mathf.RoundToInt((color.b * a + old.b * oa * (1 - a)) / resultA),
                         (byte)Mathf.RoundToInt(resultA * 255f));
-                    touched[(int)region] = true;
+                    if (legacyRegions) touched[(int)Region(x, y)] = true;
                     anyStamp = true;
                     charged += (long)CostPerOpaquePixelMicro * sourceA / 255;
                 }

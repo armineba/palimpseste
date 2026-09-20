@@ -16,6 +16,7 @@ namespace Palimpseste.Game.Bootstrap
 {
     public sealed class PalimpsesteApp : MonoBehaviour
     {
+        private const string EmptyDrawingWarning = "Ajoutez au moins un trait avant de terminer.";
         private enum Page { Library, Drawing, Processing, Card, Interpretation, Lab }
         private static PalimpsesteApp instance;
         private readonly LabApi api = new LabApi();
@@ -120,15 +121,15 @@ namespace Palimpseste.Game.Bootstrap
             if (focus || page != Page.Drawing || canvas == null || !canvas.IsDrawing) return;
             Append("up", Vector2.zero);
             canvas.End();
-            notice = "Geste interrompu et enregistré. Les régions touchées sont verrouillées.";
-            if (canvas.Closed) FinalizeDrawing("all_regions_locked");
+            notice = "Geste interrompu et enregistré. Vous pouvez continuer à dessiner.";
         }
 
         private void OnApplicationQuit()
         {
             if (page != Page.Drawing || canvas == null || selected == null || !canvas.Engaged) return;
             if (canvas.IsDrawing) { Append("up", Vector2.zero); canvas.End(); }
-            FinalizeDrawing("window_closed");
+            // The free canvas is only submitted after the player's explicit finish action.
+            // The journal and state have already been flushed by Append.
         }
 
         private void InitializeStyles()
@@ -204,9 +205,9 @@ namespace Palimpseste.Game.Bootstrap
             GUI.Box(new Rect(guideX, 270, guideWidth, Mathf.Min(300, Screen.height - 405)), GUIContent.none);
             GUI.Label(new Rect(guideX + 18, 285, guideWidth - 36, 36), "Votre parcours", titleStyle);
             GUI.DrawTexture(new Rect(guideX + 18, 325, guideWidth - 36, 2), goldBar);
-            GUI.Label(new Rect(guideX + 18, 340, guideWidth - 36, 44), "01  Dessiner sur trois régions", textStyle);
+            GUI.Label(new Rect(guideX + 18, 340, guideWidth - 36, 44), "01  Dessiner librement", textStyle);
             GUI.Label(new Rect(guideX + 18, 390, guideWidth - 36, 44), "02  Transmettre votre trace", textStyle);
-            GUI.Label(new Rect(guideX + 18, 440, guideWidth - 36, 48), "03  Lire l'interprétation de Luna", textStyle);
+            GUI.Label(new Rect(guideX + 18, 440, guideWidth - 36, 48), "03  Lire l'idée de sort d'Astra", textStyle);
             GUI.Label(new Rect(guideX + 18, 485, guideWidth - 36, 48), "04  Essayer le sort dans le labo", textStyle);
             GUI.Label(new Rect(guideX + 18, 532, guideWidth - 36, 34), "Sorts téléchargés : accessibles hors ligne.", textStyle);
             var listWidth = width * .55f;
@@ -244,22 +245,17 @@ namespace Palimpseste.Game.Bootstrap
             var width = Screen.width - x - 26;
             GUI.Box(new Rect(x, 125, width, Mathf.Min(610, Screen.height - 150)), GUIContent.none, panelStyle);
             GUI.Label(new Rect(x + 16, 139, width - 32, 34), "Atelier de dessin", titleStyle);
-            GUI.Label(new Rect(x + 16, 185, width - 32, 58), "Une région encrée se verrouille lorsque vous relevez le pinceau.", textStyle);
+            GUI.Label(new Rect(x + 16, 185, width - 32, 58), "Dessinez sur tout le parchemin. Astra imagine un sort à partir de son apparence, puis Luna en construit le plan.", textStyle);
             GUI.Label(new Rect(x + 16, 248, width - 32, 27), "Traces", textStyle);
             brush = (BrushStyle)GUI.Toolbar(new Rect(x + 16, 280, width - 32, 34), (int)brush, new[] { "Plein", "Double", "Pointillé" });
             GUI.Label(new Rect(x + 16, 329, width - 32, 27), "Encre : " + inkNames[inkIndex], textStyle);
             inkIndex = GUI.Toolbar(new Rect(x + 16, 360, width - 32, 35), inkIndex, inkNames);
             GUI.Label(new Rect(x + 16, 407, width - 32, 27), "Épaisseur : " + Mathf.RoundToInt(diameter) + " px", textStyle);
             diameter = GUI.HorizontalSlider(new Rect(x + 20, 446, width - 40, 25), diameter, 3, 40);
-            GUI.Label(new Rect(x + 16, 473, width - 32, 54), "Encre restante : " + ((DrawingCanvas.InkLimitMicro - canvas.UsedInkMicro) / 1000000f).ToString("F1") + " / 1000\nNoyau " + RegionState(InkRegion.Core) + " · Couronne " + RegionState(InkRegion.Ring) + " · Périphérie " + RegionState(InkRegion.Outer), textStyle);
-            if (GUI.Button(new Rect(x + 16, 555, width - 32, 43), "Fermer le parchemin", buttonStyle))
-            {
-                if (canvas.Engaged) FinalizeDrawing("window_closed");
-                else page = Page.Library;
-            }
+            GUI.Label(new Rect(x + 16, 473, width - 32, 54), "Encre restante : " + ((DrawingCanvas.InkLimitMicro - canvas.UsedInkMicro) / 1000000f).ToString("F1") + " / 1000\nAjoutez autant de traits que souhaité, puis validez.", textStyle);
+            if (GUI.Button(new Rect(x + 16, 555, width - 32, 43), "Dessin terminé", buttonStyle))
+                FinalizeDrawing("user_finished");
         }
-
-        private string RegionState(InkRegion r) => canvas.IsLocked(r) ? "verrouillé" : "libre";
 
         private void HandlePaperEvent(Event e)
         {
@@ -280,14 +276,17 @@ namespace Palimpseste.Game.Bootstrap
             {
                 Append("move", p, pressure);
                 canvas.Move(p, brush, inks[inkIndex], diameter, pressure);
-                if (canvas.Closed) FinalizeDrawing("ink_exhausted");
+                if (!canvas.IsDrawing)
+                {
+                    Append("up", p);
+                    notice = "Encre épuisée. Cliquez sur Dessin terminé pour créer le sort.";
+                }
                 e.Use();
             }
             else if (e.type == EventType.MouseUp && canvas.IsDrawing)
             {
                 Append("up", p);
                 canvas.End();
-                if (canvas.Closed) FinalizeDrawing("all_regions_locked");
                 e.Use();
             }
         }
@@ -297,6 +296,8 @@ namespace Palimpseste.Game.Bootstrap
             store.Append(selected, op, p, brush, inks[inkIndex], diameter, pressure);
             if (selected.sequence == 1) selected.needs_begin = true;
             store.Save(selected);
+            if (op == "down" && notice == EmptyDrawingWarning)
+                notice = "Dessin en cours. Ajoutez des traits, puis cliquez sur Dessin terminé.";
         }
 
         private void DrawProcessing()
@@ -356,7 +357,7 @@ namespace Palimpseste.Game.Bootstrap
 
         private void DrawProcessingSteps(Rect area)
         {
-            var names = new[] { "Trace", "Lecture A", "Formes", "Traduction B", "Sort" };
+            var names = new[] { "Dessin", "Astra imagine", "Luna planifie", "Compilation", "Sort" };
             var current = ProcessingStep(selected);
             var gap = 7f;
             var itemWidth = (area.width - gap * (names.Length - 1)) / names.Length;
@@ -377,9 +378,10 @@ namespace Palimpseste.Game.Bootstrap
             var state = record.state is "needs_operator" or "waiting_retry" ? record.resume_stage : record.state;
             return state switch
             {
-                "resolving_geometry" => 2,
-                "planning" => 3,
-                "validating" or "ready" => 4,
+                "resolving_geometry" => 1,
+                "planning" => 2,
+                "validating" => 3,
+                "ready" => 4,
                 _ => descriptionView != null && selected == record ? 2 : 1
             };
         }
@@ -390,10 +392,10 @@ namespace Palimpseste.Game.Bootstrap
             var state = record.state switch
             {
                 "queued" => "En file d'attente pour la lecture du dessin",
-                "interpreting" => "Luna lit les formes du dessin",
-                "resolving_geometry" => "Lecture A reçue · extraction des formes",
-                "planning" => "Luna traduit la lecture en règles de sort",
-                "validating" => "Règles et ressources contrôlées avant publication",
+                "interpreting" => "Astra lit le dessin et imagine un sort",
+                "resolving_geometry" => "Interprétation reçue · préparation des formes du dessin",
+                "planning" => "Luna construit le plan du sort",
+                "validating" => "Plan compilé et ressources contrôlées avant publication",
                 "ready" => "Sort validé · téléchargement et contrôle local",
                 "waiting_retry" => "Nouvel essai technique prévu par le service",
                 "needs_operator" => "Intervention technique requise",
@@ -405,7 +407,7 @@ namespace Palimpseste.Game.Bootstrap
         private void DrawInterpretationPanel(Rect area)
         {
             GUI.Box(area, GUIContent.none);
-            GUI.Label(new Rect(area.x + 15, area.y + 12, area.width - 30, 35), "Interprétation de Luna A", titleStyle);
+            GUI.Label(new Rect(area.x + 15, area.y + 12, area.width - 30, 35), "Interprétation d'Astra", titleStyle);
             GUI.DrawTexture(new Rect(area.x + 15, area.y + 52, area.width - 30, 2), goldBar);
             if (descriptionView == null)
             {
@@ -415,9 +417,9 @@ namespace Palimpseste.Game.Bootstrap
             }
             var content = new StringBuilder();
             content.AppendLine(descriptionView.Title).AppendLine().AppendLine(descriptionView.Summary)
-                .AppendLine().AppendLine("Ce que Luna voit dans le dessin");
+                .AppendLine().AppendLine("Ce qu'Astra voit dans le dessin");
             foreach (var line in descriptionView.Observations) content.Append("• ").AppendLine(line).AppendLine();
-            content.AppendLine("Règles et apparence proposées");
+            content.AppendLine("Idées de sort proposées");
             foreach (var line in descriptionView.Clauses) content.Append("• ").AppendLine(line).AppendLine();
             var text = content.ToString();
             var viewport = new Rect(area.x + 13, area.y + 68, area.width - 26, area.height - 81);
@@ -442,8 +444,8 @@ namespace Palimpseste.Game.Bootstrap
                 "queued" => "Lecture en attente",
                 "interpreting" => "Lecture du dessin",
                 "resolving_geometry" => "Formes en préparation",
-                "planning" => "Traduction du sort",
-                "validating" => "Vérification du sort",
+                "planning" => "Plan du sort par Luna",
+                "validating" => "Compilation du sort",
                 "ready" => "Sort à récupérer",
                 "waiting_retry" => "Nouvel essai prévu",
                 "needs_operator" => "Assistance nécessaire",
@@ -485,7 +487,7 @@ namespace Palimpseste.Game.Bootstrap
                 ? "Retour enregistré. Le sort de ce parchemin reste inchangé."
                 : pending
                     ? "Retour conservé sur cet appareil. Réessayez la transmission si nécessaire."
-                    : "Décrivez ce que le dessin devait évoquer. Une future version de Luna pourra en tenir compte.";
+                    : "Décrivez ce que le dessin devait évoquer. Ce retour aidera à améliorer la lecture d'Astra.";
             GUI.Label(new Rect(area.x, area.y + 107, area.width, 34), message, textStyle);
             GUI.enabled = previousEnabled && api.Configured && !feedbackBusy && !selected.feedback_sent &&
                           (pending || !string.IsNullOrWhiteSpace(feedbackDraft));
@@ -578,7 +580,7 @@ namespace Palimpseste.Game.Bootstrap
             }
             catch (Exception ex) { notice = "Paquet local illisible : " + ex.Message; }
             if (descriptionView != null &&
-                GUI.Button(new Rect(r.x + 25, r.yMax - 119, 260, 39), "Lire l'interprétation Luna", buttonStyle))
+                GUI.Button(new Rect(r.x + 25, r.yMax - 119, 260, 39), "Lire l'interprétation d'Astra", buttonStyle))
                 page = Page.Interpretation;
             if (GUI.Button(new Rect(r.x + 25, r.yMax - 70, 260, 45), "Lancer dans le laboratoire", buttonStyle)) EnterLab();
             if (GUI.Button(new Rect(r.x + 300, r.yMax - 70, 180, 45), "Bibliothèque", buttonStyle)) page = Page.Library;
@@ -628,7 +630,7 @@ namespace Palimpseste.Game.Bootstrap
                 GUI.DrawTexture(new Rect(area.x + 16, area.y + 22, previewWidth - 20, previewWidth - 20),
                     preview, ScaleMode.ScaleToFit);
             GUI.Label(new Rect(area.x + 16, area.y + previewWidth + 5, previewWidth - 20, 78),
-                "Votre dessin et la lecture de Luna A", textStyle);
+                "Votre dessin et la lecture d'Astra", textStyle);
             var rightX = area.x + previewWidth + 10;
             var rightWidth = area.width - previewWidth - 27;
             DrawInterpretationPanel(new Rect(rightX, area.y + 12, rightWidth, area.height - 214));
@@ -732,7 +734,7 @@ namespace Palimpseste.Game.Bootstrap
                     yield break;
                 }
             }
-            if (error != null || caps == null || caps.layout_version != "three_regions_v1" ||
+            if (error != null || caps == null || caps.layout_version != "free_canvas_v2" ||
                 !Guid.TryParseExact(caps.principal_id, "N", out _))
             {
                 api.Clear();
@@ -817,6 +819,11 @@ namespace Palimpseste.Game.Bootstrap
             yield return api.Allocate(Guid.NewGuid().ToString("N"), (p, e) => { remote = p; error = e; });
             busy = false;
             if (error != null || remote == null) { notice = "Allocation impossible : " + error; yield break; }
+            if (remote.layout_version != "free_canvas_v2")
+            {
+                notice = "Support incompatible avec le dessin libre.";
+                yield break;
+            }
             var record = store.Create(remote.parchment_id);
             record.owner_id = principalId;
             record.server_issued = true;
@@ -860,7 +867,8 @@ namespace Palimpseste.Game.Bootstrap
                 if (page == Page.Processing && api.Configured && !string.IsNullOrEmpty(record.job_id))
                     StartCoroutine(Poll(record));
             }
-            else if (record.state == "blank" && reference != null) page = Page.Drawing;
+            else if ((record.state == "blank" || record.state == "writing") && reference != null)
+                page = Page.Drawing;
             else
             {
                 page = Page.Processing;
@@ -913,7 +921,13 @@ namespace Palimpseste.Game.Bootstrap
 
         private void FinalizeDrawing(string reason)
         {
-            if (selected == null || canvas == null || !canvas.Engaged) { page = Page.Library; return; }
+            if (selected == null || canvas == null) { page = Page.Library; return; }
+            if (!canvas.Engaged)
+            {
+                notice = EmptyDrawingWarning;
+                return;
+            }
+            if (canvas.IsDrawing) { Append("up", Vector2.zero); canvas.End(); }
             canvas.Close();
             Append("close", Vector2.zero);
             selected.closed_reason = reason;
@@ -963,7 +977,9 @@ namespace Palimpseste.Game.Bootstrap
             var capture = new DrawingCaptureDto
             {
                 capture_id = record.capture_id, parchment_id = record.parchment_id,
-                reference_sha256 = record.reference_sha256, raster_version = DrawingCanvas.RasterVersion,
+                layout_version = string.IsNullOrEmpty(record.layout_version) ? "three_regions_v1" : record.layout_version,
+                reference_sha256 = record.reference_sha256,
+                raster_version = string.IsNullOrEmpty(record.raster_version) ? DrawingCanvas.LegacyRasterVersion : record.raster_version,
                 drawing_file_sha256 = ParchmentStore.Hash(drawing), drawing_pixel_sha256 = pixelHash,
                 ink_file_sha256 = ParchmentStore.Hash(ink), journal_file_sha256 = ParchmentStore.Hash(journal),
                 used_ink_micro_units = reconstructed.UsedInkMicro,
@@ -977,11 +993,13 @@ namespace Palimpseste.Game.Bootstrap
             Destroy(refTexture);
             JobDto job = null;
             string error = null;
-            yield return api.Upload(record, capture, drawing, ink, journal, (j, e) => { job = j; error = e; });
+            string errorCode = null;
+            yield return api.Upload(record, capture, drawing, ink, journal,
+                (j, e, code) => { job = j; error = e; errorCode = code; });
             busy = false;
             if (error != null || job == null)
             {
-                if (error != null && error.Contains("\"code\":\"capture_incompatible\""))
+                if (errorCode == "capture_incompatible")
                 {
                     record.state = "capture_corrupted";
                     record.needs_capture = false;
@@ -1001,6 +1019,8 @@ namespace Palimpseste.Game.Bootstrap
 
         private static string[] LockedNames(DrawingCanvas c)
         {
+            if (!c.AllLocked && !c.IsLocked(InkRegion.Core) && !c.IsLocked(InkRegion.Ring) && !c.IsLocked(InkRegion.Outer))
+                return Array.Empty<string>();
             var list = new System.Collections.Generic.List<string>();
             if (c.IsLocked(InkRegion.Core)) list.Add("core");
             if (c.IsLocked(InkRegion.Ring)) list.Add("ring");
@@ -1088,7 +1108,7 @@ namespace Palimpseste.Game.Bootstrap
             if (error != null || bytes == null ||
                 !DescriptionCache.TrySave(record, store.DirectoryFor(record), artifactId, hash, bytes, out var parsed))
             {
-                if (selected == record) notice = "Lecture de Luna A indisponible ou invalide ; le suivi du sort continue.";
+                if (selected == record) notice = "Lecture d'Astra indisponible ou invalide ; le suivi du sort continue.";
                 yield break;
             }
             store.Save(record);
@@ -1134,7 +1154,7 @@ namespace Palimpseste.Game.Bootstrap
                 page = descriptionView == null ? Page.Processing : Page.Card;
             }
             notice = descriptionView == null && selected == record
-                ? "Sort vérifié. Lecture A encore indisponible ; actualisez pour l'afficher avant le laboratoire."
+                ? "Sort vérifié. Lecture d'Astra encore indisponible ; actualisez pour l'afficher avant le laboratoire."
                 : "Sort téléchargé et vérifié. Il est disponible hors ligne.";
         }
 

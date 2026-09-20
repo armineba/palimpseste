@@ -1,0 +1,11 @@
+{
+  "id": "free_canvas_v2",
+  "width": 1024,
+  "height": 1024,
+  "origin": "top_left",
+  "coordinate_max": 65535,
+  "reference_file": "reference_free_canvas.png",
+  "reference_file_sha256": "5dc7a61d480b1432e8ae67ab7c55dbd563a8be69f80b359158feb5350c187d27",
+  "regions": [],
+  "notes": "Whole square is drawable. The narrow edge is decorative and has no spell semantics."
+}

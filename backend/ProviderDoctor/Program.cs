@@ -7,9 +7,9 @@ using Palimpseste.Core;
 using Palimpseste.Provider;
 
 var settings = CodexSettings.FromEnvironment();
-if (args.Length == 0 || args[0] is not ("local" or "active" or "plan" or "validate"))
+if (args.Length == 0 || args[0] is not ("local" or "astra" or "active" or "plan" or "validate"))
 {
-    Console.Error.WriteLine("Usage: ProviderDoctor local | active <spec-root> <reference.png> <drawing.png> --ink <ink.png> | plan <spec-root> <frozen-a.json> --a-sha256 <sha256> --ink <ink.png> | validate <spec-root> <a-final.json> <b-final.json> --a-sha256 <sha256> --b-sha256 <sha256> --ink <ink.png>; all modes accept --write <evidence.json>.");
+    Console.Error.WriteLine("Usage: ProviderDoctor local | astra <spec-root> <reference.png> <drawing.png> | active <spec-root> <reference.png> <drawing.png> --ink <ink.png> | plan <spec-root> <frozen-a.json> --a-sha256 <sha256> --ink <ink.png> | validate <spec-root> <a-final.json> <b-final.json> --a-sha256 <sha256> --b-sha256 <sha256> --ink <ink.png>; all modes accept --write <evidence.json>.");
     return 2;
 }
 
@@ -105,6 +105,7 @@ var local = new Dictionary<string, object?>
         : "not_proven_without_an_active_capability_observation",
     ["runtime_execution_tools"] = false,
     ["production_issues"] = settings.Check(true),
+    ["interpreter_production_issues"] = settings.Check(true, stage: "A"),
     ["active_test_issues"] = settings.Check(false),
     ["model_calls_executed"] = false,
     ["compatibility_evidence"] = new
@@ -127,6 +128,102 @@ if (mode == "local")
 {
     await EmitAsync(local, writePath);
     return localExit;
+}
+
+// One explicit multimodal A call consumes normal Codex account usage under the dedicated
+// service identity. It never promotes itself: the operator must review and
+// hash the report before setting the production evidence path.
+if (mode == "astra")
+{
+    local["kind"] = "astra_multimodal_probe";
+    local["requested_model"] = settings.InterpreterModel;
+    local["requested_effort"] = settings.InterpreterEffort;
+    local["production_issues"] = settings.Check(true, stage: "A");
+    local["active_test_issues"] = settings.Check(false, stage: "A");
+    local["result"] = "preflight_rejected";
+    local["output_schema_valid"] = false;
+    if (args.Length < 4 || (args.Length > 4 && !args[4].StartsWith("--", StringComparison.Ordinal)) ||
+        localExit != 0 || auth.Status != "authenticated" || executableHash is null)
+    {
+        await EmitAsync(local, writePath);
+        return 2;
+    }
+    var specRoot = Path.GetFullPath(args[1]);
+    var referencePath = Path.GetFullPath(args[2]);
+    var drawingPath = Path.GetFullPath(args[3]);
+    if (!string.Equals(specRoot.TrimEnd(Path.DirectorySeparatorChar),
+            Path.GetFullPath(settings.TrustedSpecificationRoot).TrimEnd(Path.DirectorySeparatorChar),
+            StringComparison.OrdinalIgnoreCase) ||
+        !settings.IsTrustedInputFile(referencePath) || !settings.IsTrustedInputFile(drawingPath))
+    {
+        local["result"] = "input_path_rejected";
+        await EmitAsync(local, writePath);
+        return 2;
+    }
+    try
+    {
+        var referenceHash = Hash(await File.ReadAllBytesAsync(referencePath));
+        var drawingHash = Hash(await File.ReadAllBytesAsync(drawingPath));
+        local["reference_sha256"] = referenceHash;
+        local["drawing_sha256"] = drawingHash;
+        if (string.Equals(referenceHash, drawingHash, StringComparison.Ordinal))
+        {
+            local["result"] = "images_identical";
+            await EmitAsync(local, writePath);
+            return 2;
+        }
+        var layoutPath = Path.Combine(specRoot, "reference", "layout-v2.json");
+        if (!File.Exists(layoutPath)) layoutPath = Path.Combine(specRoot, "reference", "layout-v1.json");
+        var layout = await File.ReadAllTextAsync(layoutPath);
+        var astraCapabilities = await File.ReadAllTextAsync(Path.Combine(specRoot, "contracts", "capability-catalog.json"));
+        var astraProvider = new LunaCodexProvider(new CodexProcessRunner(settings), specRoot);
+        var a = await astraProvider.ProbeInterpretAsync("operator-astra-probe", Guid.NewGuid().ToString("N"),
+            referencePath, drawingPath, layout, astraCapabilities, CancellationToken.None);
+        local["model_calls_executed"] = a.Transport.ProcessStarted;
+        local["process_started"] = a.Transport.ProcessStarted;
+        local["exit_code"] = a.Transport.ExitCode;
+        local["reported_model"] = a.Transport.ReportedModel;
+        local["reported_effort"] = a.Transport.ReportedEffort;
+        local["stage_a"] = StageEvidence(a);
+        var finalFile = a.Transport.AttemptDirectory is null ? null :
+            Path.Combine(a.Transport.AttemptDirectory, "final.json");
+        local["final_file"] = finalFile;
+        if (a.Utf8 is null || finalFile is null || !File.Exists(finalFile) ||
+            !MatchesRequestedMetadata(a.Transport, settings, "A"))
+        {
+            local["result"] = "astra_transport_or_attestation_failed";
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        var issues = SpellCompiler.ValidateDescriptionJson(a.Utf8);
+        local["description_issue_codes"] = issues.Select(issue => issue.Code).Distinct().ToArray();
+        if (issues.Count != 0)
+        {
+            local["result"] = "description_rejected";
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        var astraDescription = ContractJson.DeserializeStrict<SpellDescription>(a.Utf8, "spell-description");
+        if (astraDescription.shape_requests.Count != 0 ||
+            astraDescription.observations.Any(observation => observation.region != "full"))
+        {
+            local["result"] = "global_image_policy_rejected";
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        local["final_sha256"] = Hash(await File.ReadAllBytesAsync(finalFile));
+        local["output_schema_valid"] = true;
+        local["result"] = "success";
+        await EmitAsync(local, writePath);
+        return 0;
+    }
+    catch (Exception error) when (error is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException)
+    {
+        local["result"] = "astra_input_or_output_unreadable";
+        local["error_type"] = error.GetType().Name;
+        await EmitAsync(local, writePath);
+        return 1;
+    }
 }
 
 if (mode == "validate")
@@ -306,7 +403,7 @@ if (mode == "active")
         await EmitAsync(local, writePath);
         return 1;
     }
-    if (!MatchesRequestedMetadata(a.Transport, settings))
+    if (!MatchesRequestedMetadata(a.Transport, settings, "A"))
     {
         local["active_result"] = "stage_a_metadata_unverified";
         local["active_blocked"] = true;
@@ -386,7 +483,7 @@ local["stage_b_model_call_executed"] = b.Transport.ProcessStarted;
 local["stage_b"] = StageEvidence(b);
 if (b.Utf8 is null)
     local["active_result"] = "stage_b_failed";
-else if (!MatchesRequestedMetadata(b.Transport, settings))
+else if (!MatchesRequestedMetadata(b.Transport, settings, "B"))
 {
     local["active_result"] = "stage_b_metadata_unverified";
     local["active_blocked"] = true;
@@ -513,10 +610,10 @@ static bool? ObservedFeature(string feature, IReadOnlyDictionary<string, bool> o
     return null;
 }
 
-static bool MatchesRequestedMetadata(CodexResult transport, CodexSettings settings) =>
+static bool MatchesRequestedMetadata(CodexResult transport, CodexSettings settings, string stage) =>
     transport.Outcome == ProviderOutcome.Success &&
-    string.Equals(transport.ReportedModel, settings.Model, StringComparison.Ordinal) &&
-    string.Equals(transport.ReportedEffort, settings.Effort, StringComparison.OrdinalIgnoreCase);
+    string.Equals(transport.ReportedModel, stage == "A" ? settings.InterpreterModel : settings.Model, StringComparison.Ordinal) &&
+    string.Equals(transport.ReportedEffort, stage == "A" ? settings.InterpreterEffort : settings.Effort, StringComparison.OrdinalIgnoreCase);
 
 static async Task EmitAsync(Dictionary<string, object?> document, string? writePath)
 {
@@ -527,7 +624,7 @@ static async Task EmitAsync(Dictionary<string, object?> document, string? writeP
     var parent = Path.GetDirectoryName(full);
     if (parent is null || !Directory.Exists(parent) || CodexSettings.HasReparsePoint(parent))
         throw new InvalidOperationException("Evidence parent must be an existing non-reparse directory.");
-    await File.WriteAllTextAsync(full, json + Environment.NewLine, Encoding.UTF8);
+    await File.WriteAllTextAsync(full, json + Environment.NewLine, new UTF8Encoding(false));
 }
 
 static async Task<CommandResult> RunCommandAsync(CodexSettings settings, params string[] command)

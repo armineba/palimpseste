@@ -12,7 +12,7 @@ public static partial class ApiHandlers
     {
         try
         {
-            var (referenceId, _) = await reference.EnsureAsync(ct);
+            var (referenceId, _) = await reference.EnsureAsync("free_canvas_v2", ct);
             using var catalog = JsonDocument.Parse(await File.ReadAllBytesAsync(config.CatalogPath, ct));
             var carriers = catalog.RootElement.GetProperty("carriers").EnumerateArray().Select(x => x.GetProperty("id").GetString()).ToArray();
             return Results.Json(new
@@ -20,7 +20,7 @@ public static partial class ApiHandlers
                 principal_id = Owner(context).Id.ToString("N"),
                 catalog_version = config.CatalogVersion,
                 rules_profile = config.RulesProfile,
-                layout_version = "three_regions_v1",
+                layout_version = "free_canvas_v2",
                 reference_artifact_id = PublicIds.Artifact(referenceId),
                 minimum_client_version = config.MinimumClientVersion,
                 carriers,
@@ -88,8 +88,9 @@ public static partial class ApiHandlers
         var key = Key(context);
         if (key is null) return ApiProblem.Result(context, 400, "idempotency_key_required", "Clé d'idempotence invalide.");
         using var body = await ReadJsonAsync(context.Request, 4096, ct);
-        if (body is null || body.RootElement.ValueKind != JsonValueKind.Object || body.RootElement.EnumerateObject().Count() != 1 || !body.RootElement.TryGetProperty("layout_version", out var layout) || layout.ValueKind != JsonValueKind.String || layout.GetString() != "three_regions_v1")
+        if (body is null || body.RootElement.ValueKind != JsonValueKind.Object || body.RootElement.EnumerateObject().Count() != 1 || !body.RootElement.TryGetProperty("layout_version", out var layout) || layout.ValueKind != JsonValueKind.String || layout.GetString() is not ("three_regions_v1" or "free_canvas_v2"))
             return ApiProblem.Result(context, 400, "invalid_layout", "Layout invalide.");
+        var requestedLayout = layout.GetString()!;
         var principal = Owner(context);
         var requestHash = ApiJson.Sha256(Encoding.UTF8.GetBytes(ApiJson.Canonicalize(body.RootElement)));
         await using var connection = await db.OpenConnectionAsync(ct);
@@ -99,14 +100,15 @@ public static partial class ApiHandlers
         if (saved is not null) return ReplayOrConflict(context, saved, requestHash);
         var id = Guid.NewGuid();
         var signature = Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(8));
-        await using (var command = new NpgsqlCommand("INSERT INTO parchments(id,owner_id,state,layout_version,budget_micro_units,signature_seed_hex) VALUES (@id,@owner,'blank','three_regions_v1',1000000000,@signature)", connection, transaction))
+        await using (var command = new NpgsqlCommand("INSERT INTO parchments(id,owner_id,state,layout_version,budget_micro_units,signature_seed_hex) VALUES (@id,@owner,'blank',@layout,1000000000,@signature)", connection, transaction))
         {
             command.Parameters.AddWithValue("id", id);
             command.Parameters.AddWithValue("owner", principal.Id);
+            command.Parameters.AddWithValue("layout", requestedLayout);
             command.Parameters.AddWithValue("signature", signature);
             await command.ExecuteNonQueryAsync(ct);
         }
-        var json = Json(Parchment(id, "blank", "three_regions_v1", null, null));
+        var json = Json(Parchment(id, "blank", requestedLayout, null, null));
         await SaveResponseAsync(connection, transaction, principal.Id, "allocate_parchment", key, requestHash, 201, json, ct);
         await transaction.CommitAsync(ct);
         return Results.Content(json, "application/json", Encoding.UTF8, 201);
@@ -146,7 +148,14 @@ public static partial class ApiHandlers
                     return ApiProblem.Result(context, 409, "parchment_committed", "Ce support possède déjà une première inscription différente.");
             }
         }
-        var json = Json(Parchment(parchmentId, "writing", "three_regions_v1", null, null));
+        string parchmentLayout;
+        await using (var layoutRead = new NpgsqlCommand("SELECT layout_version FROM parchments WHERE id=@id AND owner_id=@owner", connection, transaction))
+        {
+            layoutRead.Parameters.AddWithValue("id", parchmentId);
+            layoutRead.Parameters.AddWithValue("owner", principal.Id);
+            parchmentLayout = (string?)await layoutRead.ExecuteScalarAsync(ct) ?? "three_regions_v1";
+        }
+        var json = Json(Parchment(parchmentId, "writing", parchmentLayout, null, null));
         await SaveResponseAsync(connection, transaction, principal.Id, $"begin:{id}", key, requestHash, 200, json, ct);
         await transaction.CommitAsync(ct);
         return Results.Content(json, "application/json", Encoding.UTF8, 200);
@@ -252,7 +261,7 @@ public static partial class ApiHandlers
     {
         if (!PublicIds.TryParseArtifact(id, out var artifactId)) return ApiProblem.Result(context, 400, "invalid_id", "Identifiant invalide.");
         await using var connection = await db.OpenConnectionAsync(ct);
-        await using var command = new NpgsqlCommand("SELECT storage_key,sha256,content_type FROM artifacts WHERE id=@id AND (owner_id=@owner OR (owner_id IS NULL AND kind='reference_layout'))", connection);
+        await using var command = new NpgsqlCommand("SELECT storage_key,sha256,content_type FROM artifacts WHERE id=@id AND (owner_id=@owner OR (owner_id IS NULL AND kind IN ('reference_layout','reference_free_canvas')))", connection);
         command.Parameters.AddWithValue("id", artifactId);
         command.Parameters.AddWithValue("owner", Owner(context).Id);
         await using var reader = await command.ExecuteReaderAsync(ct);

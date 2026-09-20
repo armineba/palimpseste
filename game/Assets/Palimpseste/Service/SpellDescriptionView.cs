@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Palimpseste.Game.Service
 {
-    // A view of the validated interpretation returned by Luna A. This is never
+    // A view of the validated interpretation returned by the visual model. This is never
     // synthesized from a fixture or from a job status message.
     public sealed class SpellDescriptionView
     {

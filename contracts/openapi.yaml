@@ -117,7 +117,9 @@ paths:
               type: object
               properties:
                 layout_version:
-                  const: three_regions_v1
+                  enum:
+                  - three_regions_v1
+                  - free_canvas_v2
               required:
               - layout_version
               additionalProperties: false
@@ -830,7 +832,9 @@ components:
           - ready
           - incident
         layout_version:
-          const: three_regions_v1
+          enum:
+          - three_regions_v1
+          - free_canvas_v2
         job_id:
           type:
           - string

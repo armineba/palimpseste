@@ -27,7 +27,12 @@ public sealed record CodexSettings(
     string CompatibilityEvidenceSha256 = "",
     bool RuntimeFeaturesCompatibilityVerified = false,
     string RuntimeFeaturesEvidencePath = "",
-    string RuntimeFeaturesEvidenceSha256 = "")
+    string RuntimeFeaturesEvidenceSha256 = "",
+    string InterpreterModel = "gpt-6-astra",
+    string InterpreterEffort = "max",
+    bool InterpreterCompatibilityVerified = false,
+    string InterpreterEvidencePath = "",
+    string InterpreterEvidenceSha256 = "")
 {
     // These are the capabilities that must be observed false in the CLI
     // feature table before a runtime feature evidence file can be accepted.
@@ -64,7 +69,12 @@ public sealed record CodexSettings(
         Read("PALIMPSESTE_EFFORT_EVIDENCE_SHA256"),
         ParseBool("PALIMPSESTE_RUNTIME_FEATURES_VERIFIED"),
         Read("PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_PATH"),
-        Read("PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_SHA256"));
+        Read("PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE_SHA256"),
+        Read("PALIMPSESTE_ASTRA_MODEL") is { Length: > 0 } interpreterModel ? interpreterModel : "gpt-6-astra",
+        Read("PALIMPSESTE_ASTRA_EFFORT") is { Length: > 0 } interpreterEffort ? interpreterEffort : "max",
+        ParseBool("PALIMPSESTE_ASTRA_VERIFIED"),
+        Read("PALIMPSESTE_ASTRA_EVIDENCE_PATH"),
+        Read("PALIMPSESTE_ASTRA_EVIDENCE_SHA256"));
 
     /// <summary>
     /// Performs the checks that must pass before a process can be started.
@@ -72,9 +82,11 @@ public sealed record CodexSettings(
     /// check that the probe itself is about to establish; all other production
     /// checks remain active.
     /// </summary>
-    public IReadOnlyList<string> Check(bool production, bool compatibilityProbe = false)
+    public IReadOnlyList<string> Check(bool production, bool compatibilityProbe = false, string stage = "B")
     {
         var issues = new List<string>();
+        if (stage is not ("A" or "B" or "repair_A" or "repair_B"))
+            issues.Add("invalid_provider_stage");
 
         CheckDirectoryOrFile(Executable, file: true, "codex_executable_missing", issues);
         CheckDirectoryOrFile(CodexHome, file: false, "dedicated_codex_home_missing", issues);
@@ -91,11 +103,18 @@ public sealed record CodexSettings(
             issues.Add("service_identity_mismatch");
 
         if (Model != "gpt-5.6-luna") issues.Add("model_mismatch");
+        if (InterpreterModel != "gpt-6-astra") issues.Add("interpreter_model_mismatch");
         if (Effort is not ("low" or "medium" or "high" or "xhigh" or "max")) issues.Add("invalid_effort");
         else if (Effort != "max") issues.Add("effort_below_documented_max");
+        if (InterpreterEffort is not ("low" or "medium" or "high" or "xhigh" or "max"))
+            issues.Add("invalid_interpreter_effort");
+        else if (InterpreterEffort != "max") issues.Add("interpreter_effort_below_documented_max");
         // The active doctor may establish this one fact. All other production
         // checks remain enabled for its ProbeAsync path.
         if (production && !EffortCompatibilityVerified && !compatibilityProbe) issues.Add("effort_not_verified");
+        var interpreterStage = stage is "A" or "repair_A";
+        if (production && interpreterStage && !InterpreterCompatibilityVerified && !compatibilityProbe)
+            issues.Add("interpreter_not_verified");
         if (production && !RuntimeFeaturesCompatibilityVerified) issues.Add("runtime_feature_disable_not_verified");
         string? executableHash = null;
         if (production && (RuntimeFeaturesCompatibilityVerified || EffortCompatibilityVerified))
@@ -110,6 +129,9 @@ public sealed record CodexSettings(
         if (production && EffortCompatibilityVerified && executableHash is not null &&
             !TryVerifyCompatibilityEvidence(executableHash, out var evidenceIssue))
             issues.Add(evidenceIssue ?? "effort_evidence_invalid");
+        if (production && interpreterStage && InterpreterCompatibilityVerified && executableHash is not null &&
+            !TryVerifyInterpreterEvidence(executableHash, out var interpreterIssue))
+            issues.Add(interpreterIssue ?? "interpreter_evidence_invalid");
         if (AttemptTimeout <= TimeSpan.Zero || AttemptTimeout > TimeSpan.FromHours(2)) issues.Add("invalid_timeout");
         if (MaxOutputBytes < 100_000 || MaxOutputBytes > 10_000_000) issues.Add("invalid_output_limit");
 
@@ -434,6 +456,63 @@ public sealed record CodexSettings(
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or ArgumentException)
         {
             issue = "effort_evidence_unreadable";
+            return false;
+        }
+    }
+
+    private bool TryVerifyInterpreterEvidence(string executableHash, out string? issue)
+    {
+        issue = null;
+        var approvedDirectory = Path.GetDirectoryName(CompatibilityEvidencePath);
+        if (!IsPathInside(InterpreterEvidencePath, approvedDirectory, allowEqual: false) ||
+            !File.Exists(InterpreterEvidencePath) || HasReparsePoint(InterpreterEvidencePath) ||
+            !RegexSha256(InterpreterEvidenceSha256))
+        {
+            issue = "interpreter_evidence_missing_or_untrusted";
+            return false;
+        }
+        try
+        {
+            var bytes = File.ReadAllBytes(InterpreterEvidencePath);
+            if (bytes.Length is <= 0 or > 100_000 ||
+                !string.Equals(Convert.ToHexStringLower(SHA256.HashData(bytes)),
+                    InterpreterEvidenceSha256, StringComparison.OrdinalIgnoreCase))
+            {
+                issue = "interpreter_evidence_hash_mismatch";
+                return false;
+            }
+            // Doctor reports may be written by Windows UTF-8 tooling with a
+            // BOM. Hash the exact bytes, then decode text before parsing.
+            using var json = JsonDocument.Parse(File.ReadAllText(InterpreterEvidencePath),
+                new JsonDocumentOptions { MaxDepth = 16 });
+            var root = json.RootElement;
+            if (!StringProperty(root, "kind", "astra_multimodal_probe") ||
+                !StringProperty(root, "result", "success") ||
+                !StringProperty(root, "service_identity", ExpectedServiceUser) ||
+                !StringProperty(root, "requested_model", InterpreterModel) ||
+                !StringProperty(root, "reported_model", InterpreterModel) ||
+                !StringProperty(root, "requested_effort", InterpreterEffort) ||
+                !StringProperty(root, "reported_effort", InterpreterEffort) ||
+                !StringProperty(root, "cli_executable_sha256", executableHash) ||
+                !ShaProperty(root, "reference_sha256") || !ShaProperty(root, "drawing_sha256") ||
+                !ShaProperty(root, "final_sha256") ||
+                !root.TryGetProperty("model_calls_executed", out var calls) || calls.ValueKind != JsonValueKind.True ||
+                !root.TryGetProperty("process_started", out var started) || started.ValueKind != JsonValueKind.True ||
+                !root.TryGetProperty("exit_code", out var exit) || exit.ValueKind != JsonValueKind.Number ||
+                !exit.TryGetInt32(out var code) || code != 0 ||
+                !root.TryGetProperty("output_schema_valid", out var schemaValid) || schemaValid.ValueKind != JsonValueKind.True ||
+                !root.TryGetProperty("final_file", out var finalFile) || finalFile.ValueKind != JsonValueKind.String ||
+                !IsPathInside(finalFile.GetString(), AttemptRoot, allowEqual: false) ||
+                !FileHashMatches(finalFile.GetString()!, root.GetProperty("final_sha256").GetString()!, ContractEvidenceMaxBytes))
+            {
+                issue = "interpreter_evidence_content_invalid";
+                return false;
+            }
+            return true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or ArgumentException)
+        {
+            issue = "interpreter_evidence_unreadable_" + e.GetType().Name;
             return false;
         }
     }

@@ -124,13 +124,14 @@ def main():
     assert json_call("GET", "/v1/capabilities", authorized=False)[0] == 401
     status, _, caps = json_call("GET", "/v1/capabilities")
     assert status == 200 and len(caps["carriers"]) == 6 and len(caps["inks"]) == 4
+    assert caps["layout_version"] == "free_canvas_v2"
     status, headers, reference_png = call("GET", "/v1/artifacts/" + caps["reference_artifact_id"])
     assert status == 200 and headers["X-Content-SHA256"] == sha(reference_png)
 
     allocation_key = uuid.uuid4().hex
-    status, _, parchment = json_call("POST", "/v1/parchments", {"layout_version": "three_regions_v1"}, allocation_key)
+    status, _, parchment = json_call("POST", "/v1/parchments", {"layout_version": "free_canvas_v2"}, allocation_key)
     assert status == 201, parchment
-    status, _, duplicate = json_call("POST", "/v1/parchments", {"layout_version": "three_regions_v1"}, allocation_key)
+    status, _, duplicate = json_call("POST", "/v1/parchments", {"layout_version": "free_canvas_v2"}, allocation_key)
     assert status == 201 and duplicate == parchment
     parchment_id = parchment["parchment_id"]
     keep = os.environ.get("PALIMPSESTE_SMOKE_KEEP") == "1"
@@ -149,22 +150,22 @@ def main():
 
     reference = Image.open(io.BytesIO(reference_png)).convert("RGBA")
     ink = Image.new("RGBA", (1024, 1024), (0, 0, 0, 0))
-    ink.putpixel((512, 512), (125, 39, 31, 220))
+    ink.putpixel((20, 20), (125, 39, 31, 220))
     drawing = reference.copy()
-    ref = reference.getpixel((512, 512))
+    ref = reference.getpixel((20, 20))
     alpha = 220 / 255.0
-    drawing.putpixel((512, 512), tuple(round(ink.getpixel((512, 512))[i] * alpha + ref[i] * (1 - alpha)) for i in range(3)) + (255,))
+    drawing.putpixel((20, 20), tuple(round(ink.getpixel((20, 20))[i] * alpha + ref[i] * (1 - alpha)) for i in range(3)) + (255,))
     drawing_png, ink_png = png(drawing), png(ink)
     second = journal_event(2, "up", first["sha256"])
     third = journal_event(3, "close", second["sha256"])
     journal = gzip.compress(("\n".join(json.dumps(x, separators=(",", ":")) for x in (first, second, third)) + "\n").encode())
     capture = {
         "schema_version": "sp.capture/1.0", "capture_id": uuid.uuid4().hex, "parchment_id": parchment_id,
-        "layout_version": "three_regions_v1", "reference_sha256": sha(reference_png),
-        "raster_version": "smoke-rgba8-v1", "drawing_file_sha256": sha(drawing_png),
+        "layout_version": "free_canvas_v2", "reference_sha256": sha(reference_png),
+        "raster_version": "cpu-brush/2.0", "drawing_file_sha256": sha(drawing_png),
         "drawing_pixel_sha256": sha(drawing.tobytes()), "ink_file_sha256": sha(ink_png),
         "journal_file_sha256": sha(journal), "width": 1024, "height": 1024,
-        "used_ink_micro_units": 100, "closed_reason": "window_closed", "locked_regions": ["core"],
+        "used_ink_micro_units": 100, "closed_reason": "user_finished", "locked_regions": [],
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     parts = [

@@ -1,5 +1,11 @@
 # Point de reprise immédiat
 
+## Point de reprise courant — dessin libre Astra → Luna
+
+Le job **joueur** `cd4fec7e-aae8-45ba-b5f3-16a807a9771e` du dessin humain à deux traits est `ready` : Astra et Luna ont réussi, la fiche « Estoc à crochet » a été vue dans le Player et un lancement a été capturé dans l'ancien build. Le [nouveau Player VFX](../game/Build/WindowsAppearanceVfxPlayable/Palimpseste.exe) a été relancé sans interaction manuelle : ouvrir le sort conservé et comparer son rendu à la description Astra ; aucun verdict visuel humain sur ce build n'est encore enregistré. Les clics manuels répétés sur les cibles sont arrêtés. Vérifier ensuite son, physique et relecture hors ligne sur ce build. Le build Windows IL2CPP/URP a terminé avec le code 0, contient 29 fichiers contrôlés et son test PlayMode VFX/palette a passé 1/1. Le [ZIP Player courant](../deliverables/Palimpseste-Windows-x64-IL2CPP.zip) et le [ZIP backend actuel](../deliverables/Palimpseste-Backend-Windows-x64.zip) ont été régénérés ; ce dernier est réservé à l'opérateur, avec installation sur un autre PC encore non testée. L'API et le worker avec prompts A `1.7` et B `1.3` sont déployés ; le doctor local ne signale aucun problème de production, mais aucune nouvelle génération réelle avec palette n'a encore été faite. Le job **synthétique** `769eea5bac2e414f8b9d0d3c17c397c1` demeure `needs_operator/plan_invalid` après deux réparations B rejetées ; il ne compte pas comme boucle réussie. La preuve Astra de calibration `A43D24B23AD0ABE1378B708C4DC47D6FB3C487451CB39CC10F56C47AD8519D77` est distincte du job joueur.
+
+Les sections suivantes décrivent l'ancien dessin à trois régions et le build de reconnexion précédent ; elles sont conservées comme historique.
+
 Mis à jour le 20 septembre 2026 après l'incident d'une nouvelle capture restée locale dans un Player lancé hors ligne.
 
 Preuve détaillée : [essai joueur, build et relecture sans API](../evidence/public/unity/owner-player-end-to-end-2026-09-20.md).

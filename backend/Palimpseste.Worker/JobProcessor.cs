@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Npgsql;
 using Palimpseste.Contracts;
 using Palimpseste.Core;
@@ -101,10 +102,14 @@ public sealed class JobProcessor
             return;
         }
         var capture = await jobs.GetCaptureAsync(job, ct);
+        using var captureManifest = JsonDocument.Parse(capture.ManifestJson);
+        var requirePalette = captureManifest.RootElement.GetProperty("layout_version").GetString() == "free_canvas_v2";
         var drawing = await ReadCheckedAsync(capture.DrawingKey, capture.DrawingSha, ct);
         var ink = await ReadCheckedAsync(capture.InkKey, capture.InkSha, ct);
         var reference = await ReadCheckedAsync(capture.ReferenceKey, capture.ReferenceSha, ct);
-        var layout = await File.ReadAllTextAsync(Path.Combine(specRoot, "reference", "layout-v1.json"), ct);
+        // The reference image remains a visual guide only. Its former radial
+        // role hints must not dictate what the player's drawing means.
+        const string layout = "{\"canvas_width\":1024,\"canvas_height\":1024,\"reference_purpose\":\"identify_printed_guides_only\",\"semantic_regions\":false}";
         var capabilities = await File.ReadAllTextAsync(Path.Combine(specRoot, "contracts", "capability-catalog.json"), ct);
         var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + provider.PromptASha256));
 
@@ -113,23 +118,23 @@ public sealed class JobProcessor
         if (descriptionRecord is null)
         {
             await jobs.SetStateAsync(job, "interpreting", null, "Interprétation du dessin", false, ct);
-            var attempt = await jobs.BeginAttemptAsync(job, "A", settings.Model, settings.Effort, inputHash, ct);
+            var attempt = await jobs.BeginAttemptAsync(job, "A", settings.InterpreterModel, settings.InterpreterEffort, inputHash, ct);
             var result = await provider.InterpretAsync(job.Id.ToString("N"), attempt.ToString("N"),
                 files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, ct);
-            IReadOnlyList<ValidationIssue> issues = result.Utf8 is null ? [] : SpellCompiler.ValidateDescriptionJson(result.Utf8);
+            IReadOnlyList<ValidationIssue> issues = ValidateNewInterpretation(result.Utf8, requirePalette);
             for (var repairNumber = await jobs.CountAttemptsAsync(job, "repair_A", ct) + 1;
                  repairNumber <= 2 && CanRepair(result, issues); repairNumber++)
             {
                 await jobs.CompleteAttemptAsync(job, attempt, "invalid", result.Sha256, result.Transport.CliVersion,
                     result.Transport.SessionId, result.Transport.UsageJson, "description_invalid", ct);
-                attempt = await jobs.BeginAttemptAsync(job, "repair_A", settings.Model, settings.Effort,
+                attempt = await jobs.BeginAttemptAsync(job, "repair_A", settings.InterpreterModel, settings.InterpreterEffort,
                     inputHash, ct);
                 result = await provider.RepairAsync(new RepairAttempt(
                     job.Id.ToString("N"), attempt.ToString("N"), "A", layout,
                     result.Transport.FinalJson!, RepairErrors(result, issues), repairNumber,
                     files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout,
                     null, capabilities), ct);
-                issues = result.Utf8 is null ? [] : SpellCompiler.ValidateDescriptionJson(result.Utf8);
+                issues = ValidateNewInterpretation(result.Utf8, requirePalette);
             }
             var status = result.Transport.Outcome == ProviderOutcome.Success && issues.Count == 0 ? "success" :
                 result.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid";
@@ -160,7 +165,7 @@ public sealed class JobProcessor
         var geometryRecords = await jobs.GetGeometryAsync(job, ct);
         if (geometryRecords.Geometry.Count == 0)
         {
-            await jobs.SetStateAsync(job, "resolving_geometry", null, "Extraction des formes", false, ct);
+            await jobs.SetStateAsync(job, "resolving_geometry", null, "Lecture des formes du dessin entier", false, ct);
             var decoded = ContractJson.DeserializeStrict<SpellDescription>(description, "spell-description");
             var resolved = GeometryResolver.Resolve(ink, decoded);
             if (!resolved.Success)
@@ -237,6 +242,8 @@ public sealed class JobProcessor
 
         await jobs.SetStateAsync(job, "validating", null, "Validation du sort", false, ct);
         var spellId = Guid.NewGuid();
+        var actualARequestedModel = await jobs.GetSuccessfulRequestedModelAsync(job, "A", ct);
+        var actualBRequestedModel = await jobs.GetSuccessfulRequestedModelAsync(job, "B", ct);
         var compilation = SpellCompiler.Compile(new CompilationInput
         {
             DescriptionJson = description, PlanJson = plan, GeometryJson = geometryJson, MaskPng = maskPng,
@@ -247,7 +254,9 @@ public sealed class JobProcessor
             Provenance = new SpellProvenance
             {
                 mode = "drawing", capture_sha256 = capture.ManifestSha, reference_sha256 = capture.ReferenceSha,
-                model_a = settings.Model, model_b = settings.Model,
+                // Read the persisted request, including when a legacy job
+                // resumes after the interpreter model changes.
+                model_a = actualARequestedModel, model_b = actualBRequestedModel,
                 prompt_a_version = descriptionRecord?.PromptVersion ?? LunaCodexProvider.PromptAVersion,
                 prompt_b_version = planRecord?.PromptVersion ?? LunaCodexProvider.PromptBVersion,
                 // Codex JSONL exposes a thread ID, not a provider response ID.
@@ -360,6 +369,12 @@ public sealed class JobProcessor
             ? [result.Transport.ErrorCode ?? "invalid_schema"]
             : issues.Take(32).Select(issue => $"{issue.Code} {issue.Path}: {issue.Message}")
                 .Select(message => message[..Math.Min(4000, message.Length)]).ToArray();
+
+    private static IReadOnlyList<ValidationIssue> ValidateNewInterpretation(byte[]? utf8, bool requirePalette)
+    {
+        if (utf8 is null) return [];
+        return SpellCompiler.ValidateWholeImageDescriptionJson(utf8, requirePalette);
+    }
 
     private static string Sha256(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 }

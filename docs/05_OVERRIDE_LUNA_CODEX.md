@@ -1,5 +1,7 @@
 # Avenant prioritaire — SP-1.1-LUNA
 
+> **Décision utilisateur ultérieure, 20 septembre 2026 :** pour les nouveaux parchemins, l'auteur a remplacé le découpage en trois régions par un dessin libre sur tout le carré, terminé uniquement par un bouton « Dessin terminé ». Il a ensuite choisi `gpt-6-astra` pour interpréter l'image entière et concevoir la description, puis `gpt-5.6-luna` pour construire le plan du sort sous ses consignes. Voir [D07–D08](DECISIONS.md). Les passages ci-dessous qui imposent Luna pour l'étape A ou la fermeture au relâchement sont historiques ; le transport `codex exec`, l'isolation du worker et la compilation de données contrôlées restent applicables.
+
 ## Décision utilisateur
 
 Le modèle pour générer les sorts et les tâches de développement/build confiées à Codex est Luna, au niveau maximal réellement disponible. L'appel passe par une API propre au jeu qui pilote Codex sur le serveur.

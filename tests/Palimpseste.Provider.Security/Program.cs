@@ -349,7 +349,7 @@ try
     var argumentCapture = Path.Combine(valid.AttemptDirectory!, "fake-arguments.txt");
     Assert(File.Exists(argumentCapture), "fake executable must have received structured arguments");
     var arguments = await File.ReadAllTextAsync(argumentCapture);
-    Assert(arguments.Contains("--model\ngpt-5.6-luna", StringComparison.Ordinal), "model must be an argument, not a shell fragment");
+    Assert(arguments.Contains("--model\ngpt-6-astra", StringComparison.Ordinal), "A must request Astra as a distinct process argument");
     Assert(arguments.Contains("model_reasoning_effort=\"max\"", StringComparison.Ordinal), "maximum requested effort must be forwarded literally");
     Assert(arguments.Contains("--sandbox\nread-only", StringComparison.Ordinal), "read-only sandbox must be requested");
     Assert(arguments.Contains("--disable\nshell_tool", StringComparison.Ordinal), "shell tool must be explicitly disabled");
@@ -361,6 +361,16 @@ try
         "personal Codex API key must not be inherited by the runtime process");
     Assert((await File.ReadAllTextAsync(Path.Combine(valid.AttemptDirectory!, "runtime-codex-home.txt"))).Equals(home, StringComparison.OrdinalIgnoreCase),
         "personal CODEX_HOME must be replaced by the dedicated runtime home");
+
+    var planner = await runner.TransportProbeAsync(new(
+        Guid.NewGuid().ToString("N"), "B", "trusted frozen description", schema,
+        [], "job-security"), CancellationToken.None);
+    Assert(planner.Outcome == ProviderOutcome.Success && planner.RequestedModel == "gpt-5.6-luna",
+        "B must request Luna without inheriting A's Astra model");
+    Assert(planner.AttemptDirectory is not null &&
+        (await File.ReadAllTextAsync(Path.Combine(planner.AttemptDirectory, "fake-arguments.txt")))
+            .Contains("--model\ngpt-5.6-luna", StringComparison.Ordinal),
+        "B must pass Luna explicitly to codex exec");
 
     var exitWithStderr = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", exitStderrSchema, [reference, drawing], "job-security"), CancellationToken.None);
@@ -449,7 +459,7 @@ try
     var arbitraryMetadata = await runner.TransportProbeAsync(new(
         Guid.NewGuid().ToString("N"), "A", "safe", arbitraryMetadataSchema, [reference, drawing], "job-security"), CancellationToken.None);
     Assert(arbitraryMetadata.Outcome == ProviderOutcome.Success &&
-        arbitraryMetadata.ReportedModel == "gpt-5.6-luna" && arbitraryMetadata.ReportedEffort == "max",
+        arbitraryMetadata.ReportedModel == "gpt-6-astra" && arbitraryMetadata.ReportedEffort == "max",
         "model and effort fields on ordinary JSONL events must not be trusted");
 
     var invalidJson = await runner.TransportProbeAsync(new(
@@ -518,10 +528,16 @@ static async Task RunFakeProviderAsync(string[] arguments)
     await File.WriteAllTextAsync(homeFile, Environment.GetEnvironmentVariable("CODEX_HOME") ?? "", new UTF8Encoding(false));
     string? output = null;
     string? schema = null;
+    string requestedModel = "";
+    string requestedEffort = "";
     for (var i = 0; i < arguments.Length; i++)
     {
         if (arguments[i] == "--output-last-message" && i + 1 < arguments.Length) output = arguments[i + 1];
         if (arguments[i] == "--output-schema" && i + 1 < arguments.Length) schema = arguments[i + 1];
+        if (arguments[i] == "--model" && i + 1 < arguments.Length) requestedModel = arguments[i + 1];
+        const string effortOption = "model_reasoning_effort=\"";
+        if (arguments[i].StartsWith(effortOption, StringComparison.Ordinal))
+            requestedEffort = arguments[i][effortOption.Length..].TrimEnd('"');
     }
     if (output is null) Environment.ExitCode = 11;
     else
@@ -550,8 +566,8 @@ static async Task RunFakeProviderAsync(string[] arguments)
         await File.WriteAllTextAsync(output, schemaText.Contains("invalid-json", StringComparison.OrdinalIgnoreCase)
             ? "{not-json"
             : $"{{\"schema_version\":\"{version}\"}}", new UTF8Encoding(false));
-        var model = schemaText.Contains("divergent-model", StringComparison.OrdinalIgnoreCase) ? "other-model" : "gpt-5.6-luna";
-        var effort = schemaText.Contains("divergent-effort", StringComparison.OrdinalIgnoreCase) ? "high" : "max";
+        var model = schemaText.Contains("divergent-model", StringComparison.OrdinalIgnoreCase) ? "other-model" : requestedModel;
+        var effort = schemaText.Contains("divergent-effort", StringComparison.OrdinalIgnoreCase) ? "high" : requestedEffort;
         var missingModel = schemaText.Contains("missing-model", StringComparison.OrdinalIgnoreCase);
         var missingEffort = schemaText.Contains("missing-effort", StringComparison.OrdinalIgnoreCase);
         var missingAttestation = schemaText.Contains("missing-attestation", StringComparison.OrdinalIgnoreCase);
@@ -565,9 +581,9 @@ static async Task RunFakeProviderAsync(string[] arguments)
         var attestation = missingModel
             ? "{\"type\":\"provider.attested\",\"source\":\"server_response\",\"reasoning_effort\":\"max\",\"response_count\":1}"
             : missingEffort
-                ? "{\"type\":\"provider.attested\",\"source\":\"server_response\",\"model\":\"gpt-5.6-luna\",\"response_count\":1}"
+                ? $"{{\"type\":\"provider.attested\",\"source\":\"server_response\",\"model\":\"{requestedModel}\",\"response_count\":1}}"
                 : invalidAttestation
-                    ? "{\"type\":\"provider.attested\",\"source\":\"client\",\"model\":\"gpt-5.6-luna\",\"reasoning_effort\":\"max\",\"response_count\":0}"
+                    ? $"{{\"type\":\"provider.attested\",\"source\":\"client\",\"model\":\"{requestedModel}\",\"reasoning_effort\":\"{requestedEffort}\",\"response_count\":0}}"
                 : $"{{\"type\":\"provider.attested\",\"source\":\"server_response\",\"model\":\"{model}\",\"reasoning_effort\":\"{effort}\",\"response_count\":1}}";
         var completion = arbitraryMetadata
             ? "{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":1,\"output_tokens\":1},\"model\":\"spoofed-model\",\"reasoning_effort\":\"low\"}"

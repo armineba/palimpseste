@@ -39,7 +39,20 @@ public sealed class CodexProcessRunner
     private async Task<CodexResult> ExecuteAsync(CodexAttempt attempt, bool production, bool compatibilityProbe, CancellationToken cancellationToken)
     {
         var started = DateTimeOffset.UtcNow;
-        var issues = settings.Check(production, compatibilityProbe);
+        var requestedModel = attempt?.Stage == "A" ? settings.InterpreterModel : settings.Model;
+        var requestedEffort = attempt?.Stage == "A" ? settings.InterpreterEffort : settings.Effort;
+        CodexResult Failure(ProviderOutcome outcome, string code, DateTimeOffset began, int? exitCode = null,
+            string? session = null, string? usage = null, string? directory = null,
+            string? reportedModel = null, string? reportedEffort = null, string? finalJson = null, bool processStarted = false,
+            string? diagnosticStderr = null, string? diagnosticStdoutSha256 = null,
+            int? diagnosticStdoutLength = null, bool diagnosticStdoutTruncated = false,
+            string? diagnosticEventErrorSha256 = null, int? diagnosticEventErrorLength = null,
+            bool diagnosticEventErrorTruncated = false, string? diagnosticCategory = null) =>
+            CreateFailure(requestedModel, requestedEffort, outcome, code, began, exitCode,
+                session, usage, directory, reportedModel, reportedEffort, finalJson, processStarted,
+                diagnosticStderr, diagnosticStdoutSha256, diagnosticStdoutLength, diagnosticStdoutTruncated,
+                diagnosticEventErrorSha256, diagnosticEventErrorLength, diagnosticEventErrorTruncated, diagnosticCategory);
+        var issues = settings.Check(production, compatibilityProbe, attempt?.Stage ?? "B");
         if (issues.Count != 0) return Failure(ProviderOutcome.IsolationViolation, string.Join(',', issues), started);
         if (attempt is null || attempt.Stage is not ("A" or "B") || attempt.Images is null ||
             attempt.Images.Count != (attempt.Stage == "A" ? 2 : 0))
@@ -73,7 +86,7 @@ public sealed class CodexProcessRunner
             await File.WriteAllTextAsync(Path.Combine(directory, "attempt.json"), JsonSerializer.Serialize(new
             {
                 attempt.AttemptId, attempt.JobId, attempt.Stage, started,
-                requested_model = settings.Model, requested_effort = settings.Effort,
+                requested_model = requestedModel, requested_effort = requestedEffort,
                 reported_model = (string?)null, reported_effort = (string?)null,
                 prompt_sha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(attempt.Prompt)))
             }), Encoding.UTF8, cancellationToken);
@@ -131,7 +144,7 @@ public sealed class CodexProcessRunner
         psi.Environment["GIT_CONFIG_SYSTEM"] = "NUL";
         psi.Environment["GIT_TERMINAL_PROMPT"] = "0";
         psi.Environment["PATH"] = Path.GetDirectoryName(settings.Executable)! + Path.PathSeparator + Path.Combine(psi.Environment["SystemRoot"]!, "System32");
-        foreach (var arg in new[] { "exec", "--model", settings.Model, "--config", $"model_reasoning_effort=\"{settings.Effort}\"", "--config", "approval_policy=\"never\"", "--sandbox", "read-only", "--json", "--ephemeral", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check", "--cd", directory, "--output-schema", schemaPath, "--output-last-message", outputPath })
+        foreach (var arg in new[] { "exec", "--model", requestedModel, "--config", $"model_reasoning_effort=\"{requestedEffort}\"", "--config", "approval_policy=\"never\"", "--sandbox", "read-only", "--json", "--ephemeral", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check", "--cd", directory, "--output-schema", schemaPath, "--output-last-message", outputPath })
             psi.ArgumentList.Add(arg);
         foreach (var feature in DisabledFeatures)
         {
@@ -194,11 +207,11 @@ public sealed class CodexProcessRunner
                 return await PersistFailureAsync(Failure(ProviderOutcome.IsolationViolation, events.AttestationError, started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (events.ReportedModel is null)
                 return await PersistFailureAsync(Failure(ProviderOutcome.ModelUnavailable, "reported_model_missing", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
-            if (!string.Equals(events.ReportedModel, settings.Model, StringComparison.Ordinal))
+            if (!string.Equals(events.ReportedModel, requestedModel, StringComparison.Ordinal))
                 return await PersistFailureAsync(Failure(ProviderOutcome.ModelUnavailable, "reported_model_mismatch", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             if (events.ReportedEffort is null)
                 return await PersistFailureAsync(Failure(ProviderOutcome.EffortUnsupported, "reported_effort_missing", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
-            if (!string.Equals(events.ReportedEffort, settings.Effort, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(events.ReportedEffort, requestedEffort, StringComparison.OrdinalIgnoreCase))
                 return await PersistFailureAsync(Failure(ProviderOutcome.EffortUnsupported, "reported_effort_mismatch", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, processStarted: processStarted, diagnosticStderr: diagnosticStderr));
             var info = new FileInfo(outputPath);
             if (info.Length == 0 || info.Length > settings.MaxOutputBytes)
@@ -209,7 +222,7 @@ public sealed class CodexProcessRunner
             try { using var parsed = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 64 }); }
             catch (JsonException) { return await PersistFailureAsync(Failure(ProviderOutcome.InvalidSchema, "final_not_json", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, finalJson: json, processStarted: processStarted, diagnosticStderr: diagnosticStderr)); }
             var result = new CodexResult(ProviderOutcome.Success, json, process.ExitCode, events.SessionId, null, started,
-                DateTimeOffset.UtcNow, GetCliVersion(), settings.Model, settings.Effort, events.ReportedModel, events.ReportedEffort, events.UsageJson, directory, processStarted, diagnosticStderr);
+                DateTimeOffset.UtcNow, GetCliVersion(), requestedModel, requestedEffort, events.ReportedModel, events.ReportedEffort, events.UsageJson, directory, processStarted, diagnosticStderr);
             await TryWriteAttemptOutcomeAsync(directory, result, null, null, cancellationToken);
             return result;
         }
@@ -237,7 +250,7 @@ public sealed class CodexProcessRunner
         }
     }
 
-    private CodexResult Failure(ProviderOutcome outcome, string code, DateTimeOffset started, int? exitCode = null,
+    private CodexResult CreateFailure(string requestedModel, string requestedEffort, ProviderOutcome outcome, string code, DateTimeOffset started, int? exitCode = null,
         string? session = null, string? usage = null, string? directory = null,
         string? reportedModel = null, string? reportedEffort = null, string? finalJson = null, bool processStarted = false,
         string? diagnosticStderr = null, string? diagnosticStdoutSha256 = null,
@@ -245,7 +258,7 @@ public sealed class CodexProcessRunner
         string? diagnosticEventErrorSha256 = null, int? diagnosticEventErrorLength = null,
         bool diagnosticEventErrorTruncated = false, string? diagnosticCategory = null) =>
         new(outcome, finalJson, exitCode, session, code, started, DateTimeOffset.UtcNow, GetCliVersion(),
-            settings.Model, settings.Effort, reportedModel, reportedEffort, usage, directory, processStarted, diagnosticStderr,
+            requestedModel, requestedEffort, reportedModel, reportedEffort, usage, directory, processStarted, diagnosticStderr,
             diagnosticStdoutSha256, diagnosticStdoutLength, diagnosticStdoutTruncated,
             diagnosticEventErrorSha256, diagnosticEventErrorLength, diagnosticEventErrorTruncated, diagnosticCategory);
 

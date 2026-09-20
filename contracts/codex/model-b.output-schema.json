@@ -259,6 +259,21 @@
                 "irregular"
               ]
             },
+            "palette": {
+              "type": "string",
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light"
+              ]
+            },
             "signature_geometry_id": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -436,6 +451,21 @@
                 "irregular"
               ]
             },
+            "palette": {
+              "type": "string",
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light"
+              ]
+            },
             "signature_geometry_id": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -598,6 +628,21 @@
                 "irregular"
               ]
             },
+            "palette": {
+              "type": "string",
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light"
+              ]
+            },
             "signature_geometry_id": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -731,6 +776,21 @@
                 "irregular"
               ]
             },
+            "palette": {
+              "type": "string",
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light"
+              ]
+            },
             "signature_geometry_id": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -862,6 +922,21 @@
                 "double",
                 "dotted",
                 "irregular"
+              ]
+            },
+            "palette": {
+              "type": "string",
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light"
               ]
             },
             "signature_geometry_id": {
@@ -1007,6 +1082,21 @@
                 "double",
                 "dotted",
                 "irregular"
+              ]
+            },
+            "palette": {
+              "type": "string",
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light"
               ]
             },
             "signature_geometry_id": {

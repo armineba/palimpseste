@@ -1,6 +1,14 @@
 # Tester le lecteur actuel
 
-## Nouveau build de reconnexion sur ce PC
+## Build courant : dessin libre
+
+Lancer [Palimpseste.exe](../game/Build/WindowsAppearanceVfxPlayable/Palimpseste.exe) sur **ce PC et ce profil Windows**, avec l'API locale disponible. Le parchemin humain à deux traits est déjà prêt : le job `cd4fec7e-aae8-45ba-b5f3-16a807a9771e` a produit la description Astra « Estoc à crochet » et une fiche de sort compilé. Rouvrir ce sort dans la bibliothèque et examiner en priorité son nouveau VFX dans le laboratoire face à la description. Le Player VFX a été relancé, mais cet examen visuel n'est pas encore consigné. L'essai de ciblage manuel par clics successifs a été arrêté à la demande du créateur. Pour un nouveau parchemin, dessiner plusieurs traits sur tout le papier, relâcher entre les traits, puis cliquer sur **« Dessin terminé »**. Un clic sur page vierge laisse le dessin ouvert et indique d'ajouter un trait. Une génération peut prendre plusieurs minutes avec les efforts `max`. Le bouton « Reconnecter » permet de reprendre une transmission restée locale après une coupure.
+
+Le build courant a été construit avec Unity 6000.3.24f1 en IL2CPP/URP, retour 0 et `PALIMPSESTE_BUILD_OK` : dossier nettoyé de 29 fichiers, 122 113 753 octets ; test PlayMode VFX/palette 1/1 réussi. EXE SHA-256 `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`, `GameAssembly.dll` SHA-256 `BBA75A8B708DD404D877CC7E4CA5A3448049F391EC9C5AACB4446E03EF54FF55`. L'[archive Player actuelle](../deliverables/Palimpseste-Windows-x64-IL2CPP.zip) contient ce dossier : 44 045 012 octets, SHA-256 `4AF6EF5D7449CBE89094755A3B6A045D5EF75DA21706C40484403FB17B419A3F`. Le Player précédent a montré [la fiche prête](../evidence/public/unity/free-canvas-player-spell-ready-20260920.png) puis [un lancement visible](../evidence/public/unity/free-canvas-player-cast-visible-20260920.png) du vrai sort. Ces images ne valident pas le nouveau VFX ni le son. Les 17/17 tests EditMode du dessin libre et des erreurs API avaient passé sur le build précédent. Voir [le rapport complet](../evidence/public/unity/free-canvas-appearance-2026-09-20.md). Les anciennes sections ci-dessous concernent des builds précédents.
+
+## Historique du correctif de reconnexion
+
+### Nouveau build de reconnexion sur ce PC
 
 Lancer [Palimpseste.exe](../game/Build/WindowsPlayerReconnectPlayable/Palimpseste.exe)
 depuis `game/Build/WindowsPlayerReconnectPlayable/`, en conservant les 29

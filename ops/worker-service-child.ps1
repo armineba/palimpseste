@@ -13,7 +13,7 @@ $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\', '/')
 if (-not [string]::Equals($runtime, 'E:\PalimpsesteRuntime', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab worker accepts only E:\PalimpsesteRuntime.'
 }
-$expectedWorkerSha256 = '9243F9600973B1AAF5F97F07AD0983FF60A7EFA2EB0A7F7D42D142C05015847D'
+$expectedWorkerSha256 = '737E1CC61E5D6B1E5B235D627616C7CAD0F535464385A545DD8D2BBC246D8D48'
 $child = Join-Path $runtime 'bin\WorkerService.Child.ps1'
 $worker = Join-Path $runtime 'bin\Palimpseste.Worker.exe'
 $envFile = Join-Path $runtime 'runtime.env'
@@ -140,12 +140,18 @@ $config = Read-Entries $envFile
 Require-Value $config 'PALIMPSESTE_DEPLOYMENT_MODE' 'private_lab'
 Require-Value $config 'PALIMPSESTE_PROVIDER' 'codex_exec'
 Require-Value $config 'PALIMPSESTE_LUNA_MODEL' 'gpt-5.6-luna'
+Require-Value $config 'PALIMPSESTE_LUNA_MODEL_A' 'gpt-6-astra'
+Require-Value $config 'PALIMPSESTE_LUNA_MODEL_B' 'gpt-5.6-luna'
 Require-Value $config 'PALIMPSESTE_LUNA_EFFORT' 'max'
+Require-Value $config 'PALIMPSESTE_ASTRA_MODEL' 'gpt-6-astra'
+Require-Value $config 'PALIMPSESTE_ASTRA_EFFORT' 'max'
+Require-Value $config 'PALIMPSESTE_ASTRA_VERIFIED' 'true'
 Require-Value $config 'PALIMPSESTE_MAX_PROVIDER_CONCURRENCY' '1'
 Require-Value $config 'PALIMPSESTE_RUNTIME_FEATURES_VERIFIED' 'true'
 Require-Value $config 'PALIMPSESTE_EFFORT_VERIFIED' 'true'
 Require-Evidence $config 'PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE'
 Require-Evidence $config 'PALIMPSESTE_EFFORT_EVIDENCE'
+Require-Evidence $config 'PALIMPSESTE_ASTRA_EVIDENCE'
 
 $vault = Read-Entries $databaseEnv
 if (-not $vault.ContainsKey('DATABASE_URL') -or

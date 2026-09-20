@@ -13,6 +13,12 @@ namespace Palimpseste.Game.SpellRuntime
         public Color tint;
     }
 
+    internal sealed class BeamPatternVisual : MonoBehaviour
+    {
+        public LineRenderer secondStrand;
+        public LineRenderer[] dashes;
+    }
+
     // A one-tick beam can be born and expire in successive FixedUpdates before
     // the first rendered frame. This component owns graphics only: the runtime
     // has already removed the carrier and cannot apply another effect or hit.
@@ -53,6 +59,30 @@ namespace Palimpseste.Game.SpellRuntime
         }
     }
 
+    // Decorative impact only. The fixed runtime has already applied any hit;
+    // this object has no collider, receiver or gameplay callback.
+    internal sealed class ProjectileImpactAfterimage : MonoBehaviour
+    {
+        public LineRenderer ring;
+        public Color color;
+        public bool impulse;
+        private float born;
+
+        private void OnEnable() { born = Time.realtimeSinceStartup; }
+
+        private void Update()
+        {
+            var duration = impulse ? .48f : .28f;
+            var age = (Time.realtimeSinceStartup - born) / duration;
+            if (age >= 1f) { Destroy(gameObject); return; }
+            transform.localScale = Vector3.one * Mathf.Lerp(impulse ? .22f : .12f,
+                impulse ? 1.45f : .65f, age);
+            var faded = color;
+            faded.a *= 1f - age;
+            ring.startColor = ring.endColor = faded;
+        }
+    }
+
     internal static class CarrierVisual
     {
         public static void KeepOneTickBeamVisible(GameObject visual)
@@ -60,17 +90,20 @@ namespace Palimpseste.Game.SpellRuntime
             if (visual != null) visual.AddComponent<BeamAfterimage>();
         }
 
-        public static GameObject Create(CarrierState state, Texture2D mask)
+        public static GameObject Create(CarrierState state, Texture2D mask, Texture2D signatureMask)
         {
             var node = state.node;
             var root = new GameObject(node.carrier + " " + state.id);
             root.transform.position = state.position;
             root.transform.rotation = state.rotation;
-            var tint = ColorFor(node.appearance?.affinity);
+            var tint = ColorFor(node.appearance?.palette, node.appearance?.affinity);
             switch (node.carrier)
             {
-                case "projectile": Projectile(root, state, tint); break;
-                case "beam": Beam(root, tint, node.options.width_cm ?? 4, node.appearance?.affinity == "fire"); break;
+                case "projectile": Projectile(root, state, tint, signatureMask); break;
+                case "beam": Beam(root, tint, node.options.width_cm ?? 4,
+                    node.appearance?.palette == "lava" ||
+                    (string.IsNullOrEmpty(node.appearance?.palette) && node.appearance?.affinity == "fire"),
+                    node.appearance?.pattern); break;
                 case "field": Footprint(root, mask, node.scale_cm, tint, false); break;
                 case "pulse": Pulse(root, mask, node.scale_cm, tint); break;
                 case "barrier": Barrier(root, state, tint); break;
@@ -79,44 +112,117 @@ namespace Palimpseste.Game.SpellRuntime
             return root;
         }
 
-        private static Color ColorFor(string affinity)
+        private static Color ColorFor(string palette, string affinity)
         {
+            // The compiler accepts only this named palette. No model-supplied
+            // shader, material path, code or unbounded color value reaches Unity.
+            switch (palette)
+            {
+                case "ember": return new Color(.76f, .20f, .12f, .9f);
+                case "lava": return new Color(1f, .30f, .055f, .9f);
+                case "ice": return new Color(.63f, .91f, 1f, .78f);
+                case "water": return new Color(.17f, .65f, 1f, .7f);
+                case "moss": return new Color(.35f, .69f, .28f, .78f);
+                case "stone": return new Color(.66f, .53f, .39f, .84f);
+                case "storm": return new Color(.66f, .70f, 1f, .8f);
+                case "arcane": return new Color(.70f, .36f, .95f, .8f);
+                case "shadow": return new Color(.36f, .25f, .55f, .8f);
+                case "light": return new Color(1f, .87f, .52f, .85f);
+            }
             switch (affinity)
             {
-                case "fire": return new Color(1f, .33f, .12f, .68f);
+                // Legacy packets carried affinity only. A brick-red ember is
+                // the closest visual to a painted red-brown projectile.
+                case "fire": return new Color(.76f, .20f, .12f, .9f);
                 case "water": return new Color(.16f, .68f, 1f, .62f);
                 case "stone": return new Color(.68f, .59f, .41f, .82f);
                 default: return new Color(.68f, .85f, 1f, .57f);
             }
         }
 
-        private static void Projectile(GameObject root, CarrierState state, Color tint)
+        private static void Projectile(GameObject root, CarrierState state, Color tint, Texture2D signatureMask)
         {
+            var resources = root.AddComponent<BeamVisualResources>();
             var core = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            core.name = "Noyau filament";
+            core.name = "Pointe du projectile";
             core.transform.SetParent(root.transform, false);
             core.transform.localRotation = Quaternion.Euler(90, 0, 0);
             var radius = Mathf.Max(.06f, (state.node.options.radius_cm ?? 8) / 100f);
-            core.transform.localScale = new Vector3(radius * 1.4f, radius * 2.1f, radius * 1.4f);
+            core.transform.localScale = new Vector3(radius * .65f, radius * 1.65f, radius * .65f);
             var coreCollider = core.GetComponent<Collider>();
             coreCollider.enabled = false;
             UnityEngine.Object.Destroy(coreCollider);
-            core.GetComponent<Renderer>().material = SpellLab.MaterialFor(tint, true);
-            var aura = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            aura.name = "Halo du noyau";
-            aura.transform.SetParent(root.transform, false);
-            aura.transform.localScale = Vector3.one * radius * 2.6f;
-            var auraCollider = aura.GetComponent<Collider>();
-            auraCollider.enabled = false;
-            UnityEngine.Object.Destroy(auraCollider);
-            aura.GetComponent<Renderer>().material = SpellLab.MaterialFor(new Color(tint.r, tint.g, tint.b, .22f), true);
+            core.GetComponent<Renderer>().sharedMaterial = resources.Own(SpellLab.MaterialFor(tint, true));
+
+            // The sampled source stroke becomes an actual visible contour at
+            // the moving tip. The second node therefore has its own bent
+            // silhouette, rather than another copy of a generic capsule.
+            if (state.path != null && state.path.Count >= 2)
+            {
+                var last = state.path[state.path.Count - 1];
+                var count = Mathf.Min(state.path.Count, 128);
+                var positions = new Vector3[count];
+                for (var i = 0; i < count; i++)
+                {
+                    var source = state.path[i * (state.path.Count - 1) / (count - 1)];
+                    positions[i] = source - last;
+                }
+                var pattern = state.node.appearance?.pattern;
+                if (pattern == "dotted")
+                    DottedProjectileStroke(root, resources, positions, radius, tint);
+                else
+                {
+                    var shadow = ProjectileStroke(root, resources, "Contour du dessin",
+                        radius * .95f, new Color(tint.r * .3f, tint.g * .3f, tint.b * .3f, .84f), 0);
+                    shadow.positionCount = count;
+                    shadow.SetPositions(positions);
+                    var stroke = ProjectileStroke(root, resources, "Trait du dessin",
+                        radius * .42f, tint, 1);
+                    stroke.positionCount = count;
+                    stroke.SetPositions(positions);
+                    if (pattern == "irregular")
+                    {
+                        IrregularWidth(shadow);
+                        IrregularWidth(stroke);
+                    }
+                    if (pattern == "double")
+                    {
+                        var second = ProjectileStroke(root, resources, "Second trait du dessin",
+                            radius * .42f, tint, 1);
+                        second.positionCount = count;
+                        var shifted = new Vector3[count];
+                        for (var i = 0; i < count; i++) shifted[i] = positions[i] + Vector3.right * radius * 1.1f;
+                        second.SetPositions(shifted);
+                    }
+                }
+            }
+            if (signatureMask != null && state.node.activation?.parent_id == null)
+            {
+                // The whole drawing includes any still-dormant child stroke.
+                // Its faint silhouette communicates the motif without spawning
+                // a second mechanical projectile before the hit event.
+                var glyph = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                glyph.name = "Glyphe du dessin complet";
+                glyph.transform.SetParent(root.transform, false);
+                glyph.transform.localPosition = new Vector3(0, 0, -.6f);
+                glyph.transform.localRotation = Quaternion.Euler(0, 180f, 0);
+                var size = Mathf.Clamp(state.node.scale_cm / 100f * 1.6f, .8f, 3f);
+                glyph.transform.localScale = new Vector3(size, size, 1);
+                var collider = glyph.GetComponent<Collider>();
+                collider.enabled = false;
+                UnityEngine.Object.Destroy(collider);
+                var material = resources.Own(SpellLab.MaterialFor(new Color(tint.r, tint.g, tint.b, .42f), true));
+                material.mainTexture = signatureMask;
+                material.SetTexture("_BaseMap", signatureMask);
+                glyph.GetComponent<Renderer>().sharedMaterial = material;
+            }
             var trail = root.AddComponent<TrailRenderer>();
-            trail.time = .22f;
-            trail.startWidth = radius * 1.6f;
+            trail.time = state.node.activation?.parent_id == null ? .58f : .40f;
+            trail.startWidth = radius * .85f;
             trail.endWidth = .01f;
-            trail.minVertexDistance = .045f;
-            trail.numCornerVertices = 4;
-            trail.material = SpellLab.MaterialFor(Color.white, true);
+            trail.minVertexDistance = .025f;
+            trail.numCornerVertices = 6;
+            trail.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
             trail.startColor = tint;
             trail.endColor = new Color(tint.r, tint.g, tint.b, 0);
             if (state.node.appearance?.pattern == "double")
@@ -128,7 +234,76 @@ namespace Palimpseste.Game.SpellRuntime
             }
         }
 
-        private static void Beam(GameObject root, Color tint, int widthCm, bool fire)
+        private static LineRenderer ProjectileStroke(GameObject root, BeamVisualResources resources,
+            string name, float width, Color color, int order)
+        {
+            var child = new GameObject(name);
+            child.transform.SetParent(root.transform, false);
+            var line = child.AddComponent<LineRenderer>();
+            line.useWorldSpace = false;
+            line.startWidth = line.endWidth = Mathf.Max(.018f, width);
+            line.numCapVertices = line.numCornerVertices = 6;
+            line.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
+            line.startColor = line.endColor = color;
+            line.sortingOrder = order;
+            return line;
+        }
+
+        private static void DottedProjectileStroke(GameObject root, BeamVisualResources resources,
+            Vector3[] positions, float radius, Color tint)
+        {
+            const int maxDashes = 12;
+            for (var i = 0; i < maxDashes; i++)
+            {
+                var first = i * (positions.Length - 1) / maxDashes;
+                var last = Mathf.Min(positions.Length - 1,
+                    first + Mathf.Max(1, (positions.Length - 1) / (maxDashes * 2)));
+                if (first >= last) continue;
+                var dash = ProjectileStroke(root, resources, "Pointillé du dessin " + i,
+                    radius * .7f, tint, 1);
+                dash.positionCount = 2;
+                dash.SetPosition(0, positions[first]);
+                dash.SetPosition(1, positions[last]);
+            }
+        }
+
+        private static void IrregularWidth(LineRenderer line)
+        {
+            var width = line.startWidth;
+            line.widthCurve = new AnimationCurve(
+                new Keyframe(0f, .7f), new Keyframe(.2f, 1.2f),
+                new Keyframe(.42f, .55f), new Keyframe(.7f, 1.25f),
+                new Keyframe(1f, .75f));
+            line.widthMultiplier = width;
+        }
+
+        public static void ProjectileHit(CarrierState state, Vector3 point)
+        {
+            if (state.node.carrier != "projectile") return;
+            var impulse = state.node.effects != null && state.node.effects.Exists(
+                effect => effect.@event == "hit" && effect.kind == "impulse");
+            var tint = ColorFor(state.node.appearance?.palette, state.node.appearance?.affinity);
+            var root = new GameObject(impulse ? "Onde de recul" : "Éclat d'impact");
+            root.transform.position = point;
+            root.transform.rotation = Quaternion.LookRotation(state.direction);
+            var resources = root.AddComponent<BeamVisualResources>();
+            var ring = ProjectileStroke(root, resources, "Anneau visuel", impulse ? .055f : .035f,
+                tint, 4);
+            ring.loop = true;
+            const int samples = 24;
+            ring.positionCount = samples;
+            for (var i = 0; i < samples; i++)
+            {
+                var angle = i * Mathf.PI * 2f / samples;
+                ring.SetPosition(i, new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0));
+            }
+            var afterimage = root.AddComponent<ProjectileImpactAfterimage>();
+            afterimage.ring = ring;
+            afterimage.color = tint;
+            afterimage.impulse = impulse;
+        }
+
+        private static void Beam(GameObject root, Color tint, int widthCm, bool fire, string pattern)
         {
             var resources = root.AddComponent<BeamVisualResources>();
             var line = root.AddComponent<LineRenderer>();
@@ -136,24 +311,56 @@ namespace Palimpseste.Game.SpellRuntime
             line.positionCount = 2;
             line.numCapVertices = 6;
             if (fire)
-            {
                 LavaBeam(root, line, resources, widthCm);
+            else
+            {
+                line.startWidth = line.endWidth = Mathf.Max(.02f, widthCm / 100f);
+                line.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
+                line.startColor = tint;
+                line.endColor = new Color(tint.r, tint.g, tint.b, .25f);
+                var glow = new GameObject("Lueur du faisceau");
+                glow.transform.SetParent(root.transform, false);
+                var corona = glow.AddComponent<LineRenderer>();
+                corona.useWorldSpace = true;
+                corona.positionCount = 2;
+                corona.startWidth = corona.endWidth = Mathf.Max(.09f, widthCm / 40f);
+                corona.numCapVertices = 6;
+                corona.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
+                corona.startColor = new Color(tint.r, tint.g, tint.b, .18f);
+                corona.endColor = new Color(tint.r, tint.g, tint.b, .06f);
+            }
+            BeamPattern(root, resources, line, tint, pattern);
+        }
+
+        private static void BeamPattern(GameObject root, BeamVisualResources resources,
+            LineRenderer main, Color tint, string pattern)
+        {
+            if (pattern == "irregular")
+            {
+                foreach (var part in root.GetComponentsInChildren<LineRenderer>()) IrregularWidth(part);
                 return;
             }
-            line.startWidth = line.endWidth = Mathf.Max(.02f, widthCm / 100f);
-            line.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
-            line.startColor = tint;
-            line.endColor = new Color(tint.r, tint.g, tint.b, .25f);
-            var glow = new GameObject("Lueur du faisceau");
-            glow.transform.SetParent(root.transform, false);
-            var corona = glow.AddComponent<LineRenderer>();
-            corona.useWorldSpace = true;
-            corona.positionCount = 2;
-            corona.startWidth = corona.endWidth = Mathf.Max(.09f, widthCm / 40f);
-            corona.numCapVertices = 6;
-            corona.sharedMaterial = resources.Own(SpellLab.MaterialFor(Color.white, true));
-            corona.startColor = new Color(tint.r, tint.g, tint.b, .18f);
-            corona.endColor = new Color(tint.r, tint.g, tint.b, .06f);
+            if (pattern != "double" && pattern != "dotted") return;
+            var visual = root.AddComponent<BeamPatternVisual>();
+            if (pattern == "double")
+            {
+                visual.secondStrand = BeamLayer(root, resources, "Second brin du faisceau",
+                    Mathf.Max(.025f, main.startWidth * .75f), tint, 5);
+                return;
+            }
+            // The subdued continuous trace preserves spatial readability;
+            // the bright, fixed-count dash overlay supplies the visual pattern.
+            foreach (var part in root.GetComponentsInChildren<LineRenderer>())
+            {
+                var start = part.startColor;
+                var end = part.endColor;
+                start.a *= .12f; end.a *= .12f;
+                part.startColor = start; part.endColor = end;
+            }
+            visual.dashes = new LineRenderer[12];
+            for (var i = 0; i < visual.dashes.Length; i++)
+                visual.dashes[i] = BeamLayer(root, resources, "Pointillé du faisceau " + i,
+                    Mathf.Max(.025f, main.startWidth), tint, 5);
         }
 
         private static void LavaBeam(GameObject root, LineRenderer lava, BeamVisualResources resources, int widthCm)
@@ -203,11 +410,45 @@ namespace Palimpseste.Game.SpellRuntime
         {
             if (state.visual == null || points.Count < 2) return;
             var positions = points.ToArray();
+            var pattern = state.visual.GetComponent<BeamPatternVisual>();
             foreach (var line in state.visual.GetComponentsInChildren<LineRenderer>())
             {
+                if (pattern != null && pattern.dashes != null && Array.IndexOf(pattern.dashes, line) >= 0) continue;
                 line.positionCount = positions.Length;
                 line.SetPositions(positions);
             }
+            if (pattern?.secondStrand != null)
+            {
+                var axis = (positions[positions.Length - 1] - positions[0]).normalized;
+                var lateral = Vector3.Cross(Vector3.up, axis).normalized;
+                var offset = lateral * Mathf.Max(.05f, pattern.secondStrand.startWidth * 1.4f);
+                for (var i = 0; i < positions.Length; i++) positions[i] += offset;
+                pattern.secondStrand.SetPositions(positions);
+            }
+            if (pattern?.dashes != null)
+            {
+                var total = 0f;
+                for (var i = 1; i < positions.Length; i++) total += Vector3.Distance(positions[i - 1], positions[i]);
+                for (var i = 0; i < pattern.dashes.Length; i++)
+                {
+                    var dash = pattern.dashes[i];
+                    dash.positionCount = 2;
+                    dash.SetPosition(0, PointAlong(positions, total * i / pattern.dashes.Length));
+                    dash.SetPosition(1, PointAlong(positions, total * (i + .45f) / pattern.dashes.Length));
+                }
+            }
+        }
+
+        private static Vector3 PointAlong(Vector3[] points, float distance)
+        {
+            for (var i = 1; i < points.Length; i++)
+            {
+                var segment = Vector3.Distance(points[i - 1], points[i]);
+                if (distance <= segment || i == points.Length - 1)
+                    return Vector3.Lerp(points[i - 1], points[i], segment <= .00001f ? 0 : distance / segment);
+                distance -= segment;
+            }
+            return points[points.Length - 1];
         }
 
         private static GameObject Footprint(GameObject root, Texture2D mask, int scaleCm, Color tint, bool trap)

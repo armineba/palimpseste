@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('local', 'active', 'plan', 'validate')]
+    [ValidateSet('local', 'astra', 'active', 'plan', 'validate')]
     [string]$Mode = 'local',
     [Parameter(Mandatory = $true)]
     [string]$CredentialFile,
@@ -53,8 +53,9 @@ if (-not (IsInside $EvidencePath $pending) -or (Test-Path -LiteralPath $Evidence
 if (-not [string]::IsNullOrWhiteSpace($GeometryJson)) {
     throw 'GeometryJson is deprecated. Supply InkPng so geometry is resolved from the frozen description.'
 }
-if ($Mode -in @('active', 'plan', 'validate')) {
-    $requiredArtifacts = if ($Mode -eq 'active') { @($ReferencePng, $DrawingPng, $InkPng) } else { @($InkPng) }
+if ($Mode -in @('astra', 'active', 'plan', 'validate')) {
+    $requiredArtifacts = if ($Mode -eq 'astra') { @($ReferencePng, $DrawingPng) }
+        elseif ($Mode -eq 'active') { @($ReferencePng, $DrawingPng, $InkPng) } else { @($InkPng) }
     foreach ($path in $requiredArtifacts) {
         if ([string]::IsNullOrWhiteSpace($path) -or
             -not (IsInside $path $artifactRoot) -or
@@ -97,7 +98,10 @@ $arguments = @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
     '-File', ('"' + $childScript + '"'), '-Mode', $Mode,
     '-RuntimeRoot', ('"' + $runtime + '"'),
     '-EvidencePath', ('"' + $EvidencePath + '"'))
-if ($Mode -eq 'active') {
+if ($Mode -eq 'astra') {
+    $arguments += @('-ReferencePng', ('"' + (FullPath $ReferencePng) + '"'),
+        '-DrawingPng', ('"' + (FullPath $DrawingPng) + '"'))
+} elseif ($Mode -eq 'active') {
     $arguments += @('-ReferencePng', ('"' + (FullPath $ReferencePng) + '"'),
         '-DrawingPng', ('"' + (FullPath $DrawingPng) + '"'),
         '-InkPng', ('"' + (FullPath $InkPng) + '"'))

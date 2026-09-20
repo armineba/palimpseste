@@ -1,0 +1,12 @@
+# Apparence des sorts compilés — 20 septembre 2026
+
+Le lecteur Unity applique désormais la palette contrôlée `appearance.palette` aux visuels, avec repli sur `affinity` pour les anciens paquets. Les projectiles montrent le chemin échantillonné du dessin, la silhouette alpha complète sur le projectile principal et une traînée suivant le déplacement. Le deuxième projectile reste déclenché uniquement par l'événement `hit` prévu dans le paquet. Son effet `impulse` crée un anneau de recul visuel au contact. Les motifs `double`, `dotted` et `irregular` ont des variantes fixes de tracé pour les projectiles et les faisceaux. Ces objets graphiques n'ajoutent ni collider ni receiver.
+
+La source utilisée pour l'examen est le paquet compilé « Estoc à crochet » du travail courant : son nœud principal a `geometry_id=full.path.0`, son nœud secondaire `full.path.1`, et les deux font référence au masque `full.silhouette.0`. Le paquet historique n'a que `affinity=fire`; la nouvelle palette `ember` est vérifiée dans le test ciblé. Ce contrôle ne constitue pas une validation visuelle humaine du rendu.
+
+- Test Unity PlayMode ciblé : `SpellLabFixtureTests.SixCarriersCastFromIsolatedManualFixtures`, 1 réussi, 0 échoué. Il vérifie le tracé à plusieurs points, la couleur `ember`, le masque de silhouette et l'absence de collider/receiver sur l'effet d'impact. Résultat : `game/Logs/playmode-vfx-palette-20260920.xml`, SHA-256 `63F8A0A252BD9DDF7177D20E21239BE5B96BAF11E0D2A55E71ABAF4A3CF996AD`.
+- Build Windows x64 IL2CPP/URP Unity 6000.3.24f1 : `game/Build/WindowsAppearanceVfxReady/Palimpseste.exe`, journal `PALIMPSESTE_BUILD_OK`, SHA-256 du journal `57AC953C7E0890B68BEFB9B0B7875E1198EFA16139D6CADF523903AEC571877B`.
+- SHA-256 de l'EXE : `049F79454586F2AC5445F26B55191CF6611BE62F10C4A5E12F92F806050149C2`. SHA-256 de `GameAssembly.dll` : `BBA75A8B708DD404D877CC7E4CA5A3448049F391EC9C5AACB4446E03EF54FF55`.
+- Le dossier brut Unity contient 672 fichiers, 1 371 283 164 octets, dont les dossiers de sauvegarde IL2CPP et de débogage Burst. La copie distribuable `game/Build/WindowsAppearanceVfxPlayable/` contient les 29 fichiers du lecteur (122 113 753 octets) et a été comparée fichier par fichier à la sortie brute : 0 écart de SHA-256. Ses empreintes EXE et GameAssembly sont celles indiquées ci-dessus.
+
+Les comportements visuels ont été vérifiés au niveau des objets Unity et des tests automatisés. Aucune nouvelle capture manuelle du laboratoire ni validation humaine des couleurs, sons ou animations n'a été réalisée pour ce build.

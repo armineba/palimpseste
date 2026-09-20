@@ -42,8 +42,10 @@ public sealed record ProviderDocument(CodexResult Transport, byte[]? Utf8, strin
 
 public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlanner, ITechnicalRepairProvider
 {
-    public const string PromptAVersion = "sp.prompt.a/1.3";
-    public const string PromptBVersion = "sp.prompt.b/1.1";
+    public const string InterpreterModel = "gpt-6-astra";
+    public const string PlannerModel = "gpt-5.6-luna";
+    public const string PromptAVersion = "sp.prompt.a/1.7";
+    public const string PromptBVersion = "sp.prompt.b/1.3";
     private readonly CodexProcessRunner runner;
     private readonly string promptA;
     private readonly string promptB;

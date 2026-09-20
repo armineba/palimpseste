@@ -93,6 +93,8 @@ namespace Palimpseste.Contracts
     {
         public string affinity;
         public string pattern;
+        // Optional controlled VFX palette; null preserves legacy compiled spells.
+        public string palette;
         public string signature_geometry_id;
     }
 

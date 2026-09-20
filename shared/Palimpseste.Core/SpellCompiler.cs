@@ -110,6 +110,9 @@ namespace Palimpseste.Core
                 var options = (JObject)node["options"];
                 foreach (var property in options.Properties().ToList())
                     if (property.Value.Type == JTokenType.Null) property.Remove();
+                var appearance = (JObject)node["appearance"];
+                if (appearance["palette"]?.Type == JTokenType.Null)
+                    appearance.Property("palette")?.Remove();
             }
             return new UTF8Encoding(false).GetBytes(token.ToString(Formatting.None));
         }
@@ -189,6 +192,29 @@ namespace Palimpseste.Core
             catch (Exception ex) { return new[] { new ValidationIssue("description_json", "$", ex.Message) }; }
         }
 
+        // New player captures use one composition. The palette gate applies only
+        // to free_canvas_v2; older saved descriptions remain compilable offline.
+        public static IReadOnlyList<ValidationIssue> ValidateWholeImageDescriptionJson(byte[] descriptionJson,
+            bool requirePalette)
+        {
+            var issues = ValidateDescriptionJson(descriptionJson).ToList();
+            if (issues.Count != 0) return issues;
+            var description = ContractJson.DeserializeStrict<SpellDescription>(descriptionJson, "spell-description");
+            if (description.shape_requests == null || description.shape_requests.Count != 0)
+                Add(issues, "regional_shape_request", "$.shape_requests",
+                    "New drawings must use the whole-image geometry bank");
+            if (description.observations.Any(observation => observation.region != "full"))
+                Add(issues, "regional_observation", "$.observations",
+                    "New drawings must be interpreted as one image");
+            if (requirePalette)
+                foreach (var subject in description.clauses.Select(c => c.subject_id).Distinct(StringComparer.Ordinal))
+                    if (description.clauses.Where(c => c.subject_id == subject).SelectMany(c => c.facts)
+                        .Count(f => f.dimension == "palette") != 1)
+                        Add(issues, "palette_required", subject,
+                            "New free-canvas spells require exactly one palette fact per subject");
+            return issues;
+        }
+
         public static IReadOnlyList<ValidationIssue> ValidatePlanJson(byte[] descriptionJson, byte[] planJson,
             IReadOnlyDictionary<string, byte[]> geometryJson, IReadOnlyDictionary<string, byte[]> maskPng)
         {
@@ -245,13 +271,32 @@ namespace Palimpseste.Core
             }
             foreach (var subject in subjects)
             {
-                if (d.clauses.Where(c => c.subject_id == subject && c.kind == "mechanical")
-                    .SelectMany(c => c.facts).Count(f => f.dimension == "carrier") != 1)
+                var facts = d.clauses.Where(c => c.subject_id == subject && c.kind == "mechanical")
+                    .SelectMany(c => c.facts).ToArray();
+                var palettes = d.clauses.Where(c => c.subject_id == subject).SelectMany(c => c.facts)
+                    .Where(f => f.dimension == "palette").Select(f => f.value).Distinct(StringComparer.Ordinal).ToArray();
+                if (palettes.Length > 1)
+                    Add(issues, "palette_conflict", subject, "Subject has conflicting visual palettes");
+                var carriers = facts.Where(f => f.dimension == "carrier").Select(f => f.value).ToArray();
+                var motions = facts.Where(f => f.dimension == "motion").Select(f => f.value).ToArray();
+                if (carriers.Length != 1)
                     Add(issues, "subject_carrier", subject, "Subject requires exactly one carrier fact");
-                if (d.shape_requests.Count(s => s.subject_id == subject) != 1)
+                if (motions.Length > 1)
+                    Add(issues, "motion_fact", subject, "Subject cannot declare multiple motions");
+                if (carriers.Length == 1 && motions.Length == 1)
+                {
+                    if (motions[0] == "stationary" && !new[] { "field", "barrier", "trap" }.Contains(carriers[0]))
+                        Add(issues, "motion_fact", subject, "Stationary fact cannot map to this carrier");
+                    if (motions[0] == "expanding" && carriers[0] != "pulse")
+                        Add(issues, "motion_fact", subject, "Expanding fact requires pulse");
+                    if (new[] { "straight", "curve", "homing" }.Contains(motions[0]) && carriers[0] != "projectile")
+                        Add(issues, "motion_fact", subject, "Travel motion requires projectile");
+                }
+                if (d.shape_requests != null && d.shape_requests.Count > 0 &&
+                    d.shape_requests.Count(s => s.subject_id == subject) != 1)
                     Add(issues, "shape_request", subject, "Subject requires one geometry request");
             }
-            foreach (var request in d.shape_requests)
+            foreach (var request in d.shape_requests ?? Enumerable.Empty<ShapeRequest>())
                 if (!subjects.Contains(request.subject_id)) Add(issues, "shape_subject", request.subject_id, "Unknown subject");
         }
 
@@ -279,6 +324,12 @@ namespace Palimpseste.Core
                 if (!subjectIds.SetEquals(nodeClauseIds) || nodeClauseIds.Count != node.clause_ids.Count)
                     Add(issues, "clause_trace", p, "Node must cite every clause of its subject exactly once");
                 var facts = subjectClauses.SelectMany(c => c.facts).ToArray();
+                var paletteFacts = allSubjectClauses.SelectMany(c => c.facts)
+                    .Where(f => f.dimension == "palette").Select(f => f.value).Distinct(StringComparer.Ordinal).ToArray();
+                if (paletteFacts.Length == 0 && node.appearance.palette != null)
+                    Add(issues, "palette_trace", p, "Palette was not selected by interpreter text");
+                if (paletteFacts.Length == 1 && node.appearance.palette != paletteFacts[0])
+                    Add(issues, "palette_trace", p, "Palette differs from interpreter text");
                 if (!facts.Any(f => f.dimension == "carrier" && f.value == node.carrier))
                     Add(issues, "carrier_fact", p, "Carrier differs from description");
                 var expectedEffects = facts.Where(f => f.dimension == "effect").Select(f => f.value)
@@ -345,7 +396,9 @@ namespace Palimpseste.Core
                     Add(issues, "motion_fact", p, "Stationary fact cannot map to this carrier");
                 if (motion == "expanding" && node.carrier != "pulse")
                     Add(issues, "motion_fact", p, "Expanding fact requires pulse");
-                var request = d.shape_requests.FirstOrDefault(s => s.subject_id == node.subject_id);
+                if (new[] { "straight", "curve", "homing" }.Contains(motion) && node.carrier != "projectile")
+                    Add(issues, "motion_fact", p, "Travel motion requires projectile");
+                var request = d.shape_requests?.FirstOrDefault(s => s.subject_id == node.subject_id);
                 if (!geometry.TryGetValue(node.geometry_id, out var main))
                     Add(issues, "geometry_reference", p, "Unknown main geometry");
                 else if (request != null && (main.source_region != request.region || main.kind != request.role))

@@ -11,6 +11,7 @@ public sealed class ApiConfig
     public required string ConnectionString { get; init; }
     public required string ArtifactRoot { get; init; }
     public required string ReferencePath { get; init; }
+    public required string ReferenceFreePath { get; init; }
     public required string CatalogPath { get; init; }
     public string CatalogVersion { get; init; } = "sp.capabilities/1.0";
     public string RulesProfile { get; init; } = "lab_v1";
@@ -54,6 +55,7 @@ public sealed class ApiConfig
             ConnectionString = connection,
             ArtifactRoot = Environment.GetEnvironmentVariable("ARTIFACT_ROOT") ?? Path.Combine(repositoryRoot, ".local-artifacts"),
             ReferencePath = Environment.GetEnvironmentVariable("REFERENCE_PNG") ?? Path.Combine(specificationRoot, "reference", "reference_layout.png"),
+            ReferenceFreePath = Environment.GetEnvironmentVariable("REFERENCE_FREE_PNG") ?? Path.Combine(specificationRoot, "reference", "reference_free_canvas.png"),
             CatalogPath = Environment.GetEnvironmentVariable("CAPABILITY_CATALOG") ?? Path.Combine(specificationRoot, "contracts", "capability-catalog.json"),
             CatalogVersion = Environment.GetEnvironmentVariable("CATALOG_VERSION") ?? "sp.capabilities/1.0",
             RulesProfile = Environment.GetEnvironmentVariable("RULES_PROFILE") ?? "lab_v1",
@@ -62,6 +64,13 @@ public sealed class ApiConfig
             NewGenerationsGlobal24h = GenerationLimit("PALIMPSESTE_GENERATIONS_GLOBAL_24H", 12)
         };
     }
+
+    public string ReferencePathForLayout(string layout) => layout switch
+    {
+        "three_regions_v1" => ReferencePath,
+        "free_canvas_v2" => ReferenceFreePath,
+        _ => throw new ArgumentOutOfRangeException(nameof(layout), "Unknown parchment layout")
+    };
 }
 
 public static class ApiJson

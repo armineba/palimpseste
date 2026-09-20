@@ -257,6 +257,34 @@
                     "value"
                   ],
                   "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "palette"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "ember",
+                        "lava",
+                        "ice",
+                        "water",
+                        "moss",
+                        "stone",
+                        "storm",
+                        "arcane",
+                        "shadow",
+                        "light"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
                 }
               ]
             },
@@ -363,7 +391,7 @@
         ],
         "additionalProperties": false
       },
-      "minItems": 1,
+      "minItems": 0,
       "maxItems": 16
     }
   },

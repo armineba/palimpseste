@@ -46,9 +46,10 @@ public static partial class ApiHandlers
         {
             var principal = Owner(context);
             long budget, firstSequence;
+            string layoutVersion;
             string firstHash;
             await using (var connection = await db.OpenConnectionAsync(ct))
-            await using (var command = new NpgsqlCommand("SELECT budget_micro_units,first_sequence,first_block_sha256 FROM parchments WHERE id=@id AND owner_id=@owner", connection))
+            await using (var command = new NpgsqlCommand("SELECT budget_micro_units,first_sequence,first_block_sha256,layout_version FROM parchments WHERE id=@id AND owner_id=@owner", connection))
             {
                 command.Parameters.AddWithValue("id", parchmentId);
                 command.Parameters.AddWithValue("owner", principal.Id);
@@ -56,12 +57,16 @@ public static partial class ApiHandlers
                 if (!await reader.ReadAsync(ct)) return ApiProblem.Result(context, 404, "not_found", "Support introuvable.");
                 if (reader.IsDBNull(1) || reader.IsDBNull(2)) return ApiProblem.Result(context, 409, "parchment_blank", "Le support n'a pas de première inscription durable.");
                 budget = reader.GetInt64(0); firstSequence = reader.GetInt64(1); firstHash = reader.GetString(2);
+                layoutVersion = reader.GetString(3);
             }
             (Guid referenceId, string referenceHash) referenceInfo;
-            try { referenceInfo = await reference.EnsureAsync(ct); }
+            try { referenceInfo = await reference.EnsureAsync(layoutVersion, ct); }
             catch (Exception) { return ApiProblem.Result(context, 503, "reference_unavailable", "Référence indisponible.", true); }
             CaptureManifest manifest;
-            try { manifest = CaptureValidation.Validate(manifestDocument.RootElement, parchmentId, referenceInfo.referenceHash, await File.ReadAllBytesAsync(config.ReferencePath, ct), drawing, ink, journal, budget, firstSequence, firstHash); }
+            try { manifest = CaptureValidation.Validate(manifestDocument.RootElement, parchmentId,
+                layoutVersion, referenceInfo.referenceHash,
+                await File.ReadAllBytesAsync(config.ReferencePathForLayout(layoutVersion), ct),
+                drawing, ink, journal, budget, firstSequence, firstHash); }
             catch (Exception ex) when (ex is InvalidDataException or JsonException or KeyNotFoundException or FormatException or ArgumentOutOfRangeException or InvalidOperationException)
             { return ApiProblem.Result(context, 422, "capture_incompatible", "Capture endommagée ou incompatible."); }
 

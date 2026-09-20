@@ -139,6 +139,9 @@ try
         LunaCodexProvider.PromptAVersion, successTransport, CancellationToken.None);
     Require((await repository.GetDescriptionAsync(afterA!, CancellationToken.None))?.PromptVersion == LunaCodexProvider.PromptAVersion,
         "Description or its prompt version was not frozen after A");
+    Require(await repository.GetSuccessfulRequestedModelAsync(afterA!, "A", CancellationToken.None) == "gpt-5.6-luna" &&
+        await repository.GetSuccessfulRequestedModelAsync(afterA!, "B", CancellationToken.None) is null,
+        "Persisted provider model provenance did not reflect the completed A attempt");
     await using (var conn = await db.OpenConnectionAsync())
     await using (var expire = new NpgsqlCommand("UPDATE jobs SET lease_until=now()-interval '1 second' WHERE id=$1", conn))
     { expire.Parameters.AddWithValue(recoveryJob); await expire.ExecuteNonQueryAsync(); }

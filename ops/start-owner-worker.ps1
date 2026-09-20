@@ -4,8 +4,8 @@ param([string]$RuntimeRoot = 'E:\PalimpsesteRuntime')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$expectedWorkerSha256 = '9243F9600973B1AAF5F97F07AD0983FF60A7EFA2EB0A7F7D42D142C05015847D'
-$expectedChildSha256 = '03CE0108D67A4AC27B332A41F36F1F12B2B362FA9A2AEBCF25EB21E8BDB4C104'
+$expectedWorkerSha256 = '737E1CC61E5D6B1E5B235D627616C7CAD0F535464385A545DD8D2BBC246D8D48'
+$expectedChildSha256 = 'D786B077EF1F54FF6DA11FF8D809226DB0AFB049AAB7F86F1CE9111D7ED0D194'
 $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\', '/')
 if (-not [string]::Equals($runtime, 'E:\PalimpsesteRuntime', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab worker accepts only E:\PalimpsesteRuntime.'
@@ -100,6 +100,11 @@ $gate = @(Get-Content -LiteralPath $envFile -Encoding UTF8 |
     Where-Object { $_.StartsWith('PALIMPSESTE_EFFORT_VERIFIED=', [StringComparison]::Ordinal) })
 if ($gate.Count -ne 1 -or $gate[0] -cne 'PALIMPSESTE_EFFORT_VERIFIED=true') {
     throw 'Owner lab technical effort gate remains closed.'
+}
+$astraGate = @(Get-Content -LiteralPath $envFile -Encoding UTF8 |
+    Where-Object { $_.StartsWith('PALIMPSESTE_ASTRA_VERIFIED=', [StringComparison]::Ordinal) })
+if ($astraGate.Count -ne 1 -or $astraGate[0] -cne 'PALIMPSESTE_ASTRA_VERIFIED=true') {
+    throw 'Owner lab Astra technical gate remains closed.'
 }
 
 $running = @(Get-CimInstance Win32_Process -Filter "Name = 'Palimpseste.Worker.exe'")

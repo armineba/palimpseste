@@ -44,12 +44,16 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Desti
 
 @"
 Palimpseste backend Windows x64. API, worker et doctor sont des exécutables .NET autoportants.
-La configuration et les secrets ne sont pas inclus. Lire IMPLEMENTATION_STATUS.md puis ops/provision-runtime.ps1.
+La chaîne privée est : dessin libre -> Astra multimodale (description) -> Luna (plan déclaratif) -> compilateur contrôlé -> paquet de sort Unity.
+Le worker utilise codex exec sous un compte Windows de service isolé. Il n'exécute ni C# issu d'un dessin, ni build Unity.
+L'archive contient les contrats, références, prompts A/B et migrations, mais aucun auth.json, jeton joueur, secret DB ou clé API.
+Lire IMPLEMENTATION_STATUS.md puis ops/provision-runtime.ps1 avant toute installation.
 Extraire l'archive dans un dossier opérateur inaccessible au compte worker : elle contient des scripts ops d'administration.
 Copier api, worker et doctor publiés vers leurs emplacements de service avec ACL minimales ; ne pas lancer le worker depuis le dossier extrait.
 L'API attend DATABASE_URL, ARTIFACT_ROOT et PALIMPSESTE_SPEC_ROOT pointant vers la copie runtime de spec.
 Le worker attend en plus le compte Windows dédié, CODEX_HOME isolé et la preuve du doctor actif.
 La génération reste bloquée tant que le compte de service Codex et le doctor actif ne sont pas validés.
+Le service local actuel emploie 127.0.0.1 ; cette archive ne configure pas une URL HTTPS publique ni les identités des joueurs.
 "@ | Set-Content -LiteralPath (Join-Path $stage 'README.txt') -Encoding UTF8
 
 $zip = Join-Path $deliverables 'Palimpseste-Backend-Windows-x64.zip'
