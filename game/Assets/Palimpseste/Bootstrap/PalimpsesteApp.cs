@@ -330,10 +330,14 @@ namespace Palimpseste.Game.Bootstrap
             DrawInterpretationPanel(new Rect(r.x + 36 + previewWidth, bodyY,
                 r.width - previewWidth - 60, bodyHeight));
             if (GUI.Button(new Rect(r.x + 24, r.yMax - 66, 170, 42), "Bibliothèque", buttonStyle)) page = Page.Library;
-            if (selected != null && selected.needs_capture && api.Configured && !busy &&
+            if (selected != null && CanResumeJob(selected) && api.Configured && !busy &&
+                !pollingJobs.Contains(selected.job_id) &&
+                GUI.Button(new Rect(r.x + 211, r.yMax - 66, 188, 42), "Réessayer ce dessin", buttonStyle))
+                StartCoroutine(ResumeJob(selected));
+            else if (selected != null && selected.needs_capture && api.Configured && !busy &&
                 GUI.Button(new Rect(r.x + 211, r.yMax - 66, 188, 42), "Transmettre", buttonStyle))
                 StartCoroutine(Sync(selected));
-            else if (selected != null && !string.IsNullOrEmpty(selected.job_id) && api.Configured &&
+            else if (selected != null && !string.IsNullOrEmpty(selected.job_id) && api.Configured && !busy &&
                      !pollingJobs.Contains(selected.job_id) &&
                      GUI.Button(new Rect(r.x + 211, r.yMax - 66, 188, 42), "Actualiser", buttonStyle))
                 StartCoroutine(Poll(selected));
@@ -389,6 +393,10 @@ namespace Palimpseste.Game.Bootstrap
         private static string JobStateLabel(ParchmentRecord record)
         {
             if (record.needs_capture) return "Trace fermée · transmission de la capture en attente";
+            if (record.state == "needs_operator")
+                return CanResumeJob(record)
+                    ? "Le sort n'est pas encore prêt. Réessayez avec ce dessin enregistré."
+                    : "Ce dessin n'a pas encore produit de sort. Votre trace reste enregistrée.";
             var state = record.state switch
             {
                 "queued" => "En file d'attente pour la lecture du dessin",
@@ -397,12 +405,15 @@ namespace Palimpseste.Game.Bootstrap
                 "planning" => "Luna construit le plan du sort",
                 "validating" => "Plan compilé et ressources contrôlées avant publication",
                 "ready" => "Sort validé · téléchargement et contrôle local",
-                "waiting_retry" => "Nouvel essai technique prévu par le service",
-                "needs_operator" => "Intervention technique requise",
+                "waiting_retry" => "Nouvel essai de création prévu par le laboratoire",
                 _ => "Traitement du sort en cours"
             };
             return string.IsNullOrEmpty(record.last_job_message) ? state : state + " · " + record.last_job_message;
         }
+
+        private static bool CanResumeJob(ParchmentRecord record) =>
+            record != null && record.state == "needs_operator" && record.job_retryable &&
+            !string.IsNullOrEmpty(record.job_id) && !record.needs_capture;
 
         private void DrawInterpretationPanel(Rect area)
         {
@@ -448,7 +459,7 @@ namespace Palimpseste.Game.Bootstrap
                 "validating" => "Compilation du sort",
                 "ready" => "Sort à récupérer",
                 "waiting_retry" => "Nouvel essai prévu",
-                "needs_operator" => "Assistance nécessaire",
+                "needs_operator" => CanResumeJob(record) ? "Sort à relancer" : "Sort non créé",
                 _ => "Traitement en cours"
             };
         }
@@ -842,6 +853,7 @@ namespace Palimpseste.Game.Bootstrap
             selected = record;
             interpretationScroll = Vector2.zero;
             descriptionView = null;
+            spellJson = null;
             feedbackDraft = record.feedback_correction ?? "";
             showLabFeedback = false;
             if (record.server_issued || !string.IsNullOrEmpty(record.job_id))
@@ -1069,6 +1081,11 @@ namespace Palimpseste.Game.Bootstrap
                     record.state = job.state;
                     record.resume_stage = job.resume_stage;
                     record.last_job_message = job.message;
+                    record.last_job_error_code = job.error_code;
+                    record.job_retryable = job.retryable;
+                    if (job.state != "needs_operator" || job.attempt_count > record.last_job_attempt_count)
+                        record.resume_key = null;
+                    record.last_job_attempt_count = job.attempt_count;
                     if (!string.IsNullOrEmpty(job.spell_id)) record.spell_id = job.spell_id;
                     store.Save(record);
                     if (selected == record && !string.IsNullOrEmpty(job.message)) notice = job.message;
@@ -1090,13 +1107,53 @@ namespace Palimpseste.Game.Bootstrap
                     }
                     if (job.state == "needs_operator")
                     {
-                        if (selected == record) notice = "Intervention technique requise : " + job.message;
+                        if (selected == record)
+                            notice = "Le sort n'a pas encore pu être créé. Votre dessin est conservé.";
                         yield break;
                     }
                     yield return new WaitForSecondsRealtime(Mathf.Clamp(job.poll_after_ms / 1000f, 1f, 10f));
                 }
             }
             finally { pollingJobs.Remove(jobId); }
+        }
+
+        private IEnumerator ResumeJob(ParchmentRecord record)
+        {
+            if (!api.Configured || busy || !CanResumeJob(record)) yield break;
+            busy = true;
+            if (string.IsNullOrEmpty(record.resume_key))
+            {
+                record.resume_key = Guid.NewGuid().ToString("N");
+                store.Save(record);
+            }
+            JobDto job = null;
+            string error = null;
+            yield return api.ResumeJob(record.job_id, record.resume_key,
+                (response, failure) => { job = response; error = failure; });
+            busy = false;
+            if (error != null || job == null)
+            {
+                if (selected == record)
+                    notice = "Ce dessin est conservé. La reprise du sort n'a pas abouti : " + error;
+                yield break;
+            }
+            if (job.job_id != record.job_id || job.parchment_id != record.parchment_id ||
+                job.state is not ("queued" or "ready"))
+            {
+                if (selected == record) notice = "Réponse de reprise incohérente. Votre dessin est conservé.";
+                yield break;
+            }
+            record.resume_key = null;
+            record.state = job.state;
+            record.resume_stage = job.resume_stage;
+            record.last_job_message = job.message;
+            record.last_job_error_code = job.error_code;
+            record.job_retryable = job.retryable;
+            record.last_job_attempt_count = job.attempt_count;
+            if (!string.IsNullOrEmpty(job.spell_id)) record.spell_id = job.spell_id;
+            store.Save(record);
+            if (selected == record) notice = "Création du sort relancée avec votre dessin enregistré.";
+            StartCoroutine(Poll(record));
         }
 
         private IEnumerator FetchDescription(ParchmentRecord record, string artifactId)

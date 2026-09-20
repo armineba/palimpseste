@@ -1,0 +1,4213 @@
+{
+  "schema_version": "sp.effect-recipes/1.0",
+  "production_catalog": "capability-catalog.json",
+  "semantics": "Each recipe expands to its fixed, ordered, bounded SpellEffect components on one target and one carrier event. It never executes generated code.",
+  "recipes": [
+    {
+      "id": "r_impact",
+      "label_fr": "Impact franc",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_braise",
+      "label_fr": "Braise persistante",
+      "family": "hostile",
+      "description_fr": "Inflige une brûlure périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_entaille",
+      "label_fr": "Entaille ouverte",
+      "family": "hostile",
+      "description_fr": "Inflige une hémorragie périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin",
+      "label_fr": "Venin lent",
+      "family": "hostile",
+      "description_fr": "Inflige un poison périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_gelure",
+      "label_fr": "Gelure rampante",
+      "family": "hostile",
+      "description_fr": "Inflige une gelure périodique sans immobilisation automatique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_averse",
+      "label_fr": "Marque d'eau",
+      "family": "hostile",
+      "description_fr": "Applique Mouillé, qui éteint ou empêche la brûlure.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "wet",
+          "amount": 0,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_inertie",
+      "label_fr": "Inertie imposée",
+      "family": "hostile",
+      "description_fr": "Réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_recul",
+      "label_fr": "Recul brutal",
+      "family": "hostile",
+      "description_fr": "Repousse physiquement la cible.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        }
+      ]
+    },
+    {
+      "id": "r_faille",
+      "label_fr": "Faille exposée",
+      "family": "hostile",
+      "description_fr": "Augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_torpeur",
+      "label_fr": "Torpeur offensive",
+      "family": "hostile",
+      "description_fr": "Réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_armure_fendue",
+      "label_fr": "Armure fendue",
+      "family": "hostile",
+      "description_fr": "Retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_soin_etrangle",
+      "label_fr": "Soin étranglé",
+      "family": "hostile",
+      "description_fr": "Réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lien_immobile",
+      "label_fr": "Lien immobile",
+      "family": "hostile",
+      "description_fr": "Immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_choc_neural",
+      "label_fr": "Choc neural",
+      "family": "hostile",
+      "description_fr": "Interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_finisseur",
+      "label_fr": "Finisseur conditionnel",
+      "family": "hostile",
+      "description_fr": "Ajoute des dégâts bornés seulement sous 25 % de santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lame_incandescente",
+      "label_fr": "Lame incandescente",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lame_ouverte",
+      "label_fr": "Lame qui saigne",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux",
+      "label_fr": "Dard venimeux",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_glacial",
+      "label_fr": "Éclat glacial",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_masse_repulsive",
+      "label_fr": "Masse répulsive",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; repousse physiquement la cible.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        }
+      ]
+    },
+    {
+      "id": "r_frappe_pesante",
+      "label_fr": "Frappe pesante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_pointe_fragilisante",
+      "label_fr": "Pointe fragilisante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_coup_epuisant",
+      "label_fr": "Coup épuisant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_perce_armure",
+      "label_fr": "Perce armure",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_plaie_fermee",
+      "label_fr": "Plaie fermée aux soins",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_crochet_entravant",
+      "label_fr": "Crochet entravant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_marteau_assommant",
+      "label_fr": "Marteau assommant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_pointe_de_grace",
+      "label_fr": "Pointe de grâce",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; ajoute des dégâts bornés seulement sous 25 % de santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction",
+      "label_fr": "Ponction vitale",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_cendre_lourde",
+      "label_fr": "Cendre lourde",
+      "family": "hostile",
+      "description_fr": "Inflige une brûlure périodique; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_cendre_affaiblissante",
+      "label_fr": "Cendre affaiblissante",
+      "family": "hostile",
+      "description_fr": "Inflige une brûlure périodique; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_cendre_exposante",
+      "label_fr": "Cendre exposante",
+      "family": "hostile",
+      "description_fr": "Inflige une brûlure périodique; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_fusion_d_armure",
+      "label_fr": "Fusion d'armure",
+      "family": "hostile",
+      "description_fr": "Inflige une brûlure périodique; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_cautere_de_soin",
+      "label_fr": "Cautère de soin",
+      "family": "hostile",
+      "description_fr": "Inflige une brûlure périodique; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_souffle_ardent",
+      "label_fr": "Souffle ardent",
+      "family": "hostile",
+      "description_fr": "Inflige une brûlure périodique; repousse physiquement la cible.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        }
+      ]
+    },
+    {
+      "id": "r_braises_entravantes",
+      "label_fr": "Braises entravantes",
+      "family": "hostile",
+      "description_fr": "Inflige une brûlure périodique; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_saignee_lente",
+      "label_fr": "Saignée lente",
+      "family": "hostile",
+      "description_fr": "Inflige une hémorragie périodique; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_saignee_epuisante",
+      "label_fr": "Saignée épuisante",
+      "family": "hostile",
+      "description_fr": "Inflige une hémorragie périodique; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_saignee_exposante",
+      "label_fr": "Saignée exposante",
+      "family": "hostile",
+      "description_fr": "Inflige une hémorragie périodique; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_saignee_anti_soin",
+      "label_fr": "Saignée anti soin",
+      "family": "hostile",
+      "description_fr": "Inflige une hémorragie périodique; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_saignee_entravante",
+      "label_fr": "Saignée entravante",
+      "family": "hostile",
+      "description_fr": "Inflige une hémorragie périodique; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_saignee_corrosive",
+      "label_fr": "Saignée et fissure",
+      "family": "hostile",
+      "description_fr": "Inflige une hémorragie périodique; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin_pesant",
+      "label_fr": "Venin pesant",
+      "family": "hostile",
+      "description_fr": "Inflige un poison périodique; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin_debilitant",
+      "label_fr": "Venin débilitant",
+      "family": "hostile",
+      "description_fr": "Inflige un poison périodique; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin_exposant",
+      "label_fr": "Venin exposant",
+      "family": "hostile",
+      "description_fr": "Inflige un poison périodique; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin_anti_soin",
+      "label_fr": "Venin anti soin",
+      "family": "hostile",
+      "description_fr": "Inflige un poison périodique; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin_entravant",
+      "label_fr": "Venin entravant",
+      "family": "hostile",
+      "description_fr": "Inflige un poison périodique; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin_fissurant",
+      "label_fr": "Venin fissurant",
+      "family": "hostile",
+      "description_fr": "Inflige un poison périodique; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_givre_pesant",
+      "label_fr": "Givre pesant",
+      "family": "hostile",
+      "description_fr": "Inflige une gelure périodique sans immobilisation automatique; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_givre_immobilisant",
+      "label_fr": "Givre immobilisant",
+      "family": "hostile",
+      "description_fr": "Inflige une gelure périodique sans immobilisation automatique; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_givre_assommant",
+      "label_fr": "Givre assommant",
+      "family": "hostile",
+      "description_fr": "Inflige une gelure périodique sans immobilisation automatique; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_givre_faible",
+      "label_fr": "Givre affaiblissant",
+      "family": "hostile",
+      "description_fr": "Inflige une gelure périodique sans immobilisation automatique; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_givre_exposant",
+      "label_fr": "Givre exposant",
+      "family": "hostile",
+      "description_fr": "Inflige une gelure périodique sans immobilisation automatique; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_projection_liante",
+      "label_fr": "Projection liante",
+      "family": "hostile",
+      "description_fr": "Repousse physiquement la cible; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_projection_siderante",
+      "label_fr": "Projection sidérante",
+      "family": "hostile",
+      "description_fr": "Repousse physiquement la cible; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_projection_exposante",
+      "label_fr": "Projection exposante",
+      "family": "hostile",
+      "description_fr": "Repousse physiquement la cible; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eau_lourde",
+      "label_fr": "Eau lourde",
+      "family": "hostile",
+      "description_fr": "Applique Mouillé, qui éteint ou empêche la brûlure; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "wet",
+          "amount": 0,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eau_liante",
+      "label_fr": "Eau liante",
+      "family": "hostile",
+      "description_fr": "Applique Mouillé, qui éteint ou empêche la brûlure; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "wet",
+          "amount": 0,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_visqueuse",
+      "label_fr": "Lave visqueuse",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_fissurante",
+      "label_fr": "Lave fissurante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_epuisante",
+      "label_fr": "Lave épuisante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_corrosive",
+      "label_fr": "Lave corrosive",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_cauterisante",
+      "label_fr": "Lave cautérisante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eruption_repulsive",
+      "label_fr": "Éruption répulsive",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; repousse physiquement la cible.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_entravante",
+      "label_fr": "Lave entravante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_assommante",
+      "label_fr": "Lave assommante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_braise_de_grace",
+      "label_fr": "Braise de grâce",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; ajoute des dégâts bornés seulement sous 25 % de santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_lent",
+      "label_fr": "Estoc saignant et lourd",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_fragile",
+      "label_fr": "Estoc saignant et exposant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_faible",
+      "label_fr": "Estoc saignant et épuisant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_armure",
+      "label_fr": "Estoc saignant et perforant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_soin",
+      "label_fr": "Estoc saignant et stérile",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_recul",
+      "label_fr": "Estoc saignant et repoussant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; repousse physiquement la cible.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_lien",
+      "label_fr": "Estoc saignant et liant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_choc",
+      "label_fr": "Estoc saignant et sidérant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_estoc_saignant_fin",
+      "label_fr": "Estoc saignant de grâce",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; ajoute des dégâts bornés seulement sous 25 % de santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_lent",
+      "label_fr": "Dard venimeux et pesant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_fragile",
+      "label_fr": "Dard venimeux et exposant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_faible",
+      "label_fr": "Dard venimeux et épuisant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_armure",
+      "label_fr": "Dard venimeux et perforant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_soin",
+      "label_fr": "Dard venimeux et stérile",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_recul",
+      "label_fr": "Dard venimeux et repoussant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; repousse physiquement la cible.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_lien",
+      "label_fr": "Dard venimeux et liant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_choc",
+      "label_fr": "Dard venimeux et sidérant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dard_venimeux_fin",
+      "label_fr": "Dard venimeux de grâce",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; ajoute des dégâts bornés seulement sous 25 % de santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_givre_lent",
+      "label_fr": "Éclat de givre pesant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_givre_fragile",
+      "label_fr": "Éclat de givre exposant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_givre_faible",
+      "label_fr": "Éclat de givre épuisant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_givre_armure",
+      "label_fr": "Éclat de givre perforant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_givre_recul",
+      "label_fr": "Éclat de givre repoussant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; repousse physiquement la cible.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_givre_lien",
+      "label_fr": "Éclat de givre liant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_givre_choc",
+      "label_fr": "Éclat de givre sidérant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_eclat_givre_fin",
+      "label_fr": "Éclat de givre de grâce",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; ajoute des dégâts bornés seulement sous 25 % de santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_lourde_exposante",
+      "label_fr": "Lave lourde et exposante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; réduit temporairement la vitesse; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_recul_perforant",
+      "label_fr": "Lave répulsive et perforante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; repousse physiquement la cible; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_lave_liante_sterile",
+      "label_fr": "Lave liante et stérile",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une brûlure périodique; immobilise brièvement sans supprimer les dégâts; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_entaille_lourde_epuisante",
+      "label_fr": "Entaille lourde et épuisante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; réduit temporairement la vitesse; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_entaille_recul_expose",
+      "label_fr": "Entaille répulsive et exposante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; repousse physiquement la cible; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_entaille_liante_sterile",
+      "label_fr": "Entaille liante et stérile",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une hémorragie périodique; immobilise brièvement sans supprimer les dégâts; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin_lourd_sterile",
+      "label_fr": "Venin lourd et stérile",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; réduit temporairement la vitesse; réduit temporairement les soins reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "healing_reduction",
+          "amount": 220,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_venin_epuisant_expose",
+      "label_fr": "Venin épuisant et exposant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige un poison périodique; réduit temporairement les dégâts infligés; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_givre_lourd_liant",
+      "label_fr": "Givre lourd et liant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; réduit temporairement la vitesse; immobilise brièvement sans supprimer les dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "root",
+          "amount": 0,
+          "duration_ticks": 60,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_givre_recul_siderant",
+      "label_fr": "Givre répulsif et sidérant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; inflige une gelure périodique sans immobilisation automatique; repousse physiquement la cible; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "impulse",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "outward"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction_sanglante",
+      "label_fr": "Ponction sanglante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact; inflige une hémorragie périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction_ardente",
+      "label_fr": "Ponction ardente",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact; inflige une brûlure périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "burn",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction_venimeuse",
+      "label_fr": "Ponction venimeuse",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact; inflige un poison périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction_glaciale",
+      "label_fr": "Ponction glaciale",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact; inflige une gelure périodique sans immobilisation automatique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "freeze_damage",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction_exposante",
+      "label_fr": "Ponction exposante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction_epuisante",
+      "label_fr": "Ponction épuisante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact; réduit temporairement les dégâts infligés.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "weakness",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction_perforante",
+      "label_fr": "Ponction perforante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_ponction_pesante",
+      "label_fr": "Ponction pesante",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; soigne le lanceur d'une fraction des dégâts effectivement infligés par ce même impact; réduit temporairement la vitesse.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "life_steal",
+          "amount": 250,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "slow",
+          "amount": 260,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_fin_sanglante",
+      "label_fr": "Fin sanglante",
+      "family": "hostile",
+      "description_fr": "Ajoute des dégâts bornés seulement sous 25 % de santé; inflige une hémorragie périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "bleed",
+          "amount": 1400,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_fin_venimeuse",
+      "label_fr": "Fin venimeuse",
+      "family": "hostile",
+      "description_fr": "Ajoute des dégâts bornés seulement sous 25 % de santé; inflige un poison périodique.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "poison",
+          "amount": 1200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_fin_exposante",
+      "label_fr": "Fin exposante",
+      "family": "hostile",
+      "description_fr": "Ajoute des dégâts bornés seulement sous 25 % de santé; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_fin_perforante",
+      "label_fr": "Fin perforante",
+      "family": "hostile",
+      "description_fr": "Ajoute des dégâts bornés seulement sous 25 % de santé; retire une partie de la réduction active de dégâts.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "execute",
+          "amount": 7000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "armor_break",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dissipation",
+      "label_fr": "Dissipation hostile",
+      "family": "hostile",
+      "description_fr": "Retire les effets positifs dissipables de l'ennemi.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "dispel",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_impact_dissipant",
+      "label_fr": "Impact dissipant",
+      "family": "hostile",
+      "description_fr": "Retire immédiatement de la santé; retire les effets positifs dissipables de l'ennemi.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "damage",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "dispel",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dissipation_exposante",
+      "label_fr": "Dissipation exposante",
+      "family": "hostile",
+      "description_fr": "Retire les effets positifs dissipables de l'ennemi; augmente temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "dispel",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "vulnerability",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_dissipation_siderante",
+      "label_fr": "Dissipation sidérante",
+      "family": "hostile",
+      "description_fr": "Retire les effets positifs dissipables de l'ennemi; interrompt brièvement les actions.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "hostile",
+      "components": [
+        {
+          "kind": "dispel",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "stun",
+          "amount": 0,
+          "duration_ticks": 35,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_soin",
+      "label_fr": "Soin immédiat",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_regain",
+      "label_fr": "Regain progressif",
+      "family": "support",
+      "description_fr": "Restaure périodiquement la santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "regen",
+          "amount": 1500,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_egide",
+      "label_fr": "Égide de santé",
+      "family": "support",
+      "description_fr": "Accorde une réserve de santé absorbante.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "barrier_health",
+          "amount": 15000,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_resistance",
+      "label_fr": "Résistance temporaire",
+      "family": "support",
+      "description_fr": "Réduit temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "damage_reduction",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_elan",
+      "label_fr": "Élan de mouvement",
+      "family": "support",
+      "description_fr": "Augmente temporairement la vitesse de mouvement.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "haste",
+          "amount": 200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_purge",
+      "label_fr": "Purge des afflictions",
+      "family": "support",
+      "description_fr": "Retire les altérations nettoyables.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "cleanse",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_soin_durable",
+      "label_fr": "Soin durable",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé; restaure périodiquement la santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "regen",
+          "amount": 1500,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_soin_protege",
+      "label_fr": "Soin protégé",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé; accorde une réserve de santé absorbante.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "barrier_health",
+          "amount": 15000,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_soin_resistant",
+      "label_fr": "Soin et résistance",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé; réduit temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "damage_reduction",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_soin_mobile",
+      "label_fr": "Soin et élan",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé; augmente temporairement la vitesse de mouvement.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "haste",
+          "amount": 200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_soin_purifiant",
+      "label_fr": "Soin purifiant",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé; retire les altérations nettoyables.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "cleanse",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_regain_protege",
+      "label_fr": "Regain protégé",
+      "family": "support",
+      "description_fr": "Restaure périodiquement la santé; accorde une réserve de santé absorbante.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "regen",
+          "amount": 1500,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "barrier_health",
+          "amount": 15000,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_regain_resistant",
+      "label_fr": "Regain et résistance",
+      "family": "support",
+      "description_fr": "Restaure périodiquement la santé; réduit temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "regen",
+          "amount": 1500,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "damage_reduction",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_regain_mobile",
+      "label_fr": "Regain et élan",
+      "family": "support",
+      "description_fr": "Restaure périodiquement la santé; augmente temporairement la vitesse de mouvement.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "regen",
+          "amount": 1500,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "haste",
+          "amount": 200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_egide_resistante",
+      "label_fr": "Égide résistante",
+      "family": "support",
+      "description_fr": "Accorde une réserve de santé absorbante; réduit temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "barrier_health",
+          "amount": 15000,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "damage_reduction",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_egide_mobile",
+      "label_fr": "Égide mobile",
+      "family": "support",
+      "description_fr": "Accorde une réserve de santé absorbante; augmente temporairement la vitesse de mouvement.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "barrier_health",
+          "amount": 15000,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "haste",
+          "amount": 200,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_purge_regenerante",
+      "label_fr": "Purge régénérante",
+      "family": "support",
+      "description_fr": "Retire les altérations nettoyables; restaure périodiquement la santé.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "cleanse",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "regen",
+          "amount": 1500,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_purge_resistante",
+      "label_fr": "Purge résistante",
+      "family": "support",
+      "description_fr": "Retire les altérations nettoyables; réduit temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "cleanse",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "damage_reduction",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_benediction_complete",
+      "label_fr": "Bénédiction complète",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé; restaure périodiquement la santé; accorde une réserve de santé absorbante.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "regen",
+          "amount": 1500,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "barrier_health",
+          "amount": 15000,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_restauration_renforcee",
+      "label_fr": "Restauration renforcée",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé; restaure périodiquement la santé; réduit temporairement les dégâts reçus.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "regen",
+          "amount": 1500,
+          "duration_ticks": 150,
+          "direction": "none"
+        },
+        {
+          "kind": "damage_reduction",
+          "amount": 180,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_secours_purifiant",
+      "label_fr": "Secours purifiant",
+      "family": "support",
+      "description_fr": "Rend immédiatement de la santé; retire les altérations nettoyables; accorde une réserve de santé absorbante.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "ally",
+      "components": [
+        {
+          "kind": "heal",
+          "amount": 15000,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "cleanse",
+          "amount": 0,
+          "duration_ticks": 0,
+          "direction": "none"
+        },
+        {
+          "kind": "barrier_health",
+          "amount": 15000,
+          "duration_ticks": 150,
+          "direction": "none"
+        }
+      ]
+    },
+    {
+      "id": "r_fracas_de_caisse",
+      "label_fr": "Fracas de caisse",
+      "family": "environment",
+      "description_fr": "Endommage la structure d'une caisse du labo marquée destructible.",
+      "allowed_carriers": [
+        "projectile",
+        "beam",
+        "pulse",
+        "field",
+        "trap"
+      ],
+      "target_filter": "environment",
+      "components": [
+        {
+          "kind": "shatter",
+          "amount": 18000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ]
+    }
+  ]
+}

@@ -13,7 +13,7 @@ $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\', '/')
 if (-not [string]::Equals($runtime, 'E:\PalimpsesteRuntime', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab worker accepts only E:\PalimpsesteRuntime.'
 }
-$expectedWorkerSha256 = '737E1CC61E5D6B1E5B235D627616C7CAD0F535464385A545DD8D2BBC246D8D48'
+$expectedWorkerSha256 = '7FEEE56F6ECD63741B9AC129D16ACF721ADCF2EF6B869ECFFD5068429643FDC7'
 $child = Join-Path $runtime 'bin\WorkerService.Child.ps1'
 $worker = Join-Path $runtime 'bin\Palimpseste.Worker.exe'
 $envFile = Join-Path $runtime 'runtime.env'

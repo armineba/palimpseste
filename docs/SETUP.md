@@ -30,7 +30,7 @@ dotnet run --project tests/Palimpseste.Provider.Security -c Release
 
 Pour le client, ouvrir `game/` dans l'éditeur ci-dessus. L'assemblage partagé `shared/Palimpseste.Contracts` est référencé par chemin relatif : conserver la structure du dépôt. Les commandes de tests EditMode, PlayMode et de build vérifiées sont dans [UNITY_TEST_PROOF.md](UNITY_TEST_PROOF.md). Le dernier Player construit est dans `game/Build/WindowsPlayerFeedbackPlayable/` ; les ZIP dans `deliverables/` sont historiques et n'intègrent pas tous les derniers correctifs du Player. Voir [la preuve du build](../evidence/public/unity/feedback-player-build-2026-09-20.md).
 
-Pour publier l'API, le worker et le doctor en exécutables Windows autonomes depuis les sources courantes (l'archive backend présente est historique) :
+Pour republier l'API, le worker et le doctor en exécutables Windows autonomes depuis les sources courantes :
 
 ```powershell
 .\ops\package-backend.ps1

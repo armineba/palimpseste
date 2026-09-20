@@ -9,6 +9,15 @@ namespace Palimpseste.Game.SpellRuntime
 {
     public sealed class LabReceiver : MonoBehaviour
     {
+        private sealed class TimedEffect
+        {
+            public int Amount;
+            public int Until;
+            public int NextTick;
+        }
+
+        private readonly Dictionary<string, TimedEffect> timed = new Dictionary<string, TimedEffect>(StringComparer.Ordinal);
+        private int currentTick;
         public int StableId { get; private set; }
         public string Team { get; private set; }
         public int HealthMilli { get; private set; } = 100000;
@@ -19,7 +28,13 @@ namespace Palimpseste.Game.SpellRuntime
         public int WetUntil { get; private set; }
         public int SlowAmount { get; private set; }
         public int SlowUntil { get; private set; }
-        public float SpeedFactor => 1f - (SlowUntil > 0 ? SlowAmount / 1000f : 0f);
+        public float SpeedFactor => CanMove ? (1f - (SlowUntil > currentTick ? SlowAmount / 1000f : 0f)) *
+            (1f + StatusAmount("haste") / 1000f) : 0f;
+        public bool CanMove => !HasStatus("root") && !HasStatus("stun");
+        public bool CanCast => HealthMilli > 0 && !HasStatus("stun");
+        public int ShieldMilli => StatusAmount("barrier_health");
+        public int LastTickHealMilli { get; private set; }
+        public int StructureMilli => GetComponent<LabBreakable>()?.StructureMilli ?? 0;
         private Rigidbody body;
         private LineRenderer statusHalo;
         private Transform healthFill;
@@ -40,13 +55,25 @@ namespace Palimpseste.Game.SpellRuntime
                 healthFill.localPosition = new Vector3(-.48f + width * .5f, healthFill.localPosition.y, healthFill.localPosition.z);
             }
             if (statusHalo == null) return;
-            var burning = BurnUntil > 0;
-            var wet = WetUntil > 0;
-            var slowed = SlowUntil > 0;
-            statusHalo.gameObject.SetActive(burning || wet || slowed);
+            var burning = BurnUntil > currentTick;
+            var wet = WetUntil > currentTick;
+            var slowed = SlowUntil > currentTick;
+            var poisoned = HasStatus("poison");
+            var bleeding = HasStatus("bleed");
+            var frozen = HasStatus("freeze_damage") || HasStatus("root");
+            var shielded = HasStatus("barrier_health");
+            var regenerative = HasStatus("regen");
+            var stunned = HasStatus("stun");
+            var modified = timed.Count > 0;
+            statusHalo.gameObject.SetActive(burning || wet || slowed || modified);
             if (!statusHalo.gameObject.activeSelf) return;
-            var color = burning ? new Color(1f, .36f, .17f, .9f) : wet ?
-                new Color(.23f, .78f, 1f, .85f) : new Color(.75f, .52f, 1f, .8f);
+            var color = burning ? new Color(1f, .36f, .17f, .9f) : bleeding ?
+                new Color(.8f, .08f, .13f, .9f) : poisoned ? new Color(.35f, .9f, .16f, .9f) :
+                frozen ? new Color(.35f, .85f, 1f, .9f) : stunned ? new Color(1f, .82f, .2f, .9f) :
+                shielded ? new Color(.4f, .75f, 1f, .9f) : regenerative ?
+                new Color(.2f, 1f, .45f, .9f) : wet ?
+                new Color(.23f, .78f, 1f, .85f) : slowed ? new Color(.75f, .52f, 1f, .8f) :
+                new Color(.88f, .54f, 1f, .8f);
             statusHalo.startColor = statusHalo.endColor = color;
             statusHalo.widthMultiplier = .045f + .017f * (1f + Mathf.Sin(Time.time * 7f)) * .5f;
         }
@@ -59,14 +86,37 @@ namespace Palimpseste.Game.SpellRuntime
 
         public void Restore()
         {
+            gameObject.SetActive(true);
             HealthMilli = MaxHealthMilli;
             BurnAmount = BurnUntil = BurnNextTick = WetUntil = SlowAmount = SlowUntil = 0;
+            timed.Clear(); currentTick = 0; LastTickHealMilli = 0;
+            GetComponent<LabBreakable>()?.Restore();
             if (body != null) { body.linearVelocity = Vector3.zero; body.angularVelocity = Vector3.zero; }
         }
 
-        public int ApplyDamage(int amount)
+        public bool HasStatus(string kind) => timed.TryGetValue(kind, out var status) && status.Until > currentTick;
+
+        public void AdvanceTick(int tick) { currentTick = tick; }
+
+        public int StatusAmount(string kind) => HasStatus(kind) ? timed[kind].Amount : 0;
+
+        public int OutgoingDamagePerMille => 1000 - StatusAmount("weakness");
+
+        public int ApplyDamage(int amount, int outgoingPerMille = 1000)
         {
-            var applied = Mathf.Min(Mathf.Max(amount, 0), HealthMilli);
+            if (amount <= 0 || HealthMilli <= 0) return 0;
+            var protection = Mathf.Max(0, StatusAmount("damage_reduction") - StatusAmount("armor_break"));
+            var scaled = (long)amount * Mathf.Clamp(outgoingPerMille, 0, 1000) / 1000;
+            scaled = scaled * (1000 + StatusAmount("vulnerability")) / 1000;
+            scaled = scaled * (1000 - protection) / 1000;
+            var shield = timed.TryGetValue("barrier_health", out var barrier) && barrier.Until > currentTick ? barrier : null;
+            if (shield != null)
+            {
+                var absorbed = (int)Math.Min(scaled, shield.Amount);
+                shield.Amount -= absorbed; scaled -= absorbed;
+                if (shield.Amount <= 0) timed.Remove("barrier_health");
+            }
+            var applied = (int)Math.Min(Math.Max(scaled, 0), HealthMilli);
             HealthMilli -= applied;
             return applied;
         }
@@ -74,18 +124,26 @@ namespace Palimpseste.Game.SpellRuntime
         public int ApplyHeal(int amount)
         {
             if (HealthMilli <= 0) return 0;
-            var applied = Mathf.Min(Mathf.Max(amount, 0), MaxHealthMilli - HealthMilli);
+            var scaled = (long)Mathf.Max(amount, 0) * (1000 - StatusAmount("healing_reduction")) / 1000;
+            var applied = (int)Math.Min(scaled, MaxHealthMilli - HealthMilli);
             HealthMilli += applied;
             return applied;
         }
 
         public void Impulse(Vector3 vector, int amount)
         {
-            if (body != null && !body.isKinematic) body.AddForce(vector.normalized * (amount / 1000f), ForceMode.Impulse);
+            if (CanMove && body != null && !body.isKinematic) body.AddForce(vector.normalized * (amount / 1000f), ForceMode.Impulse);
+        }
+
+        public int Shatter(int amount)
+        {
+            var breakable = GetComponent<LabBreakable>();
+            return breakable == null ? 0 : breakable.ApplyShatter(amount);
         }
 
         public string ApplyStatus(string kind, int amount, int duration, int tick)
         {
+            currentTick = tick;
             if (kind == "wet")
             {
                 var reaction = BurnUntil > tick ? "vapeur" : null;
@@ -105,11 +163,34 @@ namespace Palimpseste.Game.SpellRuntime
                 SlowAmount = Mathf.Max(SlowAmount, Mathf.Min(amount, 750));
                 SlowUntil = Mathf.Max(SlowUntil, tick + duration);
             }
+            if (kind == "cleanse")
+            {
+                BurnAmount = BurnUntil = BurnNextTick = SlowAmount = SlowUntil = WetUntil = 0;
+                foreach (var negative in new[] { "bleed", "poison", "freeze_damage", "root", "stun",
+                    "weakness", "vulnerability", "armor_break", "healing_reduction" }) timed.Remove(negative);
+            }
+            if (kind == "dispel")
+                foreach (var positive in new[] { "regen", "barrier_health", "haste", "damage_reduction" })
+                    timed.Remove(positive);
+            if (duration > 0 && kind != "burn" && kind != "wet" && kind != "slow")
+            {
+                if (!timed.TryGetValue(kind, out var status) || status.Until <= tick)
+                {
+                    status = new TimedEffect { NextTick = tick + 50 };
+                    timed[kind] = status;
+                }
+                status.Amount = Mathf.Max(status.Amount, amount);
+                status.Until = Mathf.Max(status.Until, tick + duration);
+                if (kind == "root" || kind == "stun")
+                    if (body != null && !body.isKinematic) body.linearVelocity = Vector3.zero;
+            }
             return null;
         }
 
         public int TickStatus(int tick)
         {
+            currentTick = tick;
+            LastTickHealMilli = 0;
             var damage = 0;
             if (BurnUntil >= tick && BurnNextTick > 0 && tick >= BurnNextTick)
             {
@@ -119,7 +200,36 @@ namespace Palimpseste.Game.SpellRuntime
             if (BurnUntil <= tick) { BurnUntil = 0; BurnAmount = 0; BurnNextTick = 0; }
             if (WetUntil <= tick) WetUntil = 0;
             if (SlowUntil <= tick) { SlowUntil = 0; SlowAmount = 0; }
+            foreach (var kind in new[] { "bleed", "poison", "freeze_damage", "regen" })
+            {
+                if (!timed.TryGetValue(kind, out var status) || status.Until < tick || status.NextTick > tick) continue;
+                if (kind == "regen") LastTickHealMilli += ApplyHeal(status.Amount);
+                else damage += ApplyDamage(status.Amount);
+                status.NextTick += 50;
+            }
+            foreach (var kind in new List<string>(timed.Keys))
+                if (timed[kind].Until <= tick) timed.Remove(kind);
             return damage;
+        }
+    }
+
+    // Only this authored lab component admits structural destruction.
+    public sealed class LabBreakable : MonoBehaviour
+    {
+        public int StructureMilli { get; private set; } = 100000;
+
+        public int ApplyShatter(int amount)
+        {
+            var applied = Mathf.Min(Mathf.Max(amount, 0), StructureMilli);
+            StructureMilli -= applied;
+            if (StructureMilli <= 0) gameObject.SetActive(false);
+            return applied;
+        }
+
+        public void Restore()
+        {
+            StructureMilli = 100000;
+            gameObject.SetActive(true);
         }
     }
 
@@ -265,6 +375,7 @@ namespace Palimpseste.Game.SpellRuntime
             obj.transform.position = position;
             if (team == "environment") obj.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
             var receiver = obj.AddComponent<LabReceiver>();
+            if (team == "environment") obj.AddComponent<LabBreakable>();
             if (dynamic)
             {
                 var body = obj.AddComponent<Rigidbody>();

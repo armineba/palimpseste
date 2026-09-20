@@ -34,6 +34,7 @@ namespace Palimpseste.Game.SpellRuntime
         private readonly CompiledSpell spell;
         private readonly GeometryRuntime geometry;
         private readonly Transform caster;
+        private readonly LabReceiver casterReceiver;
         private readonly List<LabReceiver> targets;
         private readonly List<CarrierState> active = new List<CarrierState>();
         private readonly List<GameObject> retiredBeamVisuals = new List<GameObject>();
@@ -47,11 +48,13 @@ namespace Palimpseste.Game.SpellRuntime
         public long HealMilli { get; private set; }
         public int Impulses { get; private set; }
         public int Statuses { get; private set; }
+        public int StructuresBroken { get; private set; }
         public int ActiveCount => active.Count;
 
         public RuntimeEngine(CompiledSpell spell, Dictionary<string, GeometryAsset> assets, Dictionary<string, Texture2D> masks, Transform caster, List<LabReceiver> targets)
         {
             this.spell = spell; this.geometry = new GeometryRuntime(assets, masks); this.caster = caster; this.targets = targets;
+            casterReceiver = caster == null ? null : caster.GetComponentInChildren<LabReceiver>();
             birthClip = Tone("palimpseste-birth", 440, .18f);
             impactClip = Tone("palimpseste-impact", 177, .13f);
             expireClip = Tone("palimpseste-expire", 320, .23f);
@@ -59,7 +62,8 @@ namespace Palimpseste.Game.SpellRuntime
 
         public bool TryCast(Vector3 position, Vector3 aim, Vector3 direction)
         {
-            if (spell?.plan?.nodes == null || active.Count >= spell.resource_bounds.max_instances) return false;
+            if (spell?.plan?.nodes == null || active.Count >= spell.resource_bounds.max_instances ||
+                (casterReceiver != null && !casterReceiver.CanCast)) return false;
             var roots = 0;
             var castId = ++nextCast;
             foreach (var node in spell.plan.nodes)
@@ -74,6 +78,7 @@ namespace Palimpseste.Game.SpellRuntime
         public void Tick()
         {
             TickCount++;
+            foreach (var target in targets) if (target != null) target.AdvanceTick(TickCount);
             for (var i = scheduled.Count - 1; i >= 0; i--)
             {
                 var pending = scheduled[i];
@@ -114,7 +119,12 @@ namespace Palimpseste.Game.SpellRuntime
                     active.RemoveAt(i);
                 }
             retiredBeamVisuals.RemoveAll(visual => visual == null);
-            foreach (var target in targets) DamageMilli += target.TickStatus(TickCount);
+            foreach (var target in targets)
+            {
+                if (target == null) continue;
+                DamageMilli += target.TickStatus(TickCount);
+                HealMilli += target.LastTickHealMilli;
+            }
         }
 
         public void CancelAll()
@@ -123,7 +133,7 @@ namespace Palimpseste.Game.SpellRuntime
             foreach (var visual in retiredBeamVisuals) if (visual != null) UnityEngine.Object.Destroy(visual);
             retiredBeamVisuals.Clear();
             active.Clear(); scheduled.Clear(); activationCounts.Clear();
-            Hits = Impulses = Statuses = 0; DamageMilli = HealMilli = 0;
+            Hits = Impulses = Statuses = StructuresBroken = 0; DamageMilli = HealMilli = 0;
         }
 
         private static int Option(int? value, int fallback) => value ?? fallback;
@@ -173,9 +183,26 @@ namespace Palimpseste.Game.SpellRuntime
             if (kind == "hit" || kind == "block" || kind == "trigger") Play(position, impactClip, .22f);
             if (kind == "hit" && receiver != null) CarrierVisual.ProjectileHit(state, position);
             if (state.node.effects != null)
+            {
+                var damageFromEvent = 0;
                 foreach (var effect in state.node.effects)
-                    if (effect.@event == kind && receiver != null && Matches(effect.target_filter, receiver))
-                        Apply(effect, receiver, position, effectForward ?? state.direction);
+                    if (effect.@event == kind && receiver != null && Matches(effect.target_filter, receiver) &&
+                        effect.kind != "life_steal")
+                        damageFromEvent += Apply(effect, receiver, position, effectForward ?? state.direction);
+                if (receiver != null && receiver.Team == "hostile" && damageFromEvent > 0 && casterReceiver != null)
+                {
+                    var fraction = 0;
+                    foreach (var effect in state.node.effects)
+                        if (effect.@event == kind && effect.kind == "life_steal" && Matches(effect.target_filter, receiver))
+                            fraction += effect.amount;
+                    if (fraction > 0)
+                    {
+                        var gained = casterReceiver.ApplyHeal((int)((long)damageFromEvent * Mathf.Min(fraction, 500) / 1000));
+                        HealMilli += gained;
+                        if (gained > 0) CarrierVisual.EffectCue("life_steal", casterReceiver.transform.position);
+                    }
+                }
+            }
             foreach (var child in spell.plan.nodes)
                 if (child.activation.parent_id == state.node.node_id && child.activation.@event == kind)
                     Schedule(child, state.castId, position, state.direction, TickCount);
@@ -195,23 +222,48 @@ namespace Palimpseste.Game.SpellRuntime
             }
         }
 
-        private void Apply(SpellEffect effect, LabReceiver receiver, Vector3 source, Vector3 forward)
+        private int Apply(SpellEffect effect, LabReceiver receiver, Vector3 source, Vector3 forward)
         {
+            var appliedDamage = 0;
             switch (effect.kind)
             {
-                case "damage": DamageMilli += receiver.ApplyDamage(effect.amount); break;
+                case "damage":
+                    appliedDamage = receiver.ApplyDamage(effect.amount, casterReceiver?.OutgoingDamagePerMille ?? 1000);
+                    DamageMilli += appliedDamage; break;
+                case "execute":
+                    if (receiver.Team == "hostile" && receiver.HealthMilli > 0 &&
+                        (long)receiver.HealthMilli * 4 <= receiver.MaxHealthMilli)
+                    {
+                        appliedDamage = receiver.ApplyDamage(effect.amount, casterReceiver?.OutgoingDamagePerMille ?? 1000);
+                        DamageMilli += appliedDamage;
+                    }
+                    break;
                 case "heal": HealMilli += receiver.ApplyHeal(effect.amount); break;
+                case "shatter":
+                    if (receiver.Team == "environment")
+                    {
+                        var before = receiver.StructureMilli;
+                        receiver.Shatter(effect.amount);
+                        if (before > 0 && receiver.StructureMilli <= 0) StructuresBroken++;
+                    }
+                    break;
                 case "impulse":
                     var direction = effect.direction == "up" ? Vector3.up : effect.direction == "forward" ? forward : receiver.transform.position - source;
                     if (direction.sqrMagnitude < .0001f) direction = forward;
                     if (effect.direction == "inward") direction = -direction;
                     receiver.Impulse(direction, effect.amount); Impulses++; break;
-                case "burn": case "wet": case "slow":
+                case "burn": case "wet": case "slow": case "bleed": case "poison":
+                case "freeze_damage": case "regen": case "barrier_health":
+                case "vulnerability": case "weakness": case "haste": case "armor_break":
+                case "damage_reduction": case "healing_reduction": case "root": case "stun":
+                case "cleanse": case "dispel":
                     var reaction = receiver.ApplyStatus(effect.kind, effect.amount, effect.duration_ticks, TickCount);
                     Statuses++;
                     if (reaction != null) Play(receiver.transform.position, expireClip, .35f);
                     break;
             }
+            if (effect.kind != "life_steal") CarrierVisual.EffectCue(effect.kind, receiver.transform.position);
+            return appliedDamage;
         }
 
         private void Expire(CarrierState state)

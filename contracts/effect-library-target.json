@@ -1,0 +1,545 @@
+{
+    "schema_version":  "sp.effect-library-target/1.0",
+    "status":  "DESIGN_LIBRARY_NOT_PRODUCTION_CAPABILITIES",
+    "production_catalog":  "capability-catalog.json",
+    "selection_rule":  "Only runtime_and_contract entries may be emitted as effect facts or SpellEffect.kind. Promotion requires schema, compiler and runtime implementation with automated verification. Status alone does not attest a Player build or individual PlayMode coverage.",
+    "verification":  {
+                         "contract_core_smoke":  "passed; detailed report owned by effect_compiler",
+                         "unity_targeted_playmode":  "6/6 passed; 0 failed; exit 0",
+                         "unity_report_sha256":  "6AD9939F3D953C1B60C6B43A5EE4E8D4E7D6D235F579C58189C6DBFB69889A04",
+                         "unity_exercised_ids":  [
+                                                    "bleed",
+                                                    "poison",
+                                                    "life_steal",
+                                                    "shatter",
+                                                    "barrier_health",
+                                                    "root",
+                                                    "cleanse",
+                                                    "dispel",
+                                                    "vulnerability",
+                                                    "weakness",
+                                                    "haste",
+                                                    "armor_break",
+                                                    "damage_reduction",
+                                                    "healing_reduction",
+                                                    "regen",
+                                                    "freeze_damage",
+                                                    "execute",
+                                                    "stun"
+                                                ],
+                         "player_build":  "Unity 6000.3.24f1 Windows x64 IL2CPP/URP; PALIMPSESTE_BUILD_OK; return code 0 in log; clean folder WindowsEffectLibraryPlayable: 29 files, 122136545 bytes; GameAssembly SHA-256 A003ED515F512965E5D4A88E0151FB976157DD0F24FE7E155302D8E3A5658B8F"
+                     },
+    "entries":  [
+                    {
+                        "id":  "damage",
+                        "family":  "impact",
+                        "label_fr":  "Dégâts directs",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Retire de la santé à un récepteur admissible."
+                    },
+                    {
+                        "id":  "heal",
+                        "family":  "support",
+                        "label_fr":  "Soin direct",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Rend de la santé à un récepteur vivant admissible."
+                    },
+                    {
+                        "id":  "impulse",
+                        "family":  "control",
+                        "label_fr":  "Impulsion physique",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Applique une force dans une direction contrôlée."
+                    },
+                    {
+                        "id":  "burn",
+                        "family":  "damage_over_time",
+                        "label_fr":  "Brûlure",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Inflige des dégâts périodiques et réagit avec Mouillé."
+                    },
+                    {
+                        "id":  "wet",
+                        "family":  "elemental",
+                        "label_fr":  "Mouillé",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Pose un état qui éteint ou empêche la brûlure."
+                    },
+                    {
+                        "id":  "slow",
+                        "family":  "control",
+                        "label_fr":  "Ralentissement",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Réduit la vitesse du récepteur pour une durée bornée."
+                    },
+                    {
+                        "id":  "bleed",
+                        "family":  "damage_over_time",
+                        "label_fr":  "Hémorragie",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Dégâts périodiques non ignés, indépendants de la brûlure; cumul plafonné et attribution à la source."
+                    },
+                    {
+                        "id":  "poison",
+                        "family":  "damage_over_time",
+                        "label_fr":  "Poison",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Dégâts périodiques. La réduction des soins requiert l'effet distinct healing_reduction."
+                    },
+                    {
+                        "id":  "corrode",
+                        "family":  "damage_over_time",
+                        "label_fr":  "Corrosion",
+                        "status":  "design_only",
+                        "semantic":  "Détériore une structure ou l\u0027armure pendant une durée; ne détruit pas le décor non destructible."
+                    },
+                    {
+                        "id":  "freeze_damage",
+                        "family":  "damage_over_time",
+                        "label_fr":  "Gelure",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Dégâts froids périodiques sans immobilisation implicite."
+                    },
+                    {
+                        "id":  "shock",
+                        "family":  "damage_over_time",
+                        "label_fr":  "Électrocution",
+                        "status":  "design_only",
+                        "semantic":  "Décharges périodiques; réaction spécifique avec Mouillé à définir et borner."
+                    },
+                    {
+                        "id":  "curse",
+                        "family":  "damage_over_time",
+                        "label_fr":  "Malédiction",
+                        "status":  "design_only",
+                        "semantic":  "Altération magique de santé dans le temps, sans transfert automatique."
+                    },
+                    {
+                        "id":  "rupture",
+                        "family":  "conditional_damage",
+                        "label_fr":  "Rupture",
+                        "status":  "design_only",
+                        "semantic":  "Dégâts lors d\u0027un déplacement réel d\u0027une cible marquée, avec fenêtre et plafond par tick."
+                    },
+                    {
+                        "id":  "torment",
+                        "family":  "conditional_damage",
+                        "label_fr":  "Tourment",
+                        "status":  "design_only",
+                        "semantic":  "Dégâts périodiques modulés par l\u0027état de mouvement du récepteur."
+                    },
+                    {
+                        "id":  "detonate",
+                        "family":  "conditional_damage",
+                        "label_fr":  "Détonation différée",
+                        "status":  "design_only",
+                        "semantic":  "Explosion à l\u0027échéance d\u0027une marque; un seul déclenchement par marque."
+                    },
+                    {
+                        "id":  "execute",
+                        "family":  "conditional_damage",
+                        "label_fr":  "Exécution",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Bonus plafonné contre une cible sous un seuil de santé; jamais mise à mort inconditionnelle."
+                    },
+                    {
+                        "id":  "splash",
+                        "family":  "conditional_damage",
+                        "label_fr":  "Éclaboussure",
+                        "status":  "design_only",
+                        "semantic":  "Répartit une part bornée des dégâts d\u0027impact à des récepteurs voisins distincts."
+                    },
+                    {
+                        "id":  "chain_hit",
+                        "family":  "conditional_damage",
+                        "label_fr":  "Chaîne d\u0027impacts",
+                        "status":  "design_only",
+                        "semantic":  "Transmet un impact à un nombre borné de cibles distinctes; rayon et décroissance explicites."
+                    },
+                    {
+                        "id":  "life_steal",
+                        "family":  "resource_transfer",
+                        "label_fr":  "Vol de vie",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Soigne le lanceur d\u0027une fraction plafonnée des dégâts effectivement infligés; aucune guérison sur un raté."
+                    },
+                    {
+                        "id":  "health_sacrifice",
+                        "family":  "resource_transfer",
+                        "label_fr":  "Sacrifice de vie",
+                        "status":  "design_only",
+                        "semantic":  "Consomme de la santé du lanceur comme coût contrôlé, sans descendre sous un seuil sûr du profil."
+                    },
+                    {
+                        "id":  "health_share",
+                        "family":  "resource_transfer",
+                        "label_fr":  "Partage de vie",
+                        "status":  "design_only",
+                        "semantic":  "Transfère une quantité bornée de santé entre deux récepteurs valides."
+                    },
+                    {
+                        "id":  "damage_reflect",
+                        "family":  "reactive",
+                        "label_fr":  "Renvoi de dégâts",
+                        "status":  "design_only",
+                        "semantic":  "Retourne une fraction plafonnée d\u0027un impact subi, avec verrou anti-boucle."
+                    },
+                    {
+                        "id":  "thorns",
+                        "family":  "reactive",
+                        "label_fr":  "Épines de riposte",
+                        "status":  "design_only",
+                        "semantic":  "Inflige un montant fixe borné à l\u0027assaillant au contact, avec cadence."
+                    },
+                    {
+                        "id":  "root",
+                        "family":  "control",
+                        "label_fr":  "Entrave",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Empêche le déplacement mais laisse les autres actions à définir."
+                    },
+                    {
+                        "id":  "stun",
+                        "family":  "control",
+                        "label_fr":  "Étourdissement",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Interrompt brièvement déplacement et action; immunité et reprise à définir."
+                    },
+                    {
+                        "id":  "daze",
+                        "family":  "control",
+                        "label_fr":  "Désorientation",
+                        "status":  "design_only",
+                        "semantic":  "Interrompt une action en cours sans bloquer durablement les contrôles."
+                    },
+                    {
+                        "id":  "blind",
+                        "family":  "control",
+                        "label_fr":  "Aveuglement",
+                        "status":  "design_only",
+                        "semantic":  "Altère la prochaine attaque ciblée selon une règle déterministe."
+                    },
+                    {
+                        "id":  "silence",
+                        "family":  "control",
+                        "label_fr":  "Silence",
+                        "status":  "design_only",
+                        "semantic":  "Empêche temporairement les capacités magiques, sans bloquer l\u0027interface du joueur."
+                    },
+                    {
+                        "id":  "fear",
+                        "family":  "control",
+                        "label_fr":  "Peur",
+                        "status":  "design_only",
+                        "semantic":  "Force une fuite bornée seulement pour une IA qui possède un contrôleur de mouvement."
+                    },
+                    {
+                        "id":  "taunt",
+                        "family":  "control",
+                        "label_fr":  "Provocation",
+                        "status":  "design_only",
+                        "semantic":  "Force temporairement la priorité de cible d\u0027une IA compatible."
+                    },
+                    {
+                        "id":  "charm",
+                        "family":  "control",
+                        "label_fr":  "Charme",
+                        "status":  "design_only",
+                        "semantic":  "Change temporairement l\u0027affiliation de cible selon des règles de sécurité et de fin."
+                    },
+                    {
+                        "id":  "sleep",
+                        "family":  "control",
+                        "label_fr":  "Sommeil",
+                        "status":  "design_only",
+                        "semantic":  "Suspend l\u0027action et se dissipe à un événement de réveil documenté."
+                    },
+                    {
+                        "id":  "knockdown",
+                        "family":  "control",
+                        "label_fr":  "Renversement",
+                        "status":  "design_only",
+                        "semantic":  "Met une cible compatible au sol pour une courte durée, avec relevé déterministe."
+                    },
+                    {
+                        "id":  "pull",
+                        "family":  "control",
+                        "label_fr":  "Attraction",
+                        "status":  "design_only",
+                        "semantic":  "Déplace vers un point autorisé avec collision et distance bornées."
+                    },
+                    {
+                        "id":  "launch",
+                        "family":  "control",
+                        "label_fr":  "Projection",
+                        "status":  "design_only",
+                        "semantic":  "Impulsion verticale suivie d\u0027une récupération contrôlée; la simple impulse actuelle ne promet pas un état aérien."
+                    },
+                    {
+                        "id":  "gravity_well",
+                        "family":  "control",
+                        "label_fr":  "Puits gravitationnel",
+                        "status":  "design_only",
+                        "semantic":  "Attraction répétée dans un champ, par tick et cible bornés."
+                    },
+                    {
+                        "id":  "disarm",
+                        "family":  "control",
+                        "label_fr":  "Désarmement",
+                        "status":  "design_only",
+                        "semantic":  "Désactive brièvement un équipement ou une attaque compatible."
+                    },
+                    {
+                        "id":  "regen",
+                        "family":  "support",
+                        "label_fr":  "Régénération",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Soin périodique plafonné, avec politique de cumul."
+                    },
+                    {
+                        "id":  "barrier_health",
+                        "family":  "defense",
+                        "label_fr":  "Bouclier de santé",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Absorbe une réserve limitée de dégâts avant la santé; distinct du porteur barrière physique."
+                    },
+                    {
+                        "id":  "damage_reduction",
+                        "family":  "defense",
+                        "label_fr":  "Protection",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Réduit une fraction bornée des dégâts reçus pendant une durée."
+                    },
+                    {
+                        "id":  "armor",
+                        "family":  "defense",
+                        "label_fr":  "Armure renforcée",
+                        "status":  "design_only",
+                        "semantic":  "Augmente une mitigation définie pour la cible; exige une règle de dégâts par type."
+                    },
+                    {
+                        "id":  "armor_break",
+                        "family":  "debuff",
+                        "label_fr":  "Brise-armure",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Réduit temporairement une mitigation existante, avec plancher et plafond."
+                    },
+                    {
+                        "id":  "vulnerability",
+                        "family":  "debuff",
+                        "label_fr":  "Vulnérabilité",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Augmente les dégâts reçus dans une limite multiplicative documentée."
+                    },
+                    {
+                        "id":  "weakness",
+                        "family":  "debuff",
+                        "label_fr":  "Faiblesse",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Réduit les dégâts sortants selon une règle bornée."
+                    },
+                    {
+                        "id":  "healing_reduction",
+                        "family":  "debuff",
+                        "label_fr":  "Plaie infectée",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Réduit les soins reçus sans modifier les dégâts directs."
+                    },
+                    {
+                        "id":  "healing_amplification",
+                        "family":  "support",
+                        "label_fr":  "Grâce curative",
+                        "status":  "design_only",
+                        "semantic":  "Augmente les soins reçus dans une limite documentée."
+                    },
+                    {
+                        "id":  "haste",
+                        "family":  "support",
+                        "label_fr":  "Hâte",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Augmente la vitesse de déplacement ou la cadence selon des valeurs séparées."
+                    },
+                    {
+                        "id":  "empower",
+                        "family":  "support",
+                        "label_fr":  "Puissance",
+                        "status":  "design_only",
+                        "semantic":  "Augmente les dégâts sortants dans une limite documentée."
+                    },
+                    {
+                        "id":  "cleanse",
+                        "family":  "support",
+                        "label_fr":  "Purification",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Retire un ensemble explicite de statuts négatifs, sans retirer les effets invisibles arbitraires."
+                    },
+                    {
+                        "id":  "dispel",
+                        "family":  "control",
+                        "label_fr":  "Dissipation",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Retire un ensemble explicite de bonus ou barrières sur une cible hostile."
+                    },
+                    {
+                        "id":  "immunity",
+                        "family":  "defense",
+                        "label_fr":  "Immunité ciblée",
+                        "status":  "design_only",
+                        "semantic":  "Bloque une famille de statut précise pour une durée courte, jamais invulnérabilité universelle implicite."
+                    },
+                    {
+                        "id":  "projectile_reflect",
+                        "family":  "defense",
+                        "label_fr":  "Miroir de projectiles",
+                        "status":  "design_only",
+                        "semantic":  "Renvoie des porteurs compatibles avec une génération et une distance maximales."
+                    },
+                    {
+                        "id":  "projectile_absorb",
+                        "family":  "defense",
+                        "label_fr":  "Absorption de projectiles",
+                        "status":  "design_only",
+                        "semantic":  "Détruit des porteurs compatibles et consomme une capacité bornée."
+                    },
+                    {
+                        "id":  "mark",
+                        "family":  "utility",
+                        "label_fr":  "Marque",
+                        "status":  "design_only",
+                        "semantic":  "Ajoute un identifiant de cible temporaire utilisable par des effets conditionnels validés."
+                    },
+                    {
+                        "id":  "reveal",
+                        "family":  "utility",
+                        "label_fr":  "Révélation",
+                        "status":  "design_only",
+                        "semantic":  "Rend visible une cible dotée d\u0027un état de dissimulation réel."
+                    },
+                    {
+                        "id":  "conceal",
+                        "family":  "utility",
+                        "label_fr":  "Dissimulation",
+                        "status":  "design_only",
+                        "semantic":  "Réduit l\u0027acquisition par les IA compatibles; VFX seul insuffisant."
+                    },
+                    {
+                        "id":  "energy_drain",
+                        "family":  "resource_transfer",
+                        "label_fr":  "Drain d\u0027énergie",
+                        "status":  "design_only",
+                        "semantic":  "Retire une ressource existante de la cible, avec plancher."
+                    },
+                    {
+                        "id":  "energy_restore",
+                        "family":  "support",
+                        "label_fr":  "Restauration d\u0027énergie",
+                        "status":  "design_only",
+                        "semantic":  "Rend une ressource existante, avec plafond."
+                    },
+                    {
+                        "id":  "energy_siphon",
+                        "family":  "resource_transfer",
+                        "label_fr":  "Vol d\u0027énergie",
+                        "status":  "design_only",
+                        "semantic":  "Transfère une quantité effectivement retirée à une source admissible."
+                    },
+                    {
+                        "id":  "revive",
+                        "family":  "support",
+                        "label_fr":  "Réanimation",
+                        "status":  "design_only",
+                        "semantic":  "Rend l\u0027état vivant à une cible vaincue admissible, avec coût et lieu sûr."
+                    },
+                    {
+                        "id":  "teleport",
+                        "family":  "spatial",
+                        "label_fr":  "Téléportation",
+                        "status":  "design_only",
+                        "semantic":  "Déplace une cible vers une position validée libre et à portée, jamais vers un chemin arbitraire."
+                    },
+                    {
+                        "id":  "swap",
+                        "family":  "spatial",
+                        "label_fr":  "Échange de places",
+                        "status":  "design_only",
+                        "semantic":  "Échange deux cibles valides après tests de collision aux deux destinations."
+                    },
+                    {
+                        "id":  "dash",
+                        "family":  "spatial",
+                        "label_fr":  "Ruée",
+                        "status":  "design_only",
+                        "semantic":  "Déplacement rapide sur une trajectoire vérifiée, avec interruption par obstacle."
+                    },
+                    {
+                        "id":  "tether",
+                        "family":  "spatial",
+                        "label_fr":  "Lien",
+                        "status":  "design_only",
+                        "semantic":  "Relie deux récepteurs pendant une durée et déclenche une règle bornée à la rupture."
+                    },
+                    {
+                        "id":  "summon",
+                        "family":  "spatial",
+                        "label_fr":  "Invocation",
+                        "status":  "design_only",
+                        "semantic":  "Fait apparaître une entité préapprouvée avec nombre, durée et IA plafonnés."
+                    },
+                    {
+                        "id":  "terrain_ignite",
+                        "family":  "environment",
+                        "label_fr":  "Sol enflammé",
+                        "status":  "design_only",
+                        "semantic":  "Crée une zone temporaire de brûlure sur terrain compatible, sans modifier la scène source."
+                    },
+                    {
+                        "id":  "terrain_freeze",
+                        "family":  "environment",
+                        "label_fr":  "Sol gelé",
+                        "status":  "design_only",
+                        "semantic":  "Crée une zone temporaire glissante ou ralentie sur terrain compatible."
+                    },
+                    {
+                        "id":  "shatter",
+                        "family":  "environment",
+                        "label_fr":  "Fracas d\u0027objet",
+                        "status":  "runtime_and_contract",
+                        "semantic":  "Inflige des dégâts structurels instantanés bornés à un accessoire de labo marqué destructible; aucun décor arbitraire."
+                    },
+                    {
+                        "id":  "terrain_break",
+                        "family":  "environment",
+                        "label_fr":  "Destruction du décor",
+                        "status":  "design_only",
+                        "semantic":  "Endommage seulement les objets prévus comme destructibles; pas de mutation de scène ni de code."
+                    },
+                    {
+                        "id":  "terrain_growth",
+                        "family":  "environment",
+                        "label_fr":  "Croissance végétale",
+                        "status":  "design_only",
+                        "semantic":  "Installe un obstacle temporaire préapprouvé avec collisions et budget."
+                    }
+                ],
+    "carrier_options_already_present_not_effect_kinds":  [
+                                                             "projectile_bounce",
+                                                             "projectile_pierce",
+                                                             "projectile_homing",
+                                                             "beam_chain",
+                                                             "node_child_on_event"
+                                                         ],
+    "documented_composition":  {
+                                   "existing_runtime":  [
+                                                            "damage+burn",
+                                                            "damage+impulse",
+                                                            "wet+slow",
+                                                            "heal+impulse"
+                                                        ],
+                                   "not_equivalent_to":  [
+                                                             "life_steal",
+                                                             "bleed",
+                                                             "terrain_break",
+                                                             "barrier_health"
+                                                         ]
+                               }
+}

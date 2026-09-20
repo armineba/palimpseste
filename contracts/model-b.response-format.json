@@ -147,7 +147,25 @@
               "impulse",
               "burn",
               "wet",
-              "slow"
+              "slow",
+              "bleed",
+              "poison",
+              "freeze_damage",
+              "regen",
+              "barrier_health",
+              "vulnerability",
+              "weakness",
+              "haste",
+              "armor_break",
+              "damage_reduction",
+              "healing_reduction",
+              "root",
+              "stun",
+              "cleanse",
+              "dispel",
+              "life_steal",
+              "execute",
+              "shatter"
             ]
           },
           "target_filter": {
@@ -263,6 +281,25 @@
                   "irregular"
                 ]
               },
+              "palette": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "ember",
+                  "lava",
+                  "ice",
+                  "water",
+                  "moss",
+                  "stone",
+                  "storm",
+                  "arcane",
+                  "shadow",
+                  "light",
+                  null
+                ]
+              },
               "signature_geometry_id": {
                 "type": "string",
                 "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -271,6 +308,7 @@
             "required": [
               "affinity",
               "pattern",
+              "palette",
               "signature_geometry_id"
             ],
             "additionalProperties": false
@@ -440,6 +478,25 @@
                   "irregular"
                 ]
               },
+              "palette": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "ember",
+                  "lava",
+                  "ice",
+                  "water",
+                  "moss",
+                  "stone",
+                  "storm",
+                  "arcane",
+                  "shadow",
+                  "light",
+                  null
+                ]
+              },
               "signature_geometry_id": {
                 "type": "string",
                 "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -448,6 +505,7 @@
             "required": [
               "affinity",
               "pattern",
+              "palette",
               "signature_geometry_id"
             ],
             "additionalProperties": false
@@ -602,6 +660,25 @@
                   "irregular"
                 ]
               },
+              "palette": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "ember",
+                  "lava",
+                  "ice",
+                  "water",
+                  "moss",
+                  "stone",
+                  "storm",
+                  "arcane",
+                  "shadow",
+                  "light",
+                  null
+                ]
+              },
               "signature_geometry_id": {
                 "type": "string",
                 "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -610,6 +687,7 @@
             "required": [
               "affinity",
               "pattern",
+              "palette",
               "signature_geometry_id"
             ],
             "additionalProperties": false
@@ -735,6 +813,25 @@
                   "irregular"
                 ]
               },
+              "palette": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "ember",
+                  "lava",
+                  "ice",
+                  "water",
+                  "moss",
+                  "stone",
+                  "storm",
+                  "arcane",
+                  "shadow",
+                  "light",
+                  null
+                ]
+              },
               "signature_geometry_id": {
                 "type": "string",
                 "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -743,6 +840,7 @@
             "required": [
               "affinity",
               "pattern",
+              "palette",
               "signature_geometry_id"
             ],
             "additionalProperties": false
@@ -868,6 +966,25 @@
                   "irregular"
                 ]
               },
+              "palette": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "ember",
+                  "lava",
+                  "ice",
+                  "water",
+                  "moss",
+                  "stone",
+                  "storm",
+                  "arcane",
+                  "shadow",
+                  "light",
+                  null
+                ]
+              },
               "signature_geometry_id": {
                 "type": "string",
                 "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -876,6 +993,7 @@
             "required": [
               "affinity",
               "pattern",
+              "palette",
               "signature_geometry_id"
             ],
             "additionalProperties": false
@@ -1013,6 +1131,25 @@
                   "irregular"
                 ]
               },
+              "palette": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "ember",
+                  "lava",
+                  "ice",
+                  "water",
+                  "moss",
+                  "stone",
+                  "storm",
+                  "arcane",
+                  "shadow",
+                  "light",
+                  null
+                ]
+              },
               "signature_geometry_id": {
                 "type": "string",
                 "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
@@ -1021,6 +1158,7 @@
             "required": [
               "affinity",
               "pattern",
+              "palette",
               "signature_geometry_id"
             ],
             "additionalProperties": false

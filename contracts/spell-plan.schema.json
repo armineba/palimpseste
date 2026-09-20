@@ -143,7 +143,25 @@
             "impulse",
             "burn",
             "wet",
-            "slow"
+            "slow",
+            "bleed",
+            "poison",
+            "freeze_damage",
+            "regen",
+            "barrier_health",
+            "vulnerability",
+            "weakness",
+            "haste",
+            "armor_break",
+            "damage_reduction",
+            "healing_reduction",
+            "root",
+            "stun",
+            "cleanse",
+            "dispel",
+            "life_steal",
+            "execute",
+            "shatter"
           ]
         },
         "target_filter": {
@@ -259,7 +277,10 @@
               ]
             },
             "palette": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "enum": [
                 "ember",
                 "lava",
@@ -270,7 +291,8 @@
                 "storm",
                 "arcane",
                 "shadow",
-                "light"
+                "light",
+                null
               ]
             },
             "signature_geometry_id": {
@@ -450,7 +472,10 @@
               ]
             },
             "palette": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "enum": [
                 "ember",
                 "lava",
@@ -461,7 +486,8 @@
                 "storm",
                 "arcane",
                 "shadow",
-                "light"
+                "light",
+                null
               ]
             },
             "signature_geometry_id": {
@@ -626,7 +652,10 @@
               ]
             },
             "palette": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "enum": [
                 "ember",
                 "lava",
@@ -637,7 +666,8 @@
                 "storm",
                 "arcane",
                 "shadow",
-                "light"
+                "light",
+                null
               ]
             },
             "signature_geometry_id": {
@@ -773,7 +803,10 @@
               ]
             },
             "palette": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "enum": [
                 "ember",
                 "lava",
@@ -784,7 +817,8 @@
                 "storm",
                 "arcane",
                 "shadow",
-                "light"
+                "light",
+                null
               ]
             },
             "signature_geometry_id": {
@@ -920,7 +954,10 @@
               ]
             },
             "palette": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "enum": [
                 "ember",
                 "lava",
@@ -931,7 +968,8 @@
                 "storm",
                 "arcane",
                 "shadow",
-                "light"
+                "light",
+                null
               ]
             },
             "signature_geometry_id": {
@@ -1079,7 +1117,10 @@
               ]
             },
             "palette": {
-              "type": "string",
+              "type": [
+                "string",
+                "null"
+              ],
               "enum": [
                 "ember",
                 "lava",
@@ -1090,7 +1131,8 @@
                 "storm",
                 "arcane",
                 "shadow",
-                "light"
+                "light",
+                null
               ]
             },
             "signature_geometry_id": {

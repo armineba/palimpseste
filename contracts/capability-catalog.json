@@ -1,6 +1,6 @@
 {
   "schema_version": "sp.capabilities/1.0",
-  "status": "SPECIFICATION_NOT_IMPLEMENTATION",
+  "status": "RUNTIME_AND_CONTRACT",
   "rules_profile": "lab_v1",
   "fixed_tick_ms": 20,
   "carriers": [
@@ -128,6 +128,168 @@
       "max_amount": 750,
       "duration_rule": "positive",
       "direction_rule": "none"
+    },
+    {
+      "id": "bleed",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "poison",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "freeze_damage",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "regen",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "barrier_health",
+      "amount_unit": "milli_health_capacity",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "vulnerability",
+      "amount_unit": "per_mille_incoming_damage_increase",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "weakness",
+      "amount_unit": "per_mille_outgoing_damage_reduction",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "haste",
+      "amount_unit": "per_mille_movement_speed_increase",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "armor_break",
+      "amount_unit": "per_mille_active_damage_reduction_removed",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "damage_reduction",
+      "amount_unit": "per_mille_incoming_damage_reduction",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "healing_reduction",
+      "amount_unit": "per_mille_incoming_heal_reduction",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "root",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "positive_max_100",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "stun",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "positive_max_100",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "cleanse",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "dispel",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "life_steal",
+      "amount_unit": "per_mille_actual_same_event_damage",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "hostile_only_requires_damage"
+    },
+    {
+      "id": "execute",
+      "amount_unit": "milli_health_below_25_percent",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "shatter",
+      "amount_unit": "milli_structure",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "breakable_environment_only"
     }
   ],
   "reactions": [
@@ -156,5 +318,12 @@
     "range_cm": 3000,
     "scale_cm": 1200,
     "concurrent_casts": 8
+  },
+  "effect_recipes": {
+    "schema_version": "sp.effect-recipes/1.0",
+    "catalog_file": "effect-recipes.json",
+    "prompt_projection_file": "effect-recipes-prompt.json",
+    "count": 141,
+    "execution": "fixed_composition_of_catalog_effects"
   }
 }

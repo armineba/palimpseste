@@ -45,6 +45,28 @@ Require(ContractJson.Validate(ContractJson.ParseStrict(compiled.PayloadUtf8), "c
     "Compiled payload fails contract");
 Require(((JObject)ContractJson.ParseStrict(compiled.PayloadUtf8)["plan"]["nodes"][0]["appearance"])
     .Property("palette") == null, "Legacy compiled spell unexpectedly requires a palette");
+// Codex structured output requires every declared object property, while a
+// legacy description has no palette to copy. The nullable transport value is
+// accepted by the plan validator and omitted from the published packet.
+var plannerSchema = JObject.Parse(Encoding.UTF8.GetString(Read("contracts/codex/model-b.output-schema.json")));
+foreach (var schemaObject in plannerSchema.DescendantsAndSelf().OfType<JObject>()
+    .Where(obj => obj["type"]?.Type == JTokenType.String && (string)obj["type"] == "object" && obj["properties"] is JObject))
+{
+    var properties = ((JObject)schemaObject["properties"]).Properties().Select(property => property.Name).ToHashSet();
+    var required = ((JArray)schemaObject["required"]).Select(value => (string)value).ToHashSet();
+    Require(properties.SetEquals(required), "Codex output schema has optional object properties");
+}
+var nullablePalettePlan = JObject.Parse(Encoding.UTF8.GetString(planJson));
+foreach (var node in (JArray)nullablePalettePlan["nodes"])
+    node["appearance"]["palette"] = JValue.CreateNull();
+var nullablePaletteBytes = Encoding.UTF8.GetBytes(nullablePalettePlan.ToString(Newtonsoft.Json.Formatting.None));
+Require(SpellCompiler.ValidatePlanJson(descriptionJson, nullablePaletteBytes, resolved.GeometryJson, resolved.MaskPng).Count == 0,
+    "Legacy description with Codex-required null palette was rejected");
+input.PlanJson = nullablePaletteBytes;
+var nullableCompiled = SpellCompiler.Compile(input);
+Require(nullableCompiled.Success && ((JObject)ContractJson.ParseStrict(nullableCompiled.PayloadUtf8)["plan"]["nodes"][0]["appearance"])
+    .Property("palette") == null, "Legacy null palette leaked into the published packet");
+input.PlanJson = planJson;
 
 // In the image-driven profile the interpreter does not divide the parchment
 // into semantic regions. Every subject may use the real geometry of the whole
@@ -228,6 +250,294 @@ Require(SpellCompiler.ValidatePlanJson(invalidLifecycleBytes,
     Encoding.UTF8.GetBytes(invalidLifecyclePlan.ToString(Newtonsoft.Json.Formatting.None)),
     resolved.GeometryJson, resolved.MaskPng).Any(i => i.Code == "clause_event"),
     "An event not emitted by the carrier was accepted");
+
+// A and B must expose exactly the runtime effect catalog. Keep the palette
+// present in both structured outputs: A chooses it; B copies it or null.
+var catalog = JObject.Parse(Encoding.UTF8.GetString(Read("contracts/capability-catalog.json")));
+var catalogKinds = ((JArray)catalog["effects"]).Select(e => (string)e["id"]).ToHashSet();
+string[] effectSchemas = { "contracts/spell-description.schema.json", "contracts/spell-plan.schema.json",
+    "contracts/compiled-spell.schema.json", "contracts/model-a.response-format.json",
+    "contracts/model-b.response-format.json", "contracts/codex/model-a.output-schema.json",
+    "contracts/codex/model-b.output-schema.json" };
+foreach (var name in effectSchemas)
+{
+    var schema = JObject.Parse(Encoding.UTF8.GetString(Read(name)));
+    var kinds = schema.DescendantsAndSelf().OfType<JArray>()
+        .Where(array => array.All(value => value.Type == JTokenType.String) &&
+            array.Values<string>().Contains("damage") && array.Values<string>().Contains("burn"))
+        .ToArray();
+    Require(kinds.Length == 1 && catalogKinds.SetEquals(kinds[0].Values<string>()),
+        "Effect enum differs from production catalog: " + name);
+}
+var promptASchema = JObject.Parse(Encoding.UTF8.GetString(Read("contracts/codex/model-a.output-schema.json")));
+var aPalette = promptASchema.DescendantsAndSelf().OfType<JArray>()
+    .Single(array => array.All(value => value.Type == JTokenType.String) &&
+        array.Values<string>().Contains("ember") && array.Values<string>().Contains("lava"));
+var bPalettes = plannerSchema.DescendantsAndSelf().OfType<JArray>()
+    .Where(array => array.All(value => value.Type == JTokenType.String || value.Type == JTokenType.Null) &&
+        array.Values<string>().Contains("ember") && array.Values<string>().Contains("lava")).ToArray();
+Require(bPalettes.Length == 6 && bPalettes.All(palette => palette.Any(value => value.Type == JTokenType.Null) &&
+    aPalette.Values<string>().ToHashSet().SetEquals(palette.Where(value => value.Type == JTokenType.String)
+        .Values<string>())), "A/B palette enums differ or legacy null is missing");
+foreach (var appearance in plannerSchema.DescendantsAndSelf().OfType<JObject>()
+    .Where(obj => obj["properties"]?["signature_geometry_id"] != null))
+    Require(((JArray)appearance["required"]).Values<string>().Contains("palette"),
+        "Structured output B could omit its palette");
+
+byte[] JsonBytes(JObject obj) => Encoding.UTF8.GetBytes(obj.ToString(Newtonsoft.Json.Formatting.None));
+JObject NewEffectDescription(string kind, string target)
+{
+    var candidate = JObject.Parse(Encoding.UTF8.GetString(descriptionJson));
+    var facts = (JArray)candidate["clauses"][0]["facts"];
+    facts.First(f => (string)f["dimension"] == "effect")["value"] = kind;
+    facts.First(f => (string)f["dimension"] == "target")["value"] = target;
+    return candidate;
+}
+JObject NewEffectPlan(byte[] descriptionBytes, string kind, string target, int amount, int duration)
+{
+    var candidate = JObject.Parse(Encoding.UTF8.GetString(planJson));
+    candidate["description_sha256"] = SpellCompiler.Sha256(descriptionBytes);
+    var effect = candidate["nodes"][0]["effects"][0];
+    effect["kind"] = kind; effect["target_filter"] = target;
+    effect["amount"] = amount; effect["duration_ticks"] = duration;
+    candidate["nodes"][0]["options"]["contact_filter"] = target;
+    return candidate;
+}
+var zeroAmount = new[] { "wet", "root", "stun", "cleanse", "dispel" }.ToHashSet();
+var periodic = new[] { "burn", "bleed", "poison", "freeze_damage", "regen" }.ToHashSet();
+var instant = new[] { "damage", "heal", "impulse", "cleanse", "dispel", "life_steal", "execute", "shatter" }.ToHashSet();
+foreach (var catalogEffect in (JArray)catalog["effects"])
+{
+    var kind = (string)catalogEffect["id"];
+    if (kind == "life_steal") continue; // Requires a same-event damage companion; exercised below.
+    var target = kind == "shatter" ? "environment" :
+        new[] { "regen", "barrier_health", "haste", "damage_reduction", "cleanse" }.Contains(kind) ? "ally" : "hostile";
+    var amount = zeroAmount.Contains(kind) ? 0 : Math.Min(1000, (int)catalogEffect["max_amount"]);
+    var duration = instant.Contains(kind) ? 0 : periodic.Contains(kind) ? 100 : 100;
+    var candidateDescription = NewEffectDescription(kind, target);
+    var candidateDescriptionBytes = JsonBytes(candidateDescription);
+    var candidatePlan = NewEffectPlan(candidateDescriptionBytes, kind, target, amount, duration);
+    if (kind == "impulse") candidatePlan["nodes"][0]["effects"][0]["direction"] = "forward";
+    var candidateIssues = SpellCompiler.ValidatePlanJson(candidateDescriptionBytes, JsonBytes(candidatePlan),
+        resolved.GeometryJson, resolved.MaskPng);
+    Require(candidateIssues.Count == 0,
+        "Catalog effect could not compile: " + kind + ": " + string.Join("; ", candidateIssues));
+}
+var multiDescription = JObject.Parse(Encoding.UTF8.GetString(descriptionJson));
+var firstFacts = (JArray)multiDescription["clauses"][0]["facts"];
+foreach (var kind in new[] { "bleed", "life_steal", "execute" })
+    firstFacts.Add(new JObject { ["dimension"] = "effect", ["value"] = kind });
+multiDescription["clauses"][1]["facts"].First(f => (string)f["dimension"] == "effect")["value"] = "shatter";
+multiDescription["clauses"][1]["facts"].First(f => (string)f["dimension"] == "target")["value"] = "environment";
+var multiDescriptionBytes = JsonBytes(multiDescription);
+var multiPlan = JObject.Parse(Encoding.UTF8.GetString(planJson));
+multiPlan["description_sha256"] = SpellCompiler.Sha256(multiDescriptionBytes);
+var firstEffects = (JArray)multiPlan["nodes"][0]["effects"];
+foreach (var (kind, amount, duration) in new[] { ("bleed", 1500, 100), ("life_steal", 300, 0), ("execute", 5000, 0) })
+{
+    var effect = (JObject)firstEffects[0].DeepClone();
+    effect["id"] = "e_" + kind; effect["kind"] = kind;
+    effect["amount"] = amount; effect["duration_ticks"] = duration;
+    firstEffects.Add(effect);
+}
+var shatter = multiPlan["nodes"][1]["effects"][0];
+shatter["kind"] = "shatter"; shatter["target_filter"] = "environment";
+shatter["amount"] = 5000; shatter["duration_ticks"] = 0;
+var multiPlanBytes = JsonBytes(multiPlan);
+Require(SpellCompiler.ValidatePlanJson(multiDescriptionBytes, multiPlanBytes,
+    resolved.GeometryJson, resolved.MaskPng).Count == 0,
+    "Damage, bleed, life steal, execute and hit-linked shatter failed validation");
+var multiInput = new CompilationInput { DescriptionJson = multiDescriptionBytes, PlanJson = multiPlanBytes,
+    GeometryJson = resolved.GeometryJson, MaskPng = resolved.MaskPng,
+    GeometryArtifactIds = artifactIds, MaskArtifactIds = maskIds,
+    SpellId = "multi-effect-smoke", ParchmentId = "multi-effect-support", SignatureSeedHex = "e10a330a765bc981",
+    Provenance = fixture["provenance"].ToObject<SpellProvenance>() };
+Require(SpellCompiler.Compile(multiInput).Success, "Multi-effect spell did not compile");
+var unpairedLifeSteal = (JObject)multiPlan.DeepClone();
+((JArray)unpairedLifeSteal["nodes"][0]["effects"])[0].Remove();
+Require(SpellCompiler.ValidatePlanJson(multiDescriptionBytes, JsonBytes(unpairedLifeSteal),
+    resolved.GeometryJson, resolved.MaskPng).Any(i => i.Code == "life_steal_source"),
+    "Life steal without actual same-event hostile damage was accepted");
+var excessiveBleed = (JObject)multiPlan.DeepClone();
+excessiveBleed["nodes"][0]["effects"][1]["amount"] = 10001;
+Require(SpellCompiler.ValidatePlanJson(multiDescriptionBytes, JsonBytes(excessiveBleed),
+    resolved.GeometryJson, resolved.MaskPng).Any(i => i.Code == "effect_amount"),
+    "Periodic damage above its catalog bound was accepted");
+var endlessStunDescription = NewEffectDescription("stun", "hostile");
+var endlessStunDescriptionBytes = JsonBytes(endlessStunDescription);
+var endlessStunPlan = NewEffectPlan(endlessStunDescriptionBytes, "stun", "hostile", 0, 101);
+Require(SpellCompiler.ValidatePlanJson(endlessStunDescriptionBytes, JsonBytes(endlessStunPlan),
+    resolved.GeometryJson, resolved.MaskPng).Any(i => i.Code == "control_duration"),
+    "Hard control beyond two seconds was accepted");
+
+var recipeCatalog = JObject.Parse(Encoding.UTF8.GetString(Read("contracts/effect-recipes.json")));
+var recipes = (JArray)recipeCatalog["recipes"];
+Require((string)recipeCatalog["schema_version"] == "sp.effect-recipes/1.0" && recipes.Count >= 100,
+    "The named recipe catalog is missing or too small");
+var recipeIds = recipes.Select(recipe => (string)recipe["id"]).ToHashSet(StringComparer.Ordinal);
+Require(recipeIds.Count == recipes.Count, "Duplicate named recipe IDs");
+var recipePromptBytes = Read("contracts/effect-recipes-prompt.json");
+var recipePrompt = JObject.Parse(Encoding.UTF8.GetString(recipePromptBytes));
+var promptRecipes = ((JArray)recipePrompt["recipes"]).ToDictionary(recipe => (string)recipe["id"],
+    recipe => recipe, StringComparer.Ordinal);
+Require(recipePromptBytes.Length <= 30000 && promptRecipes.Keys.ToHashSet(StringComparer.Ordinal).SetEquals(recipeIds),
+    "Compact interpreter recipe list is missing IDs or too large");
+foreach (var recipe in recipes)
+{
+    var summary = promptRecipes[(string)recipe["id"]];
+    Require((string)summary["target_filter"] == (string)recipe["target_filter"] &&
+        ((JArray)summary["kinds"]).Values<string>().SequenceEqual(
+            ((JArray)recipe["components"]).Select(component => (string)component["kind"])),
+        "Compact recipe projection changes an effect or target: " + recipe["id"]);
+    var hint = (string)summary["hint_fr"];
+    Require(!string.IsNullOrWhiteSpace(hint) && hint.Length <= 70 &&
+        ((string)recipe["description_fr"]).StartsWith(hint.TrimEnd('…'), StringComparison.Ordinal),
+        "Compact recipe hint invents a mechanic: " + recipe["id"]);
+}
+var aRecipeRule = promptASchema.DescendantsAndSelf().OfType<JObject>().Single(obj =>
+    (string)obj["properties"]?["dimension"]?["const"] == "recipe");
+Require(recipeIds.SetEquals(((JArray)aRecipeRule["properties"]["value"]["enum"]).Values<string>()),
+    "A structured output cannot select exactly the published recipes");
+foreach (var schemaObject in promptASchema.DescendantsAndSelf().OfType<JObject>()
+    .Where(obj => obj["type"]?.Type == JTokenType.String && (string)obj["type"] == "object" && obj["properties"] is JObject))
+    Require(((JObject)schemaObject["properties"]).Properties().Select(property => property.Name).ToHashSet()
+        .SetEquals(((JArray)schemaObject["required"]).Values<string>()),
+        "A structured output has an optional object property");
+
+JObject Fact(string dimension, string value) => new JObject { ["dimension"] = dimension, ["value"] = value };
+string RecipeEvent(string carrier) => carrier == "field" ? "enter" : carrier == "trap" ? "trigger" : "hit";
+JObject RecipeDescription(JObject recipe, string carrier)
+{
+    var facts = new JArray(Fact("carrier", carrier), Fact("recipe", (string)recipe["id"]));
+    foreach (var component in (JArray)recipe["components"])
+        facts.Add(Fact("effect", (string)component["kind"]));
+    facts.Add(Fact("target", (string)recipe["target_filter"]));
+    facts.Add(Fact("event", RecipeEvent(carrier)));
+    return new JObject {
+        ["schema_version"] = "sp.description/1.0", ["title"] = (string)recipe["label_fr"],
+        ["summary"] = (string)recipe["description_fr"],
+        ["observations"] = new JArray(new JObject { ["id"] = "o1", ["region"] = "full",
+            ["visible_feature"] = "Trace illustrée.", ["interpretation"] = "Lecture de recette." }),
+        ["clauses"] = new JArray(new JObject { ["id"] = "c1", ["subject_id"] = "s0",
+            ["kind"] = "mechanical", ["text"] = (string)recipe["description_fr"],
+            ["observation_ids"] = new JArray("o1"), ["facts"] = facts }),
+        ["relations"] = new JArray(), ["shape_requests"] = new JArray()
+    };
+}
+JObject RecipePlan(JObject recipe, string carrier, byte[] descriptionBytes)
+{
+    var template = JObject.Parse(Encoding.UTF8.GetString(Read("examples/fixture_" + carrier + ".json")));
+    var node = (JObject)template["nodes"][0];
+    template["description_sha256"] = SpellCompiler.Sha256(descriptionBytes);
+    node["node_id"] = "n0"; node["subject_id"] = "s0";
+    node["clause_ids"] = new JArray("c1");
+    node["geometry_id"] = carrier == "projectile" || carrier == "beam" ? "full.path.0" : "full.footprint.0";
+    node["appearance"]["signature_geometry_id"] = "full.silhouette.0";
+    var target = (string)recipe["target_filter"];
+    if (carrier == "projectile") node["options"]["contact_filter"] = target;
+    if (carrier == "beam") node["options"]["chain_filter"] = target;
+    if (carrier == "trap") node["options"]["trigger_filter"] = target;
+    var effects = new JArray();
+    var index = 0;
+    foreach (var component in (JArray)recipe["components"])
+        effects.Add(new JObject { ["id"] = "e" + index++, ["clause_ids"] = new JArray("c1"),
+            ["event"] = RecipeEvent(carrier), ["kind"] = (string)component["kind"],
+            ["target_filter"] = target, ["amount"] = (int)component["amount"],
+            ["duration_ticks"] = (int)component["duration_ticks"],
+            ["direction"] = (string)component["direction"] });
+    node["effects"] = effects;
+    return template;
+}
+var validatedRecipeCarriers = 0;
+foreach (var recipeToken in recipes)
+{
+    var recipe = (JObject)recipeToken;
+    var firstCarrier = true;
+    foreach (var carrierToken in (JArray)recipe["allowed_carriers"])
+    {
+        var carrier = (string)carrierToken;
+        var recipeDescription = RecipeDescription(recipe, carrier);
+        var recipeDescriptionBytes = JsonBytes(recipeDescription);
+        var recipePlan = RecipePlan(recipe, carrier, recipeDescriptionBytes);
+        var recipePlanBytes = JsonBytes(recipePlan);
+        var descriptionIssues = SpellCompiler.ValidateDescriptionJson(recipeDescriptionBytes);
+        Require(descriptionIssues.Count == 0,
+            "Recipe description rejected: " + recipe["id"] + "/" + carrier + ": " + string.Join("; ", descriptionIssues));
+        var planIssues = SpellCompiler.ValidatePlanJson(recipeDescriptionBytes, recipePlanBytes,
+            wholeGeometry.GeometryJson, wholeGeometry.MaskPng);
+        Require(planIssues.Count == 0,
+            "Recipe plan rejected: " + recipe["id"] + "/" + carrier + ": " + string.Join("; ", planIssues));
+        validatedRecipeCarriers++;
+        if (!firstCarrier) continue;
+        var recipeInput = new CompilationInput { DescriptionJson = recipeDescriptionBytes,
+            PlanJson = recipePlanBytes, GeometryJson = wholeGeometry.GeometryJson,
+            MaskPng = wholeGeometry.MaskPng, GeometryArtifactIds = wholeInput.GeometryArtifactIds,
+            MaskArtifactIds = wholeInput.MaskArtifactIds, SpellId = "recipe-smoke",
+            ParchmentId = "recipe-support", SignatureSeedHex = "e10a330a765bc981",
+            Provenance = fixture["provenance"].ToObject<SpellProvenance>() };
+        Require(SpellCompiler.Compile(recipeInput).Success, "Named recipe failed to compile: " + recipe["id"]);
+        firstCarrier = false;
+    }
+}
+Require(validatedRecipeCarriers >= recipes.Count, "Not every recipe has a validated carrier");
+var firstRecipe = (JObject)recipes[0];
+var firstRecipeCarrier = (string)firstRecipe["allowed_carriers"][0];
+var firstRecipeDescription = RecipeDescription(firstRecipe, firstRecipeCarrier);
+var unknownRecipeDescription = (JObject)firstRecipeDescription.DeepClone();
+((JArray)unknownRecipeDescription["clauses"][0]["facts"]).First(f => (string)f["dimension"] == "recipe")
+    ["value"] = "r_unlisted";
+Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(unknownRecipeDescription)).Count > 0,
+    "Unknown recipe ID was accepted");
+var incompatibleRecipeDescription = RecipeDescription(firstRecipe, "barrier");
+((JArray)incompatibleRecipeDescription["clauses"][0]["facts"])
+    .First(f => (string)f["dimension"] == "event")["value"] = "block";
+Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(incompatibleRecipeDescription))
+    .Any(i => i.Code == "recipe_carrier"), "Recipe accepted a disallowed carrier");
+var missingComponentDescription = (JObject)firstRecipeDescription.DeepClone();
+((JArray)missingComponentDescription["clauses"][0]["facts"])
+    .First(f => (string)f["dimension"] == "effect").Remove();
+Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(missingComponentDescription))
+    .Any(i => i.Code == "recipe_components"), "Recipe accepted a missing primitive effect fact");
+var firstRecipeDescriptionBytes = JsonBytes(firstRecipeDescription);
+var changedRecipePlan = RecipePlan(firstRecipe, firstRecipeCarrier, firstRecipeDescriptionBytes);
+changedRecipePlan["nodes"][0]["effects"][0]["amount"] =
+    (int)changedRecipePlan["nodes"][0]["effects"][0]["amount"] + 1;
+Require(SpellCompiler.ValidatePlanJson(firstRecipeDescriptionBytes, JsonBytes(changedRecipePlan),
+    wholeGeometry.GeometryJson, wholeGeometry.MaskPng).Any(i => i.Code == "recipe_plan"),
+    "Recipe accepted a changed fixed amount");
+var wrongRecipeTarget = (JObject)firstRecipeDescription.DeepClone();
+((JArray)wrongRecipeTarget["clauses"][0]["facts"]).First(f => (string)f["dimension"] == "target")
+    ["value"] = (string)firstRecipe["target_filter"] == "hostile" ? "ally" : "hostile";
+Require(SpellCompiler.ValidateDescriptionJson(JsonBytes(wrongRecipeTarget)).Any(i => i.Code == "recipe_target"),
+    "Recipe accepted an invented receiver filter");
+var secondRecipe = recipes.OfType<JObject>().First(recipe => recipe != firstRecipe &&
+    (string)recipe["target_filter"] == (string)firstRecipe["target_filter"] &&
+    ((JArray)recipe["components"]).Count + ((JArray)firstRecipe["components"]).Count <= 8);
+var combinedRecipeDescription = RecipeDescription(firstRecipe, firstRecipeCarrier);
+var combinedFacts = (JArray)combinedRecipeDescription["clauses"][0]["facts"];
+combinedFacts.Add(Fact("recipe", (string)secondRecipe["id"]));
+foreach (var component in (JArray)secondRecipe["components"])
+    combinedFacts.Add(Fact("effect", (string)component["kind"]));
+var combinedRecipeDescriptionBytes = JsonBytes(combinedRecipeDescription);
+var combinedRecipePlan = RecipePlan(firstRecipe, firstRecipeCarrier, combinedRecipeDescriptionBytes);
+var combinedEffects = (JArray)combinedRecipePlan["nodes"][0]["effects"];
+foreach (var component in (JArray)secondRecipe["components"])
+    combinedEffects.Add(new JObject { ["id"] = "e" + combinedEffects.Count,
+        ["clause_ids"] = new JArray("c1"), ["event"] = RecipeEvent(firstRecipeCarrier),
+        ["kind"] = (string)component["kind"], ["target_filter"] = (string)firstRecipe["target_filter"],
+        ["amount"] = (int)component["amount"], ["duration_ticks"] = (int)component["duration_ticks"],
+        ["direction"] = (string)component["direction"] });
+Require(SpellCompiler.ValidatePlanJson(combinedRecipeDescriptionBytes, JsonBytes(combinedRecipePlan),
+    wholeGeometry.GeometryJson, wholeGeometry.MaskPng).Count == 0,
+    "Two compatible recipes on one subject failed composition");
+var duplicateRecipeEffectIds = (JObject)combinedRecipePlan.DeepClone();
+var duplicateEffects = (JArray)duplicateRecipeEffectIds["nodes"][0]["effects"];
+duplicateEffects.Last()["id"] = (string)duplicateEffects.First()["id"];
+Require(SpellCompiler.ValidatePlanJson(combinedRecipeDescriptionBytes, JsonBytes(duplicateRecipeEffectIds),
+    wholeGeometry.GeometryJson, wholeGeometry.MaskPng).Any(i => i.Code == "duplicate_effect"),
+    "Recipe composition accepted duplicate effect IDs");
+Console.WriteLine("Recipe compiler smoke: " + recipes.Count + " named recipes compiled; " +
+    validatedRecipeCarriers + " declared recipe/carrier pairs validated.");
 var duplicateJson = Encoding.UTF8.GetBytes("{\"a\":1,\"a\":2}");
 bool rejectedDuplicate = false;
 try { ContractJson.ParseStrict(duplicateJson); } catch { rejectedDuplicate = true; }

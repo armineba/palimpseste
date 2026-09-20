@@ -54,7 +54,20 @@ namespace Palimpseste.Core
         };
         private static readonly Dictionary<string, int> EffectMaximum = new Dictionary<string, int>(StringComparer.Ordinal) {
             ["damage"] = 100000, ["heal"] = 100000, ["impulse"] = 200000,
-            ["burn"] = 10000, ["wet"] = 0, ["slow"] = 750
+            ["burn"] = 10000, ["wet"] = 0, ["slow"] = 750,
+            ["bleed"] = 10000, ["poison"] = 10000, ["freeze_damage"] = 10000,
+            ["regen"] = 10000, ["barrier_health"] = 100000,
+            ["vulnerability"] = 500, ["weakness"] = 500, ["haste"] = 500,
+            ["armor_break"] = 500, ["damage_reduction"] = 500,
+            ["healing_reduction"] = 500,
+            ["root"] = 0, ["stun"] = 0, ["cleanse"] = 0, ["dispel"] = 0,
+            ["life_steal"] = 500, ["execute"] = 100000, ["shatter"] = 100000
+        };
+        private static readonly HashSet<string> PeriodicEffects = new HashSet<string>(StringComparer.Ordinal) {
+            "burn", "bleed", "poison", "freeze_damage", "regen"
+        };
+        private static readonly HashSet<string> InstantEffects = new HashSet<string>(StringComparer.Ordinal) {
+            "damage", "heal", "impulse", "cleanse", "dispel", "life_steal", "execute", "shatter"
         };
 
         public static CompilationResult Compile(CompilationInput input)
@@ -249,7 +262,8 @@ namespace Palimpseste.Core
                 foreach (var id in clause.observation_ids)
                     if (!observationIds.Contains(id)) Add(issues, "observation_reference", clause.id, "Unknown observation " + id);
                 if (clause.kind == "visual_only" && clause.facts.Any(f =>
-                    f.dimension == "carrier" || f.dimension == "effect" || f.dimension == "event" || f.dimension == "target"))
+                    f.dimension == "carrier" || f.dimension == "effect" || f.dimension == "recipe" ||
+                    f.dimension == "event" || f.dimension == "target"))
                     Add(issues, "visual_mechanic", clause.id, "Visual clause cannot demand mechanics");
             }
             var incoming = new HashSet<string>(StringComparer.Ordinal);
@@ -281,6 +295,37 @@ namespace Palimpseste.Core
                 var motions = facts.Where(f => f.dimension == "motion").Select(f => f.value).ToArray();
                 if (carriers.Length != 1)
                     Add(issues, "subject_carrier", subject, "Subject requires exactly one carrier fact");
+                var selectedRecipeIds = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var clause in d.clauses.Where(c => c.subject_id == subject && c.kind == "mechanical"))
+                {
+                    var recipeFacts = clause.facts.Where(f => f.dimension == "recipe").ToArray();
+                    if (recipeFacts.Length == 0) continue;
+                    var requiredKinds = new List<string>();
+                    foreach (var fact in recipeFacts)
+                    {
+                        if (!selectedRecipeIds.Add(fact.value))
+                            Add(issues, "duplicate_recipe", clause.id, "The same recipe was selected twice for one subject");
+                        if (!EffectRecipeCatalog.Recipes.TryGetValue(fact.value, out var recipe))
+                        {
+                            Add(issues, "recipe_unknown", clause.id, "Unknown effect recipe");
+                            continue;
+                        }
+                        requiredKinds.AddRange(recipe.Components.Select(component => component.Kind));
+                        if (carriers.Length == 1 && !recipe.Allows(carriers[0]))
+                            Add(issues, "recipe_carrier", clause.id, "Recipe cannot use this carrier");
+                        if (clause.facts.Count(f => f.dimension == "target" && f.value == recipe.TargetFilter) != 1)
+                            Add(issues, "recipe_target", clause.id, "Recipe target must appear once in its clause");
+                        if (carriers.Length == 1 && clause.facts.Count(f => f.dimension == "event" &&
+                            f.value == EffectRecipe.EventFor(carriers[0])) != 1)
+                            Add(issues, "recipe_event", clause.id, "Recipe event must appear once in its clause");
+                    }
+                    var declaredKinds = clause.facts.Where(f => f.dimension == "effect").Select(f => f.value)
+                        .OrderBy(value => value, StringComparer.Ordinal).ToArray();
+                    if (!declaredKinds.SequenceEqual(requiredKinds.OrderBy(value => value, StringComparer.Ordinal)))
+                        Add(issues, "recipe_components", clause.id, "Primitive effect facts must exactly match selected recipes");
+                }
+                if (selectedRecipeIds.Count > 0 && facts.Count(f => f.dimension == "effect") > 8)
+                    Add(issues, "recipe_effect_limit", subject, "Selected recipes exceed eight effects on one carrier");
                 if (motions.Length > 1)
                     Add(issues, "motion_fact", subject, "Subject cannot declare multiple motions");
                 if (carriers.Length == 1 && motions.Length == 1)
@@ -321,6 +366,8 @@ namespace Palimpseste.Core
                 var subjectClauses = allSubjectClauses.Where(c => c.kind == "mechanical").ToArray();
                 var subjectIds = allSubjectClauses.Select(c => c.id).ToHashSet(StringComparer.Ordinal);
                 var nodeClauseIds = node.clause_ids.ToHashSet(StringComparer.Ordinal);
+                if (node.effects.Select(e => e.id).Distinct(StringComparer.Ordinal).Count() != node.effects.Count)
+                    Add(issues, "duplicate_effect", p, "Effect IDs must be distinct within a node");
                 if (!subjectIds.SetEquals(nodeClauseIds) || nodeClauseIds.Count != node.clause_ids.Count)
                     Add(issues, "clause_trace", p, "Node must cite every clause of its subject exactly once");
                 var facts = subjectClauses.SelectMany(c => c.facts).ToArray();
@@ -368,6 +415,21 @@ namespace Palimpseste.Core
                         .OrderBy(x => x, StringComparer.Ordinal).ToArray();
                     if (!clauseEffects.SequenceEqual(linked.Select(e => e.kind).OrderBy(x => x, StringComparer.Ordinal)))
                         Add(issues, "clause_effect", clause.id, "Effect trace differs from this clause");
+                    var selectedRecipes = clause.facts.Where(f => f.dimension == "recipe")
+                        .Select(f => EffectRecipeCatalog.Recipes.TryGetValue(f.value, out var recipe) ? recipe : null)
+                        .Where(recipe => recipe != null).ToArray();
+                    if (selectedRecipes.Length > 0)
+                    {
+                        var expectedComponents = selectedRecipes.SelectMany(recipe => recipe.Components.Select(component =>
+                            RecipeSignature(component.Kind, component.Amount, component.DurationTicks,
+                                component.Direction, recipe.TargetFilter, EffectRecipe.EventFor(node.carrier))))
+                            .OrderBy(value => value, StringComparer.Ordinal).ToArray();
+                        var actualComponents = linked.Select(effect => RecipeSignature(effect.kind, effect.amount,
+                            effect.duration_ticks, effect.direction, effect.target_filter, effect.@event))
+                            .OrderBy(value => value, StringComparer.Ordinal).ToArray();
+                        if (!expectedComponents.SequenceEqual(actualComponents))
+                            Add(issues, "recipe_plan", clause.id, "Plan effects differ from the fixed recipe components");
+                    }
                     foreach (var fact in clause.facts)
                     {
                         if (fact.dimension == "target" && (linked.Length == 0 || linked.Any(e => e.target_filter != fact.value)))
@@ -438,12 +500,36 @@ namespace Palimpseste.Core
                     if (!effect.clause_ids.All(id => subjectIds.Contains(id)) ||
                         !effect.clause_ids.Any(id => d.clauses.Any(c => c.id == id && c.facts.Any(f => f.dimension == "effect" && f.value == effect.kind))))
                         Add(issues, "effect_trace", p, "Effect lacks a matching clause");
-                    if (new[] { "damage", "heal", "impulse" }.Contains(effect.kind) && effect.duration_ticks != 0)
+                    if (InstantEffects.Contains(effect.kind) && effect.duration_ticks != 0)
                         Add(issues, "effect_duration", p, "Instant effect requires zero duration");
-                    if (new[] { "burn", "wet", "slow" }.Contains(effect.kind) && effect.duration_ticks <= 0)
+                    if (!InstantEffects.Contains(effect.kind) && effect.duration_ticks <= 0)
                         Add(issues, "effect_duration", p, "Status requires positive duration");
-                    if (effect.kind == "burn" && effect.duration_ticks % 50 != 0)
-                        Add(issues, "burn_duration", p, "Burn duration must be a multiple of 50 ticks");
+                    if (PeriodicEffects.Contains(effect.kind) && effect.duration_ticks % 50 != 0)
+                        Add(issues, "periodic_duration", p, "Periodic duration must be a multiple of 50 ticks");
+                    if ((effect.kind == "root" || effect.kind == "stun") && effect.duration_ticks > 100)
+                        Add(issues, "control_duration", p, "Hard control exceeds two seconds");
+                    if (effect.kind == "life_steal" &&
+                        (effect.target_filter != "hostile" || !node.effects.Any(e => e.kind == "damage" &&
+                        e.@event == effect.@event && e.target_filter == "hostile")))
+                        Add(issues, "life_steal_source", p, "Life steal requires same-event hostile damage");
+                    if (effect.kind == "execute" && effect.target_filter != "hostile")
+                        Add(issues, "execute_target", p, "Execute affects hostile receivers only");
+                    if (effect.kind == "shatter" && effect.target_filter != "environment")
+                        Add(issues, "shatter_target", p, "Shatter affects marked breakable environment only");
+                    if (new[] { "regen", "barrier_health", "haste", "damage_reduction", "cleanse" }
+                        .Contains(effect.kind) && effect.target_filter != "ally" && effect.target_filter != "self")
+                        Add(issues, "support_target", p, "Support status requires ally or self");
+                    if (new[] { "vulnerability", "weakness", "armor_break", "healing_reduction",
+                        "root", "stun", "dispel" }.Contains(effect.kind) && effect.target_filter != "hostile")
+                        Add(issues, "debuff_target", p, "Debuff or dispel requires hostile receiver");
+                    if (new[] { "bleed", "poison", "freeze_damage" }.Contains(effect.kind) &&
+                        effect.target_filter != "hostile")
+                        Add(issues, "hostile_status_target", p, "Damage-over-time status requires hostile receiver");
+                    if (new[] { "regen", "barrier_health", "vulnerability", "weakness", "haste",
+                        "armor_break", "damage_reduction", "healing_reduction", "root", "stun",
+                        "cleanse", "dispel" }.Contains(effect.kind) &&
+                        effect.target_filter == "environment")
+                        Add(issues, "support_target", p, "Support effect requires an actor receiver");
                     if ((effect.kind == "impulse") == (effect.direction == "none"))
                         Add(issues, "effect_direction", p, "Invalid direction for effect kind");
                 }
@@ -516,7 +602,7 @@ namespace Palimpseste.Core
                 }
                 foreach (var effect in node.effects)
                 {
-                    long statusTicks = effect.kind == "burn" ? effect.duration_ticks / 50 : 0;
+                    long statusTicks = PeriodicEffects.Contains(effect.kind) ? effect.duration_ticks / 50 : 0;
                     applications += count * contacts * (1 + statusTicks);
                 }
                 if (node.carrier == "barrier" && geometry.TryGetValue(node.geometry_id, out var g))
@@ -550,6 +636,9 @@ namespace Palimpseste.Core
         }
 
         private static int Clamp(long number) => number > int.MaxValue ? int.MaxValue : (int)number;
+        private static string RecipeSignature(string kind, int amount, int duration, string direction,
+            string target, string @event) => kind + "|" + amount.ToString(CultureInfo.InvariantCulture) + "|" +
+            duration.ToString(CultureInfo.InvariantCulture) + "|" + direction + "|" + target + "|" + @event;
         private static void Add(List<ValidationIssue> issues, string code, string path, string message)
         {
             if (issues.Count < 100) issues.Add(new ValidationIssue(code, path, message));

@@ -44,12 +44,14 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
 {
     public const string InterpreterModel = "gpt-6-astra";
     public const string PlannerModel = "gpt-5.6-luna";
-    public const string PromptAVersion = "sp.prompt.a/1.7";
-    public const string PromptBVersion = "sp.prompt.b/1.3";
+    public const string PromptAVersion = "sp.prompt.a/1.9";
+    public const string PromptBVersion = "sp.prompt.b/1.6";
     private readonly CodexProcessRunner runner;
     private readonly string promptA;
     private readonly string promptB;
     private readonly string promptRepair;
+    private readonly string effectRecipesAContext;
+    private readonly Dictionary<string, JsonElement> recipeDefinitions;
     private readonly string schemaA;
     private readonly string schemaB;
     public string PromptASha256 { get; }
@@ -67,6 +69,23 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
             throw new InvalidDataException("prompt_b_version_mismatch");
         PromptBSha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(promptB)));
         promptRepair = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "03_REPARATION_TECHNIQUE.md"), Encoding.UTF8);
+        effectRecipesAContext = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "contracts", "effect-recipes-prompt.json"), Encoding.UTF8);
+        var fullRecipes = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "contracts", "effect-recipes.json"), Encoding.UTF8);
+        using (var catalog = JsonDocument.Parse(fullRecipes))
+        {
+            if (catalog.RootElement.GetProperty("schema_version").GetString() != "sp.effect-recipes/1.0" ||
+                catalog.RootElement.GetProperty("recipes").GetArrayLength() < 100)
+                throw new InvalidDataException("effect_recipe_catalog_invalid");
+            recipeDefinitions = catalog.RootElement.GetProperty("recipes").EnumerateArray()
+                .ToDictionary(recipe => recipe.GetProperty("id").GetString()!, recipe => recipe.Clone(), StringComparer.Ordinal);
+        }
+        using (var summary = JsonDocument.Parse(effectRecipesAContext))
+        {
+            var ids = summary.RootElement.GetProperty("recipes").EnumerateArray()
+                .Select(recipe => recipe.GetProperty("id").GetString()).ToHashSet(StringComparer.Ordinal);
+            if (!ids.SetEquals(recipeDefinitions.Keys))
+                throw new InvalidDataException("effect_recipe_prompt_catalog_mismatch");
+        }
         schemaA = Path.Combine(trustedSpecificationRoot, "contracts", "codex", "model-a.output-schema.json");
         schemaB = Path.Combine(trustedSpecificationRoot, "contracts", "codex", "model-b.output-schema.json");
     }
@@ -74,6 +93,7 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
     public async Task<ProviderDocument> InterpretAsync(string jobId, string attemptId, string referencePng, string drawingPng, string layoutJson, string capabilitiesJson, CancellationToken ct)
     {
         var prompt = promptA + "\n\nLAYOUT_CONTEXT\n" + layoutJson + "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson +
+            "\nEFFECT_RECIPES_CONTEXT\n" + effectRecipesAContext +
             "\nIMAGE 1 = référence neutre. IMAGE 2 = dessin engagé. Réponds avec le seul contrat JSON.\n";
         var result = await runner.RunAsync(new(attemptId, "A", prompt, schemaA,
             [referencePng, drawingPng], jobId), ct);
@@ -90,6 +110,7 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
         string layoutJson, string capabilitiesJson, CancellationToken ct)
     {
         var prompt = promptA + "\n\nLAYOUT_CONTEXT\n" + layoutJson + "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson +
+            "\nEFFECT_RECIPES_CONTEXT\n" + effectRecipesAContext +
             "\nIMAGE 1 = reference. IMAGE 2 = drawing. Return only the JSON contract.\n";
         var result = await runner.ProbeAsync(new(attemptId, "A", prompt, schemaA,
             [referencePng, drawingPng], jobId), ct);
@@ -102,7 +123,8 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
         var hash = Convert.ToHexStringLower(SHA256.HashData(frozenDescriptionUtf8));
         var prompt = promptB + "\n\nDESCRIPTION_SHA256\n" + hash + "\nSPELL_DESCRIPTION\n" +
             Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + geometryJson +
-            "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson + "\nRéponds avec le seul contrat JSON.\n";
+            "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson + "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(frozenDescriptionUtf8) +
+            "\nRéponds avec le seul contrat JSON.\n";
         var result = await runner.RunAsync(new(attemptId, "B", prompt, schemaB,
             [], jobId), ct);
         var document = Parse(result, "sp.plan/1.0");
@@ -117,7 +139,8 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
         var hash = Convert.ToHexStringLower(SHA256.HashData(frozenDescriptionUtf8));
         var prompt = promptB + "\n\nDESCRIPTION_SHA256\n" + hash + "\nSPELL_DESCRIPTION\n" +
             Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + geometryJson +
-            "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson + "\nReturn only the JSON contract.\n";
+            "\nCAPABILITIES_CONTEXT\n" + capabilitiesJson + "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(frozenDescriptionUtf8) +
+            "\nReturn only the JSON contract.\n";
         var result = await runner.ProbeAsync(new(attemptId, "B", prompt, schemaB, [], jobId), ct);
         var document = Parse(result, "sp.plan/1.0");
         return EnsureDescriptionHash(document, hash);
@@ -143,6 +166,8 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
             .Append("\nVALIDATION_ERRORS\n").Append(string.Join("\n", attempt.ValidationErrors.Select(error => "- " + error)))
             .Append("\nATTEMPT_NUMBER\n").Append(attempt.AttemptNumber)
             .Append("\nCAPABILITIES_CONTEXT\n").Append(attempt.CapabilitiesJson)
+            .Append("\nEFFECT_RECIPES_CONTEXT\n").Append(attempt.Stage == "A" ? effectRecipesAContext :
+                SelectedRecipeContext(Encoding.UTF8.GetBytes(attempt.OriginalAuthorizedInput)))
             .Append('\n');
 
         string schema;
@@ -175,6 +200,19 @@ public sealed class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlan
             return EnsureDescriptionHash(document, descriptionHash);
         }
         return document;
+    }
+
+    private string SelectedRecipeContext(byte[] descriptionUtf8)
+    {
+        using var description = JsonDocument.Parse(descriptionUtf8);
+        var selected = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (var clause in description.RootElement.GetProperty("clauses").EnumerateArray())
+            foreach (var fact in clause.GetProperty("facts").EnumerateArray())
+                if (fact.GetProperty("dimension").GetString() == "recipe")
+                    selected.Add(fact.GetProperty("value").GetString()!);
+        var rows = selected.Select(id => recipeDefinitions.TryGetValue(id, out var recipe) ? recipe :
+            throw new InvalidDataException("effect_recipe_unknown_in_frozen_description")).ToArray();
+        return JsonSerializer.Serialize(new { schema_version = "sp.effect-recipes/1.0", recipes = rows });
     }
 
     private static ProviderDocument Parse(CodexResult transport, string version)

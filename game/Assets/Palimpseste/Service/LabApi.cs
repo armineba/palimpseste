@@ -236,6 +236,22 @@ namespace Palimpseste.Game.Service
             }
         }
 
+        public IEnumerator ResumeJob(string id, string key, Action<JobDto, string> done)
+        {
+            using (var req = Request("POST", "/v1/jobs/" + PathId(id) + "/resume",
+                       Json("{}"), "application/json", key))
+            {
+                yield return req.SendWebRequest();
+                JobDto response = null;
+                if (req.result == UnityWebRequest.Result.Success && req.responseCode == 202)
+                {
+                    try { response = JsonUtility.FromJson<JobDto>(req.downloadHandler.text); }
+                    catch (ArgumentException) { }
+                }
+                done(response, response == null ? Error(req) ?? "Reprise non confirmée par le laboratoire" : null);
+            }
+        }
+
         public IEnumerator SendInterpretationFeedback(string jobId, string descriptionHash,
             string correction, string key, Action<InterpretationFeedbackDto, string> done)
         {

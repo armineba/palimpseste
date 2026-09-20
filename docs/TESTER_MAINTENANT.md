@@ -1,6 +1,18 @@
 # Tester le lecteur actuel
 
-## Build courant : dessin libre
+## Essai actuel sur ce PC
+
+Ouvrir [Palimpseste.exe](../game/Build/WindowsEffectLibraryPlayable/Palimpseste.exe) en conservant ensemble les 29 fichiers du dossier. Dans la bibliothèque, ouvrir « Enclume filante », cliquer sur **Actualiser** si l'ancien échec s'affiche, puis sur **Lancer dans le laboratoire**. Ce dessin a déjà un sort compilé. Pour essayer un dessin neuf, tracer autant de traits que souhaité, cliquer sur **Dessin terminé**, lire l'interprétation d'Astra, puis ouvrir et lancer le sort une fois sa fiche prête. Si un échec de traduction admissible apparaît, **Réessayer ce dessin** conserve la capture.
+
+Le service local déployé propose maintenant **141 recettes nommées** composées des **24 effets que ce Player sait exécuter**. Le compilateur a contrôlé les 141 recettes sur leurs cinq porteurs, soit **705 couples**, et la QA des contrats a passé **61/61**. Il s'agit de tests automatiques : aucun nouveau dessin généré avec le catalogue des 141 recettes, ni verdict humain sur leurs effets visuels et sonores, n'est encore attesté. Le service répond sur ce PC, sous `127.0.0.1` ; voir l'[état de déploiement](IMPLEMENTATION_STATUS.md). Les sections ci-dessous consignent les essais des 24 effets et les builds antérieurs.
+
+## Build Player actuel : sort prêt et 24 effets primitifs
+
+Le nouveau [Palimpseste.exe](../game/Build/WindowsEffectLibraryPlayable/Palimpseste.exe) a été lancé sur ce PC ; garder les 29 fichiers de son dossier ensemble. Le service local répond. Dans la bibliothèque, ouvrir le parchemin « Enclume filante », cliquer sur **Actualiser** si son ancien écran d'échec est encore visible, puis **Lancer dans le laboratoire**. Le même dessin a déjà produit un sort compilé : aucun redessin ni intervention technique ne sont nécessaires. Pour un nouveau dessin, relâcher le stylet entre plusieurs traits, puis cliquer sur **Dessin terminé**. Astra décrit le dessin, Luna planifie dans le catalogue jouable, puis la fiche permet le lancement dans le labo. Un échec B que le serveur juge reprenable affiche **Réessayer ce dessin** et conserve la capture.
+
+Le nouveau Player utilise 24 effets contrôlés avec VFX de statut ; hémorragie, poison, vol de vie, protection et caisse destructible marquée en font partie. Les 6 tests PlayMode ciblés ont passé ; le build Windows Unity 6000.3.24f1 IL2CPP/URP contient 29 fichiers, 122 136 545 octets, `GameAssembly.dll` SHA-256 `A003ED515F512965E5D4A88E0151FB976157DD0F24FE7E155302D8E3A5658B8F`. Le [ZIP Player](../deliverables/Palimpseste-Windows-x64-IL2CPP.zip) fait 44 054 317 octets, SHA-256 `8F8ADC123388801065234D0E1179D137C03B0B574D80F5D2B8A2690BBF768587`. Aucun essai manuel de ce nouveau rendu ni appel réel avec le catalogue de 24 effets n'est encore consigné. Voir [l'état précis](IMPLEMENTATION_STATUS.md) et [la bibliothèque d'effets](EFFECT_LIBRARY.md).
+
+## Historique : premier build du dessin libre
 
 Lancer [Palimpseste.exe](../game/Build/WindowsAppearanceVfxPlayable/Palimpseste.exe) sur **ce PC et ce profil Windows**, avec l'API locale disponible. Le parchemin humain à deux traits est déjà prêt : le job `cd4fec7e-aae8-45ba-b5f3-16a807a9771e` a produit la description Astra « Estoc à crochet » et une fiche de sort compilé. Rouvrir ce sort dans la bibliothèque et examiner en priorité son nouveau VFX dans le laboratoire face à la description. Le Player VFX a été relancé, mais cet examen visuel n'est pas encore consigné. L'essai de ciblage manuel par clics successifs a été arrêté à la demande du créateur. Pour un nouveau parchemin, dessiner plusieurs traits sur tout le papier, relâcher entre les traits, puis cliquer sur **« Dessin terminé »**. Un clic sur page vierge laisse le dessin ouvert et indique d'ajouter un trait. Une génération peut prendre plusieurs minutes avec les efforts `max`. Le bouton « Reconnecter » permet de reprendre une transmission restée locale après une coupure.
 

@@ -240,8 +240,13 @@ check('Paquet : schéma, intégrité, masques et bornes illustratives', lambda: 
 check('OpenAPI : références résolubles et opérations uniques', api_structure)
 for name, target in [('model-a','spell-description.schema.json'),('model-b','spell-plan.schema.json')]:
     fmt=load(C/(name+'.response-format.json'))
+    example=deepcopy(D if name=='model-a' else P)
+    if name=='model-b':
+        # The old stored packet omits palette; strict Codex output sends null.
+        for node in example['nodes']:
+            node['appearance']['palette'] = None
     check('Format local fournisseur : '+name, lambda f=fmt: jsonschema.Draft202012Validator.check_schema(f['schema']))
-    check('Exemple conforme au format local : '+name, lambda f=fmt,d=D if name=='model-a' else P: jsonschema.Draft202012Validator(f['schema']).validate(d))
+    check('Exemple conforme au format local : '+name, lambda f=fmt,d=example: jsonschema.Draft202012Validator(f['schema']).validate(d))
     check('Transport Codex strict statique : '+name, lambda n=name,f=fmt: codex_transport_schema(n,f))
 
 # Mutations rejetées : vérification de l’échec, pas seulement des cas heureux.

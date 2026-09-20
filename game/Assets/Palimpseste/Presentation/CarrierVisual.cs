@@ -303,6 +303,49 @@ namespace Palimpseste.Game.SpellRuntime
             afterimage.impulse = impulse;
         }
 
+        // A bounded visual acknowledgement for every applied mechanic. It is
+        // graphics only: no collider, receiver, event callback or spell data.
+        public static void EffectCue(string kind, Vector3 point)
+        {
+            var color = EffectColor(kind);
+            var root = new GameObject("Effet " + kind);
+            root.transform.position = point + Vector3.up * .35f;
+            root.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            var resources = root.AddComponent<BeamVisualResources>();
+            var ring = ProjectileStroke(root, resources, "Signe d'effet", .04f, color, 6);
+            ring.loop = true;
+            const int samples = 24;
+            ring.positionCount = samples;
+            for (var i = 0; i < samples; i++)
+            {
+                var angle = i * Mathf.PI * 2f / samples;
+                ring.SetPosition(i, new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0));
+            }
+            var afterimage = root.AddComponent<ProjectileImpactAfterimage>();
+            afterimage.ring = ring;
+            afterimage.color = color;
+            afterimage.impulse = kind == "impulse" || kind == "shatter" || kind == "stun";
+        }
+
+        private static Color EffectColor(string kind)
+        {
+            switch (kind)
+            {
+                case "bleed": case "execute": return new Color(.91f, .08f, .13f, .95f);
+                case "poison": return new Color(.32f, .89f, .14f, .9f);
+                case "burn": return new Color(1f, .34f, .09f, .95f);
+                case "freeze_damage": case "root": return new Color(.46f, .86f, 1f, .9f);
+                case "regen": case "heal": case "life_steal": case "cleanse":
+                    return new Color(.27f, .98f, .50f, .9f);
+                case "barrier_health": case "damage_reduction": return new Color(.3f, .75f, 1f, .95f);
+                case "shatter": case "armor_break": return new Color(1f, .64f, .19f, .95f);
+                case "stun": return new Color(1f, .91f, .25f, .95f);
+                case "dispel": return new Color(.88f, .4f, 1f, .9f);
+                case "wet": return new Color(.2f, .7f, 1f, .9f);
+                default: return new Color(.84f, .63f, 1f, .9f);
+            }
+        }
+
         private static void Beam(GameObject root, Color tint, int widthCm, bool fire, string pattern)
         {
             var resources = root.AddComponent<BeamVisualResources>();

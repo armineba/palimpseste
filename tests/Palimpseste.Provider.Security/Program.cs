@@ -3,12 +3,30 @@ using System.Text.Json;
 using System.Security.Cryptography;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Reflection;
 using Palimpseste.Provider;
 
 if (args.Length > 0 && string.Equals(args[0], "exec", StringComparison.Ordinal))
 {
     await RunFakeProviderAsync(args[1..]);
     return;
+}
+
+// The trusted specification must contain both the compact A catalog and the
+// fixed full recipes. B receives only recipes named in the frozen description.
+var repositoryRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
+var recipeProvider = new LunaCodexProvider(null!, repositoryRoot);
+var selectedRecipeMethod = typeof(LunaCodexProvider).GetMethod("SelectedRecipeContext",
+    BindingFlags.Instance | BindingFlags.NonPublic) ?? throw new Exception("Missing recipe selection method");
+var selectedPayload = (string)(selectedRecipeMethod.Invoke(recipeProvider, new object[] {
+    Encoding.UTF8.GetBytes("{\"clauses\":[{\"facts\":[{\"dimension\":\"recipe\",\"value\":\"r_impact\"}]}]}")
+}) ?? throw new Exception("Missing selected recipe payload"));
+using (var selectedJson = JsonDocument.Parse(selectedPayload))
+{
+    var selected = selectedJson.RootElement.GetProperty("recipes");
+    if (selected.GetArrayLength() != 1 || selected[0].GetProperty("id").GetString() != "r_impact" ||
+        selectedPayload.Length >= 10000)
+        throw new Exception("B recipe context leaked the full 141-recipe catalog");
 }
 
 var root = Path.Combine("E:\\PalimpsesteProviderSecurity", Guid.NewGuid().ToString("N"));

@@ -31,7 +31,7 @@ if (-not [string]::Equals((Get-FileHash -LiteralPath $child -Algorithm SHA256).H
         '6B71085864C175C96C538F9EF5507193DBE9304D1B15EBD776C47E50B8FEF02C',
         [StringComparison]::OrdinalIgnoreCase) -or
     -not [string]::Equals((Get-FileHash -LiteralPath $api -Algorithm SHA256).Hash,
-        '6F7ABB5A4B86DD718FF77532DCF25C57F024FBE4F2F9EBA24F29642CB35F238B',
+        '8B280D15ADEA95D4322C8957913ED3A46659221E208A4938B391E9CDBFE1E825',
         [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab API binaries differ from reviewed hashes.'
 }
