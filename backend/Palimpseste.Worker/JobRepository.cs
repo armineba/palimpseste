@@ -5,7 +5,9 @@ using Palimpseste.Storage;
 
 namespace Palimpseste.Worker;
 
-public sealed record ClaimedJob(Guid Id, Guid? ParchmentId, Guid? CaptureId, long Fence, string Kind, string State);
+public sealed record ClaimedJob(Guid Id, Guid? ParchmentId, Guid? CaptureId, long Fence, string Kind, string State, int VisualPipelineVersion = 0);
+public sealed record StoredVisualReference(string StorageKey, string Sha256, Guid ArtifactId, int SizeBytes,
+    string DescriptionSha256, string PromptVersion, int Width, int Height);
 public sealed record CaptureFiles(string ManifestJson, string ManifestSha, string SignatureSeedHex, string DrawingKey, string DrawingSha, string InkKey, string InkSha,
     string ReferenceKey, string ReferenceSha);
 public sealed record StoredDocument(string StorageKey, string Sha256, Guid ArtifactId, string? PromptVersion = null);
@@ -23,7 +25,7 @@ public sealed class JobRepository
         await using var cmd = source.CreateCommand("""
             WITH candidate AS (
                 SELECT id FROM jobs
-                WHERE state IN ('queued','interpreting','resolving_geometry','planning','validating','waiting_retry')
+                WHERE state IN ('queued','interpreting','generating_visual_reference','resolving_geometry','planning','validating','waiting_retry')
                   AND (lease_until IS NULL OR lease_until < now())
                   AND (next_attempt_at IS NULL OR next_attempt_at <= now())
                 ORDER BY created_at, id FOR UPDATE SKIP LOCKED LIMIT 1
@@ -34,13 +36,13 @@ public sealed class JobRepository
                            WHEN j.state='queued' THEN 'interpreting' ELSE j.state END,
                 updated_at=now()
             FROM candidate WHERE j.id=candidate.id
-            RETURNING j.id,j.parchment_id,j.capture_id,j.fence_token,j.kind,j.state
+            RETURNING j.id,j.parchment_id,j.capture_id,j.fence_token,j.kind,j.state,j.visual_pipeline_version
             """);
         cmd.Parameters.AddWithValue(worker);
         await using var reader = await cmd.ExecuteReaderAsync(ct);
         if (!await reader.ReadAsync(ct)) return null;
         return new(reader.GetGuid(0), reader.IsDBNull(1) ? null : reader.GetGuid(1),
-            reader.IsDBNull(2) ? null : reader.GetGuid(2), reader.GetInt64(3), reader.GetString(4), reader.GetString(5));
+            reader.IsDBNull(2) ? null : reader.GetGuid(2), reader.GetInt64(3), reader.GetString(4), reader.GetString(5), reader.GetInt32(6));
     }
 
     public async Task<bool> RenewAsync(ClaimedJob job, string worker, CancellationToken ct)
@@ -94,7 +96,7 @@ public sealed class JobRepository
 
     public async Task<int> CountAttemptsAsync(ClaimedJob job, string stage, CancellationToken ct)
     {
-        if (stage is not ("A" or "B" or "repair_A" or "repair_B")) throw new ArgumentOutOfRangeException(nameof(stage));
+        if (stage is not ("A" or "G" or "B" or "repair_A" or "repair_B")) throw new ArgumentOutOfRangeException(nameof(stage));
         await using var cmd = source.CreateCommand("SELECT count(*) FROM provider_attempts WHERE job_id=$1 AND stage=$2");
         cmd.Parameters.AddWithValue(job.Id);
         cmd.Parameters.AddWithValue(stage);
@@ -117,7 +119,7 @@ public sealed class JobRepository
 
     public async Task ScheduleRetryAsync(ClaimedJob job, string stage, string reason, CancellationToken ct)
     {
-        if (stage is not ("A" or "B")) throw new ArgumentOutOfRangeException(nameof(stage));
+        if (stage is not ("A" or "G" or "B")) throw new ArgumentOutOfRangeException(nameof(stage));
         await using var cmd = source.CreateCommand("""
             UPDATE jobs SET state='waiting_retry',resume_stage=$3,error_code=$4,
                 message='Nouvelle tentative de transport planifiée',retryable=true,
@@ -171,6 +173,43 @@ public sealed class JobRepository
         cmd.Parameters.AddWithValue(job.Id);
         await using var reader = await cmd.ExecuteReaderAsync(ct);
         return await reader.ReadAsync(ct) ? new(reader.GetString(0), reader.GetString(1), reader.GetGuid(2), reader.GetString(3)) : null;
+    }
+
+    public async Task<StoredVisualReference?> GetVisualReferenceAsync(ClaimedJob job, CancellationToken ct)
+    {
+        await using var cmd = source.CreateCommand("""
+            SELECT a.storage_key,a.sha256,a.id,a.byte_length,v.description_sha256,v.prompt_version,v.width_px,v.height_px
+            FROM visual_references v JOIN artifacts a ON a.id=v.artifact_id
+            JOIN jobs j ON j.id=v.job_id AND a.owner_id=j.owner_id
+            WHERE v.job_id=$1 AND j.fence_token=$2 AND a.kind='visual_reference' AND a.content_type='image/png'
+            """);
+        cmd.Parameters.AddWithValue(job.Id); cmd.Parameters.AddWithValue(job.Fence);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        return await r.ReadAsync(ct) ? new(r.GetString(0), r.GetString(1), r.GetGuid(2), checked((int)r.GetInt64(3)),
+            r.GetString(4), r.GetString(5), r.GetInt32(6), r.GetInt32(7)) : null;
+    }
+
+    public async Task SaveVisualReferenceAsync(ClaimedJob job, Guid attemptId, StoredArtifact artifact,
+        string descriptionHash, string inputHash, string promptVersion, int width, int height,
+        CodexResult transport, CancellationToken ct)
+    {
+        await using var conn = await source.OpenConnectionAsync(ct);
+        await using var tx = await conn.BeginTransactionAsync(ct);
+        await InsertArtifactAsync(conn, tx, job, artifact, "visual_reference", ct);
+        await using (var cmd = new NpgsqlCommand("""
+            INSERT INTO visual_references(job_id,provider_attempt_id,artifact_id,description_sha256,prompt_version,input_sha256,width_px,height_px)
+            VALUES($1,$2,$3,$4,$5,$6,$7,$8)
+            """, conn, tx))
+        {
+            cmd.Parameters.AddWithValue(job.Id); cmd.Parameters.AddWithValue(attemptId);
+            cmd.Parameters.AddWithValue(artifact.Id); cmd.Parameters.AddWithValue(descriptionHash);
+            cmd.Parameters.AddWithValue(promptVersion); cmd.Parameters.AddWithValue(inputHash);
+            cmd.Parameters.AddWithValue(width); cmd.Parameters.AddWithValue(height);
+            await cmd.ExecuteNonQueryAsync(ct);
+        }
+        await CompleteSuccessfulAttemptInTransactionAsync(conn, tx, job, attemptId, artifact.Sha256, transport, ct);
+        await MoveInTransactionAsync(conn, tx, job, "resolving_geometry", ct);
+        await tx.CommitAsync(ct);
     }
 
     public async Task<AuthoringInput> GetAuthoringInputAsync(ClaimedJob job, CancellationToken ct)

@@ -21,6 +21,8 @@ namespace Palimpseste.Game.Library
         public string spell_id;
         public string description_artifact_id;
         public string description_sha256;
+        public string visual_reference_artifact_id;
+        public string visual_reference_sha256;
         public string feedback_key;
         public string feedback_description_sha256;
         public string feedback_correction;

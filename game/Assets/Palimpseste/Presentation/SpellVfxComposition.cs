@@ -69,7 +69,7 @@ namespace Palimpseste.Game.SpellRuntime
             energyRoot.localPosition = center;
             quad = Own(Quad());
 
-            var spectral = form == "spirit";
+            var spectral = form == "spirit" && node.appearance.construction == null;
             if (groundComposition)
             {
                 MakeGroundComposition();

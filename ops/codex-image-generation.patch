@@ -1,0 +1,329 @@
+diff --git a/codex-rs/core/src/tools/spec_plan.rs b/codex-rs/core/src/tools/spec_plan.rs
+--- a/codex-rs/core/src/tools/spec_plan.rs
++++ b/codex-rs/core/src/tools/spec_plan.rs
+@@ -356,6 +356,13 @@
+     hosted_specs: Vec<ToolSpec>,
+     tool_search_handler_cache: &ToolSearchHandlerCache,
+ ) -> CodexResult<ToolRouter> {
++    if std::env::var("PALIMPSESTE_IMAGEGEN_TEXT_ONLY")
++        .ok()
++        .as_deref()
++        == Some("1")
++    {
++        return Ok(palimpseste_image_only_router(registry));
++    }
+     apply_direct_model_only_namespace_overrides(turn_context, &mut registry);
+     let tool_mode = effective_tool_mode(turn_context, model_info);
+     let code_mode_enabled = matches!(tool_mode, ToolMode::CodeMode | ToolMode::CodeModeOnly);
+@@ -492,6 +499,32 @@
+         tool_namespaces_info,
+         &child_management_tools,
+     ))
++}
++
++// A player image worker exposes and executes only the native image tool. A
++// read-only sandbox alone does not remove apply_patch or other built-in tools.
++pub(crate) fn palimpseste_image_only_router(mut registry: ToolRegistry) -> ToolRouter {
++    let allowed = ToolName::namespaced(IMAGE_GEN_NAMESPACE, IMAGEGEN_TOOL_NAME);
++    let rejected = registry
++        .entries()
++        .map(|tool| tool.runtime.tool_name())
++        .filter(|name| name != &allowed)
++        .collect::<Vec<_>>();
++    for name in rejected {
++        registry.remove(&name);
++    }
++    for tool in registry.entries_mut() {
++        tool.exposure = ToolExposure::DirectModelOnly;
++    }
++    let specs = registry.entries().map(|tool| tool.runtime.spec()).collect();
++    ToolRouter::from_parts(
++        registry,
++        specs,
++        ToolMode::Direct,
++        BTreeMap::new(),
++        None,
++        &[],
++    )
+ }
+ 
+ fn apply_direct_model_only_namespace_overrides(
+diff --git a/codex-rs/core/src/tools/spec_plan_tests.rs b/codex-rs/core/src/tools/spec_plan_tests.rs
+--- a/codex-rs/core/src/tools/spec_plan_tests.rs
++++ b/codex-rs/core/src/tools/spec_plan_tests.rs
+@@ -332,6 +332,52 @@
+ struct TestNamespaceExtensionTool {
+     namespace: &'static str,
+     tool_name: &'static str,
++}
++
++#[test]
++fn palimpseste_image_router_removes_all_other_executable_tools() {
++    use crate::tools::handlers::ApplyPatchHandler;
++    use crate::tools::handlers::PlanHandler;
++    use crate::tools::handlers::extension_tools::ExtensionToolAdapter;
++    use crate::tools::registry::ToolRegistry;
++    use crate::tools::spec_plan::palimpseste_image_only_router;
++
++    let mut registry = ToolRegistry::default();
++    registry.add(ApplyPatchHandler::new(false));
++    registry.add(PlanHandler);
++    for (namespace, tool_name) in [
++        ("image_gen", "imagegen"),
++        ("web", "run"),
++        ("functions", "exec_command"),
++    ] {
++        registry.register_external(Arc::new(ExtensionToolAdapter::new(Arc::new(
++            TestNamespaceExtensionTool {
++                namespace,
++                tool_name,
++            },
++        ))));
++    }
++    let router = palimpseste_image_only_router(registry);
++    assert_eq!(
++        router.registered_tool_names_for_test(),
++        vec![ToolName::namespaced("image_gen", "imagegen")]
++    );
++    assert_eq!(router.model_visible_specs().len(), 1);
++    assert_eq!(router.model_visible_specs()[0].name(), "image_gen");
++    assert_eq!(router.tool_mode(), ToolMode::Direct);
++    assert!(!router.requires_code_mode_worker());
++    assert!(!router.has_terminal_controls());
++    assert!(!router.can_manage_children());
++
++    // A/B disable the image-generation feature before this filter runs.
++    let mut text_registry = ToolRegistry::default();
++    text_registry.add(ApplyPatchHandler::new(false));
++    text_registry.add(PlanHandler);
++    let text_router = palimpseste_image_only_router(text_registry);
++    assert!(text_router.registered_tool_names_for_test().is_empty());
++    assert!(text_router.model_visible_specs().is_empty());
++    assert_eq!(text_router.tool_mode(), ToolMode::Direct);
++    assert!(!text_router.requires_code_mode_worker());
+ }
+ 
+ impl<'call> ToolExecutor<ExtensionToolCall<'call>> for TestNamespaceExtensionTool {
+diff --git a/codex-rs/exec/src/exec_events.rs b/codex-rs/exec/src/exec_events.rs
+--- a/codex-rs/exec/src/exec_events.rs
++++ b/codex-rs/exec/src/exec_events.rs
+@@ -136,6 +136,8 @@
+     /// Captures a web search request. It starts when the search is kicked off
+     /// and completes when results are returned to the agent.
+     WebSearch(WebSearchItem),
++    /// Native image-generation artifact metadata. Image bytes remain in the managed artifact file.
++    ImageGeneration(ImageGenerationItem),
+     /// Tracks the agent's running to-do list. It starts when the plan is first
+     /// issued, updates as steps change state, and completes when the turn ends.
+     TodoList(TodoListItem),
+@@ -148,6 +150,18 @@
+ #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
+ pub struct AgentMessageItem {
+     pub text: String,
++}
++
++#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, TS)]
++pub struct ImageGenerationItem {
++    pub call_id: String,
++    pub status: String,
++    pub saved_path: Option<String>,
++    pub failure: Option<serde_json::Value>,
++    pub source: String,
++    pub protocol: String,
++    pub text_only: bool,
++    pub one_shot: bool,
+ }
+ 
+ /// Agent's reasoning summary.
+diff --git a/codex-rs/exec/src/event_processor_with_jsonl_output.rs b/codex-rs/exec/src/event_processor_with_jsonl_output.rs
+--- a/codex-rs/exec/src/event_processor_with_jsonl_output.rs
++++ b/codex-rs/exec/src/event_processor_with_jsonl_output.rs
+@@ -33,6 +33,7 @@
+ use crate::exec_events::ErrorItem;
+ use crate::exec_events::FileChangeItem;
+ use crate::exec_events::FileUpdateChange;
++use crate::exec_events::ImageGenerationItem;
+ use crate::exec_events::ItemCompletedEvent;
+ use crate::exec_events::ItemStartedEvent;
+ use crate::exec_events::ItemUpdatedEvent;
+@@ -325,6 +326,24 @@
+                     },
+                 }),
+             }),
++            ThreadItem::ImageGeneration(item) => {
++                let restricted = std::env::var("PALIMPSESTE_IMAGEGEN_TEXT_ONLY")
++                    .ok()
++                    .as_deref() == Some("1");
++                Some(ExecThreadItem {
++                    id: make_id(),
++                    details: ThreadItemDetails::ImageGeneration(ImageGenerationItem {
++                        call_id: item.id,
++                        status: item.status,
++                        saved_path: item.saved_path.map(|path| path.as_path().to_string_lossy().into_owned()),
++                        failure: item.failure.map(|failure| serde_json::to_value(failure).unwrap_or_else(|_| json!({"type":"unknown"}))),
++                        source: "native_image_generation".to_string(),
++                        protocol: "palimpseste.codex-image/1.0".to_string(),
++                        text_only: restricted,
++                        one_shot: restricted,
++                    }),
++                })
++            }
+             _ => None,
+         }
+     }
+diff --git a/codex-rs/exec/src/event_processor_with_jsonl_output_tests.rs b/codex-rs/exec/src/event_processor_with_jsonl_output_tests.rs
+--- a/codex-rs/exec/src/event_processor_with_jsonl_output_tests.rs
++++ b/codex-rs/exec/src/event_processor_with_jsonl_output_tests.rs
+@@ -2,6 +2,29 @@
+ use pretty_assertions::assert_eq;
+ use serde_json::json;
+ use tempfile::tempdir;
++
++#[test]
++fn palimpseste_image_event_preserves_artifact_and_omits_image_bytes() {
++    let path = codex_utils_absolute_path::AbsolutePathBuf::current_dir()
++        .unwrap()
++        .join("generated.png");
++    let native: ThreadItem = serde_json::from_value(json!({
++        "type": "imageGeneration", "id": "call-image-test", "status": "completed",
++        "result": "PRIVATE_PNG_BYTES_NOT_IN_EXEC_JSONL", "savedPath": path,
++        "revisedPrompt": "private rewritten prompt", "transparentBackground": null, "failure": null
++    }))
++    .unwrap();
++    let mapped =
++        EventProcessorWithJsonOutput::map_item_with_id(native, || "item_1".to_string()).unwrap();
++    let json = serde_json::to_value(mapped).unwrap();
++    assert_eq!(json["type"], "image_generation");
++    assert_eq!(json["call_id"], "call-image-test");
++    assert_eq!(json["source"], "native_image_generation");
++    assert_eq!(json["protocol"], "palimpseste.codex-image/1.0");
++    assert_eq!(json["saved_path"], serde_json::to_value(path).unwrap());
++    assert!(json.get("result").is_none());
++    assert!(json.get("revised_prompt").is_none());
++}
+ 
+ fn raw_response(
+     response_id: &str,
+diff --git a/codex-rs/ext/image-generation/src/tool.rs b/codex-rs/ext/image-generation/src/tool.rs
+--- a/codex-rs/ext/image-generation/src/tool.rs
++++ b/codex-rs/ext/image-generation/src/tool.rs
+@@ -1,4 +1,7 @@
++use std::collections::HashSet;
+ use std::io;
++use std::sync::Mutex;
++use std::sync::OnceLock;
+ 
+ use base64::Engine;
+ use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
+@@ -61,12 +64,14 @@
+ const MAX_EXECUTOR_GENERATED_IMAGE_BASE64_BYTES: usize =
+     MAX_EXECUTOR_GENERATED_IMAGE_BYTES.div_ceil(3) * 4;
+ const IMAGEGEN_DESCRIPTION: &str = include_str!("../imagegen_description.md");
++static RESTRICTED_GENERATION_THREADS: OnceLock<Mutex<HashSet<String>>> = OnceLock::new();
+ 
+ #[derive(Clone)]
+ pub(crate) struct ImageGenerationTool {
+     backend: CodexImagesBackend,
+     save_root: Option<AbsolutePathBuf>,
+     thread_id: String,
++    text_only_once: bool,
+ }
+ 
+ impl ImageGenerationTool {
+@@ -80,6 +85,10 @@
+             backend,
+             save_root,
+             thread_id,
++            text_only_once: std::env::var("PALIMPSESTE_IMAGEGEN_TEXT_ONLY")
++                .ok()
++                .as_deref()
++                == Some("1"),
+         }
+     }
+ }
+@@ -92,6 +101,39 @@
+     referenced_image_paths: Option<Vec<AbsolutePathBuf>>,
+     #[schemars(range(min = 1, max = 5))]
+     num_last_images_to_include: Option<usize>,
++}
++
++fn claim_text_only_generation(
++    thread_id: &str,
++    args: &ImagegenArgs,
++) -> Result<(), FunctionCallError> {
++    if args
++        .referenced_image_paths
++        .as_ref()
++        .is_some_and(|paths| !paths.is_empty())
++        || args.num_last_images_to_include.is_some()
++    {
++        return Err(FunctionCallError::RespondToModel(
++            "This image-generation worker accepts text only; file paths and image history are unavailable.".to_string(),
++        ));
++    }
++    // Contributors can recreate a tool between model responses. Keep this guard
++    // process-wide and keyed by the native thread ID, not per tool instance.
++    let mut started = RESTRICTED_GENERATION_THREADS
++        .get_or_init(|| Mutex::new(HashSet::new()))
++        .lock()
++        .map_err(|_| {
++            FunctionCallError::RespondToModel(
++                "Image-generation session guard unavailable.".to_string(),
++            )
++        })?;
++    if started.len() >= 128 || !started.insert(thread_id.to_string()) {
++        return Err(FunctionCallError::RespondToModel(
++            "This image-generation worker permits exactly one image request per session."
++                .to_string(),
++        ));
++    }
++    Ok(())
+ }
+ 
+ fn legacy_end_event(item: &ImageGenerationItem) -> EventMsg {
+@@ -144,6 +186,9 @@
+         call: ToolCall<'_>,
+     ) -> Result<Box<dyn ToolOutput>, FunctionCallError> {
+         let args = parse_args(&call)?;
++        if self.text_only_once {
++            claim_text_only_generation(&self.thread_id, &args)?;
++        }
+         let request =
+             request_for_call_args(&args, call.conversation_history.items(), &call.environments)
+                 .await?;
+diff --git a/codex-rs/ext/image-generation/src/tests.rs b/codex-rs/ext/image-generation/src/tests.rs
+--- a/codex-rs/ext/image-generation/src/tests.rs
++++ b/codex-rs/ext/image-generation/src/tests.rs
+@@ -21,6 +21,7 @@
+ use super::GeneratedImageOutput;
+ use super::ImageRequest;
+ use super::ImagegenArgs;
++use super::claim_text_only_generation;
+ use super::imagegen_tool_spec;
+ use super::request_for_call_args;
+ use crate::IMAGE_GEN_NAMESPACE;
+@@ -29,6 +30,24 @@
+ use crate::artifact::image_generation_output_hint;
+ 
+ const RESULT: &str = "cG5n";
++
++#[test]
++fn palimpseste_image_guard_rejects_files_history_and_second_request() {
++    let mut args = ImagegenArgs {
++        prompt: "Spell reference".to_string(),
++        referenced_image_paths: Some(vec![
++            AbsolutePathBuf::current_dir().unwrap().join("not-read.png"),
++        ]),
++        num_last_images_to_include: None,
++    };
++    assert!(claim_text_only_generation("palimpseste-guard-test", &args).is_err());
++    args.referenced_image_paths = None;
++    args.num_last_images_to_include = Some(1);
++    assert!(claim_text_only_generation("palimpseste-guard-test", &args).is_err());
++    args.num_last_images_to_include = None;
++    assert!(claim_text_only_generation("palimpseste-guard-test", &args).is_ok());
++    assert!(claim_text_only_generation("palimpseste-guard-test", &args).is_err());
++}
+ 
+ #[test]
+ fn artifact_path_sanitizes_session_and_call_ids() {

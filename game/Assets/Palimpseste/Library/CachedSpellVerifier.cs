@@ -47,7 +47,16 @@ namespace Palimpseste.Game.Library
                     if (!VerifyArtifact(item, artifacts, seen)) return false;
                 foreach (var item in binaries)
                     if (!VerifyArtifact(item, artifacts, seen)) return false;
+                if (packet["visual_reference"] is JObject visual)
+                {
+                    if (!VerifyArtifact(visual, artifacts, seen) ||
+                        Value(visual, "description_sha256") != Value(packet, "description_sha256") ||
+                        Value(visual, "sha256") != Value(packet, "plan", "visual_reference_sha256")) return false;
+                    var bytesVisual = File.ReadAllBytes(Path.Combine(artifacts, Value(visual, "artifact_id")));
+                    if (!VisualReferenceCache.ValidPng(bytesVisual, Value(visual, "sha256"))) return false;
+                }
                 json = Encoding.UTF8.GetString(bytes);
+                ImageSpellPacketValidator.Validate(json, parchmentDirectory);
                 return true;
             }
             catch { return false; }
@@ -63,7 +72,7 @@ namespace Palimpseste.Game.Library
             return root.Type == JTokenType.String ? root.Value<string>() : null;
         }
 
-        private static bool SupportedMinimumClient(string version) => version == "1.0.0" || version == "1.1.0" || version == "1.2.0";
+        private static bool SupportedMinimumClient(string version) => version == "1.0.0" || version == "1.1.0" || version == "1.2.0" || version == "1.3.0";
 
         private static bool VerifyArtifact(JToken item, string root, HashSet<string> seen)
         {

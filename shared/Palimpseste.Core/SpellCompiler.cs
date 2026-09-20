@@ -25,6 +25,7 @@ namespace Palimpseste.Core
         public string CreatedAt;
         public string MinimumClientVersion = "1.0.0";
         public SpellProvenance Provenance;
+        public SpellVisualReference VisualReference;
     }
 
     public sealed class CompilationResult
@@ -86,6 +87,8 @@ namespace Palimpseste.Core
             var geometry = LoadGeometry(input, issues);
             CheckSemanticGeometry(description, geometry, input, issues);
             CheckPlan(description, plan, geometry, issues);
+            CheckVisualReference(input.DescriptionJson, plan, input.VisualReference, issues);
+            CheckVisualConstruction(plan, issues);
             if (input.GeometryJson == null || input.MaskPng == null) return new CompilationResult { Issues = issues };
             if (issues.Count != 0) return new CompilationResult { Issues = issues };
             var bounds = ComputeBounds(plan, geometry, input, issues);
@@ -94,7 +97,9 @@ namespace Palimpseste.Core
 
             var minimumClient = input.MinimumClientVersion;
             if (!System.Version.TryParse(minimumClient, out var parsedClient)) parsedClient = new System.Version(0, 0, 0);
-            if (plan.nodes.Any(node => node.appearance.vfx != null) && parsedClient < new System.Version(1, 2, 0))
+            if (input.VisualReference != null && parsedClient < new System.Version(1, 3, 0))
+                minimumClient = "1.3.0";
+            else if (plan.nodes.Any(node => node.appearance.vfx != null) && parsedClient < new System.Version(1, 2, 0))
                 minimumClient = "1.2.0";
             else if (plan.nodes.Any(node => node.appearance.form != null) && parsedClient < new System.Version(1, 1, 0))
                 minimumClient = "1.1.0";
@@ -106,6 +111,7 @@ namespace Palimpseste.Core
                     geometry = "sp.geometry/1.0", rules_profile = "lab_v1", min_client = minimumClient },
                 provenance = input.Provenance, signature_seed_hex = input.SignatureSeedHex,
                 description_sha256 = plan.description_sha256, plan = plan,
+                visual_reference = input.VisualReference,
                 geometry_manifest = input.GeometryJson.OrderBy(x => x.Key, StringComparer.Ordinal)
                     .Select(x => new GeometryManifestEntry { id = x.Key, kind = geometry[x.Key].kind,
                         artifact_id = input.GeometryArtifactIds[x.Key], sha256 = Sha256(x.Value), size_bytes = x.Value.Length }).ToList(),
@@ -125,6 +131,11 @@ namespace Palimpseste.Core
         public static byte[] Serialize(CompiledSpell spell)
         {
             var token = JObject.FromObject(spell, JsonSerializer.CreateDefault());
+            if (token["visual_reference"]?.Type == JTokenType.Null)
+                token.Property("visual_reference")?.Remove();
+            var planToken = (JObject)token["plan"];
+            if (planToken["visual_reference_sha256"]?.Type == JTokenType.Null)
+                planToken.Property("visual_reference_sha256")?.Remove();
             foreach (var node in (JArray)token["plan"]["nodes"])
             {
                 var options = (JObject)node["options"];
@@ -137,6 +148,8 @@ namespace Palimpseste.Core
                     appearance.Property("form")?.Remove();
                 if (appearance["vfx"]?.Type == JTokenType.Null)
                     appearance.Property("vfx")?.Remove();
+                if (appearance["construction"]?.Type == JTokenType.Null)
+                    appearance.Property("construction")?.Remove();
                 if (appearance["signature_geometry_id"]?.Type == JTokenType.Null)
                     appearance.Property("signature_geometry_id")?.Remove();
             }
@@ -280,7 +293,8 @@ namespace Palimpseste.Core
         }
 
         public static IReadOnlyList<ValidationIssue> ValidatePlanJson(byte[] descriptionJson, byte[] planJson,
-            IReadOnlyDictionary<string, byte[]> geometryJson, IReadOnlyDictionary<string, byte[]> maskPng)
+            IReadOnlyDictionary<string, byte[]> geometryJson, IReadOnlyDictionary<string, byte[]> maskPng,
+            SpellVisualReference visualReference = null)
         {
             try {
                 var description = ContractJson.DeserializeStrict<SpellDescription>(descriptionJson, "spell-description");
@@ -293,12 +307,110 @@ namespace Palimpseste.Core
                 var geometry = LoadGeometry(input, issues);
                 CheckSemanticGeometry(description, geometry, input, issues);
                 CheckPlan(description, plan, geometry, issues);
+                CheckVisualReference(descriptionJson, plan, visualReference, issues);
+                CheckVisualConstruction(plan, issues);
                 if (geometryJson != null && maskPng != null && issues.Count == 0)
                     ComputeBounds(plan, geometry, input, issues);
                 return issues;
             }
             catch (Exception ex) { return new[] { new ValidationIssue("plan_json", "$", ex.Message) }; }
         }
+
+        private static void CheckVisualReference(byte[] description, SpellPlan plan,
+            SpellVisualReference reference, List<ValidationIssue> issues)
+        {
+            var hasConstruction = plan.nodes.Any(node => node.appearance.construction != null);
+            if (reference == null)
+            {
+                if (plan.visual_reference_sha256 != null || hasConstruction)
+                    Add(issues, "visual_reference_missing", "$.visual_reference",
+                        "Image-guided construction requires the persisted generated image metadata");
+                return;
+            }
+            if (!HexDigest(reference.sha256) || plan.visual_reference_sha256 != reference.sha256)
+                Add(issues, "visual_reference_hash", "$.visual_reference_sha256",
+                    "Plan must cite the exact generated image supplied to its multimodal planner");
+            if (!HexDigest(reference.description_sha256) || reference.description_sha256 != Sha256(description))
+                Add(issues, "visual_reference_description", "$.visual_reference.description_sha256",
+                    "Generated image must be bound to the same frozen description bytes");
+            if (reference.artifact_id == null || reference.artifact_id.Length != 33 || reference.artifact_id[0] != 'a' ||
+                !Guid.TryParseExact(reference.artifact_id.Substring(1), "N", out _) ||
+                reference.artifact_id.Skip(1).Any(c => !(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f')))
+                Add(issues, "visual_reference_artifact", "$.visual_reference.artifact_id",
+                    "Generated image requires a persisted owner-scoped artifact identifier");
+            if (reference.size_bytes < 24 || reference.size_bytes > SpellVisualConstructionLimits.MaximumReferenceBytes ||
+                reference.width_px < 512 || reference.width_px > SpellVisualConstructionLimits.MaximumReferenceDimension ||
+                reference.height_px < 512 || reference.height_px > SpellVisualConstructionLimits.MaximumReferenceDimension)
+                Add(issues, "visual_reference_size", "$.visual_reference", "Generated image exceeds its bounded PNG profile");
+            if (string.IsNullOrWhiteSpace(reference.prompt_version) || reference.prompt_version.Length > 80 ||
+                !reference.prompt_version.StartsWith("sp.prompt.g/", StringComparison.Ordinal) ||
+                !System.Version.TryParse(reference.prompt_version.Substring("sp.prompt.g/".Length), out _))
+                Add(issues, "visual_reference_prompt", "$.visual_reference.prompt_version", "Generated image prompt version is invalid");
+            for (var i = 0; i < plan.nodes.Count; i++)
+                if (plan.nodes[i].appearance.construction == null)
+                    Add(issues, "visual_construction_required", "$.nodes[" + i + "].appearance.construction",
+                        "Every image-guided node requires an explicit visual construction");
+        }
+
+        private static bool HexDigest(string value) => value != null && value.Length == 64 &&
+            value.All(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
+
+        private static void CheckVisualConstruction(SpellPlan plan, List<ValidationIssue> issues)
+        {
+            var total = 0;
+            long expanded = 0;
+            for (var nodeIndex = 0; nodeIndex < plan.nodes.Count; nodeIndex++)
+            {
+                var node = plan.nodes[nodeIndex];
+                var construction = node.appearance.construction;
+                if (construction == null) continue;
+                var path = "$.nodes[" + nodeIndex + "].appearance.construction";
+                if (construction.parts == null || construction.parts.Count < 1 ||
+                    construction.parts.Count > SpellVisualConstructionLimits.MaximumPartsPerNode)
+                {
+                    Add(issues, "visual_part_count", path, "Visual construction requires between one and 64 parts");
+                    continue;
+                }
+                total += construction.parts.Count;
+                expanded += (long)construction.parts.Count * node.activation.copies * node.activation.max_activations;
+                for (var index = 0; index < construction.parts.Count; index++)
+                {
+                    var part = construction.parts[index];
+                    var p = path + ".parts[" + index + "]";
+                    if (part == null) { Add(issues, "visual_part", p, "Visual part is missing"); continue; }
+                    if (!SpellVisualConstructionLimits.Kinds.Contains(part.kind) ||
+                        !SpellVisualConstructionLimits.Materials.Contains(part.material) ||
+                        !VectorInRange(part.position_cm, -1000, 1000) ||
+                        !VectorInRange(part.scale_cm, 1, 1000) ||
+                        !VectorInRange(part.rotation_mdeg, -360000, 360000) ||
+                        !VectorInRange(part.color_rgb, 0, 255) ||
+                        part.opacity_milli < 0 || part.opacity_milli > 1000 ||
+                        part.emission_milli < 0 || part.emission_milli > 6000)
+                        Add(issues, "visual_part_bounds", p, "Visual part exceeds its controlled vocabulary or numeric bounds");
+                    var pathPart = part.kind == "ribbon" || part.kind == "arc";
+                    if (part.points_cm == null || part.points_cm.Count > SpellVisualConstructionLimits.MaximumPoints ||
+                        (pathPart ? part.points_cm.Count < 2 : part.points_cm.Count != 0) ||
+                        part.points_cm.Any(point => !VectorInRange(point, -1000, 1000)))
+                        Add(issues, "visual_part_points", p + ".points_cm",
+                            "Ribbon/arc requires two to 16 bounded points; other kinds require an empty list");
+                    else if (pathPart && part.points_cm.Skip(1).All(point => point.SequenceEqual(part.points_cm[0])))
+                        Add(issues, "visual_part_path_degenerate", p + ".points_cm", "A visual path requires distinct points");
+                    var motion = part.motion;
+                    if (motion == null || !SpellVisualConstructionLimits.Motions.Contains(motion.kind) ||
+                        motion.amplitude_cm < 0 || motion.amplitude_cm > 150 ||
+                        motion.frequency_mhz < 0 || motion.frequency_mhz > 6000 ||
+                        motion.phase_mdeg < 0 || motion.phase_mdeg > 360000)
+                        Add(issues, "visual_motion", p + ".motion", "Visual motion exceeds its controlled bounds");
+                }
+            }
+            if (total > SpellVisualConstructionLimits.MaximumPartsPerPlan ||
+                expanded > SpellVisualConstructionLimits.MaximumExpandedParts)
+                Add(issues, "visual_resource_budget", "$.nodes",
+                    "Construction exceeds 128 authored parts or 1024 parts expanded across bounded activations");
+        }
+
+        private static bool VectorInRange(int[] values, int minimum, int maximum) =>
+            values != null && values.Length == 3 && values.All(value => value >= minimum && value <= maximum);
 
         private static void CheckDescription(SpellDescription d, List<ValidationIssue> issues)
         {

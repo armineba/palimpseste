@@ -1,0 +1,877 @@
+{
+  "evidence_kind": "cached_packet_image_construction_unity_replay",
+  "packet_sha256": "efe24fa464c061b93bdbe7e44195dc513c99b548bce78c0ba325bec9abff7cd5",
+  "expected_packet_sha256": "efe24fa464c061b93bdbe7e44195dc513c99b548bce78c0ba325bec9abff7cd5",
+  "spell_title": "Pique du Grand Oiseau d’Orage",
+  "visual_reference": {
+    "artifact_id": "afeb61aa5db924dc58c9d1c2844b6c756",
+    "sha256": "04f621d5cc1b75cba6c7c564c0ffc4f77e944b82826000ad484643e0071f6bee",
+    "size_bytes": 2307699,
+    "width_px": 1536,
+    "height_px": 1024,
+    "description_sha256": "2d0c2770c413cae82c971adacf391172bfa12cb0b984e7686eaed7afe3a00fcb",
+    "prompt_version": "sp.prompt.g/1.0"
+  },
+  "image_file": "visual-reference.png",
+  "description_sha256": "2d0c2770c413cae82c971adacf391172bfa12cb0b984e7686eaed7afe3a00fcb",
+  "provider": {
+    "mode": "fixture",
+    "capture_sha256": null,
+    "reference_sha256": null,
+    "model_a": null,
+    "model_b": null,
+    "prompt_a_version": "doctor.offline",
+    "prompt_b_version": "doctor.offline",
+    "response_a_id": null,
+    "response_b_id": null
+  },
+  "model_calls": 0,
+  "art_acceptance": "not_claimed",
+  "camera": "unchanged shipping lab pose and postprocessing, full arena viewport without UI",
+  "side_camera": "additional 40 degree side comparison camera follows actual renderer bounds; no geometry or gameplay changes",
+  "capture": "ARGBHalf linear target; completed GPU frame converted to sRGB; 60 Hz simulation is not a performance benchmark",
+  "graphics_device": "NVIDIA GeForce RTX 3070",
+  "authored_parts": 36,
+  "maximum_visible_parts": 72,
+  "maximum_active_carriers": 1,
+  "aim": [
+    2.53417,
+    1.0,
+    6.0
+  ],
+  "require_hit": true,
+  "hits": 1,
+  "damage_milli": 12000,
+  "impulses": 1,
+  "initial_targets": [
+    {
+      "id": 1,
+      "team": "ally",
+      "health_milli": 100000,
+      "position": [
+        0.0,
+        1.1,
+        -5.0
+      ]
+    },
+    {
+      "id": 2,
+      "team": "hostile",
+      "health_milli": 100000,
+      "position": [
+        -3.0,
+        1.0,
+        3.0
+      ]
+    },
+    {
+      "id": 3,
+      "team": "hostile",
+      "health_milli": 100000,
+      "position": [
+        0.0,
+        1.0,
+        6.0
+      ]
+    },
+    {
+      "id": 4,
+      "team": "hostile",
+      "health_milli": 100000,
+      "position": [
+        3.0,
+        1.0,
+        4.0
+      ]
+    },
+    {
+      "id": 5,
+      "team": "ally",
+      "health_milli": 50000,
+      "position": [
+        -5.0,
+        1.0,
+        7.0
+      ]
+    },
+    {
+      "id": 6,
+      "team": "environment",
+      "health_milli": 100000,
+      "position": [
+        5.0,
+        0.55,
+        8.0
+      ]
+    }
+  ],
+  "final_targets": [
+    {
+      "id": 1,
+      "team": "ally",
+      "health_milli": 100000,
+      "position": [
+        0.0,
+        1.1,
+        -5.0
+      ]
+    },
+    {
+      "id": 2,
+      "team": "hostile",
+      "health_milli": 100000,
+      "position": [
+        -3.0,
+        0.99999994,
+        3.0
+      ]
+    },
+    {
+      "id": 3,
+      "team": "hostile",
+      "health_milli": 88000,
+      "position": [
+        -0.000639465,
+        1.0,
+        6.001402
+      ]
+    },
+    {
+      "id": 4,
+      "team": "hostile",
+      "health_milli": 100000,
+      "position": [
+        3.0,
+        0.99999994,
+        4.0
+      ]
+    },
+    {
+      "id": 5,
+      "team": "ally",
+      "health_milli": 50000,
+      "position": [
+        -5.0,
+        1.0,
+        7.0
+      ]
+    },
+    {
+      "id": 6,
+      "team": "environment",
+      "health_milli": 100000,
+      "position": [
+        5.0,
+        0.55,
+        8.0
+      ]
+    }
+  ],
+  "expiry_bound_seconds": 4.7999988153576849,
+  "final_active_carriers": 0,
+  "final_image_renderers": 0,
+  "cache_unchanged": true,
+  "completed": true,
+  "frames": [
+    {
+      "elapsed_seconds": 0.08333334,
+      "file": "image-spell-frame-00.png",
+      "sha256": "21a3941d86c6ec6edbf7c30aeeedd79e52e30e4bf12595bb97b05454823c7b0b",
+      "side_file": "image-spell-side-frame-00.png",
+      "side_sha256": "6c5ad23efdba6b59ae9484dee1661ab51bd89fef2dbfe3c7e6884b9246c33318",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_camera": {
+        "position": [
+          9.567495,
+          3.10127616,
+          -8.23022652
+        ],
+        "forward": [
+          -0.926524043,
+          -0.177443355,
+          0.331763566
+        ],
+        "field_of_view_degrees": 40.0
+      },
+      "image_parts": 36,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "targets": [
+        {
+          "id": 1,
+          "team": "ally",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            1.1,
+            -5.0
+          ]
+        },
+        {
+          "id": 2,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            -3.0,
+            0.99999994,
+            3.0
+          ]
+        },
+        {
+          "id": 3,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            0.99999994,
+            6.0
+          ]
+        },
+        {
+          "id": 4,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            3.0,
+            0.99999994,
+            4.0
+          ]
+        },
+        {
+          "id": 5,
+          "team": "ally",
+          "health_milli": 50000,
+          "position": [
+            -5.0,
+            1.0,
+            7.0
+          ]
+        },
+        {
+          "id": 6,
+          "team": "environment",
+          "health_milli": 100000,
+          "position": [
+            5.0,
+            0.55,
+            8.0
+          ]
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 0.25000003,
+      "file": "image-spell-frame-01.png",
+      "sha256": "a28a609e537cdb95e295cfc976cdf8967f089c68cc32b8ed07c11611c2f47248",
+      "side_file": "image-spell-side-frame-01.png",
+      "side_sha256": "293ef4bf2f63f374fad3d7ba791c21e0e72351b4e71876fef467d52e274d7388",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_camera": {
+        "position": [
+          15.46056,
+          4.14236641,
+          1.42069244
+        ],
+        "forward": [
+          -0.952383935,
+          -0.177443355,
+          -0.247949228
+        ],
+        "field_of_view_degrees": 40.0
+      },
+      "image_parts": 36,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "targets": [
+        {
+          "id": 1,
+          "team": "ally",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            1.1,
+            -5.0
+          ]
+        },
+        {
+          "id": 2,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            -3.0,
+            0.99999994,
+            3.0
+          ]
+        },
+        {
+          "id": 3,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            0.99999994,
+            6.0
+          ]
+        },
+        {
+          "id": 4,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            3.0,
+            0.99999994,
+            4.0
+          ]
+        },
+        {
+          "id": 5,
+          "team": "ally",
+          "health_milli": 50000,
+          "position": [
+            -5.0,
+            1.0,
+            7.0
+          ]
+        },
+        {
+          "id": 6,
+          "team": "environment",
+          "health_milli": 100000,
+          "position": [
+            5.0,
+            0.55,
+            8.0
+          ]
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 0.450000018,
+      "file": "image-spell-frame-02.png",
+      "sha256": "022fa945efe5ac955f702f543e2a064ff9a045a69b120aeeb3b3a277dce1a277",
+      "side_file": "image-spell-side-frame-02.png",
+      "side_sha256": "cf510e10192ef132472be2e0776f550d793a682f506b783b72688a0a405b775c",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_camera": {
+        "position": [
+          10.9679718,
+          4.16311646,
+          11.3850021
+        ],
+        "forward": [
+          -0.6304839,
+          -0.177443385,
+          -0.755648136
+        ],
+        "field_of_view_degrees": 40.0
+      },
+      "image_parts": 36,
+      "active_carriers": 1,
+      "hits": 0,
+      "damage_milli": 0,
+      "impulses": 0,
+      "targets": [
+        {
+          "id": 1,
+          "team": "ally",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            1.1,
+            -5.0
+          ]
+        },
+        {
+          "id": 2,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            -3.0,
+            0.99999994,
+            3.0
+          ]
+        },
+        {
+          "id": 3,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            0.99999994,
+            6.0
+          ]
+        },
+        {
+          "id": 4,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            3.0,
+            0.99999994,
+            4.0
+          ]
+        },
+        {
+          "id": 5,
+          "team": "ally",
+          "health_milli": 50000,
+          "position": [
+            -5.0,
+            1.0,
+            7.0
+          ]
+        },
+        {
+          "id": 6,
+          "team": "environment",
+          "health_milli": 100000,
+          "position": [
+            5.0,
+            0.55,
+            8.0
+          ]
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 0.7166667,
+      "file": "image-spell-frame-03.png",
+      "sha256": "a921075fdd4b7f7aa2a08e9fc236d42ea9aec428dca51cf727e8cf3370a9205f",
+      "side_file": "image-spell-side-frame-03.png",
+      "side_sha256": "91ae4dd1469acf5a4261451c74e858681712f981e102f773ab45ae2f46a25130",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_camera": {
+        "position": [
+          9.687276,
+          4.570153,
+          13.6152
+        ],
+        "forward": [
+          -0.6304839,
+          -0.177443385,
+          -0.755648136
+        ],
+        "field_of_view_degrees": 40.0
+      },
+      "image_parts": 72,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "impulses": 1,
+      "targets": [
+        {
+          "id": 1,
+          "team": "ally",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            1.1,
+            -5.0
+          ]
+        },
+        {
+          "id": 2,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            -3.0,
+            0.99999994,
+            3.0
+          ]
+        },
+        {
+          "id": 3,
+          "team": "hostile",
+          "health_milli": 88000,
+          "position": [
+            -0.000639465,
+            1.0,
+            6.001402
+          ]
+        },
+        {
+          "id": 4,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            3.0,
+            0.99999994,
+            4.0
+          ]
+        },
+        {
+          "id": 5,
+          "team": "ally",
+          "health_milli": 50000,
+          "position": [
+            -5.0,
+            1.0,
+            7.0
+          ]
+        },
+        {
+          "id": 6,
+          "team": "environment",
+          "health_milli": 100000,
+          "position": [
+            5.0,
+            0.55,
+            8.0
+          ]
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1.05,
+      "file": "image-spell-frame-04.png",
+      "sha256": "eceeaab57c46426b2bb3109dc6c2ee60b27c6ae85225f5c64ff2104a3798e7bc",
+      "side_file": "image-spell-side-frame-04.png",
+      "side_sha256": "aeb89b6120d21d6d7634309f8846b250f7879eaa38c59c67ed5ae454e794f88a",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_camera": {
+        "position": [
+          9.62875,
+          5.221818,
+          13.7505989
+        ],
+        "forward": [
+          -0.6304839,
+          -0.177443385,
+          -0.755648136
+        ],
+        "field_of_view_degrees": 40.0
+      },
+      "image_parts": 72,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "impulses": 1,
+      "targets": [
+        {
+          "id": 1,
+          "team": "ally",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            1.1,
+            -5.0
+          ]
+        },
+        {
+          "id": 2,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            -3.0,
+            0.99999994,
+            3.0
+          ]
+        },
+        {
+          "id": 3,
+          "team": "hostile",
+          "health_milli": 88000,
+          "position": [
+            -0.000639465,
+            1.0,
+            6.001402
+          ]
+        },
+        {
+          "id": 4,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            3.0,
+            0.99999994,
+            4.0
+          ]
+        },
+        {
+          "id": 5,
+          "team": "ally",
+          "health_milli": 50000,
+          "position": [
+            -5.0,
+            1.0,
+            7.0
+          ]
+        },
+        {
+          "id": 6,
+          "team": "environment",
+          "health_milli": 100000,
+          "position": [
+            5.0,
+            0.55,
+            8.0
+          ]
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1.4,
+      "file": "image-spell-frame-05.png",
+      "sha256": "4051b2d713ea1fabab31f6108c81d11190b6cd5d0e5a3a989e368253ae544cd0",
+      "side_file": "image-spell-side-frame-05.png",
+      "side_sha256": "5ab35242209f4935574b9b23f1d21e3b4989ed22827f30f0345667eacd405a5e",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_camera": {
+        "position": [
+          8.307752,
+          3.91360426,
+          15.5583553
+        ],
+        "forward": [
+          -0.6304839,
+          -0.177443385,
+          -0.755648136
+        ],
+        "field_of_view_degrees": 40.0
+      },
+      "image_parts": 36,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "impulses": 1,
+      "targets": [
+        {
+          "id": 1,
+          "team": "ally",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            1.1,
+            -5.0
+          ]
+        },
+        {
+          "id": 2,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            -3.0,
+            0.99999994,
+            3.0
+          ]
+        },
+        {
+          "id": 3,
+          "team": "hostile",
+          "health_milli": 88000,
+          "position": [
+            -0.000639465,
+            1.0,
+            6.001402
+          ]
+        },
+        {
+          "id": 4,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            3.0,
+            0.99999994,
+            4.0
+          ]
+        },
+        {
+          "id": 5,
+          "team": "ally",
+          "health_milli": 50000,
+          "position": [
+            -5.0,
+            1.0,
+            7.0
+          ]
+        },
+        {
+          "id": 6,
+          "team": "environment",
+          "health_milli": 100000,
+          "position": [
+            5.0,
+            0.55,
+            8.0
+          ]
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 2.0,
+      "file": "image-spell-frame-06.png",
+      "sha256": "05fb6c4ea1f72e53462bfe59b7057dd68e32da3ab6e6e6d1163d4f15fe0e36e1",
+      "side_file": "image-spell-side-frame-06.png",
+      "side_sha256": "d1791d44d45141861a2f854605f2e5fb60df335e3ea2c2ebd21da69e97e3a19d",
+      "shipping_camera": {
+        "position": [
+          5.77165127,
+          8.284511,
+          -13.0853376
+        ],
+        "forward": [
+          -0.3395089,
+          -0.42261827,
+          0.8403139
+        ],
+        "field_of_view_degrees": 44.0
+      },
+      "side_camera": {
+        "position": [
+          8.609346,
+          4.12073946,
+          15.9684429
+        ],
+        "forward": [
+          -0.6304839,
+          -0.177443385,
+          -0.755648136
+        ],
+        "field_of_view_degrees": 40.0
+      },
+      "image_parts": 0,
+      "active_carriers": 0,
+      "hits": 1,
+      "damage_milli": 12000,
+      "impulses": 1,
+      "targets": [
+        {
+          "id": 1,
+          "team": "ally",
+          "health_milli": 100000,
+          "position": [
+            0.0,
+            1.1,
+            -5.0
+          ]
+        },
+        {
+          "id": 2,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            -3.0,
+            0.99999994,
+            3.0
+          ]
+        },
+        {
+          "id": 3,
+          "team": "hostile",
+          "health_milli": 88000,
+          "position": [
+            -0.000639465,
+            1.0,
+            6.001402
+          ]
+        },
+        {
+          "id": 4,
+          "team": "hostile",
+          "health_milli": 100000,
+          "position": [
+            3.0,
+            0.99999994,
+            4.0
+          ]
+        },
+        {
+          "id": 5,
+          "team": "ally",
+          "health_milli": 50000,
+          "position": [
+            -5.0,
+            1.0,
+            7.0
+          ]
+        },
+        {
+          "id": 6,
+          "team": "environment",
+          "health_milli": 100000,
+          "position": [
+            5.0,
+            0.55,
+            8.0
+          ]
+        }
+      ]
+    }
+  ]
+}

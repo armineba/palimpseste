@@ -770,6 +770,7 @@ components:
           enum:
           - queued
           - interpreting
+          - generating_visual_reference
           - resolving_geometry
           - planning
           - validating
@@ -790,6 +791,13 @@ components:
           - 'null'
           pattern: '^a[0-9a-f]{32}$'
           description: Identifiant public de l'artefact JSON de la description A validée. Nul avant sa persistance, puis stable pendant tout le job.
+        visual_reference_artifact_id:
+          type: [string, 'null']
+          pattern: '^a[0-9a-f]{32}$'
+          description: Image générée depuis la description, figée et transmise à B.
+        visual_reference_sha256:
+          type: [string, 'null']
+          pattern: '^[0-9a-f]{64}$'
         attempt_count:
           type: integer
           minimum: 0

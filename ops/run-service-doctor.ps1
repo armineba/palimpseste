@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('local', 'interpreter', 'astra', 'active', 'plan', 'validate')]
+    [ValidateSet('local', 'interpreter', 'astra', 'active', 'plan', 'image', 'validate')]
     [string]$Mode = 'local',
     [Parameter(Mandatory = $true)]
     [string]$CredentialFile,
@@ -53,7 +53,7 @@ if (-not (IsInside $EvidencePath $pending) -or (Test-Path -LiteralPath $Evidence
 if (-not [string]::IsNullOrWhiteSpace($GeometryJson)) {
     throw 'GeometryJson is deprecated. Supply InkPng so geometry is resolved from the frozen description.'
 }
-if ($Mode -in @('interpreter', 'astra', 'active', 'plan', 'validate')) {
+if ($Mode -in @('interpreter', 'astra', 'active', 'plan', 'image', 'validate')) {
     $requiredArtifacts = if ($Mode -in @('interpreter', 'astra')) { @($ReferencePng, $DrawingPng) }
         elseif ($Mode -eq 'active') { @($ReferencePng, $DrawingPng, $InkPng) } else { @($InkPng) }
     foreach ($path in $requiredArtifacts) {
@@ -64,7 +64,7 @@ if ($Mode -in @('interpreter', 'astra', 'active', 'plan', 'validate')) {
         }
     }
 }
-if ($Mode -eq 'plan') {
+if ($Mode -in @('plan', 'image')) {
     if ([string]::IsNullOrWhiteSpace($FrozenAJson) -or
         -not ((IsInside $FrozenAJson $artifactRoot) -or (IsInside $FrozenAJson $attemptRoot)) -or
         -not (Test-Path -LiteralPath $FrozenAJson -PathType Leaf) -or
@@ -105,7 +105,7 @@ if ($Mode -in @('interpreter', 'astra')) {
     $arguments += @('-ReferencePng', ('"' + (FullPath $ReferencePng) + '"'),
         '-DrawingPng', ('"' + (FullPath $DrawingPng) + '"'),
         '-InkPng', ('"' + (FullPath $InkPng) + '"'))
-} elseif ($Mode -eq 'plan') {
+} elseif ($Mode -in @('plan', 'image')) {
     $arguments += @('-FrozenAJson', ('"' + (FullPath $FrozenAJson) + '"'),
         '-FrozenASha256', $FrozenASha256,
         '-InkPng', ('"' + (FullPath $InkPng) + '"'))

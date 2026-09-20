@@ -1,6 +1,8 @@
 [CmdletBinding()]
 param(
-    [string]$Configuration = 'Release'
+    [string]$Configuration = 'Release',
+    [string]$CodexExecutable = '',
+    [string]$CodexSha256 = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -28,7 +30,7 @@ foreach ($directory in @('contracts', 'reference')) {
 }
 $runtimePrompts = Join-Path $spec 'prompts'
 New-Item -ItemType Directory -Force -Path $runtimePrompts | Out-Null
-foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_REPARATION_TECHNIQUE.md')) {
+foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_REPARATION_TECHNIQUE.md', '04_IMAGE_REFERENCE.md')) {
     Copy-Item -LiteralPath (Join-Path (Join-Path $projectRoot 'prompts') $name) -Destination (Join-Path $runtimePrompts $name)
 }
 New-Item -ItemType Directory -Force -Path (Join-Path $stage 'migrations') | Out-Null
@@ -37,8 +39,26 @@ Get-ChildItem -LiteralPath (Join-Path $projectRoot 'backend/migrations') -Filter
     ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path (Join-Path $stage 'migrations') $_.Name) }
 New-Item -ItemType Directory -Force -Path (Join-Path $stage 'ops') | Out-Null
 Get-ChildItem -LiteralPath (Join-Path $projectRoot 'ops') -File |
-    Where-Object { $_.Name.EndsWith('.ps1') -or $_.Name.EndsWith('.env.example') -or $_.Name -eq 'README.md' } |
+    Where-Object { $_.Name.EndsWith('.ps1') -or $_.Name.EndsWith('.env.example') -or $_.Name.EndsWith('.patch') -or $_.Name.EndsWith('.md') } |
     ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path (Join-Path $stage 'ops') $_.Name) }
+
+if (-not [string]::IsNullOrWhiteSpace($CodexExecutable)) {
+    if ($CodexSha256 -notmatch '^[0-9a-fA-F]{64}$' -or
+        (Get-FileHash -LiteralPath $CodexExecutable -Algorithm SHA256).Hash -ine $CodexSha256) {
+        throw 'Le binaire Codex doit correspondre au SHA explicitement vérifié.'
+    }
+    $native = Join-Path $stage 'codex'
+    New-Item -ItemType Directory -Path $native | Out-Null
+    Copy-Item -LiteralPath $CodexExecutable -Destination (Join-Path $native 'codex-image.exe')
+    Copy-Item -Path (Join-Path $projectRoot 'ops/codex-licenses/*.txt') -Destination $native
+    [ordered]@{
+        base_tag='rust-v0.154.0-alpha.6.2'; modified=$true;
+        sha256=$CodexSha256.ToLowerInvariant();
+        patches=@('ops/codex-attestation.patch','ops/codex-image-generation.patch');
+        runtime_guard='PALIMPSESTE_IMAGEGEN_TEXT_ONLY=1';
+        tools='A/B: empty native registry. G: only image_gen.imagegen.'
+    } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $native 'BUILD.json') -Encoding UTF8
+}
 
 # Single-file publishing may change the executable bytes across publishes.
 # Bind the archive's worker launch scripts to the executable in this archive.
@@ -69,9 +89,9 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Desti
 
 @"
 Palimpseste backend Windows x64. API, worker et doctor sont des exécutables .NET autoportants.
-La chaîne privée est : dessin libre -> Sol high (description) -> Astra high (plan déclaratif et VFX) -> compilateur contrôlé -> paquet de sort Unity 1.2.
+La chaîne privée est : dessin libre -> Sol high (description) -> image native Codex -> Astra high (construction depuis l'image et plan déclaratif) -> compilateur contrôlé -> paquet de sort Unity 1.3.
 Le worker utilise codex exec sous un compte Windows de service isolé. Il n'exécute ni C# issu d'un dessin, ni build Unity.
-L'archive contient les contrats, références, prompts A/B et migrations, mais aucun auth.json, jeton joueur, secret DB ou clé API.
+L'archive contient les contrats, références, prompts A/G/B et migrations, mais aucun auth.json, jeton joueur, secret DB ou clé API. Le binaire durci A/B/G et son attestation native sont décrits dans ops/codex-image-generation.md. Si codex/ est présent, son exécutable a été inclus avec un SHA vérifié et les notices amont ; sinon le construire à partir des correctifs fournis. Dans les deux cas, établir les preuves sur le compte de service avant activation.
 Lire IMPLEMENTATION_STATUS.md puis ops/provision-runtime.ps1 avant toute installation.
 Extraire l'archive dans un dossier opérateur inaccessible au compte worker : elle contient des scripts ops d'administration.
 Copier api, worker et doctor publiés vers leurs emplacements de service avec ACL minimales ; ne pas lancer le worker depuis le dossier extrait.

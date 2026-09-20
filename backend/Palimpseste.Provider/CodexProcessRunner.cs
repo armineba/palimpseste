@@ -55,9 +55,14 @@ public sealed class CodexProcessRunner
                 diagnosticEventErrorSha256, diagnosticEventErrorLength, diagnosticEventErrorTruncated, diagnosticCategory);
         var issues = settings.Check(production, compatibilityProbe, attempt?.Stage ?? "B");
         if (issues.Count != 0) return Failure(ProviderOutcome.IsolationViolation, string.Join(',', issues), started);
-        if (attempt is null || attempt.Stage is not ("A" or "B") || attempt.Images is null ||
-            attempt.Images.Count != (attempt.Stage == "A" ? 2 : 0))
+        if (attempt is null || attempt.Stage is not ("A" or "B" or "G") || attempt.Images is null ||
+            attempt.Images.Count != (attempt.Stage == "A" ? 2 : attempt.Stage == "B" && attempt.VisualReference is not null ? 1 : 0) ||
+            attempt.Stage != "B" && attempt.VisualReference is not null)
             return Failure(ProviderOutcome.IsolationViolation, "stage_image_count", started);
+        if (attempt.VisualReference is { } visualReference &&
+            (!string.Equals(attempt.Images[0], visualReference.PngPath, StringComparison.OrdinalIgnoreCase) ||
+             visualReference.Sha256.Length != 64 || visualReference.Sha256.Any(c => c is not (>= 'a' and <= 'f') and not (>= '0' and <= '9'))))
+            return Failure(ProviderOutcome.IsolationViolation, "visual_reference_binding_invalid", started);
         if (!settings.IsTrustedSpecificationFile(attempt.SchemaPath) ||
             string.IsNullOrWhiteSpace(attempt.Prompt) || attempt.Prompt.Length > 200_000 ||
             string.IsNullOrWhiteSpace(attempt.JobId) || attempt.JobId.Length > 256)
@@ -95,6 +100,7 @@ public sealed class CodexProcessRunner
                 reported_model = (string?)null, reported_effort = (string?)null,
                 prompt_utf8_bytes = Encoding.UTF8.GetByteCount(attempt.Prompt),
                 schema_utf8_bytes = new FileInfo(schemaPath).Length,
+                visual_reference_sha256 = attempt.VisualReference?.Sha256,
                 prompt_sha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(attempt.Prompt)))
             }), Encoding.UTF8, cancellationToken);
         }
@@ -106,16 +112,32 @@ public sealed class CodexProcessRunner
         for (var i = 0; i < attempt.Images.Count; i++)
         {
             byte[] bytes;
-            try { bytes = await File.ReadAllBytesAsync(attempt.Images[i], cancellationToken); }
+            try
+            {
+                using var input = new FileStream(attempt.Images[i], FileMode.Open, FileAccess.Read, FileShare.Read);
+                if (input.Length is < 24 or > VisualReferencePng.MaxBytes) throw new InvalidDataException("image_size");
+                bytes = new byte[checked((int)input.Length)];
+                await input.ReadExactlyAsync(bytes, cancellationToken);
+            }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
             {
                 return Failure(ProviderOutcome.IsolationViolation, "image_read_failed", started, directory: directory);
             }
-            if (bytes.Length < 24 || bytes.Length > 8 * 1024 * 1024 || !bytes.AsSpan(0, 8).SequenceEqual(PngMagic) ||
-                BinaryPrimitives.ReadUInt32BigEndian(bytes.AsSpan(16, 4)) != 1024 ||
-                BinaryPrimitives.ReadUInt32BigEndian(bytes.AsSpan(20, 4)) != 1024)
+            if (attempt.Stage == "B")
+            {
+                try
+                {
+                    VisualReferencePng.Validate(bytes);
+                    if (Convert.ToHexStringLower(SHA256.HashData(bytes)) != attempt.VisualReference!.Sha256)
+                        return Failure(ProviderOutcome.IsolationViolation, "visual_reference_input_hash_mismatch", started);
+                }
+                catch (IOException) { return Failure(ProviderOutcome.IsolationViolation, "invalid_visual_reference_png", started); }
+            }
+            else if (bytes.Length < 24 || bytes.Length > 8 * 1024 * 1024 || !bytes.AsSpan(0, 8).SequenceEqual(PngMagic) ||
+                     BinaryPrimitives.ReadUInt32BigEndian(bytes.AsSpan(16, 4)) != 1024 ||
+                     BinaryPrimitives.ReadUInt32BigEndian(bytes.AsSpan(20, 4)) != 1024)
                 return Failure(ProviderOutcome.IsolationViolation, "invalid_png_input", started);
-            var local = Path.Combine(directory, i == 0 ? "reference.png" : "drawing.png");
+            var local = Path.Combine(directory, attempt.Stage == "B" ? "visual-reference.png" : i == 0 ? "reference.png" : "drawing.png");
             try { await File.WriteAllBytesAsync(local, bytes, cancellationToken); }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
             {
@@ -124,7 +146,8 @@ public sealed class CodexProcessRunner
             imagePaths.Add(local);
         }
 
-        var psi = new ProcessStartInfo(settings.Executable)
+        var executable = settings.ExecutableForStage(attempt.Stage);
+        var psi = new ProcessStartInfo(executable)
         {
             UseShellExecute = false,
             RedirectStandardInput = true,
@@ -150,14 +173,19 @@ public sealed class CodexProcessRunner
         psi.Environment["GIT_CONFIG_GLOBAL"] = "NUL";
         psi.Environment["GIT_CONFIG_SYSTEM"] = "NUL";
         psi.Environment["GIT_TERMINAL_PROMPT"] = "0";
-        psi.Environment["PATH"] = Path.GetDirectoryName(settings.Executable)! + Path.PathSeparator + Path.Combine(psi.Environment["SystemRoot"]!, "System32");
-        foreach (var arg in new[] { "exec", "--model", requestedModel, "--config", $"model_reasoning_effort=\"{requestedEffort}\"", "--config", "approval_policy=\"never\"", "--sandbox", "read-only", "--json", "--ephemeral", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check", "--cd", directory, "--output-schema", schemaPath, "--output-last-message", outputPath })
+        psi.Environment["PATH"] = Path.GetDirectoryName(executable)! + Path.PathSeparator + Path.Combine(psi.Environment["SystemRoot"]!, "System32");
+        // The pinned CLI removes every runtime tool except the native image
+        // generator. That feature is disabled for A/B, making their registry empty.
+        psi.Environment["PALIMPSESTE_IMAGEGEN_TEXT_ONLY"] = "1";
+        foreach (var arg in new[] { "exec", "--model", requestedModel, "--config", $"model_reasoning_effort=\"{requestedEffort}\"", "--config", "approval_policy=\"never\"", "--config", "forced_login_method=\"chatgpt\"", "--sandbox", "read-only", "--json", "--ephemeral", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check", "--cd", directory, "--output-schema", schemaPath, "--output-last-message", outputPath })
             psi.ArgumentList.Add(arg);
         foreach (var feature in DisabledFeatures)
         {
+            if (attempt.Stage == "G" && feature == "image_generation") continue;
             psi.ArgumentList.Add("--disable");
             psi.ArgumentList.Add(feature);
         }
+        if (attempt.Stage == "G") { psi.ArgumentList.Add("--enable"); psi.ArgumentList.Add("image_generation"); }
         // The CLI's --image accepts one or more files. Repeated flags preserve the required order.
         foreach (var image in imagePaths) { psi.ArgumentList.Add("--image"); psi.ArgumentList.Add(image); }
         psi.ArgumentList.Add("-");
@@ -228,9 +256,29 @@ public sealed class CodexProcessRunner
             var json = await File.ReadAllTextAsync(outputPath, Encoding.UTF8, timeout.Token);
             try { using var parsed = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 64 }); }
             catch (JsonException) { return await PersistFailureAsync(Failure(ProviderOutcome.InvalidSchema, "final_not_json", started, process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort, finalJson: json, processStarted: processStarted, diagnosticStderr: diagnosticStderr)); }
+            GeneratedImageArtifact? generatedImage = null;
+            if (attempt.Stage == "G")
+            {
+                try { generatedImage = ReadGeneratedImage(outText, events.SessionId, started); }
+                catch (NativeImageFailureException e)
+                {
+                    return await PersistFailureAsync(Failure(e.Outcome, e.Message, started, process.ExitCode,
+                        events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort,
+                        finalJson: json, processStarted: true, diagnosticStderr: diagnosticStderr),
+                        SnapshotDiagnostic(outText)?.Text);
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or JsonException or KeyNotFoundException or InvalidOperationException)
+                {
+                    return await PersistFailureAsync(Failure(ProviderOutcome.IsolationViolation,
+                        "generated_image_event_or_artifact_invalid", started, process.ExitCode, events.SessionId, events.UsageJson,
+                        directory, events.ReportedModel, events.ReportedEffort, processStarted: true, diagnosticStderr: diagnosticStderr),
+                        SnapshotDiagnostic(outText)?.Text);
+                }
+            }
             var result = new CodexResult(ProviderOutcome.Success, json, process.ExitCode, events.SessionId, null, started,
-                DateTimeOffset.UtcNow, GetCliVersion(), requestedModel, requestedEffort, events.ReportedModel, events.ReportedEffort, events.UsageJson, directory, processStarted, diagnosticStderr);
-            await TryWriteAttemptOutcomeAsync(directory, result, null, null, cancellationToken);
+                DateTimeOffset.UtcNow, GetCliVersion(executable), requestedModel, requestedEffort, events.ReportedModel, events.ReportedEffort,
+                events.UsageJson, directory, processStarted, diagnosticStderr, GeneratedImage: generatedImage);
+            await TryWriteAttemptOutcomeAsync(directory, result, attempt.Stage == "G" ? SnapshotDiagnostic(outText)?.Text : null, null, cancellationToken);
             return result;
         }
         catch (OperationCanceledException)
@@ -336,6 +384,7 @@ public sealed class CodexProcessRunner
             values["reported_model"] = result.ReportedModel;
             values["reported_effort"] = result.ReportedEffort;
             values["usage"] = result.UsageJson;
+            values["generated_image"] = result.GeneratedImage;
             // This is written only inside the private attempt directory. It is
             // bounded before reaching this method and is never exposed in API
             // DTOs or public doctor evidence. stdout JSONL is kept in the
@@ -460,9 +509,62 @@ public sealed class CodexProcessRunner
         lower.Contains("insufficient credits") || lower.Contains("insufficient_credits") ||
         lower.Contains("credits exhausted") || lower.Contains("credit balance");
 
-    private string GetCliVersion()
+    private GeneratedImageArtifact ReadGeneratedImage(string jsonl, string? sessionId, DateTimeOffset started)
     {
-        try { return FileVersionInfo.GetVersionInfo(settings.Executable).ProductVersion ?? "non exposé"; }
+        string? path = null; string? callId = null; var count = 0;
+        foreach (var line in jsonl.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            using var json = JsonDocument.Parse(line);
+            var root = json.RootElement;
+            if (!root.TryGetProperty("type", out var eventType) || eventType.GetString() != "item.completed" ||
+                !root.TryGetProperty("item", out var item) || item.ValueKind != JsonValueKind.Object ||
+                !item.TryGetProperty("type", out var type) || type.GetString() != "image_generation") continue;
+            count++;
+            if (count != 1 ||
+                item.GetProperty("source").GetString() != "native_image_generation" ||
+                item.GetProperty("protocol").GetString() != "palimpseste.codex-image/1.0" ||
+                item.GetProperty("text_only").ValueKind != JsonValueKind.True ||
+                item.GetProperty("one_shot").ValueKind != JsonValueKind.True)
+                throw new InvalidDataException("native_image_generation_event_invalid");
+            if (item.GetProperty("status").GetString() == "failed")
+            {
+                var quota = item.TryGetProperty("failure", out var nativeFailure) && nativeFailure.ValueKind == JsonValueKind.Object &&
+                    nativeFailure.TryGetProperty("type", out var failureType) && failureType.ValueKind == JsonValueKind.String &&
+                    failureType.GetString() == "usageLimitExceeded";
+                throw new NativeImageFailureException(quota ? ProviderOutcome.Quota : ProviderOutcome.ProcessFailure,
+                    quota ? "native_image_generation_quota" : "native_image_generation_failed");
+            }
+            if (item.GetProperty("status").GetString() != "completed" ||
+                item.TryGetProperty("failure", out var failure) && failure.ValueKind != JsonValueKind.Null)
+                throw new InvalidDataException("native_image_generation_event_invalid");
+            path = item.GetProperty("saved_path").GetString();
+            callId = item.GetProperty("call_id").GetString();
+        }
+        if (count != 1 || string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(callId) || string.IsNullOrWhiteSpace(path))
+            throw new InvalidDataException("native_image_generation_event_missing");
+        static string Segment(string value) => new(value.Select(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_' ? c : '_').ToArray());
+        var expected = Path.Combine(settings.CodexHome, "generated_images", Segment(sessionId), Segment(callId) + ".png");
+        if (!CodexSettings.IsPathInside(path, Path.Combine(settings.CodexHome, "generated_images"), allowEqual: false) ||
+            !string.Equals(Path.GetFullPath(path), Path.GetFullPath(expected), StringComparison.OrdinalIgnoreCase) ||
+            CodexSettings.HasReparsePoint(path) || !File.Exists(path))
+            throw new InvalidDataException("native_image_generation_path_untrusted");
+        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        if (file.Length is < 50 or > VisualReferencePng.MaxBytes || File.GetLastWriteTimeUtc(path) < started.UtcDateTime.AddSeconds(-2))
+            throw new InvalidDataException("native_image_generation_size_or_age_invalid");
+        var bytes = new byte[checked((int)file.Length)];
+        file.ReadExactly(bytes);
+        var dimensions = VisualReferencePng.Validate(bytes);
+        return new(path, Convert.ToHexStringLower(SHA256.HashData(bytes)), dimensions.Width, dimensions.Height, callId);
+    }
+
+    private sealed class NativeImageFailureException(ProviderOutcome outcome, string code) : Exception(code)
+    {
+        public ProviderOutcome Outcome { get; } = outcome;
+    }
+
+    private string GetCliVersion(string? executable = null)
+    {
+        try { return FileVersionInfo.GetVersionInfo(executable ?? settings.Executable).ProductVersion ?? "non exposé"; }
         catch { return "non exposé"; }
     }
 }

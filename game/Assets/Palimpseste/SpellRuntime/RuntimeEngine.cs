@@ -114,6 +114,14 @@ namespace Palimpseste.Game.SpellRuntime
                             CarrierVisual.KeepOneTickBeamVisible(visual);
                             retiredVisuals.Add(visual);
                         }
+                        else if (active[i].node.carrier != "barrier" &&
+                            visual.TryGetComponent<ImageConstructedSpellVisual>(out var construction))
+                        {
+                            construction.Retire(.62f);
+                            visual.GetComponent<SpellVfxComposition>()?.DissolveWake();
+                            UnityEngine.Object.Destroy(visual, .65f);
+                            retiredVisuals.Add(visual);
+                        }
                         else if (visual.TryGetComponent<SemanticSpellVisual>(out var semantic) &&
                             semantic.RetireWithDissolvingWake())
                             retiredVisuals.Add(visual);
@@ -344,7 +352,13 @@ namespace Palimpseste.Game.SpellRuntime
                 {
                     var receiver = Receiver(hit.collider);
                     var barrier = Barrier(hit.collider);
-                    if (receiver != null && receiver.transform.IsChildOf(caster) && state.travelled < 1f) continue;
+                    // A cast begins inside its owner's collider. SphereCastAll also
+                    // reports an initial overlap, so use the swept sphere's actual
+                    // starting volume instead of a distance already advanced this tick.
+                    // A later return from outside this volume still collides normally.
+                    if (receiver != null && receiver.transform.IsChildOf(caster) &&
+                        (hit.collider.ClosestPoint(old) - old).sqrMagnitude <= radius * radius + .000001f)
+                        continue;
                     if (receiver != null && !state.visited.Add(receiver.StableId)) continue;
                     if (barrier != null)
                     {

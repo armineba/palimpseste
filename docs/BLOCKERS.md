@@ -2,6 +2,18 @@
 
 Mis à jour le 20 septembre 2026.
 
+## État courant D13 — essai local disponible
+
+Le backend D13 est déployé, `/health/ready` est prêt et le Player `1.3.0` est ouvert, PID `39012`, fenêtre réactive. [Preuve de déploiement](../evidence/public/backend/image-reference-deployment-2026-09-20.json). Les échecs du préflight PowerShell et de l'écriture du manifeste ont été corrigés ; ils ne bloquent plus cet essai.
+
+- **À constater dans le jeu :** nouveau dessin → description → vraie image → construction → lancement ; aucun parcours joueur D13 complet encore enregistré.
+- **À juger par le créateur :** fidélité à l'image, beauté, mouvement et son. Capture Unity 04 réussie, mais dernier réglage du verre non recapturé ; aucune acceptation artistique présumée.
+- **Hors preuve actuelle :** relecture hors ligne du nouveau parcours D13, recette des 30 dessins, second créateur, autre machine et accès distant/multijoueur.
+
+Les quatre appels de diagnostic A/G/B1/B2 sont conservés ; B1 rejeté, B2 validé et compilé avec le même PNG. Aucun achat/rechargement n'est déclenché par le code. [Instructions de test](TESTER_MAINTENANT.md).
+
+## Historique — incidents et portes des premières versions
+
 | Sujet | État observé | Prochaine action |
 |---|---|---|
 | Nouveau dessin en attente | Le Player PID `35804` lancé sans API a conservé le second dessin en `capture_pending` avec `needs_begin=true`, `needs_capture=true` et 151 entrées de journal. L'API répondait ensuite 200 et le worker tournait, mais aucun nouveau job n'existait. Le bouton « Reconnecter » est codé ; `WindowsPlayerReconnectPlayable/` est produit, sans lancement du nouveau Player ni reprise attestée. Voir la [preuve de l'incident](../evidence/public/unity/player-reconnect-pending-capture-2026-09-20.md). | Sur le même profil Windows, ouvrir ce parchemin avec le nouveau build, cliquer « Reconnecter », puis vérifier la création du job et l'affichage de A. Relever l'erreur si la reprise échoue ; le dessin peut alors être refait. |

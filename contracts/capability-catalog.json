@@ -480,5 +480,90 @@
       "pillar"
     ],
     "minimum_client": "1.2.0"
+  },
+  "image_guided_construction": {
+    "schema_version": "sp.visual-construction/1.0",
+    "minimum_client_version": "1.3.0",
+    "source": "frozen_generated_image_plus_description",
+    "max_parts_per_node": 64,
+    "max_parts_per_plan": 128,
+    "max_expanded_parts": 1024,
+    "kinds": [
+      "ellipsoid",
+      "shard",
+      "feather",
+      "ribbon",
+      "ring",
+      "arc"
+    ],
+    "materials": [
+      "glass",
+      "energy",
+      "mist",
+      "stone",
+      "metal"
+    ],
+    "motions": [
+      "still",
+      "flutter",
+      "orbit",
+      "drift"
+    ],
+    "bounds": {
+      "position_cm": [
+        -1000,
+        1000
+      ],
+      "scale_cm": [
+        1,
+        1000
+      ],
+      "rotation_mdeg": [
+        -360000,
+        360000
+      ],
+      "color_rgb": [
+        0,
+        255
+      ],
+      "opacity_milli": [
+        0,
+        1000
+      ],
+      "emission_milli": [
+        0,
+        6000
+      ],
+      "points_cm": [
+        -1000,
+        1000
+      ],
+      "max_points": 16,
+      "amplitude_cm": [
+        0,
+        150
+      ],
+      "frequency_mhz": [
+        0,
+        6000
+      ],
+      "phase_mdeg": [
+        0,
+        360000
+      ]
+    },
+    "coordinate_system": {
+      "forward": "+Z",
+      "up": "+Y",
+      "right": "+X",
+      "rotation": "Euler XYZ in millidegrees",
+      "position": "centimeters relative to the carrier node",
+      "ellipsoid_shard": "scale_cm is the full bounding size XYZ",
+      "feather": "root at Z=0, tip along +Z; X=width,Y=thickness,Z=length",
+      "ribbon_arc": "points_cm are local path positions; scale_cm.x is full ribbon width or arc tube diameter; scale_cm.y/z do not affect path; 2..16 distinct path points",
+      "ring": "lies in local XZ; scale_cm.x/z give diameters and scale_cm.y thickness",
+      "motion_frequency": "frequency_mhz / 1000 hertz"
+    },
+    "mechanics": "Decorative only; image and construction never alter collision, effects or target filtering."
   }
 }

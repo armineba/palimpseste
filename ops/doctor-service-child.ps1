@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('local', 'interpreter', 'astra', 'active', 'plan', 'validate')]
+    [ValidateSet('local', 'interpreter', 'astra', 'active', 'plan', 'image', 'validate')]
     [string]$Mode,
     [Parameter(Mandatory = $true)]
     [string]$RuntimeRoot,
@@ -67,7 +67,7 @@ if ($Mode -eq 'local') {
         & $doctor interpreter $spec $ReferencePng $DrawingPng --write $evidence
     } elseif ($Mode -eq 'active') {
         & $doctor active $spec $ReferencePng $DrawingPng --ink $InkPng --write $evidence
-    } elseif ($Mode -eq 'plan') {
+    } elseif ($Mode -in @('plan', 'image')) {
         $frozen = [IO.Path]::GetFullPath($FrozenAJson)
         $artifacts = Join-Path $runtime 'artifacts'
         $attempts = Join-Path $runtime 'attempts'
@@ -77,7 +77,7 @@ if ($Mode -eq 'local') {
             $FrozenASha256 -notmatch '^[0-9A-Fa-f]{64}$') {
             throw 'Frozen A must be under artifacts or attempts with a SHA-256.'
         }
-        & $doctor plan $spec $frozen --a-sha256 $FrozenASha256 --ink $InkPng --write $evidence
+        & $doctor $Mode $spec $frozen --a-sha256 $FrozenASha256 --ink $InkPng --write $evidence
     } else {
         $aFinal = [IO.Path]::GetFullPath($FrozenAJson)
         $bFinal = [IO.Path]::GetFullPath($FrozenBJson)

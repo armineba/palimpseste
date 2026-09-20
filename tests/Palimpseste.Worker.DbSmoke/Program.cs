@@ -14,8 +14,9 @@ var reference = Guid.NewGuid(); var drawing = Guid.NewGuid();
 var ink = Guid.NewGuid(); var journal = Guid.NewGuid();
 var recoveryParchment = Guid.NewGuid(); var recoveryCapture = Guid.NewGuid();
 var recoveryDescriptionArtifact = Guid.NewGuid();
+var recoveryImageArtifact = Guid.NewGuid(); var replacementImageArtifact = Guid.NewGuid();
 var artifacts = new[] { reference, drawing, ink, journal };
-var cleanupArtifacts = new[] { reference, drawing, ink, journal, recoveryDescriptionArtifact };
+var cleanupArtifacts = new[] { reference, drawing, ink, journal, recoveryDescriptionArtifact, recoveryImageArtifact, replacementImageArtifact };
 void Require(bool value, string message) { if (!value) throw new Exception(message); }
 
 await using (var conn = await db.OpenConnectionAsync())
@@ -155,20 +156,83 @@ try
     catch (InvalidOperationException e) when (e.Message == "fence_lost_on_state_change") { staleRejected = true; }
     Require(staleRejected, "Stale worker changed state after A was persisted");
 
+    // Synthetic image metadata exercises the durable checkpoint only: no
+    // image model, PNG renderer, or provider process is invoked by this test.
+    Require(afterAResume!.VisualPipelineVersion == 1, "New jobs did not opt into the generated-image pipeline");
+    await repository.SetStateAsync(afterAResume, "generating_visual_reference", null, "synthetic G", false, CancellationToken.None);
+    var gAttempt = await repository.BeginAttemptAsync(afterAResume, "G", "gpt-6-astra", "max", new string('6', 64), CancellationToken.None);
+    var image = new StoredArtifact(recoveryImageArtifact, "ee/" + recoveryImageArtifact.ToString("N") + ".png",
+        new string('7', 64), 2048, "image/png");
+    staleRejected = false;
+    try
+    {
+        await repository.SaveVisualReferenceAsync(afterA!, gAttempt, image, description.Sha256, new string('6', 64),
+            "sp.prompt.g/1.0", 1024, 1024, successTransport, CancellationToken.None);
+    }
+    catch (InvalidOperationException e) when (e.Message == "fence_lost_on_artifact_insert" ||
+        e.Message == "attempt_not_running_or_fence_lost" || e.Message == "fence_lost_on_stage_change")
+    { staleRejected = true; }
+    Require(staleRejected && await repository.GetVisualReferenceAsync(afterAResume, CancellationToken.None) is null,
+        "Stale G writer published reference metadata");
+    await using (var conn = await db.OpenConnectionAsync())
+    await using (var check = new NpgsqlCommand("SELECT count(*) FROM artifacts WHERE id=$1", conn))
+    {
+        check.Parameters.AddWithValue(recoveryImageArtifact);
+        Require((long)(await check.ExecuteScalarAsync() ?? -1L) == 0, "Stale G rollback left an orphan artifact");
+    }
+    await repository.SaveVisualReferenceAsync(afterAResume, gAttempt, image, description.Sha256, new string('6', 64),
+        "sp.prompt.g/1.0", 1024, 1024, successTransport, CancellationToken.None);
+    var frozenImage = await repository.GetVisualReferenceAsync(afterAResume, CancellationToken.None);
+    Require(frozenImage?.ArtifactId == image.Id && frozenImage.Sha256 == image.Sha256 &&
+        frozenImage.DescriptionSha256 == description.Sha256 && frozenImage.PromptVersion == "sp.prompt.g/1.0" &&
+        frozenImage.Width == 1024 && frozenImage.Height == 1024 && frozenImage.SizeBytes == 2048,
+        "G checkpoint lost image identity, dimensions, or description provenance");
+    var replacementImage = new StoredArtifact(replacementImageArtifact, "ef/" + replacementImageArtifact.ToString("N") + ".png",
+        new string('8', 64), 4096, "image/png");
+    var replacementRejected = false;
+    try
+    {
+        await repository.SaveVisualReferenceAsync(afterAResume, gAttempt, replacementImage, description.Sha256, new string('6', 64),
+            "sp.prompt.g/1.0", 1024, 1024, successTransport, CancellationToken.None);
+    }
+    catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.UniqueViolation) { replacementRejected = true; }
+    Require(replacementRejected &&
+        (await repository.GetVisualReferenceAsync(afterAResume, CancellationToken.None))?.ArtifactId == image.Id,
+        "A second image replaced the frozen G checkpoint");
+    await using (var conn = await db.OpenConnectionAsync())
+    await using (var check = new NpgsqlCommand("SELECT count(*) FROM artifacts WHERE id=$1", conn))
+    {
+        check.Parameters.AddWithValue(replacementImageArtifact);
+        Require((long)(await check.ExecuteScalarAsync() ?? -1L) == 0, "Duplicate G rollback left a replacement artifact");
+    }
+    await using (var conn = await db.OpenConnectionAsync())
+    await using (var expire = new NpgsqlCommand("UPDATE jobs SET lease_until=now()-interval '1 second' WHERE id=$1", conn))
+    { expire.Parameters.AddWithValue(recoveryJob); await expire.ExecuteNonQueryAsync(); }
+    var afterGResume = await repository.ClaimAsync("recovery-g-resume", CancellationToken.None);
+    Require(afterGResume?.Id == recoveryJob && afterGResume.Fence == 3 && afterGResume.State == "resolving_geometry",
+        "After-G resume lost its stage or fencing token");
+    Require(await repository.GetVisualReferenceAsync(afterAResume, CancellationToken.None) is null &&
+        (await repository.GetVisualReferenceAsync(afterGResume!, CancellationToken.None))?.ArtifactId == image.Id &&
+        await repository.CountAttemptsAsync(afterGResume!, "G", CancellationToken.None) == 1 &&
+        !await repository.HasUncertainAttemptAsync(afterGResume!, CancellationToken.None),
+        "After-G resume lost the frozen image or duplicated an image-generation attempt");
+
     // Move to planning, then crash while B is running. The next fence must
     // stop on the uncertain attempt instead of issuing a duplicate B call.
-    await repository.SaveGeometryAsync(afterAResume!, new Dictionary<string, StoredArtifact>(),
+    await repository.SaveGeometryAsync(afterGResume!, new Dictionary<string, StoredArtifact>(),
         new Dictionary<string, StoredArtifact>(), CancellationToken.None);
-    var bAttempt = await repository.BeginAttemptAsync(afterAResume!, "B", "gpt-5.6-luna", "max", new string('4', 64), CancellationToken.None);
+    var bAttempt = await repository.BeginAttemptAsync(afterGResume!, "B", "gpt-5.6-luna", "max", new string('4', 64), CancellationToken.None);
     await using (var conn = await db.OpenConnectionAsync())
     await using (var expire = new NpgsqlCommand("UPDATE jobs SET lease_until=now()-interval '1 second' WHERE id=$1", conn))
     { expire.Parameters.AddWithValue(recoveryJob); await expire.ExecuteNonQueryAsync(); }
     var duringB = await repository.ClaimAsync("recovery-b-resume", CancellationToken.None);
-    Require(duringB?.Id == recoveryJob && duringB.Fence == 3 && duringB.State == "planning", "During-B fencing claim failed");
+    Require(duringB?.Id == recoveryJob && duringB.Fence == 4 && duringB.State == "planning", "During-B fencing claim failed");
     Require(await repository.HasUncertainAttemptAsync(duringB!, CancellationToken.None), "During-B uncertainty was not durable");
     Require(await repository.GetDescriptionAsync(duringB!, CancellationToken.None) is not null, "During-B resume lost A output");
+    Require((await repository.GetVisualReferenceAsync(duringB!, CancellationToken.None))?.Sha256 == image.Sha256,
+        "During-B resume lost the generated reference checkpoint");
     staleRejected = false;
-    try { await repository.CompleteAttemptAsync(afterAResume!, bAttempt, "success", new string('5', 64), "synthetic", null, null, null, CancellationToken.None); }
+    try { await repository.CompleteAttemptAsync(afterGResume!, bAttempt, "success", new string('5', 64), "synthetic", null, null, null, CancellationToken.None); }
     catch (InvalidOperationException e) when (e.Message == "fence_lost_on_attempt_completion") { staleRejected = true; }
     Require(staleRejected, "Stale B worker completed an attempt after lease reclaim");
     await repository.SetStateAsync(duringB!, "needs_operator", "uncertain_provider_attempt", "controlled B crash", false, CancellationToken.None);
@@ -177,16 +241,17 @@ try
     {
         check.Parameters.AddWithValue(recoveryJob);
         await using var r = await check.ExecuteReaderAsync();
-        Require(await r.ReadAsync() && r.GetString(0) == "needs_operator" && r.GetInt32(1) == 2,
+        Require(await r.ReadAsync() && r.GetString(0) == "needs_operator" && r.GetInt32(1) == 3,
             "During-B incident did not stop at operator review");
     }
-    Console.WriteLine("Worker DB smoke passed: claim/lease, heartbeat, durable repair count, stale fence, uncertain incident, scheduled retry backoff, controlled crash after A and during B.");
+    Console.WriteLine("Worker DB smoke passed: claim/lease, heartbeat, durable repair count, stale fence, uncertain incident, scheduled retry backoff, controlled crash after A/G and during B, immutable image checkpoint and transactional rollback. Image/provider metadata was synthetic; no model called.");
 }
 finally
 {
     await using var conn = await db.OpenConnectionAsync();
     await using var tx = await conn.BeginTransactionAsync();
     foreach (var (sql, id) in new[] {
+        ("DELETE FROM visual_references WHERE job_id=$1", recoveryJob),
         ("DELETE FROM interpretations WHERE job_id=$1", recoveryJob),
         ("DELETE FROM provider_attempts WHERE job_id=$1", job),
         ("DELETE FROM provider_attempts WHERE job_id=$1", retryJob),

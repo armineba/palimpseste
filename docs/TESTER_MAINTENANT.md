@@ -1,6 +1,20 @@
 # Tester le lecteur actuel
 
-## Essayer le spectre magique livré — D12 / 1.2.2
+## Essayer le nouveau parcours — D13 / 1.3.0
+
+**Le jeu `1.3.0` est ouvert et le service local est prêt.** Le Player PID `39012` a été lancé le 20 septembre à 20:11:04 UTC, fenêtre réactive, et le raccourci Bureau **Palimpseste Spell Lab** est actualisé. [Preuve de livraison](../evidence/public/unity/image-reference-delivery.json) · [Déploiement local](../evidence/public/backend/image-reference-deployment-2026-09-20.json). Dans le jeu :
+
+1. Cliquer **Dessiner un parchemin** et dessiner librement. Relâcher la souris entre les traits pour ajouter plusieurs éléments.
+2. Cliquer **Dessin terminé** une fois le dessin complet.
+3. Attendre les étapes **Description → Image du sort → Construction → Compilation → Sort**. Une nouvelle génération peut prendre **plusieurs minutes** ; le dessin est conservé pendant l'attente.
+4. Sur la fiche prête, cliquer **Lancer dans le laboratoire**, puis cliquer dans l'arène pour lancer le sort vers une cible.
+5. Comparer l'image de référence et le sort en mouvement, puis écouter le son. Le rendu reste à juger par le joueur.
+
+Les anciens sorts restent dans la bibliothèque et se rejouent **sans régénération**. Le nouveau parcours avec image s'applique aux nouvelles générations ; il ne transforme pas rétroactivement les anciens résultats.
+
+La [capture Unity réelle du sort d'orage](../evidence/public/unity/image-reference-2026-09-20.md) a réussi les contrôles de lancement, impact et nettoyage. Un dernier réglage du verre a été effectué après cette capture et n'a pas été recapturé. Ces contrôles ne constituent pas une acceptation artistique ni un parcours joueur complet dans le Player final.
+
+## Historique — essai du spectre magique livré, D12 / 1.2.2
 
 Ouvrir le raccourci Bureau **Palimpseste Spell Lab** ou [le Player `1.2.2`](../game/Build/WindowsSpectralEnergyPlayable/Palimpseste.exe), déjà lancé sur ce PC. Conserver les **29 fichiers du dossier** ensemble ; [preuves de livraison](../evidence/public/unity/spectral-energy-delivery.json).
 

@@ -58,6 +58,9 @@ namespace Palimpseste.Contracts
     {
         public string schema_version;
         public string description_sha256;
+        // Hash of the actual generated reference image supplied to the planner.
+        // Null is reserved for plans produced before image-guided construction.
+        public string visual_reference_sha256;
         public string catalog_version;
         public string rules_profile;
         public List<SpellNode> nodes;
@@ -99,7 +102,59 @@ namespace Palimpseste.Contracts
         public string form;
         // Decorative, bounded VFX layers. Null preserves all earlier compiled packets.
         public SpellVfxProfile vfx;
+        public SpellVisualConstruction construction;
         public string signature_geometry_id;
+    }
+
+    public sealed class SpellVisualConstruction
+    {
+        public List<SpellVisualPart> parts;
+    }
+
+    public sealed class SpellVisualPart
+    {
+        public string kind;
+        public string material;
+        public int[] position_cm;
+        public int[] scale_cm;
+        public int[] rotation_mdeg;
+        public int[] color_rgb;
+        public int opacity_milli;
+        public int emission_milli;
+        public List<int[]> points_cm;
+        public SpellVisualMotion motion;
+    }
+
+    public sealed class SpellVisualMotion
+    {
+        public string kind;
+        public int amplitude_cm;
+        public int frequency_mhz;
+        public int phase_mdeg;
+    }
+
+    public sealed class SpellVisualReference
+    {
+        public string artifact_id;
+        public string sha256;
+        public int size_bytes;
+        public int width_px;
+        public int height_px;
+        public string description_sha256;
+        public string prompt_version;
+    }
+
+    public static class SpellVisualConstructionLimits
+    {
+        public static readonly string[] Kinds = { "ellipsoid", "shard", "feather", "ribbon", "ring", "arc" };
+        public static readonly string[] Materials = { "glass", "energy", "mist", "stone", "metal" };
+        public static readonly string[] Motions = { "still", "flutter", "orbit", "drift" };
+        public const int MaximumPartsPerNode = 64;
+        public const int MaximumPartsPerPlan = 128;
+        public const int MaximumExpandedParts = 1024;
+        public const int MaximumPoints = 16;
+        public const int MaximumReferenceBytes = 8 * 1024 * 1024;
+        public const int MaximumReferenceDimension = 2048;
     }
 
     public sealed class SpellVfxProfile
@@ -232,6 +287,7 @@ namespace Palimpseste.Contracts
         public SpellProvenance provenance;
         public string signature_seed_hex;
         public string description_sha256;
+        public SpellVisualReference visual_reference;
         public SpellPlan plan;
         public List<GeometryManifestEntry> geometry_manifest;
         public List<BinaryAssetEntry> binary_assets;

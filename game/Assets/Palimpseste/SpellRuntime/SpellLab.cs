@@ -283,6 +283,7 @@ namespace Palimpseste.Game.SpellRuntime
         {
             try
             {
+                Library.ImageSpellPacketValidator.Validate(json, parchmentDirectory);
                 spell = JsonConvert.DeserializeObject<CompiledSpell>(json);
                 if (spell?.schema_version != "sp.compiled/1.0" || spell.plan?.nodes == null) throw new InvalidDataException("Paquet compilé invalide");
                 foreach (var entry in spell.geometry_manifest)

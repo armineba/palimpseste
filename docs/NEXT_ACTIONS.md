@@ -1,6 +1,22 @@
 # Point de reprise immédiat
 
-## Priorité actuelle — essayer le spectre magique livré, D12 / 1.2.2
+## Priorité actuelle — essayer D13 dans le jeu ouvert
+
+**Le Player `1.3.0` est ouvert**, PID `39012`, fenêtre réactive, raccourci Bureau actualisé. Le backend D13 est déployé localement : API `30084`, worker `15760`, `/health/ready` prêt et diagnostic local sans issues de production A/B/G. [Preuve du déploiement](../evidence/public/backend/image-reference-deployment-2026-09-20.json).
+
+Le [Player livré](../game/Build/WindowsImageReferencePlayable/Palimpseste.exe) contient **29 fichiers, 122 734 785 octets**. Son ZIP fait **44 320 872 octets**, SHA `0ca7d134f733632f23483726b70fbbeb1de750b046d1478efa94f18d4891ad7b` ; [manifeste](../evidence/public/unity/image-reference-delivery.json). Build final exit 0. Le manifeste a été promu après correction de `Replace($null)` et vérification du Player déjà lancé, sans second lancement.
+
+1. Dans le jeu, **Dessiner un parchemin → Dessin terminé**, puis attendre **Description → Image du sort → Construction → Compilation → Sort**. Une génération peut prendre plusieurs minutes.
+2. Cliquer **Lancer dans le laboratoire**, puis dans l'arène pour lancer vers une cible. Observer le résultat en mouvement face à l'image, écouter le son et recueillir le verdict du joueur. [Instructions courtes](TESTER_MAINTENANT.md).
+3. Consigner ce nouveau parcours joueur, son téléchargement de référence et sa relecture hors ligne lorsqu'ils seront effectivement observés. Aucun nouveau parcours complet D13 n'est encore enregistré. Les anciens sorts conservés se rejouent sans génération rétroactive.
+
+Preuves déjà acquises : CoreSmoke et DbSmoke réussis, migration 008 appliquée au runtime, quatre tests Unity du validateur passés ; capture 04 du vrai paquet réussie **1/1**, impact 1, dégâts 12000, impulsion 1, nettoyage complet et cache inchangé. [Capture et limites](../evidence/public/unity/image-reference-2026-09-20.md). Le dernier réglage du verre est postérieur à cette capture, non recapturé ; les contrôles techniques ne signent pas l'acceptation artistique.
+
+Les [quatre appels réels de diagnostic](../evidence/public/backend/image-reference-2026-09-20.json) restent conservés : A Sol/high **34,091 s**, G Astra/high **55,784 s**, B1 **218,064 s** rejeté pour `turn_rate`, puis B2 **204,725 s** validé et compilé après correction du prompt `2.1`. B2 réutilise le même PNG G, sans nouvelle image. G a utilisé une description figée antérieure, distincte de la nouvelle sortie A : ces sondes ne constituent pas un job joueur complet. Le filtre natif `codex-image.exe` sert A/B/G ; les trois preuves au SHA durci sont promues. Aucun nouvel appel modèle, achat ou rechargement n'a été ajouté au déploiement.
+
+L'accès distant/multijoueur, la recette des 30 dessins, le second créateur, l'autre machine et l'acceptation humaine restent ouverts. Les sections suivantes sont historiques.
+
+## Historique — spectre magique livré, D12 / 1.2.2
 
 Le [Player `1.2.2`](../game/Build/WindowsSpectralEnergyPlayable/Palimpseste.exe) est construit avec le code 0, empaqueté en **29 fichiers, 122 554 797 octets**, puis lancé sous le PID `13972`. Le raccourci Bureau est actualisé. Le [manifeste de livraison](../evidence/public/unity/spectral-energy-delivery.json) atteste le ZIP de **44 089 295 octets**, SHA-256 `6836f2cac5941a58d28b5a07c1b7f5e0b88cc5c51430320a6c9d9d199c1c542e`.
 

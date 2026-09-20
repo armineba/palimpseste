@@ -59,6 +59,9 @@ namespace Palimpseste.Game.Bootstrap
         private Texture2D goldBar;
         private Texture2D capturePreview;
         private string capturePreviewPath;
+        private Texture2D generatedPreview;
+        private string generatedPreviewHash;
+        private bool showGeneratedReference = true;
         private Vector2 libraryScroll;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -108,6 +111,7 @@ namespace Palimpseste.Game.Bootstrap
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             if (capturePreview != null) Destroy(capturePreview);
+            if (generatedPreview != null) Destroy(generatedPreview);
             if (instance == this) instance = null;
         }
 
@@ -361,7 +365,7 @@ namespace Palimpseste.Game.Bootstrap
 
         private void DrawProcessingSteps(Rect area)
         {
-            var names = new[] { "Dessin", "Interprétation", "Création du sort", "Compilation", "Sort" };
+            var names = new[] { "Dessin", "Description", "Image du sort", "Construction", "Compilation", "Sort" };
             var current = ProcessingStep(selected);
             var gap = 7f;
             var itemWidth = (area.width - gap * (names.Length - 1)) / names.Length;
@@ -370,7 +374,7 @@ namespace Palimpseste.Game.Bootstrap
                 var x = area.x + i * (itemWidth + gap);
                 GUI.Box(new Rect(x, area.y, itemWidth, area.height), GUIContent.none);
                 GUI.DrawTexture(new Rect(x, area.y, itemWidth, 3), i <= current ? goldBar : labHudBackground);
-                var mark = i < current || (i == 4 && spellJson != null) ? "✓ " : i == current ? "… " : "· ";
+                var mark = i < current || (i == 5 && spellJson != null) ? "✓ " : i == current ? "… " : "· ";
                 GUI.Label(new Rect(x + 7, area.y + 15, itemWidth - 12, 32), mark + names[i], textStyle);
             }
         }
@@ -378,14 +382,15 @@ namespace Palimpseste.Game.Bootstrap
         private int ProcessingStep(ParchmentRecord record)
         {
             if (record == null || record.needs_capture || string.IsNullOrEmpty(record.job_id)) return 0;
-            if (spellJson != null && selected == record) return 4;
+            if (spellJson != null && selected == record) return 5;
             var state = record.state is "needs_operator" or "waiting_retry" ? record.resume_stage : record.state;
             return state switch
             {
-                "resolving_geometry" => 1,
-                "planning" => 2,
-                "validating" => 3,
-                "ready" => 4,
+                "generating_visual_reference" => 2,
+                "resolving_geometry" => 3,
+                "planning" => 3,
+                "validating" => 4,
+                "ready" => 5,
                 _ => descriptionView != null && selected == record ? 2 : 1
             };
         }
@@ -401,8 +406,9 @@ namespace Palimpseste.Game.Bootstrap
             {
                 "queued" => "En file d'attente pour la lecture du dessin",
                 "interpreting" => "Lecture du dessin et création de son interprétation",
+                "generating_visual_reference" => "Création de l’image de référence depuis la description",
                 "resolving_geometry" => "Interprétation reçue · préparation des volumes 3D",
-                "planning" => "Composition du sort et de ses effets visuels",
+                "planning" => "Construction du sort et de ses effets depuis l’image",
                 "validating" => "Plan compilé et ressources contrôlées avant publication",
                 "ready" => "Sort validé · téléchargement et contrôle local",
                 "waiting_retry" => "Nouvel essai de création prévu par le laboratoire",
@@ -424,6 +430,20 @@ namespace Palimpseste.Game.Bootstrap
         private void DrawInterpretationPanel(Rect area)
         {
             GUI.Box(area, GUIContent.none);
+            var visual = GeneratedReferencePreview();
+            if (visual != null)
+            {
+                var buttonWidth = Mathf.Min(190, (area.width - 36) / 2);
+                if (GUI.Button(new Rect(area.x + 15, area.y + 12, buttonWidth, 34), "Image du sort", buttonStyle)) showGeneratedReference = true;
+                if (GUI.Button(new Rect(area.x + 21 + buttonWidth, area.y + 12, buttonWidth, 34), "Description", buttonStyle)) showGeneratedReference = false;
+                if (showGeneratedReference)
+                {
+                    GUI.DrawTexture(new Rect(area.x + 15, area.y + 59, area.width - 30, area.height - 92), visual, ScaleMode.ScaleToFit);
+                    GUI.Label(new Rect(area.x + 15, area.yMax - 28, area.width - 30, 24), "Image générée · référence pour la construction du sort", textStyle);
+                    return;
+                }
+            }
+            else
             GUI.Label(new Rect(area.x + 15, area.y + 12, area.width - 30, 35), "Interprétation du dessin", titleStyle);
             GUI.DrawTexture(new Rect(area.x + 15, area.y + 52, area.width - 30, 2), goldBar);
             if (descriptionView == null)
@@ -460,8 +480,9 @@ namespace Palimpseste.Game.Bootstrap
                 "capture_corrupted" => "Journal endommagé",
                 "queued" => "Lecture en attente",
                 "interpreting" => "Lecture du dessin",
+                "generating_visual_reference" => "Image du sort en création",
                 "resolving_geometry" => "Formes en préparation",
-                "planning" => "Plan du sort par Luna",
+                "planning" => "Construction depuis l’image",
                 "validating" => "Compilation du sort",
                 "ready" => "Sort à récupérer",
                 "waiting_retry" => "Nouvel essai prévu",
@@ -571,18 +592,40 @@ namespace Palimpseste.Game.Bootstrap
             return capturePreview;
         }
 
+        private Texture2D GeneratedReferencePreview()
+        {
+            if (selected == null || string.IsNullOrEmpty(selected.visual_reference_sha256)) return null;
+            if (generatedPreviewHash == selected.visual_reference_sha256) return generatedPreview;
+            if (generatedPreview != null) Destroy(generatedPreview);
+            generatedPreview = null;
+            generatedPreviewHash = null;
+            if (!VisualReferenceCache.TryRead(selected, store.DirectoryFor(selected), out var bytes)) return null;
+            var texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            if (!texture.LoadImage(bytes, false)) { Destroy(texture); return null; }
+            generatedPreview = texture;
+            generatedPreviewHash = selected.visual_reference_sha256;
+            return texture;
+        }
+
         private void DrawCard()
         {
             if (selected == null) { page = Page.Library; return; }
             var r = new Rect(Screen.width * .14f, 120, Screen.width * .72f, Screen.height - 160);
             GUI.Box(r, GUIContent.none, panelStyle);
             GUI.Label(new Rect(r.x + 25, r.y + 20, r.width - 50, 40), "Fiche du sort", titleStyle);
+            var visual = GeneratedReferencePreview();
+            var visualWidth = visual != null ? Mathf.Min(330, r.width * .36f) : 0;
+            if (visual != null)
+            {
+                GUI.DrawTexture(new Rect(r.xMax - visualWidth - 25, r.y + 130, visualWidth, Mathf.Max(120, r.height - 265)), visual, ScaleMode.ScaleToFit);
+                GUI.Label(new Rect(r.xMax - visualWidth - 25, r.yMax - 128, visualWidth, 25), "Image de référence du sort", textStyle);
+            }
             try
             {
                 var packet = JObject.Parse(spellJson);
                 var display = packet["display"];
                 GUI.Label(new Rect(r.x + 25, r.y + 75, r.width - 50, 43), display?["title"]?.ToString() ?? "Sort", titleStyle);
-                GUI.Label(new Rect(r.x + 25, r.y + 130, r.width - 50, 120), display?["factual_description"]?.ToString() ?? "", textStyle);
+                GUI.Label(new Rect(r.x + 25, r.y + 130, r.width - 50 - visualWidth, 120), display?["factual_description"]?.ToString() ?? "", textStyle);
                 var lines = display?["mechanical_lines"] as JArray;
                 if (lines != null)
                 {
@@ -590,14 +633,14 @@ namespace Palimpseste.Game.Bootstrap
                     foreach (var line in lines)
                     {
                         if (y > r.yMax - 120) break;
-                        GUI.Label(new Rect(r.x + 28, y, r.width - 56, 38), "• " + line, textStyle);
+                        GUI.Label(new Rect(r.x + 28, y, r.width - 56 - visualWidth, 38), "• " + line, textStyle);
                         y += 42;
                     }
                 }
             }
             catch (Exception ex) { notice = "Paquet local illisible : " + ex.Message; }
             if (descriptionView != null &&
-                GUI.Button(new Rect(r.x + 25, r.yMax - 119, 260, 39), "Lire l'interprétation d'Astra", buttonStyle))
+                GUI.Button(new Rect(r.x + 25, r.yMax - 119, 260, 39), "Description et image du sort", buttonStyle))
                 page = Page.Interpretation;
             if (GUI.Button(new Rect(r.x + 25, r.yMax - 70, 260, 45), "Lancer dans le laboratoire", buttonStyle)) EnterLab();
             if (GUI.Button(new Rect(r.x + 300, r.yMax - 70, 180, 45), "Bibliothèque", buttonStyle)) page = Page.Library;
@@ -1103,6 +1146,10 @@ namespace Palimpseste.Game.Bootstrap
                         yield return FetchDescription(record, job.description_artifact_id);
                     else if (selected == record && descriptionView == null)
                         DescriptionCache.TryLoad(record, store.DirectoryFor(record), out descriptionView);
+                    if (!string.IsNullOrEmpty(job.visual_reference_artifact_id) &&
+                        (record.visual_reference_sha256 != job.visual_reference_sha256 ||
+                        !VisualReferenceCache.TryRead(record, store.DirectoryFor(record), out _)))
+                        yield return FetchVisualReference(record, job.visual_reference_artifact_id, job.visual_reference_sha256);
                     if (job.state == "ready")
                     {
                         if (string.IsNullOrEmpty(record.spell_id))
@@ -1180,6 +1227,21 @@ namespace Palimpseste.Game.Bootstrap
             if (selected == record) { descriptionView = parsed; interpretationScroll = Vector2.zero; }
         }
 
+        private IEnumerator FetchVisualReference(ParchmentRecord record, string artifactId, string expectedHash)
+        {
+            byte[] bytes = null;
+            string hash = null, error = null;
+            yield return api.GetArtifact(artifactId, (b, h, e) => { bytes = b; hash = h; error = e; });
+            if (error != null || hash != expectedHash ||
+                !VisualReferenceCache.TrySave(record, store.DirectoryFor(record), artifactId, expectedHash, bytes))
+            {
+                if (selected == record) notice = "L’image du sort n’a pas encore été téléchargée. Le suivi continue.";
+                yield break;
+            }
+            store.Save(record);
+            if (selected == record) showGeneratedReference = true;
+        }
+
         private IEnumerator Download(ParchmentRecord record)
         {
             byte[] bytes = null;
@@ -1196,19 +1258,41 @@ namespace Palimpseste.Game.Bootstrap
             var manifest = new JArray();
             if (packet["geometry_manifest"] is JArray geometries) foreach (var item in geometries) manifest.Add(item);
             if (packet["binary_assets"] is JArray binaries) foreach (var item in binaries) manifest.Add(item);
+            if (packet["visual_reference"] is JObject visualReference) manifest.Add(visualReference);
             foreach (var item in manifest)
             {
                 var id = item["artifact_id"]?.ToString();
                 var expected = item["sha256"]?.ToString();
                 if (string.IsNullOrEmpty(id) || !System.Text.RegularExpressions.Regex.IsMatch(id, "^[a-z][a-z0-9_.-]{0,63}$"))
                 { notice = "Référence d'artefact interdite"; yield break; }
+                var artifactPath = Path.Combine(artifactDir, id);
+                // The reference is normally fetched while B constructs the
+                // spell. Reuse its verified bytes instead of downloading it twice.
+                var cachedArtifact = false;
+                try
+                {
+                    if (File.Exists(artifactPath) && new FileInfo(artifactPath).Length <= 8 * 1024 * 1024)
+                        cachedArtifact = ParchmentStore.Hash(File.ReadAllBytes(artifactPath)) == expected;
+                }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+                if (cachedArtifact) continue;
                 byte[] data = null;
                 yield return api.GetArtifact(id, (b, h, e) => { data = b; error = e; });
                 if (error != null || data == null || ParchmentStore.Hash(data) != expected)
                 { notice = "Artefact invalide : " + id + " " + error; yield break; }
                 File.WriteAllBytes(Path.Combine(artifactDir, id), data);
             }
+            if (packet["visual_reference"] is JObject downloadedVisual)
+            {
+                record.visual_reference_artifact_id = downloadedVisual["artifact_id"]?.ToString();
+                record.visual_reference_sha256 = downloadedVisual["sha256"]?.ToString();
+                if (!VisualReferenceCache.TryRead(record, store.DirectoryFor(record), out _))
+                { notice = "Image de référence invalide ; téléchargement à reprendre."; yield break; }
+            }
             var spellPath = Path.Combine(store.DirectoryFor(record), "spell.json");
+            try { ImageSpellPacketValidator.Validate(Encoding.UTF8.GetString(bytes), store.DirectoryFor(record)); }
+            catch (Exception) { notice = "Construction du sort invalide ; votre dessin reste enregistré."; yield break; }
             File.WriteAllBytes(spellPath, bytes);
             File.WriteAllText(spellPath + ".sha256", ParchmentStore.Hash(bytes), Encoding.ASCII);
             record.state = "ready";

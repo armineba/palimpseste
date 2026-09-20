@@ -1,0 +1,1251 @@
+{
+    "observed_at":  "2026-09-20T20:11:04.0206753Z",
+    "client_version":  "1.3.0",
+    "unity":  "6000.3.24f1",
+    "backend":  "IL2CPP",
+    "build_exit":  0,
+    "build_success_marker_observed":  true,
+    "build_log":  "game/Logs/image-reference-build-final.log",
+    "build_log_sha256":  "719e91b9d304fc1779b50d3b066bbb161d8239bcb18184e52ff5a069371e8449",
+    "source":  "game/Build/WindowsImageReferenceRelease",
+    "playable":  "game/Build/WindowsImageReferencePlayable",
+    "zip":  "deliverables/Palimpseste-Windows-x64-IL2CPP.zip",
+    "zip_bytes":  44320872,
+    "zip_sha256":  "0ca7d134f733632f23483726b70fbbeb1de750b046d1478efa94f18d4891ad7b",
+    "files_verified":  29,
+    "playable_bytes":  122734785,
+    "files":  [
+                  {
+                      "file":  "baselib.dll",
+                      "bytes":  239536,
+                      "sha256":  "b1c81019d9e7b525f5d52a3fa46417b08be0e073a5c2354319b495c07e1e4d94"
+                  },
+                  {
+                      "file":  "D3D12/D3D12Core.dll",
+                      "bytes":  4725304,
+                      "sha256":  "625bd40005b1c3708695d5256ecf230d278e6b8edba5a88af70f3d91324f3052"
+                  },
+                  {
+                      "file":  "GameAssembly.dll",
+                      "bytes":  51138560,
+                      "sha256":  "5031d9d360ae6dee050cbf162e9983271158cb30fb86ba5af0b96db7722f3acc"
+                  },
+                  {
+                      "file":  "Palimpseste.exe",
+                      "bytes":  667136,
+                      "sha256":  "049f79454586f2ac5445f26b55191cf6611be62f10c4a5e12f92f806050149c2"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/app.info",
+                      "bytes":  33,
+                      "sha256":  "fb8ea29e27f64f69f6831a98d4ae46950e0897715143379bf00525373f021774"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/boot.config",
+                      "bytes":  156,
+                      "sha256":  "463033957c898155ec2d86b167bb1615251eae80896abdfa7a979a20f616b9d7"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/globalgamemanagers",
+                      "bytes":  214932,
+                      "sha256":  "b2250da857a04bbb35fba0c38020547a4385f50b8d5918e9b3358af604dad267"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/globalgamemanagers.assets",
+                      "bytes":  1012504,
+                      "sha256":  "8ba787583a67ebc5579772e50424c3220e21a85789389315e92e8ecbe722214a"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/globalgamemanagers.assets.resS",
+                      "bytes":  6174944,
+                      "sha256":  "26b24bbd0bdb7017ecbac3b829c0ed7c4848bc343af5702e96ebdb75a7258b04"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Metadata/global-metadata.dat",
+                      "bytes":  10571872,
+                      "sha256":  "f6b4b9ca952345659b47ff452a1d561f6de0a54500056e89ec58cc6dcfee352e"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Resources/mscorlib.dll-resources.dat",
+                      "bytes":  337563,
+                      "sha256":  "c5baa176a5b72cd545266340e42102d393a5e43d38c95796bc828918bb95277f"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Resources/Newtonsoft.Json.dll-resources.dat",
+                      "bytes":  900,
+                      "sha256":  "531de49e73ddea25554c9f656f54da2a665946f3fec57048e0cfe3b9e49b03f8"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Resources/System.Data.dll-resources.dat",
+                      "bytes":  93718,
+                      "sha256":  "98a7950ec6de3242c2e190dfa630188dfa32511a125542b94baa952d1c757d49"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/il2cpp_data/Resources/System.Drawing.dll-resources.dat",
+                      "bytes":  25453,
+                      "sha256":  "7c33aa707bc3fdc83991b81a97d6fc622b140762a767300f08f616c2c0a91255"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/level0",
+                      "bytes":  2668,
+                      "sha256":  "29d8403263776685878058611a3c646d3ddbb0431cb2f4c2a3f52bb55e709fa9"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/level1",
+                      "bytes":  2668,
+                      "sha256":  "29d8403263776685878058611a3c646d3ddbb0431cb2f4c2a3f52bb55e709fa9"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/Plugins/x86_64/lib_burst_generated.dll",
+                      "bytes":  381440,
+                      "sha256":  "7959049b92ebee81a7615f53369a6a882bda14958a35939a5d66149ba485b1b6"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/resources.assets",
+                      "bytes":  564952,
+                      "sha256":  "df040e94d39951a5009044d6f3c45cc2c2ed57b50d03fca1f515ae17a5a0cfeb"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/resources.assets.resS",
+                      "bytes":  1405360,
+                      "sha256":  "5b1e402fa3ea347154f10c0c45e2daeedb2b00d4a6cec760ebb114fddfc574b0"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/Resources/unity default resources",
+                      "bytes":  5883716,
+                      "sha256":  "32b58bdb9cf090212b46a8ca7436dcdae89e4ef43e9d55a835233c21d1347734"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/Resources/unity_builtin_extra",
+                      "bytes":  397720,
+                      "sha256":  "1aaf0d2a3f870903aba2596836425a590724df4c2bc046fc00d324e4858e928e"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/RuntimeInitializeOnLoads.json",
+                      "bytes":  2701,
+                      "sha256":  "159628ab433cae20aab08f92ac8dfc6fc041b98f47f493a905b29ff7a1e9cb63"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/ScriptingAssemblies.json",
+                      "bytes":  4313,
+                      "sha256":  "8cca4e3764c3c208b8d1fe0fb42a04a115d668cc728418b975926f714b24d27b"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/sharedassets0.assets",
+                      "bytes":  8064,
+                      "sha256":  "3f72e441e58ba3fdb6e49a127a4439891d97912eacc3b9e216b716e3871dfa3c"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/sharedassets0.assets.resS",
+                      "bytes":  524288,
+                      "sha256":  "393efe6399536384aa91bdfc4e64f244b4d3e1fbb6a4ff145c483ffee64ccb36"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/sharedassets1.assets",
+                      "bytes":  505,
+                      "sha256":  "1a5ef5d521375dca5978e83e9d9bfd2b95b1a7f24791be8fef2654d587f60f64"
+                  },
+                  {
+                      "file":  "Palimpseste_Data/StreamingAssets/service.json",
+                      "bytes":  19,
+                      "sha256":  "7405724d4a5bbbca9e70e9ef39ba2eb3de0ce3c476025151466ff09b75af8cc2"
+                  },
+                  {
+                      "file":  "UnityCrashHandler64.exe",
+                      "bytes":  1669552,
+                      "sha256":  "c110a9e47b4c8173a51978f9ff1224b9eff00216084cef0237958c53dcc1da99"
+                  },
+                  {
+                      "file":  "UnityPlayer.dll",
+                      "bytes":  36684208,
+                      "sha256":  "79a54af1c83b5b3bfa34936be18899de49fa88eea6a33ba7351c2163f95f6613"
+                  }
+              ],
+    "source_commit":  "d3bdace3a96b714b6afecc0f36f32bd2a574a85e",
+    "source_snapshot_sha256":  "3924de3a26450ee048d29f05ee57738a2774822256c3972c211642746711f950",
+    "source_files":  [
+                         {
+                             "file":  "game/Assets/InputSystem_Actions.inputactions",
+                             "bytes":  41005,
+                             "sha256":  "1c6cbb519d65ecfe19a29231735b7f54741a20ac1a8ad4f46a18e1bfb28a3c39"
+                         },
+                         {
+                             "file":  "game/Assets/InputSystem_Actions.inputactions.meta",
+                             "bytes":  376,
+                             "sha256":  "3b4e424a80f5b4fa76b6abd774884a24285eaa61f22ff9bb20e5ad505fd8b569"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste.meta",
+                             "bytes":  172,
+                             "sha256":  "033473921dffea024d2ff64db3b061575146cffbb170939a9921e5fd48c01a62"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Art.meta",
+                             "bytes":  172,
+                             "sha256":  "2b940415cf592e2bac211bb9e8d2be6220c85fdee442c6021fb21ffc438e3546"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Art/README.md",
+                             "bytes":  342,
+                             "sha256":  "550e0ae7a910ef0d42ba330f11c18fa64b598379f635e264710eaec4049a97d4"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Art/README.md.meta",
+                             "bytes":  158,
+                             "sha256":  "a66ffdb39fb5405edd4969c7cfc9dfae0d44ea4b8041462ddde8aadfe49441e9"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Bootstrap.meta",
+                             "bytes":  172,
+                             "sha256":  "8be28678a00934df75b217e4f5c1a5c3a9351505e617b8daa1f923523d100fd5"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Bootstrap/PalimpsesteApp.cs",
+                             "bytes":  72404,
+                             "sha256":  "923264e9ad6ed51be28ebd174cf27684b0d0f73b491fc6b8f6986fab6423709c"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Bootstrap/PalimpsesteApp.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "e4279b7f97556d922a983fd0f48828c6d5ac0d82d6bb53617b2a52072e009240"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Drawing.meta",
+                             "bytes":  172,
+                             "sha256":  "30886a717efbccf0de1d370656a0aeb6dd06085e5959497221cc3933d73fe291"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Drawing/DrawingCanvas.cs",
+                             "bytes":  9248,
+                             "sha256":  "70a15aa2e5f55733f536dec3c4f13c33a2ab08de6a64ef709b6101f8e6a7bc0b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Drawing/DrawingCanvas.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "9fe4a7b1acfd1683129f0d844c38045ec123290adf768bd7084d6ba94b3a662b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Editor.meta",
+                             "bytes":  172,
+                             "sha256":  "3bf314928e61fffc78d01de816148699bef809dd872183c4dd7f26420b19c7ea"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Editor/BuildPalimpseste.cs",
+                             "bytes":  5611,
+                             "sha256":  "4a4b71d40bab6ab31a44bbeb55372d05af94988c8d65fbd060eae0fa73f049d5"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Editor/BuildPalimpseste.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "799435c9964356ab6409f23e7267b8c4a1d6f951baac1a8c6a498017911d7fbc"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Editor/Palimpseste.Game.Editor.asmdef",
+                             "bytes":  355,
+                             "sha256":  "4efa8ea03077fed8761d6ba5cc6e46494c99c4cb5f4b23831d38e378305f8dbc"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Editor/Palimpseste.Game.Editor.asmdef.meta",
+                             "bytes":  166,
+                             "sha256":  "d8aca1227e9f4efba462ce8c9f212d16b3088e001eccdeb5baea4017d4b446b0"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library.meta",
+                             "bytes":  172,
+                             "sha256":  "819768ca241443b252e1d3868435ecff7768e9681c84efd8a5525a14e01d7b87"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/CachedSpellVerifier.cs",
+                             "bytes":  4814,
+                             "sha256":  "39256d61b5ce256aa96c3653f0a21271ecaee1637479bcb7546ffe2083a21048"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/CachedSpellVerifier.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "1af8ca50556b6510d00c82385741f84e41428a41d95d34c241aa84a809864585"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/DescriptionCache.cs",
+                             "bytes":  3125,
+                             "sha256":  "935dc4395a5732ed960cdb29c1fbf6f163e069779700bf4f3fd2fdcae833fc59"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/DescriptionCache.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "39e849b48ac35175955d9f6e4270990964631161345e1d04b97f58882c7e8669"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/ImageSpellPacketValidator.cs",
+                             "bytes":  12762,
+                             "sha256":  "3e29014e2846988aac766fe5143c76975d9d2489bb4f55fa2aeeb1aa4f53f43f"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/ImageSpellPacketValidator.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "417fad1f3fa4969a6642f133f7733c630737eca6008e9f5c0e62b649a7a02170"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/ParchmentStore.cs",
+                             "bytes":  14015,
+                             "sha256":  "fef07a5c21a996013db76ecb05919cee96368ceacab53945883ff5701d28f3d4"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/ParchmentStore.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "7f0c783dda3eb7feb9a966d7985d653d445635482392375c215137a54ba07eeb"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/PlayerParchmentFilter.cs",
+                             "bytes":  569,
+                             "sha256":  "22cc5fed4455a1b93538b2429c5f6f39c0b59537a0f8b189c0bf1893a19a4767"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/PlayerParchmentFilter.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "5eb04408ff8798e0ccb84ca137c7b60c1711e368c0e4c673d9b954d442f02009"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/VisualReferenceCache.cs",
+                             "bytes":  3003,
+                             "sha256":  "1e6febf8ad9c17f0b3302ff00f70ecd3415e898d4fda0bb5cef2159ca1a6835b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Library/VisualReferenceCache.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "22b0dd9efe397ff348d8eeda9d092d7efdd4ce01f9fd42d649c6491341e6ec50"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Palimpseste.Game.asmdef",
+                             "bytes":  337,
+                             "sha256":  "cb343d834c275ed0b0b028421d75825d785aa0171e3cef0cecb2e942d4ee8fac"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Palimpseste.Game.asmdef.meta",
+                             "bytes":  166,
+                             "sha256":  "787ae6ae98fcb24c0773cb1657c529c23bead52eca6808bff19383da2c6123b1"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation.meta",
+                             "bytes":  172,
+                             "sha256":  "a9164cc3d3c7d9277c3efe7d92f3ab2e63bcaddd689c0945394a53b3a80cf499"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/CarrierVisual.cs",
+                             "bytes":  33418,
+                             "sha256":  "6ac64381a57ddb70a1166386f72d406f5f3766bef35b069e15376e441d11b978"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/CarrierVisual.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "96e6407fa98b6dd714b16acc209d105f6f54db1662fbd80a6c8936094a0b2012"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/ImageConstructedSpellVisual.cs",
+                             "bytes":  41145,
+                             "sha256":  "023152b4c2abd52146e92a8e9d98561a601f20265939c65a3f8b61efba69bb0d"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/ImageConstructedSpellVisual.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "fea4a050094037392320f43b135ffe6e21acbe78066e9e2b752ea1b0f0c2bc51"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/SemanticSpellVisual.cs",
+                             "bytes":  45984,
+                             "sha256":  "fc66362cf6a4d93040c371ed6886a70dc6012dbadd8eccc38aa82818bcfd6657"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/SemanticSpellVisual.cs.meta",
+                             "bytes":  62,
+                             "sha256":  "bcd15ea99d98a99112ecc202b408362c5622a88e7303d89cbaee7a90393ec19a"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/SpectralWakeMotion.cs",
+                             "bytes":  12196,
+                             "sha256":  "2306fc23277179eb444d4038cee95f143f56609a8600e6d28909866581e68377"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/SpectralWakeMotion.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "81605e5132d0b7ece379869e4528e4c0cae75cc9ecea651b2957c1a6df031cc7"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/SpellVfxComposition.cs",
+                             "bytes":  54400,
+                             "sha256":  "5a5656d328dc86bd624f41fa67700a8f0f6c82a2dce2fd958f5829acc8af8bf4"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Presentation/SpellVfxComposition.cs.meta",
+                             "bytes":  254,
+                             "sha256":  "1db09e26434abab05d5999394a44e38c07e335d4f195d9d5ab328336e55ae88c"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources.meta",
+                             "bytes":  172,
+                             "sha256":  "4e4f361d2c8a9308c1e30bb3bea3aae15b679339a01e93c0b6f83e794c4fc87e"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LabEmissive.mat",
+                             "bytes":  3820,
+                             "sha256":  "7ad6fb569f075e9a15a43979d8a7abce2fd49d4897c539f6ad3d6c26b5d982f9"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LabEmissive.mat.meta",
+                             "bytes":  62,
+                             "sha256":  "ec43cc52d39ec2bd99e70766ba9948a4ae4fc7a7127e21f97c7aa1c2f068060e"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LabOpaque.mat",
+                             "bytes":  3807,
+                             "sha256":  "cf290e9b317b1f7e84208014a6797ccaffdbac1ed2cf8acb5b933bd0e7369502"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LabOpaque.mat.meta",
+                             "bytes":  188,
+                             "sha256":  "5a287ae52a11a3d4155e30fba7ef27ec69f3b3d17566266a33dce0aa5782ba6d"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LabUnlit.shader",
+                             "bytes":  1746,
+                             "sha256":  "66391a661481f09fdfe6df42ea20ca9fef7eacf8e018fa79046b915b9c7345dd"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LabUnlit.shader.meta",
+                             "bytes":  204,
+                             "sha256":  "86982411610d73854e340576400efba06b81fc903c6daaf66c069383a92cd950"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LabVfxVolume.asset",
+                             "bytes":  3456,
+                             "sha256":  "8e46a691a19a2b3cdc93c2f7dd004220f4c950485bee5df045d3c74f9aee9e36"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LabVfxVolume.asset.meta",
+                             "bytes":  189,
+                             "sha256":  "c389fe18e64e3d0f61f139bc24d338564a27f2ff8239eebe677b0846db1b8737"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LavaBeam.shader",
+                             "bytes":  2579,
+                             "sha256":  "9c5a542eb058e49ad16387d1a4998e2e4e5e6a6aa78c9d4f90e1de1375eda962"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LavaBeam.shader.meta",
+                             "bytes":  201,
+                             "sha256":  "16cef49d2c9d6a5d1473ad4b98f36f0b6baf8ed3fd05b112bc116fc599ff27fd"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LibraryBackdrop.png",
+                             "bytes":  2695233,
+                             "sha256":  "74a69ebc3872077870e171f111c3792ccd70c55ec1d2b5c19e42f7cfeb4db63b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/LibraryBackdrop.png.meta",
+                             "bytes":  2652,
+                             "sha256":  "6224c14d51f86c40f9e2a16e26ba3383233f6c2dde73c7907561b9050bea2b4a"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellComposition.shader",
+                             "bytes":  7477,
+                             "sha256":  "b1e909e2d26c7c919f4bcc0474b48dd36c61ca3444fde030e52d023978947509"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellComposition.shader.meta",
+                             "bytes":  240,
+                             "sha256":  "083a82023b971ae276426ae4eba96beac391b73435b3115f4bfa5192279a7698"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellEnergy.shader",
+                             "bytes":  1719,
+                             "sha256":  "3258a98e938274504320f951b7788f948d85f08926e120ae033cad3a2cd43451"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellEnergy.shader.meta",
+                             "bytes":  62,
+                             "sha256":  "57880f5bd6318ecf8342acd2954e62e1956d3a60c1643cb220013650c9903c93"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader",
+                             "bytes":  7780,
+                             "sha256":  "93347119535e1c349c6452387899dfabf4f4f6b87bd47e5b00a5d3f8c90a7c41"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader.meta",
+                             "bytes":  60,
+                             "sha256":  "53e00330f931c2e54515c5ba705f30fdf4f32aacc17715405aae603fad4ef074"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellSpectralCloth.shader",
+                             "bytes":  6745,
+                             "sha256":  "6625b0f3475577b2ad3e46daebf8790dc29e245818915f6e844562d9c34e48c5"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellSpectralCloth.shader.meta",
+                             "bytes":  240,
+                             "sha256":  "3a160c3cd74fa327e63515925c20fb63b7d153b59388af153e535249638ad0ad"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellSpectralMist.shader",
+                             "bytes":  8770,
+                             "sha256":  "21f0e72f29283a7bd7ac0412a2056f35ec7f133cf7c4aa3084457b33693a51e8"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellSpectralMist.shader.meta",
+                             "bytes":  227,
+                             "sha256":  "4e5eeefaa569ff49ac79a9444a4c02a33451391f54fa8bc7cf34f6c1ae59750b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellStylized.shader",
+                             "bytes":  11145,
+                             "sha256":  "ae8e0cab756afa808803a97caa5433a86738c56e70d790391bd88987823421bf"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SpellStylized.shader.meta",
+                             "bytes":  227,
+                             "sha256":  "070a49268bb2a36f7a73f125fafcf69ecb8af58db3213136037036a3e156b0d0"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Scenes.meta",
+                             "bytes":  172,
+                             "sha256":  "8550ee836ded94b08bf9b8afe8bad264a0a188a0bfd36e60a26ed8b5de65f29d"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Scenes/Bootstrap.unity",
+                             "bytes":  11413,
+                             "sha256":  "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Scenes/Bootstrap.unity.meta",
+                             "bytes":  155,
+                             "sha256":  "f36fb429e30b8fa31833ce265898a6f8096b6435653e0cb89bc3855b8d66dfc9"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Scenes/SpellLab.unity",
+                             "bytes":  11413,
+                             "sha256":  "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Scenes/SpellLab.unity.meta",
+                             "bytes":  155,
+                             "sha256":  "bc709730a4ff25559a799631eb62f5547896eae9586118c803885acec91cd327"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service.meta",
+                             "bytes":  172,
+                             "sha256":  "f418d8b453c79eb955bc56ac2986ccd53a042beaf0503e50d3fd91b1465f41cf"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/LabApi.cs",
+                             "bytes":  14211,
+                             "sha256":  "7c4f3f5192c1dd01a81b202da8509d760448890183991b643461e44209cfd998"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/LabApi.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "94fd464d79634c464eed314e48b5f1ea8f390e7e7bff1a0755d9ea2228003779"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/ServiceAccess.cs",
+                             "bytes":  5380,
+                             "sha256":  "2ee9cf6a057e7a138e8aa9d0522623ea9cec126b3279fc5ae4bacea1b64171b9"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/ServiceAccess.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "9bece07f209069512769e4ce665ad623304d129dc56c65cf1de151b2a155fd19"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/SpellDescriptionView.cs",
+                             "bytes":  3769,
+                             "sha256":  "dcb8b8e994530c315f86a2b6014e12652ef62be3f872642415753c367d3342f5"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/SpellDescriptionView.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "0cb72d3a7639372547af3d3819a890224087b9c80e0398f8ddbe134b182e887d"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/WindowsCredentialStore.cs",
+                             "bytes":  7170,
+                             "sha256":  "87e8afa60f91253ba584f27c12909abf0515892a87096f98b16b12e25fb3ccd6"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/WindowsCredentialStore.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "81cb8a998ce935f4a5a199a375f7ee3441c063dd85e75d1e19a92045a4c7db5b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/WindowsInvitationPicker.cs",
+                             "bytes":  2363,
+                             "sha256":  "1e04e31f933297573efc6069da67a9390fd9c8b3fef96cb8b1c539beb70fd6f4"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Service/WindowsInvitationPicker.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "c8d24359af59d45a8409fd8611de1c915fa5d47e1e80ec13341cc53631ee159b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime.meta",
+                             "bytes":  172,
+                             "sha256":  "5698aa22c35de6f7fac97d50523cd47129b4e015159e31f52cf92d14f4fb384f"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/GeometryRuntime.cs",
+                             "bytes":  2956,
+                             "sha256":  "a0c2cd9e5f3b9d2a95aa3f23c31a5aa710381e07db7ebd249845ef511bc074db"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/GeometryRuntime.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "c8ef4dfbc8cfdafc533a8a661771d72251815d526646b607ca181f1a7a56ddb1"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/LabPerformanceProbe.cs",
+                             "bytes":  1620,
+                             "sha256":  "5c1f0639feb1b9a2b2a92c41cafc1fa96c15442da0349a8287c8032f06c7ffc7"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/LabPerformanceProbe.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "3bcacf7d77808653399daa2d1952f6b427ddc27ea34d79772cf67b5560262475"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/LabSetDressing.cs",
+                             "bytes":  10498,
+                             "sha256":  "629b62141299e6ce823deea6009e25374c9f537314616998af589d8765c87f8a"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/LabSetDressing.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "cbd2b4454303f3b7e8f63a18ad31f03405644431089af526f00d85500c31dd16"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/RuntimeEngine.cs",
+                             "bytes":  34942,
+                             "sha256":  "6dbe6b78ec4821911d5f854c3be2d94e067564895d18036b608bf2c53c93fe28"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/RuntimeEngine.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "893be00dffc4854ed7358664afcf01da8417e9dd1b90d8d9575521ffa6094216"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/SpellLab.cs",
+                             "bytes":  23418,
+                             "sha256":  "eee791b858f148f41f5663f1d2d11d93033ea2faed0543e2784f4b181a16571f"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/SpellRuntime/SpellLab.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "6bb1a1890a5b4c24e10c014a2f0eb44cfafd4d73fe16da1040a1fabf556d1770"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests.meta",
+                             "bytes":  172,
+                             "sha256":  "35b29c522d5d3d92dcca4e9a3d3e5c8958fd3f0f29d56e841283bdf1171beb6f"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/CachedSpellVerifierTests.cs",
+                             "bytes":  5664,
+                             "sha256":  "5602c2878b56d89487dda04a33afafb6923273bd880271fef8d88834ba4c223b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/CachedSpellVerifierTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "b941fe88e9c3ba9c9ffa563366e99b0057deb6698ef8e2a81ee874d3481e9eea"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/DescriptionCacheTests.cs",
+                             "bytes":  2654,
+                             "sha256":  "9d671d7fce2dfce95ebdcd8d070ea6307d401648c77f1c1bfcd897b0da02dc71"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/DescriptionCacheTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "728e5a0479ea2bd10ce8604fe8faf67814f64377c42cccc09c33b46f45ce7e66"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/DrawingCanvasTests.cs",
+                             "bytes":  2839,
+                             "sha256":  "5970fc05ecd0b07428aa824bf4f778a481199e941d897383b6c6d1643953532f"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/DrawingCanvasTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "4c10e52798592f0e707712082c46307c032d9306e15f2d46c2affe0d26d04698"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/LabApiErrorTests.cs",
+                             "bytes":  1324,
+                             "sha256":  "bcf2392fd9cd965f9495e183e3d6e1060b95e892ebc66af1e3412bb7df8809f8"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/LabApiErrorTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "a8eb474460d17e5a9579c0492ff1ed883e9403da2a90145b35e142fe4b8c3ce3"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/Palimpseste.Game.Tests.asmdef",
+                             "bytes":  438,
+                             "sha256":  "562e69de3032d49eecc06e9db719eb92d8d7c5d494d8e33dfbcbf764d24987c4"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/Palimpseste.Game.Tests.asmdef.meta",
+                             "bytes":  166,
+                             "sha256":  "56399b433b8d57b7705c89c2408b86586ecd7fa44248fb3de28f79c429cc0f4b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/ParchmentRecoveryTests.cs",
+                             "bytes":  8686,
+                             "sha256":  "f402cb6f1e7cc5a22c893c91cd532f858102095ea2ad81d97fb4c46995ef1f08"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/ParchmentRecoveryTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "7f7ca47a23bcc3b6fe798d1b9dc6a0366752a809ed34e7a9220b5e08284f0ebb"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayerParchmentFilterTests.cs",
+                             "bytes":  1912,
+                             "sha256":  "a04baf6e441cf509cbaf544e4fc64bf430ba2109dbf4dbe624654fdb9e5535ba"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayerParchmentFilterTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "4c3cd9119c31eb34bd0f165e5f2e65f9cb731292d3ee871c9601f9a1c5f6c518"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode.meta",
+                             "bytes":  172,
+                             "sha256":  "9c257768b55552666fd25263dab33d8689d235d39fc03618089c374a14cc322b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/BeamPathPlayModeTests.cs",
+                             "bytes":  9206,
+                             "sha256":  "5e277bf822d2639f64e8b07b5f6623b2dcf1a2125ff632a3c324d8e987e8c331"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/BeamPathPlayModeTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "f0dde071e6c55b95e4ef49a3c71a364d1bbeddec07db850809810f306e95650f"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/CachedSpectrePresentationTests.cs",
+                             "bytes":  19571,
+                             "sha256":  "f993195ebdd07566ba9d45ddec5a64fb476359b50b0b9603e5a71c9b08bdf15d"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/CachedSpectrePresentationTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "a8882bd8b075e92091d231d199c80fa6b75a8f5741950aef131eb0ea8c055b59"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/EffectRuntimePlayModeTests.cs",
+                             "bytes":  14469,
+                             "sha256":  "324e23fbd7042d5237e55a87eace315a65ea02ebc04e3a3cf56b6ab3329b2c48"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/EffectRuntimePlayModeTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "23e35d319d64aecad05242d59efb76d0122b67aa1c92aea52dab0048500a5363"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/FocusInterruptionTests.cs",
+                             "bytes":  6646,
+                             "sha256":  "e7e6a822b5fdec3cbae10ef90be444fae1a29c0b112f482763f0f6107fdcfe0b"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/FocusInterruptionTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "1b268cc5caa5581f6b72a9438fb1e7ce64aa2b1a4bc20983273a5be0bae064ea"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/ImageConstructionPresentationTests.cs",
+                             "bytes":  19604,
+                             "sha256":  "e3dca4567fd2a44a1b711447f767bea77a4726642b526dc92a5689996f3d2346"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/ImageConstructionPresentationTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "dfda1040997694cca61e4cb7b153b953a8d84459ba6588dfdc31b97bb7b9fd45"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/ImageSpellPacketValidatorTests.cs",
+                             "bytes":  3941,
+                             "sha256":  "1ebb2d781134450db323e92ec5f54b1ee6cfa2c33b64371f8149543a0306900d"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/ImageSpellPacketValidatorTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "8b81a80ff7d1758fc6bc92f887e40d8573ae5d9fb3b84c8559a4fb295e4b56bf"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/Palimpseste.Game.PlayModeTests.asmdef",
+                             "bytes":  527,
+                             "sha256":  "3bfc0eed1f30f57771dff46e17eb90e095237654aa07b03eaa96a71e5b35b3d7"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/Palimpseste.Game.PlayModeTests.asmdef.meta",
+                             "bytes":  166,
+                             "sha256":  "9f6ddae861ddf9fe32eefede78e43e31824c90de12d2259209098df6e76fdc82"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/RealLunaPacketPlayModeTests.cs",
+                             "bytes":  11374,
+                             "sha256":  "8e15f5a2b477964762c01080462a556ab7057b09cc449dad2c1fb357ab429a64"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/RealLunaPacketPlayModeTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "a8628a9ba52bd9e4d9e28943ca9ef26ce357596f0dd58ce715243807b494c6cb"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/SemanticVisualPlayModeTests.cs",
+                             "bytes":  7699,
+                             "sha256":  "f6e91e8e15243f38f8c58aa734c6410b4f5b151e4192070e241418740315375e"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/SemanticVisualPlayModeTests.cs.meta",
+                             "bytes":  62,
+                             "sha256":  "06814d5fc40c256b3ecef0e2d1b45bd1c937da1a1a06bb516b42503267052d4e"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/SemanticVisualPresentationTests.cs",
+                             "bytes":  8336,
+                             "sha256":  "8dad923cef0cae972514fcdbd7f924278fecf65ba401da4385436fb90ed06174"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/SemanticVisualPresentationTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "1a5a427ec3420bc0c0019cb585f42e5801f9648755bf4e106a8325d471bcec01"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/SpellLabFixtureTests.cs",
+                             "bytes":  11951,
+                             "sha256":  "33c4a4a7b17fbd2335914b20d663f1f70a69641b7e044afa1baacd92fa6c5154"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/SpellLabFixtureTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "5da2c71aeba2f7c92c341dd6764459f4632365aab1917be807b8ddf845b6e9dc"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/StylizedCompositionPresentationTests.cs",
+                             "bytes":  14532,
+                             "sha256":  "68794e0626811edf2b25e756ac729b68dec907c6aa458a4dd860161eda4f317f"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/PlayMode/StylizedCompositionPresentationTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "7d808059b14fd1ae7a1d4069ccd4f69c019188534972dd1103ed7083ba3e5119"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/ServiceAccessTests.cs",
+                             "bytes":  3241,
+                             "sha256":  "0fbba170000dae3878a97e9a57d20a21116d13ba2570394a33f52c4e85be5570"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/ServiceAccessTests.cs.meta",
+                             "bytes":  60,
+                             "sha256":  "efb0fbcae5d6efbcdeb69329c8bb12974c2feb0049ce0f633f3a59a1942c8b84"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/WindowsCredentialStoreTests.cs",
+                             "bytes":  1409,
+                             "sha256":  "bbf429f62c8379b6c670cad3d81b3782be5d49154e14822297bbbf2bbc4290f0"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Tests/WindowsCredentialStoreTests.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "5a82ae148551984fa4edf8b81943671e9b12b1fa6e5015311a9f5c5d82ad3b80"
+                         },
+                         {
+                             "file":  "game/Assets/Readme.asset",
+                             "bytes":  1144,
+                             "sha256":  "6d098604e909b6a0e64fe5910c2719704864d49678bcf5413bd47b67e5490107"
+                         },
+                         {
+                             "file":  "game/Assets/Readme.asset.meta",
+                             "bytes":  182,
+                             "sha256":  "46c6b89ac1d47bd0c0d1a8b141ae3e32cd95d3e74c49381f0d9f942488c254ce"
+                         },
+                         {
+                             "file":  "game/Assets/Resources.meta",
+                             "bytes":  172,
+                             "sha256":  "0464242e302d7f867fe549f2cdb57d6e86aea5c7c2bf5ec627c81523aa9eb6d6"
+                         },
+                         {
+                             "file":  "game/Assets/Scenes.meta",
+                             "bytes":  172,
+                             "sha256":  "dc3ac95238c331489025612f48d74cb2af4fb2f2f466c7f5c43c0e83f6d2ef99"
+                         },
+                         {
+                             "file":  "game/Assets/Scenes/SampleScene.unity",
+                             "bytes":  11413,
+                             "sha256":  "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca"
+                         },
+                         {
+                             "file":  "game/Assets/Scenes/SampleScene.unity.meta",
+                             "bytes":  155,
+                             "sha256":  "b5815a6b12afaf810577bc89041c4ce46516c7cd6609693f8db616f8e5584d80"
+                         },
+                         {
+                             "file":  "game/Assets/Settings.meta",
+                             "bytes":  172,
+                             "sha256":  "73c8e19843240273facb0af6bdbf430d719e397aded705629594060ce25ce7ad"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/DefaultVolumeProfile.asset",
+                             "bytes":  24035,
+                             "sha256":  "463776c51ae49d4fef980e8fd268081b2f505610d79315003faae1acff8f4115"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/DefaultVolumeProfile.asset.meta",
+                             "bytes":  189,
+                             "sha256":  "efbcb026cee6b8e32fdf27018c06b0515296a6ccbb43969e792fea270310700a"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/Mobile_Renderer.asset",
+                             "bytes":  1713,
+                             "sha256":  "aa93274c9521fa941170becec9e87c5fa36b8587eefd5eeb5c0eed0d1d4b1dbe"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/Mobile_Renderer.asset.meta",
+                             "bytes":  189,
+                             "sha256":  "a148ee2b4987b05b8ff7ae5f9bf84916184f77aefddc821dceb551f5a69f8179"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/Mobile_RPAsset.asset",
+                             "bytes":  4345,
+                             "sha256":  "077b30c366ee79c2b0906284297c3433c470b59a7bca563801901512d6cabf64"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/Mobile_RPAsset.asset.meta",
+                             "bytes":  189,
+                             "sha256":  "53ea46647712c615fd1a3f2e0dddfa8559eeedc649e9a1dbf93ff913de28544c"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/PC_Renderer.asset",
+                             "bytes":  3439,
+                             "sha256":  "3d0b01d8ded3327263b6690be128a3de58d17c514943ae42fe743a3e084a9c79"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/PC_Renderer.asset.meta",
+                             "bytes":  189,
+                             "sha256":  "b5df8ddb2708c6ed4c133a5ff9ee95a75cc20e4ee3ed6181366a61aedbaf31ec"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/PC_RPAsset.asset",
+                             "bytes":  4669,
+                             "sha256":  "86a7e0f07ac4ddc12496b9ca6bf03fff7be00f41fd170b7d1f9bf6b18f07aa47"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/PC_RPAsset.asset.meta",
+                             "bytes":  189,
+                             "sha256":  "bb469b9b6f318e9e9bed29c3b2e73e79371c04743c6f95dd6603941f1cd3e53e"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/SampleSceneProfile.asset",
+                             "bytes":  3703,
+                             "sha256":  "a8677d4bac051d24caa11cd622e39f968155ee277bfce132274f1de225692fe9"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/SampleSceneProfile.asset.meta",
+                             "bytes":  182,
+                             "sha256":  "2e23abc214069f0adbf2b2207f1db54be7876629ec2a3681d0f4aa5b61622ef0"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset",
+                             "bytes":  26104,
+                             "sha256":  "ac1d98fdd295c59e0ff1bbed41724d1153bc4c4424fba20b46a6ff23dc01723e"
+                         },
+                         {
+                             "file":  "game/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta",
+                             "bytes":  189,
+                             "sha256":  "f61661d8bc8dbe531daf09f6211ef978c7ba145c9207c8e76524396ae0722d7c"
+                         },
+                         {
+                             "file":  "game/Assets/StreamingAssets.meta",
+                             "bytes":  169,
+                             "sha256":  "d6f9f5931063c8f5306b3301b3930f360b34d190f833a9fa9af8125f37515991"
+                         },
+                         {
+                             "file":  "game/Assets/StreamingAssets/service.json",
+                             "bytes":  19,
+                             "sha256":  "7405724d4a5bbbca9e70e9ef39ba2eb3de0ce3c476025151466ff09b75af8cc2"
+                         },
+                         {
+                             "file":  "game/Assets/StreamingAssets/service.json.meta",
+                             "bytes":  152,
+                             "sha256":  "88d1b034b547d4959c7e766244dfa8eb7272a05e7cd8ae81920047ba7f1c320a"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo.meta",
+                             "bytes":  172,
+                             "sha256":  "07f022e5932c833d026e020b27d73452ebd781993b616d76003494af1e140946"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Icons.meta",
+                             "bytes":  193,
+                             "sha256":  "546e7d7af6b4d5e17d284c8f1188d05472e681911b8359905ee9b9e20769a106"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Icons/URP.png",
+                             "bytes":  24069,
+                             "sha256":  "1d17a9ff3537859abe2c008603d29d90cf43191ae77aa386167cc65e53ba03d9"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Icons/URP.png.meta",
+                             "bytes":  3156,
+                             "sha256":  "b330f1fcfc4e6ceccc95fc34a38434141603469b135633e1c4e8a03c19f9fdbc"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Layout.wlt",
+                             "bytes":  15479,
+                             "sha256":  "0a18bf035aa7ce914f19f7ce6b60a5a2d33e2371af6f492a8ea7a1bc78755b8b"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Layout.wlt.meta",
+                             "bytes":  176,
+                             "sha256":  "b8745a251df078ffa75dbaac0c4c6debecb61ab306b5b119a490ce6c635a11d8"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Scripts.meta",
+                             "bytes":  193,
+                             "sha256":  "930d0c8276cea1559a3e315f8500ea6ca8b58d980eee3b44aaa1d461742c47e0"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Scripts/Editor.meta",
+                             "bytes":  193,
+                             "sha256":  "7036bdbc8af05799b5fd508484343b35c28a68b390198da4673d34357d7d667f"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+                             "bytes":  6677,
+                             "sha256":  "d2023934bc2be23af69cd930ade85eff41c5db0a6f6666b05324b975befdb5b5"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs.meta",
+                             "bytes":  264,
+                             "sha256":  "f59080b424c16fa13edd105bf006fdbad98c11fce0c921043e63c8877f144cd9"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Scripts/Readme.cs",
+                             "bytes":  302,
+                             "sha256":  "c09c93844f93eb252a6fb39c222d169c63a63e96008fd040b9e7628c3e7ccc2e"
+                         },
+                         {
+                             "file":  "game/Assets/TutorialInfo/Scripts/Readme.cs.meta",
+                             "bytes":  317,
+                             "sha256":  "80a3df9969fab6e656583ee9bbca884d0507e2b7de3417f6ea3118fba901cd60"
+                         },
+                         {
+                             "file":  "game/Packages/manifest.json",
+                             "bytes":  653,
+                             "sha256":  "35c6ab6aa6ec350c372a610ef4ab583207100890e7816683e416c1cc60c285f4"
+                         },
+                         {
+                             "file":  "game/Packages/packages-lock.json",
+                             "bytes":  7795,
+                             "sha256":  "34cd982d37e5391fe667b819d9c8a1515ab2d58f9d126f6cfcd3a092cb87ada4"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/AudioManager.asset",
+                             "bytes":  413,
+                             "sha256":  "aeedeb3243f07b61dbbe854aa08b5ef6f0b5274dd9852ad9f6129dde3e105a31"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/ClusterInputManager.asset",
+                             "bytes":  114,
+                             "sha256":  "40e65dd214bf254955d2c8829ca8ce2130fd3510485560ce012e9a1ddd93e623"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/DynamicsManager.asset",
+                             "bytes":  1254,
+                             "sha256":  "b7c9a9dc08b98990109d4346f68745e15e238de400f96c583e53e1c83c743a78"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/EditorBuildSettings.asset",
+                             "bytes":  520,
+                             "sha256":  "0223ab0b853a0ea66a01dc3399ee022430144a4410f5797e93e0489e4b6c6a66"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/EditorSettings.asset",
+                             "bytes":  970,
+                             "sha256":  "705e5dde8b4ceb8147971b0c8f3781ebbe566a12b8e280379ee24f2bd9ad9474"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/GraphicsSettings.asset",
+                             "bytes":  2615,
+                             "sha256":  "6736f33dc62c35b0e7a88e275242080bc7a1d94c91154d18fceb332b661a6bce"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/InputManager.asset",
+                             "bytes":  9731,
+                             "sha256":  "7a1bb836a1008d26d0860d143e9d9df7ca41731d30a72901b518063819c62df2"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/MemorySettings.asset",
+                             "bytes":  1192,
+                             "sha256":  "1e8379a461b10ae09f3f696911088c16875d63e87ed5f2d95df9e1892703f9fd"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/MultiplayerManager.asset",
+                             "bytes":  157,
+                             "sha256":  "aba89fd1a1ddad182727ad82727e536d27372e90328a8196da2a4560398983dd"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/NavMeshAreas.asset",
+                             "bytes":  1308,
+                             "sha256":  "80106cfa7e6181a1928b142c075f3e510d527441e3d79bc83590e4ac91e7cd66"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/PackageManagerSettings.asset",
+                             "bytes":  1003,
+                             "sha256":  "a7dabba589abe7fc2b45bd3d3fba3fe9be97043492703f716da2d9131c13a807"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/Physics2DSettings.asset",
+                             "bytes":  2028,
+                             "sha256":  "e3cbdbf0be15244b7b67d2f07bdb8e8981911c11a8c7fe8035f5261272fec658"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/PresetManager.asset",
+                             "bytes":  146,
+                             "sha256":  "29c125923fe6e29f90190d4fce1c82d660e7051546e2c9d02908d18c9cf2436c"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/ProjectSettings.asset",
+                             "bytes":  25565,
+                             "sha256":  "37f919a1276d69b3e0b3db947b82220978754d7e53fb422708b7465a3d6ca6ef"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/ProjectVersion.txt",
+                             "bytes":  85,
+                             "sha256":  "7a43a06dfe51c4e3933c5a7848320925ce96e667f8c7736557d13a02007e9860"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/QualitySettings.asset",
+                             "bytes":  3662,
+                             "sha256":  "6814d6cc3eb850dd7d2a069a8b17ba9f7591deba8b1758a855978bd9c8627643"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/SceneTemplateSettings.json",
+                             "bytes":  3535,
+                             "sha256":  "bb9098b3bfcde78d93e264b96f7b77b5430e64e8c57a7aad7f5a5d9c3945e16a"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/ShaderGraphSettings.asset",
+                             "bytes":  556,
+                             "sha256":  "cdba1e5d65bcf6e3269d76ed3e60b6c21f98322002996642c9d74f1eb89f6b91"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/TagManager.asset",
+                             "bytes":  657,
+                             "sha256":  "23fc56b484aa3d7edf5914cd3591f7a823ccef5e3f3496f8a51f30388ead63dc"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/TimeManager.asset",
+                             "bytes":  202,
+                             "sha256":  "1a83e54adbbda7c9f4851103a0c6ab7f6448a3343d4ea5b7620452fa08416ecd"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/UnityConnectSettings.asset",
+                             "bytes":  1063,
+                             "sha256":  "11251dae0356b6f43dd2c67bb511f6b7ecda4e5de425186bba3297e6f3dc1c6f"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/URPProjectSettings.asset",
+                             "bytes":  410,
+                             "sha256":  "a3a626cb529ccfc0a82e388b8cd32bc60888f7226c33412fad3bc50aba802cd7"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/VersionControlSettings.asset",
+                             "bytes":  188,
+                             "sha256":  "e7bda45bf7a394745fee1316e6c71fa676004d591ad1f3aa247fd3e4ceb86071"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/VFXManager.asset",
+                             "bytes":  308,
+                             "sha256":  "f066c6483919961332415ee64204f74fe52f38c02e82892eb02b7a5b2e381f0e"
+                         },
+                         {
+                             "file":  "game/ProjectSettings/XRSettings.asset",
+                             "bytes":  158,
+                             "sha256":  "edd2beb4a2e388312b4b7da241aa51070434005d82c59363f1237dd2e567585f"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/bin.meta",
+                             "bytes":  172,
+                             "sha256":  "3c12222e501a35e98d6baa203830ca44c0dfb85a78a188f518e802d27b5f38c3"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/Directory.Build.props",
+                             "bytes":  270,
+                             "sha256":  "dc27c7b57be01b60769581460449bae16e4162174a818af69f70fe21aa1b7c59"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/Directory.Build.props.meta",
+                             "bytes":  155,
+                             "sha256":  "d0e147dc3421cb78f502026d20673ad5d53f598c9eefc5ba7a64e59ff19521f3"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/obj.meta",
+                             "bytes":  172,
+                             "sha256":  "a61879a08f5937ee186feb874497dfa08a3240c0de515df5d9d7ec711945700e"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/package.json",
+                             "bytes":  202,
+                             "sha256":  "5c0a970e6a3d02585b00769ccb520a7e9a46fe7359c850263cde1e061c02382e"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/package.json.meta",
+                             "bytes":  163,
+                             "sha256":  "fc033185be7705cce0000224c20c535d741fb7aafb048f2a7880684311a24d8a"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/Palimpseste.Contracts.asmdef",
+                             "bytes":  248,
+                             "sha256":  "e9664c956d035b27f11216a1714bf1dd9ee1bd3689df95eb104ee1fea61a0011"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/Palimpseste.Contracts.asmdef.meta",
+                             "bytes":  166,
+                             "sha256":  "992914be09670a13f7fc8231cd09c51c770385fa145eeb66b201cf0bdc9737f6"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/Palimpseste.Contracts.csproj",
+                             "bytes":  204,
+                             "sha256":  "36810124497198b5fa55c28d390a82caccc441e867a54043906c5b4041344777"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/Palimpseste.Contracts.csproj.meta",
+                             "bytes":  155,
+                             "sha256":  "8f623c7f5c8ea92d2310621a195c7d464642c7e808d0819110e8235e6c3b0ec5"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/SpellContracts.cs",
+                             "bytes":  11147,
+                             "sha256":  "0249e1c21a70d7d2e38b3ab7e3ddf6b960201f6434657a102f2028f6c5228499"
+                         },
+                         {
+                             "file":  "shared/Palimpseste.Contracts/SpellContracts.cs.meta",
+                             "bytes":  59,
+                             "sha256":  "bd81f4bbf166ca5cbd7679cf0e5b66c39bfd9c495e170f6be8f2a2246066c5db"
+                         }
+                     ],
+    "source_snapshot":  "working tree hashes observed after successful build; not a claim that the tree is committed",
+    "excluded_patterns":  [
+                              "*DoNotShip*",
+                              "*DontShipItWithYourGame*"
+                          ],
+    "previous_delivery_backup":  "game/Build/ImageReferenceBackups/20260920-201056-7bd8b32d",
+    "model_calls":  0,
+    "art_acceptance":  "not_claimed",
+    "player_launch":  {
+                          "pid":  39012,
+                          "requested_at":  "2026-09-20T20:11:04.2441142Z",
+                          "shortcut_updated":  true
+                      }
+}

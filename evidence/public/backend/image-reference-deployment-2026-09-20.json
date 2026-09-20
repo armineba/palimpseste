@@ -1,0 +1,50 @@
+{
+    "kind":  "palimpseste_d13_public_deployment",
+    "source_private_report_sha256":  "cc8db035311fed41f793fc63eb2b0529a49724a2215b09040dd41d250548ed52",
+    "started_at":  "2026-09-20T20:10:06.3707384+00:00",
+    "finished_at":  "2026-09-20T20:10:26.5937018+00:00",
+    "completed":  true,
+    "phase":  "services_running",
+    "migration_008_applied":  true,
+    "cli_name":  "codex-image.exe",
+    "cli_sha256":  "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "worker_sha256":  "c0cd54b824f5e9101b8dfa7dbcdd7d89f5d8d2d967142f2196bbb3eac410c813",
+    "api_sha256":  "f8f507a3884b92414a7d5b0137ef470dcb0b6be6926674faa2b543bd57f8d9e1",
+    "api_pid":  30084,
+    "worker_pid":  15760,
+    "image_and_planner_evidence_sha256":  "74cb91c014f5d07488e7d3ae1a62f26b875e2c85d358b0c2b4d82376097b9c8a",
+    "interpreter_evidence_sha256":  "8a6e81d9e827ca2d23f37e41db745c03e6c7cc15654ba67ef7b6ede079430850",
+    "feature_evidence_sha256":  "c4723002f93b0dbc022a68eadba57861c92841df75a3e172c7065c3c9de0aef3",
+    "readiness":  {
+                      "status":  "ready",
+                      "observation":  "local /health/ready checked by deployment operator",
+                      "postdeploy_doctor_production_issues":  [
+
+                                                              ],
+                      "postdeploy_doctor_interpreter_production_issues":  [
+
+                                                                          ],
+                      "postdeploy_doctor_image_production_issues":  [
+
+                                                                    ],
+                      "doctor_observation":  "local diagnostic reported by deployment operator; no model call"
+                  },
+    "player":  {
+                   "version":  "1.3.0",
+                   "pid":  39012,
+                   "launched_at_utc":  "2026-09-20T20:11:04Z",
+                   "main_window_title":  "Palimpseste Spell Lab",
+                   "responding":  true,
+                   "shortcut_updated":  true,
+                   "observation":  "PID, executable path and window checked by deployment operator",
+                   "manifest":  "../unity/image-reference-delivery.json"
+               },
+    "incidents":  {
+                      "first_preflight":  "Stopped before service shutdown: local LASTEXITCODE shadowed successful native PostgreSQL exit. Exact read-only count returned 0 jobs, native exit 0, empty stderr; script corrected.",
+                      "packaging":  "Player launch succeeded before manifest Save-Proof Replace(null) failed. Corrected with NullString.Value; pending manifest verified against existing PID/path and promoted without second launch."
+                  },
+    "new_model_calls_during_deployment":  0,
+    "production_player_job_observed":  false,
+    "human_acceptance":  "pending",
+    "scope":  "local owner installation; no remote-player availability asserted"
+}

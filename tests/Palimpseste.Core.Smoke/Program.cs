@@ -760,3 +760,104 @@ foreach (var appearance in plannerSchema.DescendantsAndSelf().OfType<JObject>()
         ((JArray)appearance["properties"]["form"]["enum"]).Where(value => value.Type == JTokenType.String)
             .Values<string>().ToHashSet().SetEquals(aForms), "Codex B visual forms differ from A");
 Console.WriteLine("Semantic forms passed: controlled A-to-B mapping, clean geometry independent of ink contours, provenance and mask tamper rejection, client 1.1 requirement, and legacy compatibility.");
+
+// Synthetic image metadata exercises the compiler boundary only. No image
+// provider is called, and this fixture does not claim a generated picture.
+var imageReference = new SpellVisualReference {
+    artifact_id = "a" + Guid.NewGuid().ToString("N"), sha256 = new string('c', 64),
+    size_bytes = 2048, width_px = 1024, height_px = 1024,
+    description_sha256 = SpellCompiler.Sha256(semanticDescriptionBytes), prompt_version = "sp.prompt.g/1.0"
+};
+JObject VisualPart(string kind) => new JObject {
+    ["kind"] = kind, ["material"] = "glass", ["position_cm"] = new JArray(-35, 15, 40),
+    ["scale_cm"] = new JArray(24, 12, 180), ["rotation_mdeg"] = new JArray(0, -25000, 12000),
+    ["color_rgb"] = new JArray(38, 155, 230), ["opacity_milli"] = 620, ["emission_milli"] = 900,
+    ["points_cm"] = kind is "ribbon" or "arc" ? new JArray(new JArray(0, 0, 0), new JArray(25, 8, 100)) : new JArray(),
+    ["motion"] = new JObject { ["kind"] = "flutter", ["amplitude_cm"] = 12,
+        ["frequency_mhz"] = 1400, ["phase_mdeg"] = 35000 }
+};
+var constructedPlan = (JObject)semanticPlan.DeepClone();
+constructedPlan["visual_reference_sha256"] = imageReference.sha256;
+foreach (var node in (JArray)constructedPlan["nodes"])
+    node["appearance"]["construction"] = new JObject {
+        ["parts"] = new JArray(VisualPart("shard"), VisualPart("ribbon"))
+    };
+var constructedInput = new CompilationInput {
+    DescriptionJson = semanticDescriptionBytes, PlanJson = JsonBytes(constructedPlan),
+    GeometryJson = semanticGeometry.GeometryJson, MaskPng = semanticGeometry.MaskPng,
+    GeometryArtifactIds = semanticInput.GeometryArtifactIds, MaskArtifactIds = semanticInput.MaskArtifactIds,
+    SpellId = "image-construction-smoke", ParchmentId = "image-construction-support",
+    SignatureSeedHex = "e10a330a765bc981", Provenance = input.Provenance, VisualReference = imageReference
+};
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, constructedInput.PlanJson,
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng, imageReference).Count == 0,
+    "Image-guided planner contract rejected its bound construction");
+var constructedCompiled = SpellCompiler.Compile(constructedInput);
+Require(constructedCompiled.Success, "Image construction did not compile: " + string.Join("; ", constructedCompiled.Issues));
+Require(constructedCompiled.Spell.versions.min_client == "1.3.0" &&
+    constructedCompiled.Spell.visual_reference.artifact_id == imageReference.artifact_id &&
+    constructedCompiled.Spell.plan.visual_reference_sha256 == imageReference.sha256 &&
+    constructedCompiled.Spell.binary_assets.Count == semanticCompiled.Spell.binary_assets.Count &&
+    JToken.DeepEquals(JToken.FromObject(constructedCompiled.Spell.resource_bounds), JToken.FromObject(semanticCompiled.Spell.resource_bounds)),
+    "Image construction lost provenance, changed collision assets/budgets, or allowed an incompatible client");
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, constructedInput.PlanJson,
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng).Any(issue => issue.Code == "visual_reference_missing"),
+    "An unbound image construction was accepted without persisted reference metadata");
+var wrongImagePlan = (JObject)constructedPlan.DeepClone();
+wrongImagePlan["visual_reference_sha256"] = new string('d', 64);
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(wrongImagePlan),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng, imageReference).Any(issue => issue.Code == "visual_reference_hash"),
+    "Plan accepted another reference image hash");
+imageReference.description_sha256 = new string('d', 64);
+Require(SpellCompiler.Compile(constructedInput).Issues.Any(issue => issue.Code == "visual_reference_description"),
+    "An image generated for a different frozen description was accepted");
+imageReference.description_sha256 = SpellCompiler.Sha256(semanticDescriptionBytes);
+var missingConstruction = (JObject)constructedPlan.DeepClone();
+missingConstruction["nodes"][0]["appearance"]["construction"] = JValue.CreateNull();
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(missingConstruction),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng, imageReference).Any(issue => issue.Code == "visual_construction_required"),
+    "Image-guided plan accepted a node containing only an old template form");
+foreach (var badPart in new[] {
+    (field: "kind", value: (JToken)"execute_csharp"),
+    (field: "material", value: (JToken)"https://example.invalid/shader"),
+    (field: "position_cm", value: (JToken)new JArray(1001, 0, 0)),
+    (field: "scale_cm", value: (JToken)new JArray(0, 20, 30)),
+    (field: "color_rgb", value: (JToken)new JArray(255, 256, 0)),
+    (field: "opacity_milli", value: (JToken)1001),
+    (field: "custom_code", value: (JToken)"untrusted")
+})
+{
+    var altered = (JObject)constructedPlan.DeepClone();
+    altered["nodes"][0]["appearance"]["construction"]["parts"][0][badPart.field] = badPart.value;
+    Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(altered),
+        semanticGeometry.GeometryJson, semanticGeometry.MaskPng, imageReference).Any(issue => issue.Code == "plan_json"),
+        "Unsafe visual part escaped the strict contract: " + badPart.field);
+}
+var degenerateRibbon = (JObject)constructedPlan.DeepClone();
+degenerateRibbon["nodes"][0]["appearance"]["construction"]["parts"][1]["points_cm"] =
+    new JArray(new JArray(0, 0, 0), new JArray(0, 0, 0));
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(degenerateRibbon),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng, imageReference)
+    .Any(issue => issue.Code == "visual_part_path_degenerate"), "Collapsed construction ribbon was accepted");
+var nonPathPoints = (JObject)constructedPlan.DeepClone();
+nonPathPoints["nodes"][0]["appearance"]["construction"]["parts"][0]["points_cm"] = new JArray { new JArray(0, 0, 0) };
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(nonPathPoints),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng, imageReference)
+    .Any(issue => issue.Code == "visual_part_points"), "Primitive accepted an unsupported point list");
+var excessiveVisualInstances = (JObject)constructedPlan.DeepClone();
+excessiveVisualInstances["nodes"][0]["appearance"]["construction"]["parts"] =
+    new JArray(Enumerable.Range(0, 64).Select(_ => VisualPart("feather")));
+excessiveVisualInstances["nodes"][0]["activation"]["copies"] = 8;
+excessiveVisualInstances["nodes"][0]["activation"]["max_activations"] = 8;
+Require(SpellCompiler.ValidatePlanJson(semanticDescriptionBytes, JsonBytes(excessiveVisualInstances),
+    semanticGeometry.GeometryJson, semanticGeometry.MaskPng, imageReference)
+    .Any(issue => issue.Code == "visual_resource_budget"), "Expanded visual-part budget was omitted");
+var legacyPacket = ContractJson.ParseStrict(semanticCompiled.PayloadUtf8);
+Require(legacyPacket.Property("visual_reference") == null &&
+    ((JObject)legacyPacket["plan"]).Property("visual_reference_sha256") == null &&
+    ((JObject)legacyPacket["plan"]["nodes"][0]["appearance"]).Property("construction") == null,
+    "Legacy compiled packets contain null image-construction fields");
+Require(((JArray)plannerSchema["required"]).Values<string>().Contains("visual_reference_sha256") &&
+    ((JArray)plannerSchema["properties"]["visual_reference_sha256"]["type"]).Values<string>().Contains("null"),
+    "B transport must require an explicitly nullable reference hash for legacy calls");
+Console.WriteLine("Image-guided contract passed with synthetic metadata: strict bounded parts, reference/description provenance, all-node construction, expanded budget, unchanged mechanics, client 1.3, and legacy omission. No image provider was called.");

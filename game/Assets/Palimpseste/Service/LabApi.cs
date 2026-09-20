@@ -15,6 +15,7 @@ namespace Palimpseste.Game.Service
     [Serializable] public sealed class JobDto
     {
         public string job_id, parchment_id, state, resume_stage, spell_id, message, error_code, description_artifact_id;
+        public string visual_reference_artifact_id, visual_reference_sha256;
         public int attempt_count, poll_after_ms;
         public long elapsed_ms;
         public string created_at, updated_at, stage_started_at;

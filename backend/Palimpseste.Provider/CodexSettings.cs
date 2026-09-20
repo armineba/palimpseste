@@ -32,7 +32,11 @@ public sealed record CodexSettings(
     string InterpreterEffort = LunaCodexProvider.InterpreterEffort,
     bool InterpreterCompatibilityVerified = false,
     string InterpreterEvidencePath = "",
-    string InterpreterEvidenceSha256 = "")
+    string InterpreterEvidenceSha256 = "",
+    bool ImageGenerationCompatibilityVerified = false,
+    string ImageGenerationEvidencePath = "",
+    string ImageGenerationEvidenceSha256 = "",
+    string ImageGenerationExecutable = "")
 {
     // These are the capabilities that must be observed false in the CLI
     // feature table before a runtime feature evidence file can be accepted.
@@ -74,7 +78,14 @@ public sealed record CodexSettings(
         Read("PALIMPSESTE_INTERPRETER_EFFORT", "PALIMPSESTE_ASTRA_EFFORT") is { Length: > 0 } interpreterEffort ? interpreterEffort : LunaCodexProvider.InterpreterEffort,
         ParseBool("PALIMPSESTE_INTERPRETER_VERIFIED"),
         Read("PALIMPSESTE_INTERPRETER_EVIDENCE_PATH"),
-        Read("PALIMPSESTE_INTERPRETER_EVIDENCE_SHA256"));
+        Read("PALIMPSESTE_INTERPRETER_EVIDENCE_SHA256"),
+        ParseBool("PALIMPSESTE_IMAGE_GENERATION_VERIFIED"),
+        Read("PALIMPSESTE_IMAGE_GENERATION_EVIDENCE_PATH"),
+        Read("PALIMPSESTE_IMAGE_GENERATION_EVIDENCE_SHA256"),
+        Read("PALIMPSESTE_IMAGE_CODEX_EXE"));
+
+    public string ExecutableForStage(string stage) => stage == "G" && !string.IsNullOrWhiteSpace(ImageGenerationExecutable)
+        ? ImageGenerationExecutable : Executable;
 
     /// <summary>
     /// Performs the checks that must pass before a process can be started.
@@ -85,10 +96,18 @@ public sealed record CodexSettings(
     public IReadOnlyList<string> Check(bool production, bool compatibilityProbe = false, string stage = "B")
     {
         var issues = new List<string>();
-        if (stage is not ("A" or "B" or "repair_A" or "repair_B"))
+        if (stage is not ("A" or "B" or "G" or "repair_A" or "repair_B"))
             issues.Add("invalid_provider_stage");
 
         CheckDirectoryOrFile(Executable, file: true, "codex_executable_missing", issues);
+        if (stage == "G")
+        {
+            var imageExecutable = ExecutableForStage(stage);
+            CheckDirectoryOrFile(imageExecutable, file: true, "image_codex_executable_missing", issues);
+            if (HasReparsePoint(imageExecutable) || !string.Equals(Path.GetDirectoryName(imageExecutable),
+                    Path.GetDirectoryName(Executable), StringComparison.OrdinalIgnoreCase))
+                issues.Add("image_codex_executable_untrusted_location");
+        }
         CheckDirectoryOrFile(CodexHome, file: false, "dedicated_codex_home_missing", issues);
         CheckDirectoryOrFile(AttemptRoot, file: false, "attempt_root_missing", issues);
         CheckDirectoryOrFile(TrustedSpecificationRoot, file: false, "spec_root_missing", issues);
@@ -132,6 +151,20 @@ public sealed record CodexSettings(
         if (production && !compatibilityProbe && interpreterStage && InterpreterCompatibilityVerified && executableHash is not null &&
             !TryVerifyInterpreterEvidence(executableHash, out var interpreterIssue))
             issues.Add(interpreterIssue ?? "interpreter_evidence_invalid");
+        if (production && stage == "G" && !compatibilityProbe)
+        {
+            if (!ImageGenerationCompatibilityVerified) issues.Add("image_generation_not_verified");
+            else
+            {
+                try
+                {
+                    if (!TryVerifyImageGenerationEvidence(ComputeExecutableSha256(ExecutableForStage(stage))))
+                        issues.Add("image_generation_evidence_invalid");
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+                { issues.Add("image_codex_executable_hash_unavailable"); }
+            }
+        }
         if (AttemptTimeout <= TimeSpan.Zero || AttemptTimeout > TimeSpan.FromHours(2)) issues.Add("invalid_timeout");
         if (MaxOutputBytes < 100_000 || MaxOutputBytes > 10_000_000) issues.Add("invalid_output_limit");
 
@@ -446,14 +479,14 @@ public sealed record CodexSettings(
             if (root.ValueKind != JsonValueKind.Object ||
                 !(StringProperty(root, "kind", "provider_doctor_composite")
                     ? TryVerifyCompositeEvidence(root, executableHash)
-                    : ValidActiveEvidence(root, executableHash)))
+                    : ValidActiveEvidence(root, executableHash) || ValidImagePlannerEvidence(root, executableHash)))
             {
                 issue = "effort_evidence_content_invalid";
                 return false;
             }
             return true;
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or ArgumentException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException or KeyNotFoundException)
         {
             issue = "effort_evidence_unreadable";
             return false;
@@ -537,6 +570,40 @@ public sealed record CodexSettings(
             root.GetProperty("stage_a").GetProperty("final_sha256").GetString()!) &&
         StageFinalMatches(root, "stage_a", out _, out _) &&
         StageFinalMatches(root, "stage_b", out _, out _);
+
+    // A separately attested interpreter probe proves A. One actual image doctor
+    // then proves G and image-guided B without paying for a redundant B call.
+    private bool ValidImagePlannerEvidence(JsonElement root, string executableHash)
+    {
+        if (!ImageGenerationEvidenceIsValid(root, executableHash) ||
+            !StringProperty(root, "mode", "image") ||
+            !StringProperty(root, "plan_validation_status", "success") ||
+            !StringProperty(root, "compilation_status", "success") ||
+            !StringProperty(root, "compiler_version", "sp.compiler/1.0") ||
+            !ShaProperty(root, "compiled_probe_sha256") ||
+            !StageMetadata(root, "stage_b", Model, Effort) || !StageStarted(root, "stage_b") ||
+            !StageFinalMatches(root, "stage_b", out var bFinal, out _) ||
+            !StageFinalMatches(root, "stage_g", out var gFinal, out _) ||
+            !GeometryFromResolvedInk(root) ||
+            !root.TryGetProperty("stage_b_model_call_executed", out var bCall) || bCall.ValueKind != JsonValueKind.True ||
+            !root.TryGetProperty("stage_a_reuse", out var reuse) || reuse.ValueKind != JsonValueKind.Object ||
+            !reuse.TryGetProperty("hash_verified", out var verified) || verified.ValueKind != JsonValueKind.True ||
+            !reuse.TryGetProperty("model_call_executed", out var aCall) || aCall.ValueKind != JsonValueKind.False ||
+            !reuse.TryGetProperty("source_file", out var source) || source.ValueKind != JsonValueKind.String ||
+            !ShaProperty(reuse, "sha256")) return false;
+        var aPath = source.GetString()!;
+        var aSha = reuse.GetProperty("sha256").GetString()!;
+        if ((!IsTrustedInputFile(aPath) && !IsTrustedFile(aPath, AttemptRoot)) ||
+            !FileHashMatches(aPath, aSha, ContractEvidenceMaxBytes) ||
+            !StringProperty(root.GetProperty("geometry"), "description_sha256", aSha)) return false;
+        using var g = JsonDocument.Parse(File.ReadAllText(gFinal), new JsonDocumentOptions { MaxDepth = 32 });
+        using var b = JsonDocument.Parse(File.ReadAllText(bFinal), new JsonDocumentOptions { MaxDepth = 64 });
+        return StringProperty(g.RootElement, "schema_version", "sp.visual-reference-receipt/1.0") &&
+            StringProperty(g.RootElement, "description_sha256", aSha) &&
+            StringProperty(g.RootElement, "status", "generated") &&
+            StringProperty(b.RootElement, "description_sha256", aSha) &&
+            StringProperty(b.RootElement, "visual_reference_sha256", root.GetProperty("image").GetProperty("sha256").GetString()!);
+    }
 
     private bool CommonDoctorEvidence(JsonElement root, string executableHash) =>
         StringProperty(root, "requested_model", Model) &&
@@ -746,6 +813,46 @@ public sealed record CodexSettings(
         }
     }
 
+    private bool TryVerifyImageGenerationEvidence(string executableHash)
+    {
+        if (!IsFullyQualified(ImageGenerationEvidencePath) || HasReparsePoint(ImageGenerationEvidencePath) ||
+            !File.Exists(ImageGenerationEvidencePath) || !RegexSha256(ImageGenerationEvidenceSha256)) return false;
+        try
+        {
+            if (!FileHashMatches(ImageGenerationEvidencePath, ImageGenerationEvidenceSha256, 100_000)) return false;
+            using var json = JsonDocument.Parse(File.ReadAllText(ImageGenerationEvidencePath), new JsonDocumentOptions { MaxDepth = 32 });
+            return ImageGenerationEvidenceIsValid(json.RootElement, executableHash);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException or ArgumentException or InvalidOperationException or KeyNotFoundException)
+        {
+            return false;
+        }
+    }
+
+    private bool ImageGenerationEvidenceIsValid(JsonElement root, string executableHash)
+    {
+            if (!StringProperty(root, "kind", "provider_image_generation_doctor") ||
+                !StringProperty(root, "active_result", "success") || !CommonDoctorEvidence(root, executableHash) ||
+                !StringProperty(root, "cli_image_generation_contract", "palimpseste.codex-image/1.0") ||
+                !StageMetadata(root, "stage_g", Model, Effort) || !StageStarted(root, "stage_g") ||
+                !root.TryGetProperty("feature_list_observations", out var features) || features.ValueKind != JsonValueKind.Object ||
+                !root.TryGetProperty("image_generation_text_only", out var textOnly) || textOnly.ValueKind != JsonValueKind.True ||
+                !root.TryGetProperty("image_generation_one_shot", out var oneShot) || oneShot.ValueKind != JsonValueKind.True ||
+                !root.TryGetProperty("image", out var image) || image.ValueKind != JsonValueKind.Object ||
+                !image.TryGetProperty("saved_path", out var savedPath) || savedPath.ValueKind != JsonValueKind.String ||
+                !ShaProperty(image, "sha256")) return false;
+            foreach (var feature in RuntimeFeatureGateNames)
+                if (!features.TryGetProperty(feature, out var value) ||
+                    value.ValueKind != (feature == "image_generation" ? JsonValueKind.True : JsonValueKind.False)) return false;
+            var path = savedPath.GetString()!;
+            if (!IsPathInside(path, Path.Combine(CodexHome, "generated_images"), allowEqual: false) ||
+                !FileHashMatches(path, image.GetProperty("sha256").GetString()!, VisualReferencePng.MaxBytes)) return false;
+            var dimensions = VisualReferencePng.Validate(File.ReadAllBytes(path));
+            return image.TryGetProperty("width", out var width) && width.TryGetInt32(out var w) && w == dimensions.Width &&
+                image.TryGetProperty("height", out var height) && height.TryGetInt32(out var h) && h == dimensions.Height &&
+                StageFinalMatches(root, "stage_g", out _, out _);
+    }
+
     private bool RuntimeFeatureEvidenceContentIsValid(JsonElement root)
     {
         if (StringProperty(root, "kind", "provider_feature_doctor"))
@@ -853,7 +960,7 @@ public enum ProviderOutcome
 
 public sealed record CodexAttempt(
     string AttemptId, string Stage, string Prompt, string SchemaPath, IReadOnlyList<string> Images,
-    string JobId);
+    string JobId, SpellVisualReference? VisualReference = null);
 
 public sealed record CodexResult(
     ProviderOutcome Outcome, string? FinalJson, int? ExitCode, string? SessionId,
@@ -865,4 +972,5 @@ public sealed record CodexResult(
     bool DiagnosticStdoutTruncated = false,
     string? DiagnosticEventErrorSha256 = null, int? DiagnosticEventErrorLength = null,
     bool DiagnosticEventErrorTruncated = false,
-    string? DiagnosticCategory = null);
+    string? DiagnosticCategory = null,
+    GeneratedImageArtifact? GeneratedImage = null);

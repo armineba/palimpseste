@@ -174,13 +174,17 @@ public static partial class ApiHandlers
                    EXISTS(SELECT 1 FROM provider_attempts pa WHERE pa.job_id=j.id AND pa.status IN ('running','transport_uncertain')),
                    j.created_at,j.updated_at,
                    greatest(0,floor(extract(epoch from ((CASE WHEN j.state IN ('ready','needs_operator') THEN j.updated_at ELSE clock_timestamp() END)-j.created_at))*1000))::bigint,
-                   (SELECT max(pa.started_at) FROM provider_attempts pa WHERE pa.job_id=j.id AND pa.status='running')
+                   (SELECT max(pa.started_at) FROM provider_attempts pa WHERE pa.job_id=j.id AND pa.status='running'),
+                   va.id,va.sha256
             FROM jobs j
             LEFT JOIN interpretations i ON i.job_id=j.id
             LEFT JOIN artifacts da ON da.id=i.description_artifact_id
                 AND da.owner_id=j.owner_id
                 AND da.kind='description'
                 AND da.content_type='application/json'
+            LEFT JOIN visual_references vr ON vr.job_id=j.id
+            LEFT JOIN artifacts va ON va.id=vr.artifact_id AND va.owner_id=j.owner_id
+                AND va.kind='visual_reference' AND va.content_type='image/png'
             WHERE j.id=@id AND j.owner_id=@owner
             """, connection);
         command.Parameters.AddWithValue("id", jobId);
@@ -193,7 +197,8 @@ public static partial class ApiHandlers
             state, reader.IsDBNull(6) ? null : reader.GetString(6), reader.GetString(9),
             descriptionArtifactId, reader.GetInt64(10), reader.GetBoolean(11), reader.GetBoolean(12), reader.GetInt32(4));
         return Results.Json(Job(jobId, reader.IsDBNull(0) ? null : reader.GetGuid(0), state, reader.IsDBNull(2) ? null : reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetGuid(3), reader.GetInt32(4), reader.GetString(5), reader.IsDBNull(6) ? null : reader.GetString(6), retryable, state == "waiting_retry" ? 10000 : 2000, descriptionArtifactId,
-            reader.GetDateTime(13), reader.GetDateTime(14), reader.GetInt64(15), reader.IsDBNull(16) ? null : reader.GetDateTime(16)));
+            reader.GetDateTime(13), reader.GetDateTime(14), reader.GetInt64(15), reader.IsDBNull(16) ? null : reader.GetDateTime(16),
+            reader.IsDBNull(17) ? null : reader.GetGuid(17), reader.IsDBNull(18) ? null : reader.GetString(18)));
     }
 
     public static async Task<IResult> ResumeJob(HttpContext context, string id, NpgsqlDataSource db, CancellationToken ct)

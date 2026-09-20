@@ -96,7 +96,8 @@ public static partial class ApiHandlers
         => new { parchment_id = id.ToString("N"), state, layout_version = layout, job_id = jobId?.ToString("N"), spell_id = spellId?.ToString("N") };
 
     private static object Job(Guid id, Guid? parchmentId, string state, string? resumeStage, Guid? spellId, int attempts, string message, string? errorCode, bool retryable, int pollAfterMs = 2000, Guid? descriptionArtifactId = null,
-        DateTime? createdAt = null, DateTime? updatedAt = null, long? elapsedMs = null, DateTime? stageStartedAt = null)
+        DateTime? createdAt = null, DateTime? updatedAt = null, long? elapsedMs = null, DateTime? stageStartedAt = null,
+        Guid? visualReferenceArtifactId = null, string? visualReferenceSha256 = null)
         => new
         {
             job_id = id.ToString("N"),
@@ -105,6 +106,8 @@ public static partial class ApiHandlers
             resume_stage = resumeStage,
             spell_id = spellId?.ToString("N"),
             description_artifact_id = descriptionArtifactId is { } description ? PublicIds.Artifact(description) : null,
+            visual_reference_artifact_id = visualReferenceArtifactId is { } visual ? PublicIds.Artifact(visual) : null,
+            visual_reference_sha256 = visualReferenceSha256,
             attempt_count = attempts,
             message,
             error_code = errorCode,

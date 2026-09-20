@@ -186,6 +186,13 @@
           },
           "minItems": 1,
           "maxItems": 16
+        },
+        "visual_reference_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
         }
       },
       "required": [
@@ -346,6 +353,54 @@
         "title",
         "factual_description",
         "mechanical_lines"
+      ],
+      "additionalProperties": false
+    },
+    "visual_reference": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^a[0-9a-f]{32}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 24,
+          "maximum": 8388608
+        },
+        "width_px": {
+          "type": "integer",
+          "minimum": 512,
+          "maximum": 2048
+        },
+        "height_px": {
+          "type": "integer",
+          "minimum": 512,
+          "maximum": 2048
+        },
+        "description_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "prompt_version": {
+          "type": "string",
+          "minLength": 13,
+          "maxLength": 80,
+          "pattern": "^sp\\.prompt\\.g/[0-9]+\\.[0-9]+(\\.[0-9]+){0,2}$"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "sha256",
+        "size_bytes",
+        "width_px",
+        "height_px",
+        "description_sha256",
+        "prompt_version"
       ],
       "additionalProperties": false
     }
@@ -704,6 +759,9 @@
                 "impact"
               ],
               "additionalProperties": false
+            },
+            "construction": {
+              "$ref": "#/$defs/visual_construction"
             }
           },
           "required": [
@@ -991,6 +1049,9 @@
                 "impact"
               ],
               "additionalProperties": false
+            },
+            "construction": {
+              "$ref": "#/$defs/visual_construction"
             }
           },
           "required": [
@@ -1263,6 +1324,9 @@
                 "impact"
               ],
               "additionalProperties": false
+            },
+            "construction": {
+              "$ref": "#/$defs/visual_construction"
             }
           },
           "required": [
@@ -1506,6 +1570,9 @@
                 "impact"
               ],
               "additionalProperties": false
+            },
+            "construction": {
+              "$ref": "#/$defs/visual_construction"
             }
           },
           "required": [
@@ -1749,6 +1816,9 @@
                 "impact"
               ],
               "additionalProperties": false
+            },
+            "construction": {
+              "$ref": "#/$defs/visual_construction"
             }
           },
           "required": [
@@ -2004,6 +2074,9 @@
                 "impact"
               ],
               "additionalProperties": false
+            },
+            "construction": {
+              "$ref": "#/$defs/visual_construction"
             }
           },
           "required": [
@@ -2083,6 +2156,166 @@
         "appearance",
         "effects",
         "options"
+      ],
+      "additionalProperties": false
+    },
+    "visual_part": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "ellipsoid",
+            "shard",
+            "feather",
+            "ribbon",
+            "ring",
+            "arc"
+          ]
+        },
+        "material": {
+          "type": "string",
+          "enum": [
+            "glass",
+            "energy",
+            "mist",
+            "stone",
+            "metal"
+          ]
+        },
+        "position_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -1000,
+            "maximum": 1000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "scale_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "rotation_mdeg": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -360000,
+            "maximum": 360000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "color_rgb": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "opacity_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "emission_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6000
+        },
+        "points_cm": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": -1000,
+              "maximum": 1000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "motion": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "still",
+                "flutter",
+                "orbit",
+                "drift"
+              ]
+            },
+            "amplitude_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 150
+            },
+            "frequency_mhz": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6000
+            },
+            "phase_mdeg": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 360000
+            }
+          },
+          "required": [
+            "kind",
+            "amplitude_cm",
+            "frequency_mhz",
+            "phase_mdeg"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "kind",
+        "material",
+        "position_cm",
+        "scale_cm",
+        "rotation_mdeg",
+        "color_rgb",
+        "opacity_milli",
+        "emission_milli",
+        "points_cm",
+        "motion"
+      ],
+      "additionalProperties": false
+    },
+    "visual_construction": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/visual_part"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "parts"
       ],
       "additionalProperties": false
     }

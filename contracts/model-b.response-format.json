@@ -47,6 +47,13 @@
         },
         "minItems": 1,
         "maxItems": 16
+      },
+      "visual_reference_sha256": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^[0-9a-f]{64}$"
       }
     },
     "required": [
@@ -54,7 +61,8 @@
       "description_sha256",
       "catalog_version",
       "rules_profile",
-      "nodes"
+      "nodes",
+      "visual_reference_sha256"
     ],
     "additionalProperties": false,
     "$defs": {
@@ -403,6 +411,9 @@
                   "impact"
                 ],
                 "additionalProperties": false
+              },
+              "construction": {
+                "$ref": "#/$defs/visual_construction"
               }
             },
             "required": [
@@ -411,7 +422,8 @@
               "palette",
               "signature_geometry_id",
               "form",
-              "vfx"
+              "vfx",
+              "construction"
             ],
             "additionalProperties": false
           },
@@ -702,6 +714,9 @@
                   "impact"
                 ],
                 "additionalProperties": false
+              },
+              "construction": {
+                "$ref": "#/$defs/visual_construction"
               }
             },
             "required": [
@@ -710,7 +725,8 @@
               "palette",
               "signature_geometry_id",
               "form",
-              "vfx"
+              "vfx",
+              "construction"
             ],
             "additionalProperties": false
           },
@@ -986,6 +1002,9 @@
                   "impact"
                 ],
                 "additionalProperties": false
+              },
+              "construction": {
+                "$ref": "#/$defs/visual_construction"
               }
             },
             "required": [
@@ -994,7 +1013,8 @@
               "palette",
               "signature_geometry_id",
               "form",
-              "vfx"
+              "vfx",
+              "construction"
             ],
             "additionalProperties": false
           },
@@ -1241,6 +1261,9 @@
                   "impact"
                 ],
                 "additionalProperties": false
+              },
+              "construction": {
+                "$ref": "#/$defs/visual_construction"
               }
             },
             "required": [
@@ -1249,7 +1272,8 @@
               "palette",
               "signature_geometry_id",
               "form",
-              "vfx"
+              "vfx",
+              "construction"
             ],
             "additionalProperties": false
           },
@@ -1496,6 +1520,9 @@
                   "impact"
                 ],
                 "additionalProperties": false
+              },
+              "construction": {
+                "$ref": "#/$defs/visual_construction"
               }
             },
             "required": [
@@ -1504,7 +1531,8 @@
               "palette",
               "signature_geometry_id",
               "form",
-              "vfx"
+              "vfx",
+              "construction"
             ],
             "additionalProperties": false
           },
@@ -1763,6 +1791,9 @@
                   "impact"
                 ],
                 "additionalProperties": false
+              },
+              "construction": {
+                "$ref": "#/$defs/visual_construction"
               }
             },
             "required": [
@@ -1771,7 +1802,8 @@
               "palette",
               "signature_geometry_id",
               "form",
-              "vfx"
+              "vfx",
+              "construction"
             ],
             "additionalProperties": false
           },
@@ -1846,6 +1878,166 @@
           "appearance",
           "effects",
           "options"
+        ],
+        "additionalProperties": false
+      },
+      "visual_part": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "ellipsoid",
+              "shard",
+              "feather",
+              "ribbon",
+              "ring",
+              "arc"
+            ]
+          },
+          "material": {
+            "type": "string",
+            "enum": [
+              "glass",
+              "energy",
+              "mist",
+              "stone",
+              "metal"
+            ]
+          },
+          "position_cm": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": -1000,
+              "maximum": 1000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "scale_cm": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "rotation_mdeg": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": -360000,
+              "maximum": 360000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "color_rgb": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "opacity_milli": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "emission_milli": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6000
+          },
+          "points_cm": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": -1000,
+                "maximum": 1000
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "minItems": 0,
+            "maxItems": 16
+          },
+          "motion": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "still",
+                  "flutter",
+                  "orbit",
+                  "drift"
+                ]
+              },
+              "amplitude_cm": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 150
+              },
+              "frequency_mhz": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 6000
+              },
+              "phase_mdeg": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 360000
+              }
+            },
+            "required": [
+              "kind",
+              "amplitude_cm",
+              "frequency_mhz",
+              "phase_mdeg"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "kind",
+          "material",
+          "position_cm",
+          "scale_cm",
+          "rotation_mdeg",
+          "color_rgb",
+          "opacity_milli",
+          "emission_milli",
+          "points_cm",
+          "motion"
+        ],
+        "additionalProperties": false
+      },
+      "visual_construction": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/visual_part"
+            },
+            "minItems": 1,
+            "maxItems": 64
+          }
+        },
+        "required": [
+          "parts"
         ],
         "additionalProperties": false
       }

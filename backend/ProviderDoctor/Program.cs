@@ -7,14 +7,51 @@ using Palimpseste.Core;
 using Palimpseste.Provider;
 
 var settings = CodexSettings.FromEnvironment();
-if (args.Length == 0 || args[0] is not ("local" or "interpreter" or "astra" or "active" or "plan" or "validate"))
+if (args.Length == 0 || args[0] is not ("local" or "interpreter" or "astra" or "active" or "plan" or "image" or "validate"))
 {
-    Console.Error.WriteLine("Usage: ProviderDoctor local | interpreter <spec-root> <reference.png> <drawing.png> | active <spec-root> <reference.png> <drawing.png> --ink <ink.png> | plan <spec-root> <frozen-a.json> --a-sha256 <sha256> --ink <ink.png> | validate <spec-root> <a-final.json> <b-final.json> --a-sha256 <sha256> --b-sha256 <sha256> --ink <ink.png>; all modes accept --write <evidence.json>.");
+    Console.Error.WriteLine("Usage: ProviderDoctor local | interpreter <spec-root> <reference.png> <drawing.png> | active <spec-root> <reference.png> <drawing.png> --ink <ink.png> | plan|image <spec-root> <frozen-a.json> --a-sha256 <sha256> --ink <ink.png> | validate <spec-root> <a-final.json> <b-final.json> --a-sha256 <sha256> --b-sha256 <sha256> --ink <ink.png>; all modes accept --write <evidence.json>. Image mode may explicitly reuse successful G with --reuse-visual-evidence <private-report.json> --reuse-visual-evidence-sha256 <sha256> and a new --write path.");
     return 2;
 }
 
 var mode = args[0];
+var planningOnly = mode is "plan" or "image";
 var writePath = ReadOption(args, "--write");
+var reuseVisualPath = ReadOption(args, "--reuse-visual-evidence");
+var reuseVisualSha = ReadStringOption(args, "--reuse-visual-evidence-sha256");
+if (args.Contains("--reuse-visual-evidence") || args.Contains("--reuse-visual-evidence-sha256"))
+{
+    var privatePending = Path.Combine(Path.GetDirectoryName(settings.CodexHome.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))!, "evidence", "pending");
+    if (mode != "image" || reuseVisualPath is null || !IsSha256(reuseVisualSha) || writePath is null ||
+        args.Count(value => value == "--reuse-visual-evidence") != 1 ||
+        args.Count(value => value == "--reuse-visual-evidence-sha256") != 1 ||
+        !CodexSettings.IsTrustedFile(reuseVisualPath, privatePending) ||
+        !CodexSettings.IsPathInside(writePath, privatePending, allowEqual: false) ||
+        CodexSettings.HasReparsePoint(writePath) || File.Exists(writePath))
+    {
+        Console.Error.WriteLine("Image reuse requires a hash-bound private pending report and a different new --write path.");
+        return 2;
+    }
+    using var currentDoctor = Process.GetCurrentProcess();
+    foreach (var other in Process.GetProcessesByName(currentDoctor.ProcessName))
+    {
+        using (other)
+            if (other.Id != currentDoctor.Id)
+            {
+                Console.Error.WriteLine("Stop or finish the prior image doctor before explicitly resuming B.");
+                return 2;
+            }
+    }
+    // A crashed doctor may leave its Codex child alive. Reusing its checkpoint
+    // must not start another B while that previous provider process is running.
+    foreach (var child in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(settings.ExecutableForStage("G"))))
+    {
+        using (child)
+        {
+            Console.Error.WriteLine("Finish the outstanding hardened Codex process before explicitly resuming B.");
+            return 2;
+        }
+    }
+}
 string? executableHash = null;
 try { executableHash = CodexSettings.ComputeExecutableSha256(settings.Executable); }
 catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException) { }
@@ -108,6 +145,7 @@ var local = new Dictionary<string, object?>
     ["runtime_execution_tools"] = false,
     ["production_issues"] = settings.Check(true),
     ["interpreter_production_issues"] = settings.Check(true, stage: "A"),
+    ["image_production_issues"] = settings.Check(true, stage: "G"),
     ["active_test_issues"] = settings.Check(false),
     ["model_calls_executed"] = false,
     ["compatibility_evidence"] = new
@@ -347,9 +385,9 @@ var requiredPositionals = mode == "active" ? 4 : 3;
 var inkArgument = ReadOption(args, "--ink");
 var aHashArgument = ReadStringOption(args, "--a-sha256");
 if (args.Length < requiredPositionals || inkArgument is null ||
-    (mode == "plan" && (aHashArgument is null || !IsSha256(aHashArgument))) ||
+    (planningOnly && (aHashArgument is null || !IsSha256(aHashArgument))) ||
     (mode == "active" && args.Length > 4 && !args[4].StartsWith("--", StringComparison.Ordinal)) ||
-    (mode == "plan" && args.Length > 3 && !args[3].StartsWith("--", StringComparison.Ordinal)))
+    (planningOnly && args.Length > 3 && !args[3].StartsWith("--", StringComparison.Ordinal)))
 {
     Console.Error.WriteLine("Active doctor requires reference, drawing and --ink. Plan doctor requires frozen A, --a-sha256 and --ink.");
     await EmitAsync(local, writePath);
@@ -373,12 +411,12 @@ var root = Path.GetFullPath(args[1]);
 var inkPath = inkArgument;
 var reference = mode == "active" ? Path.GetFullPath(args[2]) : null;
 var drawing = mode == "active" ? Path.GetFullPath(args[3]) : null;
-var frozenAPath = mode == "plan" ? Path.GetFullPath(args[2]) : null;
+var frozenAPath = planningOnly ? Path.GetFullPath(args[2]) : null;
 if (!string.Equals(Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar),
         Path.GetFullPath(settings.TrustedSpecificationRoot).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase) ||
     !settings.IsTrustedInputFile(inkPath) ||
     (mode == "active" && (!settings.IsTrustedInputFile(reference!) || !settings.IsTrustedInputFile(drawing!))) ||
-    (mode == "plan" && !settings.IsTrustedInputFile(frozenAPath!) &&
+    (planningOnly && !settings.IsTrustedInputFile(frozenAPath!) &&
      !CodexSettings.IsTrustedFile(frozenAPath!, settings.AttemptRoot)))
 {
     local["active_blocked"] = true;
@@ -483,10 +521,101 @@ catch (Exception error) when (error is ArgumentException or InvalidDataException
     return 1;
 }
 
-var b = await provider.ProbePlanAsync("operator-doctor", Guid.NewGuid().ToString("N"), description, geometry, capabilities, CancellationToken.None);
-local["model_calls_executed"] = stageAProcessStarted || b.Transport.ProcessStarted;
+Palimpseste.Contracts.SpellVisualReference? visualMetadata = null;
+Palimpseste.Provider.SpellVisualReference? visualInput = null;
+byte[]? referenceImageBytes = null;
+var newImageModeModelCalls = 0;
+if (mode == "image")
+{
+    local["kind"] = "provider_image_generation_doctor";
+    var imageSettings = settings with { Executable = settings.ExecutableForStage("G") };
+    local["cli_executable_sha256"] = CodexSettings.ComputeExecutableSha256(imageSettings.Executable);
+    var imageFeatures = await RunCommandAsync(imageSettings, DoctorConstants.ImageFeatureListArguments());
+    var observations = ParseFeatureList(imageFeatures.Output);
+    local["feature_list_observations"] = DoctorConstants.DisabledFeatures.Distinct(StringComparer.Ordinal)
+        .ToDictionary(feature => feature, feature => ObservedFeature(feature, observations, featureListAliases), StringComparer.Ordinal);
+    if (imageFeatures.Status != "ok" || !CodexSettings.RuntimeFeatureGateNames.All(feature =>
+        ObservedFeature(feature, observations, featureListAliases) == (feature == "image_generation")))
+    {
+        local["active_result"] = "image_feature_observation_failed";
+        await EmitAsync(local, writePath);
+        return 1;
+    }
+    byte[] visualBytes;
+    string visualSha;
+    int visualWidth, visualHeight;
+    if (reuseVisualPath is not null)
+    {
+        try
+        {
+            var reused = ReadReusableVisualEvidence(settings, reuseVisualPath, reuseVisualSha!, Hash(description));
+            visualBytes = reused.Png; visualSha = reused.Sha256;
+            visualWidth = reused.Width; visualHeight = reused.Height;
+            // This is the original historical stage, never a fabricated new G
+            // result. The adjacent reuse metadata makes its origin explicit.
+            local["stage_g"] = reused.StageG;
+            local["image"] = reused.Image;
+            local["stage_g_model_call_executed"] = false;
+            local["stage_g_reuse"] = new { source_evidence = reuseVisualPath, sha256 = reuseVisualSha!.ToLowerInvariant(),
+                hash_verified = true, native_attestation_revalidated = true, model_call_executed = false,
+                historical_stage_g = true, source_result = reused.SourceResult,
+                explicit_operator_resume = true };
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or
+            JsonException or InvalidOperationException or KeyNotFoundException)
+        {
+            local["active_result"] = "visual_reuse_rejected";
+            local["visual_reuse_error_type"] = error.GetType().Name;
+            local["visual_reuse_error"] = error is InvalidDataException ? error.Message : "unreadable_or_invalid_visual_evidence";
+            local["new_model_calls_executed"] = 0;
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+    }
+    else
+    {
+        var g = await provider.ProbeGenerateVisualReferenceAsync("operator-image-doctor", Guid.NewGuid().ToString("N"), description, CancellationToken.None);
+        local["stage_g"] = StageEvidence(new ProviderDocument(g.Transport,
+            g.Transport.FinalJson is null ? null : Encoding.UTF8.GetBytes(g.Transport.FinalJson),
+            g.Transport.FinalJson is null ? null : Hash(Encoding.UTF8.GetBytes(g.Transport.FinalJson))));
+        local["model_calls_executed"] = g.Transport.ProcessStarted;
+        local["stage_g_model_call_executed"] = g.Transport.ProcessStarted;
+        newImageModeModelCalls = g.Transport.ProcessStarted ? 1 : 0;
+        local["new_model_calls_executed"] = newImageModeModelCalls;
+        if (g.PngBytes is null || !MatchesRequestedMetadata(g.Transport, settings, "G"))
+        {
+            local["active_result"] = "stage_g_failed";
+            await EmitAsync(local, writePath);
+            return 1;
+        }
+        visualBytes = g.PngBytes; visualSha = g.Sha256!;
+        visualWidth = g.Width!.Value; visualHeight = g.Height!.Value;
+        local["image"] = new { saved_path = g.SavedPath, sha256 = g.Sha256, width = g.Width, height = g.Height };
+    }
+    // Success requires the runner to validate the native event and text-only
+    // one-shot guard attestation; these flags are not inferred from the prompt.
+    local["cli_image_generation_contract"] = "palimpseste.codex-image/1.0";
+    local["image_generation_text_only"] = true;
+    local["image_generation_one_shot"] = true;
+    local["new_model_calls_executed"] = newImageModeModelCalls;
+    referenceImageBytes = visualBytes;
+    var inputPath = Path.Combine(settings.TrustedInputRoot, "visual-doctor-" + Guid.NewGuid().ToString("N") + ".png");
+    await File.WriteAllBytesAsync(inputPath, visualBytes);
+    visualInput = new(inputPath, visualSha);
+    visualMetadata = new()
+    {
+        artifact_id = "a" + Guid.NewGuid().ToString("N"), sha256 = visualSha,
+        size_bytes = visualBytes.Length, width_px = visualWidth, height_px = visualHeight,
+        description_sha256 = Hash(description), prompt_version = LunaCodexProvider.PromptGVersion
+    };
+    local["active_result"] = "stage_g_saved_stage_b_pending";
+    await EmitAsync(local, writePath);
+}
+var b = await provider.ProbePlanAsync("operator-doctor", Guid.NewGuid().ToString("N"), description, geometry, capabilities, visualInput, CancellationToken.None);
+local["model_calls_executed"] = local["model_calls_executed"] is true || stageAProcessStarted || b.Transport.ProcessStarted;
 local["stage_b_model_call_executed"] = b.Transport.ProcessStarted;
 local["stage_b"] = StageEvidence(b);
+if (mode == "image") local["new_model_calls_executed"] = newImageModeModelCalls + (b.Transport.ProcessStarted ? 1 : 0);
 if (b.Utf8 is null)
     local["active_result"] = "stage_b_failed";
 else if (!MatchesRequestedMetadata(b.Transport, settings, "B"))
@@ -497,7 +626,7 @@ else if (!MatchesRequestedMetadata(b.Transport, settings, "B"))
 }
 else
 {
-    var planIssues = SpellCompiler.ValidatePlanJson(description, b.Utf8, geometryJson, maskPng);
+    var planIssues = SpellCompiler.ValidatePlanJson(description, b.Utf8, geometryJson, maskPng, visualMetadata);
     local["plan_validation_status"] = planIssues.Count == 0 ? "success" : "rejected";
     if (planIssues.Count != 0)
     {
@@ -506,11 +635,29 @@ else
     }
     else
     {
-        var compilation = CompileDoctorProbe(description, b.Utf8, geometryJson, maskPng);
+        var compilation = CompileDoctorProbe(description, b.Utf8, geometryJson, maskPng, visualMetadata);
         local["compiler_version"] = SpellCompiler.Version;
         local["compilation_status"] = compilation.Success ? "success" : "rejected";
         local["active_result"] = compilation.Success ? "success" : "compilation_rejected";
-        if (compilation.Success) local["compiled_probe_sha256"] = compilation.PayloadSha256;
+        if (compilation.Success)
+        {
+            local["compiled_probe_sha256"] = compilation.PayloadSha256;
+            if (mode == "image" && writePath is not null)
+            {
+                var cache = Path.Combine(Path.GetDirectoryName(writePath)!, Path.GetFileNameWithoutExtension(writePath) + "-cache");
+                if (Directory.Exists(cache) || CodexSettings.HasReparsePoint(cache)) throw new InvalidDataException("probe_cache_exists");
+                Directory.CreateDirectory(Path.Combine(cache, "artifacts"));
+                await File.WriteAllBytesAsync(Path.Combine(cache, "spell.json"), compilation.PayloadUtf8);
+                await File.WriteAllTextAsync(Path.Combine(cache, "spell.json.sha256"), compilation.PayloadSha256);
+                await File.WriteAllBytesAsync(Path.Combine(cache, "description.json"), description);
+                await File.WriteAllBytesAsync(Path.Combine(cache, "artifacts", visualMetadata!.artifact_id), referenceImageBytes!);
+                foreach (var entry in compilation.Spell.geometry_manifest)
+                    await File.WriteAllBytesAsync(Path.Combine(cache, "artifacts", entry.artifact_id), geometryJson[entry.id]);
+                foreach (var entry in compilation.Spell.binary_assets)
+                    await File.WriteAllBytesAsync(Path.Combine(cache, "artifacts", entry.artifact_id), maskPng[entry.file_name]);
+                local["visual_probe_cache"] = cache;
+            }
+        }
         else local["compilation_issue_codes"] = compilation.Issues.Select(issue => issue.Code).Distinct().ToArray();
     }
 }
@@ -534,8 +681,102 @@ static string? ReadStringOption(string[] values, string name)
 static bool IsSha256(string? value) => value?.Length == 64 && value.All(Uri.IsHexDigit);
 static string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 
+static (byte[] Png, string Sha256, int Width, int Height, JsonElement StageG, JsonElement Image, string SourceResult)
+    ReadReusableVisualEvidence(CodexSettings settings, string evidencePath, string evidenceSha, string descriptionSha)
+{
+    static string Text(JsonElement parent, string name) => parent.GetProperty(name).GetString()
+        ?? throw new InvalidDataException("visual_reuse_string_missing");
+    static bool True(JsonElement parent, string name) => parent.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.True;
+    static void Require(bool condition, string code) { if (!condition) throw new InvalidDataException(code); }
+    static byte[] ReadBounded(string path, string boundary, int maximum)
+    {
+        if (!CodexSettings.IsTrustedFile(path, boundary)) throw new InvalidDataException("visual_reuse_file_untrusted");
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        if (stream.Length is <= 0 || stream.Length > maximum) throw new InvalidDataException("visual_reuse_file_size");
+        var bytes = new byte[checked((int)stream.Length)];
+        stream.ReadExactly(bytes);
+        return bytes;
+    }
+    var pending = Path.Combine(Path.GetDirectoryName(settings.CodexHome.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))!, "evidence", "pending");
+    var evidenceBytes = ReadBounded(evidencePath, pending, 100_000);
+    Require(Hash(evidenceBytes).Equals(evidenceSha, StringComparison.OrdinalIgnoreCase), "visual_reuse_report_hash");
+    using var report = JsonDocument.Parse(Encoding.UTF8.GetString(evidenceBytes).TrimStart('\uFEFF'), new JsonDocumentOptions { MaxDepth = 32 });
+    var root = report.RootElement;
+    var sourceResult = Text(root, "active_result");
+    Require(Text(root, "kind") == "provider_image_generation_doctor" && Text(root, "mode") == "image" &&
+        sourceResult is "stage_g_saved_stage_b_pending" or "stage_b_failed" or "stage_b_metadata_unverified" or "plan_rejected" or "compilation_rejected",
+        "visual_reuse_requires_prior_g_success_and_b_not_successful");
+    Require(Text(root, "service_identity") == settings.ExpectedServiceUser &&
+        Text(root, "expected_service_identity") == settings.ExpectedServiceUser &&
+        Environment.UserName.Equals(settings.ExpectedServiceUser, StringComparison.OrdinalIgnoreCase), "visual_reuse_service_identity");
+    var executableSha = CodexSettings.ComputeExecutableSha256(settings.ExecutableForStage("G"));
+    Require(Text(root, "cli_executable_sha256").Equals(executableSha, StringComparison.OrdinalIgnoreCase) &&
+        CodexSettings.ComputeExecutableSha256(settings.Executable).Equals(executableSha, StringComparison.OrdinalIgnoreCase),
+        "visual_reuse_hardened_executable_changed");
+    Require(Text(root, "requested_model") == settings.Model && Text(root, "requested_effort") == settings.Effort &&
+        Text(root, "cli_image_generation_contract") == "palimpseste.codex-image/1.0" &&
+        True(root, "image_generation_text_only") && True(root, "image_generation_one_shot"), "visual_reuse_native_contract");
+    var features = root.GetProperty("feature_list_observations");
+    foreach (var feature in CodexSettings.RuntimeFeatureGateNames)
+        Require(features.TryGetProperty(feature, out var observed) &&
+            observed.ValueKind == (feature == "image_generation" ? JsonValueKind.True : JsonValueKind.False), "visual_reuse_feature_isolation");
+    var stage = root.GetProperty("stage_g");
+    Require(Text(stage, "outcome") == "Success" && True(stage, "process_started") && stage.GetProperty("exit_code").GetInt32() == 0 &&
+        Text(stage, "requested_model") == settings.Model && Text(stage, "reported_model") == settings.Model &&
+        Text(stage, "requested_effort") == settings.Effort && Text(stage, "reported_effort") == settings.Effort,
+        "visual_reuse_g_stage_attestation");
+    Require(Text(root.GetProperty("stage_a_reuse"), "sha256") == descriptionSha &&
+        True(root.GetProperty("stage_a_reuse"), "hash_verified") &&
+        Text(root.GetProperty("geometry"), "description_sha256") == descriptionSha, "visual_reuse_description_changed");
+    var attemptDirectory = Text(stage, "attempt_directory");
+    var finalBytes = ReadBounded(Path.Combine(attemptDirectory, "final.json"), settings.AttemptRoot, ContractJson.MaxDocumentBytes);
+    Require(Hash(finalBytes).Equals(Text(stage, "final_sha256"), StringComparison.OrdinalIgnoreCase), "visual_reuse_receipt_hash");
+    using var receipt = JsonDocument.Parse(finalBytes);
+    Require(Text(receipt.RootElement, "schema_version") == "sp.visual-reference-receipt/1.0" &&
+        Text(receipt.RootElement, "status") == "generated" &&
+        Text(receipt.RootElement, "description_sha256") == descriptionSha, "visual_reuse_receipt_description");
+    var image = root.GetProperty("image");
+    var imagePath = Text(image, "saved_path");
+    var generatedRoot = Path.Combine(settings.CodexHome, "generated_images");
+    var png = ReadBounded(imagePath, generatedRoot, VisualReferencePng.MaxBytes);
+    var imageSha = Hash(png);
+    Require(imageSha.Equals(Text(image, "sha256"), StringComparison.OrdinalIgnoreCase), "visual_reuse_png_hash");
+    var dimensions = VisualReferencePng.Validate(png);
+    Require(image.GetProperty("width").GetInt32() == dimensions.Width && image.GetProperty("height").GetInt32() == dimensions.Height,
+        "visual_reuse_png_dimensions");
+    // Successful G preserves its native JSONL in the private attempt folder.
+    // Recheck that one actual native completion, its safeguards and its path
+    // match the PNG; a model-written receipt alone cannot authorize reuse.
+    var events = ReadBounded(Path.Combine(attemptDirectory, "stdout.jsonl"), settings.AttemptRoot, 100_000);
+    string? threadId = null, callId = null, nativePath = null;
+    var nativeCount = 0;
+    foreach (var line in Encoding.UTF8.GetString(events).Split('\n', StringSplitOptions.RemoveEmptyEntries))
+    {
+        using var entry = JsonDocument.Parse(line);
+        var evt = entry.RootElement;
+        if (!evt.TryGetProperty("type", out var eventType)) continue;
+        if (eventType.GetString() == "thread.started") threadId = Text(evt, "thread_id");
+        if (eventType.GetString() != "item.completed" || !evt.TryGetProperty("item", out var item) ||
+            !item.TryGetProperty("type", out var itemType) || itemType.GetString() != "image_generation") continue;
+        nativeCount++;
+        Require(nativeCount == 1 && Text(item, "source") == "native_image_generation" &&
+            Text(item, "protocol") == "palimpseste.codex-image/1.0" && True(item, "text_only") && True(item, "one_shot") &&
+            Text(item, "status") == "completed" &&
+            (!item.TryGetProperty("failure", out var failure) || failure.ValueKind == JsonValueKind.Null), "visual_reuse_native_event");
+        callId = Text(item, "call_id"); nativePath = Text(item, "saved_path");
+    }
+    Require(nativeCount == 1 && !string.IsNullOrWhiteSpace(threadId) && !string.IsNullOrWhiteSpace(callId) &&
+        !string.IsNullOrWhiteSpace(nativePath), "visual_reuse_native_event_missing_or_truncated");
+    static string Segment(string value) => new(value.Select(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_' ? c : '_').ToArray());
+    var expected = Path.Combine(generatedRoot, Segment(threadId!), Segment(callId!) + ".png");
+    Require(Path.GetFullPath(imagePath).Equals(Path.GetFullPath(expected), StringComparison.OrdinalIgnoreCase) &&
+        Path.GetFullPath(nativePath!).Equals(Path.GetFullPath(expected), StringComparison.OrdinalIgnoreCase), "visual_reuse_native_path");
+    return (png, imageSha, dimensions.Width, dimensions.Height, stage.Clone(), image.Clone(), sourceResult);
+}
+
 static CompilationResult CompileDoctorProbe(byte[] description, byte[] plan,
-    IReadOnlyDictionary<string, byte[]> geometry, IReadOnlyDictionary<string, byte[]> masks)
+    IReadOnlyDictionary<string, byte[]> geometry, IReadOnlyDictionary<string, byte[]> masks,
+    Palimpseste.Contracts.SpellVisualReference? visualReference = null)
 {
     var geometryIds = geometry.Keys.OrderBy(key => key, StringComparer.Ordinal)
         .Select((key, index) => (key, index))
@@ -548,6 +789,7 @@ static CompilationResult CompileDoctorProbe(byte[] description, byte[] plan,
         DescriptionJson = description, PlanJson = plan,
         GeometryJson = geometry, MaskPng = masks,
         GeometryArtifactIds = geometryIds, MaskArtifactIds = maskIds,
+        VisualReference = visualReference,
         SpellId = "doctor-only", ParchmentId = "doctor-only",
         SignatureSeedHex = "0000000000000000", CreatedAt = "2026-09-20T00:00:00Z",
         Provenance = new SpellProvenance
@@ -724,6 +966,15 @@ static class DoctorConstants
         foreach (var feature in DisabledFeatures) { arguments.Add("--disable"); arguments.Add(feature); }
         arguments.Add("features");
         arguments.Add("list");
+        return arguments.ToArray();
+    }
+
+    public static string[] ImageFeatureListArguments()
+    {
+        var arguments = new List<string>();
+        foreach (var feature in DisabledFeatures.Where(feature => feature != "image_generation"))
+        { arguments.Add("--disable"); arguments.Add(feature); }
+        arguments.AddRange(["--enable", "image_generation", "features", "list"]);
         return arguments.ToArray();
     }
 }

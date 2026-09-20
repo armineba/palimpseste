@@ -97,6 +97,15 @@ namespace Palimpseste.Game.SpellRuntime
             root.transform.position = state.position;
             root.transform.rotation = state.rotation;
             var tint = ColorFor(node.appearance?.palette, node.appearance?.affinity);
+            if (ImageConstructedSpellVisual.Supports(node))
+            {
+                ImageConstructedSpellVisual.ValidateConstruction(node.appearance.construction);
+                if (node.carrier == "barrier") Barrier(root, state, tint, false);
+                root.AddComponent<ImageConstructedSpellVisual>().Initialize(node);
+                root.AddComponent<SpellVfxComposition>().Initialize(node, tint, Vector3.zero,
+                    Mathf.Clamp(node.scale_cm / 100f * .25f, .4f, 2f));
+                return root;
+            }
             if (SemanticSpellVisual.Supports(node.appearance?.form))
             {
                 // Canonical paths and footprints still govern collisions. The
@@ -290,6 +299,14 @@ namespace Palimpseste.Game.SpellRuntime
         public static void ProjectileHit(CarrierState state, Vector3 point)
         {
             if (state.node.carrier != "projectile") return;
+            if (ImageConstructedSpellVisual.Supports(state.node))
+            {
+                ImageConstructedSpellVisual.SpawnImpact(state.node, point, state.direction);
+                SpellVfxComposition.SpawnImpact(state.node.appearance, point, state.direction,
+                    ColorFor(state.node.appearance.palette, state.node.appearance.affinity),
+                    Mathf.Clamp(state.node.scale_cm / 400f, .5f, 2f));
+                return;
+            }
             if (SemanticSpellVisual.Supports(state.node.appearance?.form))
             {
                 SpellVfxComposition.SpawnImpact(state.node.appearance, point, state.direction,
@@ -471,6 +488,13 @@ namespace Palimpseste.Game.SpellRuntime
         public static void BeamSegments(CarrierState state, System.Collections.Generic.List<Vector3> points)
         {
             if (state.visual == null || points.Count < 2) return;
+            var construction = state.visual.GetComponent<ImageConstructedSpellVisual>();
+            if (construction != null)
+            {
+                construction.SetBeamPath(points);
+                state.visual.GetComponent<SpellVfxComposition>()?.SetBeamPath(points);
+                return;
+            }
             var semantic = state.visual.GetComponent<SemanticSpellVisual>();
             if (semantic != null)
             {
@@ -573,6 +597,7 @@ namespace Palimpseste.Game.SpellRuntime
 
         public static void PulseRadius(CarrierState state, float outerRadius)
         {
+            state.visual?.GetComponent<ImageConstructedSpellVisual>()?.SetPulseRadius(outerRadius);
             var semantic = state.visual?.GetComponent<SemanticSpellVisual>();
             if (semantic != null)
             {
@@ -625,6 +650,12 @@ namespace Palimpseste.Game.SpellRuntime
 
         public static void TrapArmed(CarrierState state)
         {
+            if (state.visual?.GetComponent<ImageConstructedSpellVisual>() is ImageConstructedSpellVisual construction)
+            {
+                construction.Arm();
+                state.visual.GetComponent<SpellVfxComposition>()?.Arm();
+                return;
+            }
             var semantic = state.visual?.GetComponent<SemanticSpellVisual>();
             if (semantic != null)
             {

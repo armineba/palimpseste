@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="4" result="Passed" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0,265895">
+  <test-suite type="TestSuite" id="1043" name="Palimpseste Spell Lab" fullname="Palimpseste Spell Lab" runstate="Runnable" testcasecount="24" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.265895" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1036" name="Palimpseste.Game.PlayModeTests.dll" fullname="E:/Palimpseste/Palimpseste_Unity_Dossier_Luna_Codex/Palimpseste_Unity_Dossier/game/Library/ScriptAssemblies/Palimpseste.Game.PlayModeTests.dll" runstate="Runnable" testcasecount="24" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.256316" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="39348" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1037" name="Palimpseste" fullname="Palimpseste" runstate="Runnable" testcasecount="24" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.254754" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1038" name="Game" fullname="Palimpseste.Game" runstate="Runnable" testcasecount="24" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.253337" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1039" name="PlayModeTests" fullname="Palimpseste.Game.PlayModeTests" runstate="Runnable" testcasecount="24" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.216713" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1016" name="ImageSpellPacketValidatorTests" fullname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests" classname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.213768" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1021" name="DoesNotCoerceFractionalCoordinatesToIntegers" fullname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests.DoesNotCoerceFractionalCoordinatesToIntegers" methodname="DoesNotCoerceFractionalCoordinatesToIntegers" classname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests" runstate="Runnable" seed="662573100" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.032461" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1020" name="RejectsAggregateBudgetBeforeReadingImageOrCreatingMeshes" fullname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests.RejectsAggregateBudgetBeforeReadingImageOrCreatingMeshes" classname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.162431" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1018" name="RejectsAggregateBudgetBeforeReadingImageOrCreatingMeshes(3,43,1,1)" fullname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests.RejectsAggregateBudgetBeforeReadingImageOrCreatingMeshes(3,43,1,1)" methodname="RejectsAggregateBudgetBeforeReadingImageOrCreatingMeshes" classname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests" runstate="Runnable" seed="136464233" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.088357" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1019" name="RejectsAggregateBudgetBeforeReadingImageOrCreatingMeshes(1,17,8,8)" fullname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests.RejectsAggregateBudgetBeforeReadingImageOrCreatingMeshes(1,17,8,8)" methodname="RejectsAggregateBudgetBeforeReadingImageOrCreatingMeshes" classname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests" runstate="Runnable" seed="1718317423" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.000853" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-case id="1017" name="RejectsConstructionWithoutItsGeneratedImage" fullname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests.RejectsConstructionWithoutItsGeneratedImage" methodname="RejectsConstructionWithoutItsGeneratedImage" classname="Palimpseste.Game.PlayModeTests.ImageSpellPacketValidatorTests" runstate="Runnable" seed="1093023686" result="Passed" start-time="2026-09-20 18:31:22Z" end-time="2026-09-20 18:31:22Z" duration="0.001241" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:/Users/Utilisateur/AppData/LocalLow/Palimpseste/Palimpseste Spell Lab\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
