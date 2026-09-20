@@ -36,6 +36,7 @@ namespace Palimpseste.Game.SpellRuntime
         private readonly Transform caster;
         private readonly List<LabReceiver> targets;
         private readonly List<CarrierState> active = new List<CarrierState>();
+        private readonly List<GameObject> retiredBeamVisuals = new List<GameObject>();
         private readonly List<ScheduledCarrier> scheduled = new List<ScheduledCarrier>();
         private readonly Dictionary<string, int> activationCounts = new Dictionary<string, int>();
         private int nextInstance, nextCast;
@@ -100,15 +101,27 @@ namespace Palimpseste.Game.SpellRuntime
             for (var i = active.Count - 1; i >= 0; i--)
                 if (active[i].expired)
                 {
-                    if (active[i].visual != null) UnityEngine.Object.Destroy(active[i].visual);
+                    var visual = active[i].visual;
+                    if (visual != null)
+                    {
+                        if (active[i].node.carrier == "beam" && Option(active[i].node.options.lifetime_ticks, 1) == 1)
+                        {
+                            CarrierVisual.KeepOneTickBeamVisible(visual);
+                            retiredBeamVisuals.Add(visual);
+                        }
+                        else UnityEngine.Object.Destroy(visual);
+                    }
                     active.RemoveAt(i);
                 }
+            retiredBeamVisuals.RemoveAll(visual => visual == null);
             foreach (var target in targets) DamageMilli += target.TickStatus(TickCount);
         }
 
         public void CancelAll()
         {
             foreach (var state in active) if (state.visual != null) UnityEngine.Object.Destroy(state.visual);
+            foreach (var visual in retiredBeamVisuals) if (visual != null) UnityEngine.Object.Destroy(visual);
+            retiredBeamVisuals.Clear();
             active.Clear(); scheduled.Clear(); activationCounts.Clear();
             Hits = Impulses = Statuses = 0; DamageMilli = HealMilli = 0;
         }

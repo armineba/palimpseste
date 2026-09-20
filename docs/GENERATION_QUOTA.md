@@ -8,6 +8,8 @@ Un rejeu idempotent d'une capture déjà soumise renvoie le job existant avant l
 
 Ce plafond **n'est pas une limite de crédits OpenAI**. Un même job peut entraîner plusieurs tentatives du fournisseur, et les appels à Codex hors de cette API ne sont pas comptés. Le plafond borne le nombre de nouvelles demandes de génération acceptées par cette application, sans garantie monétaire absolue. L'opérateur doit garder des contrôles de compte et de supervision séparés.
 
+Pour ce déploiement, l'opérateur maintient la recharge automatique du compte Codex désactivée et n'effectue aucun achat de crédits. La connexion du worker utilise le compte ChatGPT déjà présent, sans clé API. Le serveur ne dispose d'aucune interface fiable pour lire ou modifier le solde et le réglage de recharge de ce compte ; ces points se vérifient dans l'interface de facturation du compte avant d'ouvrir la génération joueur. Tant que cette vérification et la revue humaine A/B ne sont pas acceptées, le worker reste arrêté.
+
 ## Vérification du 20 septembre 2026
 
 `dotnet build Palimpseste.sln -c Release -v:q` et `dotnet build tests/Palimpseste.Api.GenerationQuota/Palimpseste.Api.GenerationQuota.csproj -c Release -v:q` : succès, 0 avertissement et 0 erreur chacun. Le test utilise exclusivement la base locale `palimpseste_test` et crée puis supprime un schéma aléatoire isolé. Vingt admissions concurrentes avec plafonds de test 2/principal et 3/global ont produit exactement 3 jobs engagés ; aucun principal n'a dépassé 2. Un job vieux de 25 heures et une transaction annulée n'ont pas consommé de place ; un principal a été refusé par le plafond individuel et un autre par le plafond global. La sortie publique est sous `evidence/public/backend/generation-quota-2026-09-20.md`.

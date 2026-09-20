@@ -2404,7 +2404,7 @@ index 30df7f1..69fbba3 100644
  pub struct TurnFailedEvent {
      pub error: ThreadErrorEvent,
 diff --git a/codex-rs/exec/src/lib.rs b/codex-rs/exec/src/lib.rs
-index c7c54fe..06e2095 100644
+index c7c54fe..a670288 100644
 --- a/codex-rs/exec/src/lib.rs
 +++ b/codex-rs/exec/src/lib.rs
 @@ -135,6 +135,7 @@ pub use exec_events::McpToolCallItemResult;
@@ -2415,7 +2415,17 @@ index c7c54fe..06e2095 100644
  pub use exec_events::ReasoningItem;
  pub use exec_events::ThreadErrorEvent;
  pub use exec_events::ThreadEvent;
-@@ -1619,6 +1620,9 @@ fn should_process_notification(
+@@ -1365,6 +1366,9 @@ fn thread_start_params_from_config(
+         ephemeral: Some(config.ephemeral),
+         history_mode: (!config.ephemeral).then_some(ThreadHistoryMode::Paginated),
+         thread_source: Some(thread_source.clone()),
++        // The app-server otherwise filters rawResponse/completed before exec can
++        // attest the upstream metadata carried by every model response.
++        experimental_raw_events: true,
+         ..ThreadStartParams::default()
+     }
+ }
+@@ -1619,6 +1623,9 @@ fn should_process_notification(
          ServerNotification::ModelVerification(notification) => {
              notification.thread_id == thread_id && notification.turn_id == turn_id
          }
@@ -2426,7 +2436,7 @@ index c7c54fe..06e2095 100644
              notification.thread_id == thread_id && notification.turn_id == turn_id
          }
 diff --git a/codex-rs/exec/src/lib_tests.rs b/codex-rs/exec/src/lib_tests.rs
-index fb5b589..9e296b0 100644
+index fb5b589..2d08b1a 100644
 --- a/codex-rs/exec/src/lib_tests.rs
 +++ b/codex-rs/exec/src/lib_tests.rs
 @@ -18,6 +18,37 @@ use std::sync::Mutex;
@@ -2467,6 +2477,22 @@ index fb5b589..9e296b0 100644
  fn test_tracing_subscriber() -> impl tracing::Subscriber + Send + Sync {
      let provider = SdkTracerProvider::builder().build();
      let tracer = provider.tracer("codex-exec-tests");
+@@ -663,6 +694,7 @@ async fn thread_start_params_match_history_to_persistence() {
+         Some(codex_app_server_protocol::ThreadSource::User)
+     );
+     assert_eq!(params.history_mode, Some(ThreadHistoryMode::Paginated));
++    assert!(params.experimental_raw_events);
+ 
+     let thread_source = ThreadSource::Feature("automated_review".to_string());
+     let params = thread_start_params_from_config(&config, &thread_source);
+@@ -673,6 +705,7 @@ async fn thread_start_params_match_history_to_persistence() {
+ 
+     assert_eq!(params.ephemeral, Some(true));
+     assert_eq!(params.history_mode, None);
++    assert!(params.experimental_raw_events);
+ }
+ 
+ #[tokio::test]
 diff --git a/codex-rs/protocol/src/protocol.rs b/codex-rs/protocol/src/protocol.rs
 index 66e4315..33ab062 100644
 --- a/codex-rs/protocol/src/protocol.rs

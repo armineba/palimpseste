@@ -236,7 +236,12 @@ namespace Palimpseste.Core
                 if (relation.source_subject_id == relation.target_subject_id)
                     Add(issues, "self_relation", relation.source_subject_id, "Subject cannot trigger itself");
                 foreach (var id in relation.clause_ids)
-                    if (!clauseIds.Contains(id)) Add(issues, "relation_clause", id, "Unknown relation clause");
+                {
+                    var cited = d.clauses.FirstOrDefault(c => c.id == id);
+                    if (cited == null || cited.kind != "mechanical" ||
+                        (cited.subject_id != relation.source_subject_id && cited.subject_id != relation.target_subject_id))
+                        Add(issues, "relation_clause", id, "Relation requires a mechanical clause of its source or target");
+                }
             }
             foreach (var subject in subjects)
             {
@@ -267,9 +272,12 @@ namespace Palimpseste.Core
             {
                 var p = node.node_id;
                 if (!Emitted.ContainsKey(node.carrier)) { Add(issues, "carrier", p, "Unknown carrier"); continue; }
-                var subjectClauses = d.clauses.Where(c => c.subject_id == node.subject_id && c.kind == "mechanical").ToArray();
-                var subjectIds = subjectClauses.Select(c => c.id).ToHashSet(StringComparer.Ordinal);
-                if (!subjectIds.SetEquals(node.clause_ids)) Add(issues, "clause_trace", p, "Node clauses differ from subject mechanical clauses");
+                var allSubjectClauses = d.clauses.Where(c => c.subject_id == node.subject_id).ToArray();
+                var subjectClauses = allSubjectClauses.Where(c => c.kind == "mechanical").ToArray();
+                var subjectIds = allSubjectClauses.Select(c => c.id).ToHashSet(StringComparer.Ordinal);
+                var nodeClauseIds = node.clause_ids.ToHashSet(StringComparer.Ordinal);
+                if (!subjectIds.SetEquals(nodeClauseIds) || nodeClauseIds.Count != node.clause_ids.Count)
+                    Add(issues, "clause_trace", p, "Node must cite every clause of its subject exactly once");
                 var facts = subjectClauses.SelectMany(c => c.facts).ToArray();
                 if (!facts.Any(f => f.dimension == "carrier" && f.value == node.carrier))
                     Add(issues, "carrier_fact", p, "Carrier differs from description");
@@ -282,6 +290,25 @@ namespace Palimpseste.Core
                     .ToHashSet(StringComparer.Ordinal);
                 var allowedEvents = facts.Where(f => f.dimension == "event").Select(f => f.value)
                     .ToHashSet(StringComparer.Ordinal);
+                var carrierFilter = node.carrier switch {
+                    "projectile" => node.options.contact_filter,
+                    "beam" => node.options.chain_filter,
+                    "trap" => node.options.trigger_filter,
+                    _ => null
+                };
+                if (carrierFilter != null)
+                {
+                    var noTargetVisual = allowedTargets.Count == 0 && node.effects.Count == 0 &&
+                        carrierFilter == "environment";
+                    var allActorsStated = carrierFilter == "all_actors" &&
+                        new[] { "hostile", "ally", "self" }.All(allowedTargets.Contains);
+                    if (!noTargetVisual && !allowedTargets.Contains(carrierFilter) && !allActorsStated)
+                        Add(issues, "carrier_target", p, "Carrier receiver filter is not justified by target facts");
+                    foreach (var effect in node.effects)
+                        if (carrierFilter != effect.target_filter &&
+                            !(carrierFilter == "all_actors" && new[] { "hostile", "ally", "self" }.Contains(effect.target_filter)))
+                            Add(issues, "carrier_target", p, "Carrier filter excludes an effect target");
+                }
                 var motion = facts.FirstOrDefault(f => f.dimension == "motion")?.value;
                 foreach (var clause in subjectClauses)
                 {
@@ -294,14 +321,24 @@ namespace Palimpseste.Core
                     {
                         if (fact.dimension == "target" && (linked.Length == 0 || linked.Any(e => e.target_filter != fact.value)))
                             Add(issues, "clause_target", clause.id, "Effect target differs from this clause");
-                        if (fact.dimension == "event" && (linked.Length == 0 || linked.Any(e => e.@event != fact.value)))
-                            Add(issues, "clause_event", clause.id, "Effect event differs from this clause");
+                        if (fact.dimension == "event" &&
+                            (!Emitted[node.carrier].Contains(fact.value) ||
+                             (linked.Length > 0 && linked.Any(e => e.@event != fact.value))))
+                            Add(issues, "clause_event", clause.id, "Carrier or effect event differs from this clause");
                         if (fact.dimension == "affinity" && node.appearance.affinity != fact.value)
                             Add(issues, "clause_affinity", clause.id, "Appearance affinity differs from clause");
                         if (fact.dimension == "pattern" && node.appearance.pattern != fact.value)
                             Add(issues, "clause_pattern", clause.id, "Visible pattern differs from clause");
                     }
                 }
+                foreach (var clause in allSubjectClauses.Where(c => c.kind == "visual_only"))
+                    foreach (var fact in clause.facts)
+                    {
+                        if (fact.dimension == "affinity" && node.appearance.affinity != fact.value)
+                            Add(issues, "clause_affinity", clause.id, "Appearance affinity differs from visual clause");
+                        if (fact.dimension == "pattern" && node.appearance.pattern != fact.value)
+                            Add(issues, "clause_pattern", clause.id, "Visible pattern differs from visual clause");
+                    }
                 if (node.carrier == "projectile" && motion != null && node.options.motion != motion)
                     Add(issues, "motion_fact", p, "Projectile motion differs from description");
                 if (motion == "stationary" && !new[] { "field", "barrier", "trap" }.Contains(node.carrier))

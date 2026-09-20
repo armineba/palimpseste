@@ -10,7 +10,7 @@ officielle lors de toute distribution du binaire.
 ## Correctif et comportement
 
 Le fichier [codex-attestation.patch](codex-attestation.patch) a pour SHA-256
-`143d78e3768896c8f150c62ce7ef0561372f8da69dd0caf28b6a059953c3c4bc`.
+`c4e13fe4f25773eb1873f9e9dab28e27037dd6888dcbca2b785b917205fbabf3`.
 Il inclut la mise à jour du `Cargo.lock` : les packages locaux de la source
 publiée portent `0.154.0-alpha.6.2` dans leurs manifestes, mais `0.0.0` dans
 le lock d'origine. Aucune dépendance externe n'est ajoutée par cette mise à jour.
@@ -32,13 +32,21 @@ un événement avant `turn.completed` :
 {"type":"provider.attested","source":"server_response","model":"gpt-5.6-luna","reasoning_effort":"max","response_count":2}
 ```
 
+Le démarrage de thread de `codex exec` active `experimental_raw_events` dans
+l'app-server embarqué. Sans ce drapeau, ce serveur filtre l'événement
+`rawResponse/completed` avant que l'agrégateur puisse le voir. L'opt-in est
+testé pour le démarrage normal et éphémère. La reprise de threads créés sans
+cet opt-in reste fermée : aucun événement d'attestation n'est émis.
+
 L'événement est absent si une réponse ne fournit pas les deux champs, si les
 réponses divergent, si un identifiant se répète, si le compteur déborde ou si
 le tour échoue. Les réponses de compaction locale et distante v2 traversent
 le même contrôle. Cette absence doit rester un échec
-fermé pour le backend. La présence des champs dans les réponses réelles Luna
-n'a pas encore été vérifiée avec ce binaire ; les tests ci-dessous utilisent
-seulement des événements locaux construits pour les tests. Le modèle de
+fermé pour le backend. Les tests de reconstruction ci-dessous utilisent
+des événements locaux construits pour les tests. Après installation, une
+sonde réelle A/B sous le compte de service a aussi vérifié la présence du
+modèle `gpt-5.6-luna` et de l'effort `max` dans les deux réponses ; voir la
+preuve publique de bascule. Le modèle de
 l'en-tête de connexion WebSocket initial est pris en compte pour la première
 requête. Sur une connexion réutilisée, cet en-tête pourrait être périmé ;
 seules les métadonnées de l'événement courant permettent alors l'attestation.
@@ -83,13 +91,26 @@ cargo +1.95.0 test -p codex-core --lib collect_compaction_output_accepts_additio
 cargo +1.95.0 test -p codex-exec --lib attestation --locked
 cargo +1.95.0 test -p codex-exec --lib compaction_then_generation_attests_both_distinct_responses --locked
 cargo +1.95.0 test -p codex-exec --lib raw_response_filter_requires_matching_thread_and_turn --locked
+cargo +1.95.0 test -p codex-exec --lib thread_start_params_match_history_to_persistence --locked -j 3
+cargo +1.95.0 test -p codex-app-server --test all turn_start_emits_raw_response_completed_with_upstream_usage --locked -j 3
 cargo +1.95.0 build -p codex-cli --bin codex --release --locked -j 3
 ```
 
 Tests locaux observés le 20 septembre 2026 : parseur modèle/effort/ID
 `5/5`, priorité d'en-tête `1/1`, propagation SSE `1/1`, compaction core
 `1/1`, agrégation, refus et tour échoué `4/4`, compaction suivie de génération
-`1/1`, filtre thread/tour `1/1`. Le build Release, son hachage et les
-tests avec une réponse réelle doivent être ajoutés à la preuve avant usage
-dans le worker. Ne pas remplacer l'exécutable du runtime avant la revue du
-correctif, des tests et du hachage du binaire.
+`1/1`, filtre thread/tour `1/1`, opt-in `codex exec` `1/1`, app-server local
+avec serveur simulé `8/8`.
+Le build Release s'est terminé avec le code 0 en 40 min 16 s. Son exécutable
+`E:\Palimpseste\.runtime\codex-target-rust-v0.154.0-alpha.6.2\release\codex.exe`
+fait 300 902 912 octets ; SHA-256
+`8AA8BF5CC27C55331C29C1050CD666174076E3C83D9AE84C6AE2BD54D9C7A72D`.
+La commande locale `codex.exe --version` rend
+`codex-cli 0.154.0-alpha.6.2`. Le détail des tests et du build figure dans
+`evidence/public/backend/codex-attestation-local-validation-2026-09-20.md`.
+Ce binaire a ensuite été installé dans `E:\PalimpsesteRuntime\bin` après
+sauvegarde et contrôle d'accès sous `PalRuntimeSvc`. Une sonde active réelle a
+obtenu A et B avec `gpt-5.6-luna` et l'effort `max` rapportés pour les deux.
+La preuve et ses limites figurent dans
+`evidence/public/backend/codex-cutover-active-ab-2026-09-20.md`.
+La preuve active attend encore la revue humaine et le worker demeure arrêté.

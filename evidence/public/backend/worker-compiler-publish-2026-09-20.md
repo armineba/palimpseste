@@ -1,0 +1,7 @@
+# Publication du worker après correction du compilateur
+
+Le 20 septembre 2026, `dotnet publish backend/Palimpseste.Worker/Palimpseste.Worker.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=false -o E:\Palimpseste\.runtime\operator-staging\worker-compiler-2026-09-20 -v:q` a quitté avec le code 0. La publication a suivi la correction de `shared/Palimpseste.Core/SpellCompiler.cs`, dont le SHA-256 était `76A94C0B2AFCCA18EB651127BF588BFC355F5A518CDE1840C2982607C529F038` au moment de la vérification.
+
+Le candidat `Palimpseste.Worker.exe` mesure 76 223 015 octets et a pour SHA-256 `D04A81E54EF0FBFE8FFFCE6A121DABA1DCE0FB2C16F7B163CCF3EA1EA0E08CAA`. Son en-tête PE est `0x00004550`, machine `0x8664` (x64). Le dossier de staging et l'exécutable héritent uniquement des droits FullControl des Administrateurs et de SYSTEM ; le compte `PalRuntimeSvc` n'y a aucun droit.
+
+La vérification des processus ne montrait aucun `Palimpseste.Worker.exe` actif. Le seul `codex.exe` observé était celui de l'extension VS Code, hors du runtime du jeu. `E:\PalimpsesteRuntime\bin\Palimpseste.Worker.exe` n'existait pas au moment du contrôle. Le candidat **n'a pas été copié dans le runtime ni lancé**. La procédure `docs/ops/CODEX_CUTOVER.md` place l'installation du worker après l'acceptation humaine de la preuve A/B et du préflight ; cette acceptation n'était pas acquise. Aucune requête Luna, connexion à PostgreSQL ni génération joueur n'a été effectuée par cette publication.

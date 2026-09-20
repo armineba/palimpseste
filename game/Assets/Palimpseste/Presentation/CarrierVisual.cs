@@ -12,8 +12,33 @@ namespace Palimpseste.Game.SpellRuntime
         public Color tint;
     }
 
+    // A one-tick beam can be born and expire in successive FixedUpdates before
+    // the first rendered frame. This component owns graphics only: the runtime
+    // has already removed the carrier and cannot apply another effect or hit.
+    internal sealed class BeamAfterimage : MonoBehaviour
+    {
+        private const float MinimumSeconds = .16f;
+        private float retireAt;
+        private int lateUpdates;
+
+        private void OnEnable() { retireAt = Time.realtimeSinceStartup + MinimumSeconds; }
+
+        private void LateUpdate()
+        {
+            lateUpdates++;
+            // The first LateUpdate precedes at least one render opportunity.
+            if (lateUpdates >= 2 && Time.realtimeSinceStartup >= retireAt)
+                Destroy(gameObject);
+        }
+    }
+
     internal static class CarrierVisual
     {
+        public static void KeepOneTickBeamVisible(GameObject visual)
+        {
+            if (visual != null) visual.AddComponent<BeamAfterimage>();
+        }
+
         public static GameObject Create(CarrierState state, Texture2D mask)
         {
             var node = state.node;

@@ -1,11 +1,14 @@
 # Commandes opérateur pour la bascule CLI et doctor
 
-Ce protocole complète CODEX_CUTOVER.md. Il n'a pas été exécuté. Le 20 septembre
-2026, le fichier release\codex.exe du build patché n'existait pas encore ;
-il faut d'abord son build, ses tests, son diff revu et son SHA-256 attesté.
-Le worker reste arrêté. Toutes les commandes ci-dessous s'exécutent dans une
-console PowerShell élevée de l'opérateur, jamais sous PalRuntimeSvc. Elles ne
-lancent aucun modèle. Ne pas lancer le doctor actif dans cette phase.
+Ce protocole complète CODEX_CUTOVER.md. Ses opérations de bascule, contrôle
+d'accès effectif et doctor local ont été effectuées le 20 septembre 2026.
+Le CLI patché release a été construit et installé ; le doctor actif A/B a
+ensuite été exécuté séparément et a réussi. Voir
+`evidence/public/backend/codex-cutover-active-ab-2026-09-20.md` pour les
+hashes et la portée de ces preuves. Les commandes ci-dessous servent à une
+nouvelle bascule ou à un audit ; elles ne doivent pas être rejouées telles
+quelles sur le runtime vivant sans nouvelle préparation. Le worker reste
+arrêté. La phase de bascule seule ne lance aucun modèle.
 
 ## 1. Préflight et sauvegardes
 
@@ -21,7 +24,7 @@ sauvegarde n'est pas réservé aux Administrateurs et à SYSTEM.
     $staging = 'E:\Palimpseste\.runtime\operator-staging'
     $cliSource = 'E:\Palimpseste\.runtime\codex-target-rust-v0.154.0-alpha.6.2\release\codex.exe'
     $doctorSource = Join-Path $staging 'doctor\ProviderDoctor.exe'
-    $cliExpectedSha = '<SHA-256 CLI patché attesté>'
+    $cliExpectedSha = '8AA8BF5CC27C55331C29C1050CD666174076E3C83D9AE84C6AE2BD54D9C7A72D'
     $doctorExpectedSha = '4135407E2366FACC20F5528AE4ED11733DF1F54D0486121CEDF4DD98F1550E6E'
     $cliDest = Join-Path $runtime 'bin\codex.exe'
     $doctorDest = Join-Path $runtime 'bin\ProviderDoctor.exe'
@@ -219,8 +222,8 @@ ni démarrer le nouveau worker à cette étape.
 
 ## Risques et limites
 
-- Le candidat CLI release et son hash sont absents au moment de la rédaction ;
-  aucun remplacement n'est autorisé avant leur attestation.
+- Le candidat CLI release et son hash ont été attestés et le binaire installé.
+  Toute nouvelle bascule doit vérifier à nouveau source, diff, hash et ACL.
 - Le staging opérateur est inaccessible au service. Un binaire laissé là ne
   peut pas être utilisé par le worker ; une copie sous runtime\bin avec ACL RX
   contrôlée est nécessaire.

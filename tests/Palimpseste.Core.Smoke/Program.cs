@@ -49,6 +49,69 @@ badPlan["nodes"][0]["effects"][0]["kind"] = "heal";
 var badIssues = SpellCompiler.ValidatePlanJson(descriptionJson, Encoding.UTF8.GetBytes(badPlan.ToString()),
     resolved.GeometryJson, resolved.MaskPng);
 Require(badIssues.Count > 0, "Changed effect was accepted");
+var visualDescription = JObject.Parse(Encoding.UTF8.GetString(descriptionJson));
+((JArray)visualDescription["clauses"]).Add(new JObject {
+    ["id"] = "c_visual", ["subject_id"] = "s0", ["kind"] = "visual_only",
+    ["text"] = "Le trait reste plein.", ["observation_ids"] = new JArray("o1"),
+    ["facts"] = new JArray(new JObject { ["dimension"] = "pattern", ["value"] = "solid" })
+});
+var visualPlan = JObject.Parse(Encoding.UTF8.GetString(planJson));
+((JArray)visualPlan["nodes"][0]["clause_ids"]).Add("c_visual");
+var visualDescriptionBytes = Encoding.UTF8.GetBytes(visualDescription.ToString(Newtonsoft.Json.Formatting.None));
+visualPlan["description_sha256"] = SpellCompiler.Sha256(visualDescriptionBytes);
+Require(SpellCompiler.ValidatePlanJson(visualDescriptionBytes,
+    Encoding.UTF8.GetBytes(visualPlan.ToString(Newtonsoft.Json.Formatting.None)),
+    resolved.GeometryJson, resolved.MaskPng).Count == 0,
+    "A cited visual clause was rejected");
+var mismatchedVisualPlan = (JObject)visualPlan.DeepClone();
+mismatchedVisualPlan["nodes"][0]["appearance"]["pattern"] = "dotted";
+Require(SpellCompiler.ValidatePlanJson(visualDescriptionBytes,
+    Encoding.UTF8.GetBytes(mismatchedVisualPlan.ToString(Newtonsoft.Json.Formatting.None)),
+    resolved.GeometryJson, resolved.MaskPng).Any(i => i.Code == "clause_pattern"),
+    "A visual clause mismatch was accepted");
+var omittedVisualPlan = (JObject)visualPlan.DeepClone();
+((JArray)omittedVisualPlan["nodes"][0]["clause_ids"])
+    .First(id => (string)id == "c_visual").Remove();
+Require(SpellCompiler.ValidatePlanJson(visualDescriptionBytes,
+    Encoding.UTF8.GetBytes(omittedVisualPlan.ToString(Newtonsoft.Json.Formatting.None)),
+    resolved.GeometryJson, resolved.MaskPng).Any(i => i.Code == "clause_trace"),
+    "An omitted visual clause was accepted");
+var visualRelationDescription = (JObject)visualDescription.DeepClone();
+((JArray)visualRelationDescription["relations"])[0]["clause_ids"] = new JArray("c_visual");
+Require(SpellCompiler.ValidateDescriptionJson(
+    Encoding.UTF8.GetBytes(visualRelationDescription.ToString(Newtonsoft.Json.Formatting.None)))
+    .Any(i => i.Code == "relation_clause"),
+    "A relation justified only by a visual clause was accepted");
+var broadenedCarrierPlan = JObject.Parse(Encoding.UTF8.GetString(planJson));
+broadenedCarrierPlan["nodes"][0]["options"]["contact_filter"] = "all_actors";
+Require(SpellCompiler.ValidatePlanJson(descriptionJson,
+    Encoding.UTF8.GetBytes(broadenedCarrierPlan.ToString(Newtonsoft.Json.Formatting.None)),
+    resolved.GeometryJson, resolved.MaskPng).Any(i => i.Code == "carrier_target"),
+    "A carrier receiver filter broader than the description was accepted");
+var lifecycleDescription = JObject.Parse(Encoding.UTF8.GetString(descriptionJson));
+var lifecycleFacts = (JArray)lifecycleDescription["clauses"][0]["facts"];
+foreach (var fact in lifecycleFacts.Where(f => new[] { "effect", "target" }.Contains((string)f["dimension"])).ToList())
+    fact.Remove();
+lifecycleFacts.First(f => (string)f["dimension"] == "event")["value"] = "spawn";
+var lifecyclePlan = JObject.Parse(Encoding.UTF8.GetString(planJson));
+((JArray)lifecyclePlan["nodes"][0]["effects"]).Clear();
+lifecyclePlan["nodes"][0]["options"]["contact_filter"] = "environment";
+var lifecycleDescriptionBytes = Encoding.UTF8.GetBytes(lifecycleDescription.ToString(Newtonsoft.Json.Formatting.None));
+lifecyclePlan["description_sha256"] = SpellCompiler.Sha256(lifecycleDescriptionBytes);
+Require(SpellCompiler.ValidatePlanJson(lifecycleDescriptionBytes,
+    Encoding.UTF8.GetBytes(lifecyclePlan.ToString(Newtonsoft.Json.Formatting.None)),
+    resolved.GeometryJson, resolved.MaskPng).Count == 0,
+    "A carrier lifecycle event without an effect was rejected");
+var invalidLifecycleDescription = (JObject)lifecycleDescription.DeepClone();
+((JArray)invalidLifecycleDescription["clauses"][0]["facts"])
+    .First(f => (string)f["dimension"] == "event")["value"] = "enter";
+var invalidLifecycleBytes = Encoding.UTF8.GetBytes(invalidLifecycleDescription.ToString(Newtonsoft.Json.Formatting.None));
+var invalidLifecyclePlan = (JObject)lifecyclePlan.DeepClone();
+invalidLifecyclePlan["description_sha256"] = SpellCompiler.Sha256(invalidLifecycleBytes);
+Require(SpellCompiler.ValidatePlanJson(invalidLifecycleBytes,
+    Encoding.UTF8.GetBytes(invalidLifecyclePlan.ToString(Newtonsoft.Json.Formatting.None)),
+    resolved.GeometryJson, resolved.MaskPng).Any(i => i.Code == "clause_event"),
+    "An event not emitted by the carrier was accepted");
 var duplicateJson = Encoding.UTF8.GetBytes("{\"a\":1,\"a\":2}");
 bool rejectedDuplicate = false;
 try { ContractJson.ParseStrict(duplicateJson); } catch { rejectedDuplicate = true; }
@@ -81,4 +144,4 @@ var footprintImage = PngCodec.DecodeRgba(donutGeometry.MaskPng[footprint.mask_fi
 byte At(int x, int y) => footprintImage.Rgba[(y * footprintImage.Width + x) * 4 + 3];
 Require(At(footprintImage.Width / 2, footprintImage.Height / 2) == 0, "Nested hole filled incorrectly");
 Require(At(50, footprintImage.Height / 2) == 255, "Enclosed annulus was not filled");
-Console.WriteLine("Core smoke passed: PNG roundtrip/corruption, pixel geometry and nested hole, compilation/bounds/hash, semantic rejection, duplicate-key/comment rejection.");
+Console.WriteLine("Core smoke passed: PNG and pixel geometry, controlled compilation, visual clause and lifecycle event checks, semantic and JSON rejection.");
