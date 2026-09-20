@@ -1,5 +1,11 @@
 # Tester le lecteur actuel
 
+## Réessayer le dessin conservé après le refus de quota
+
+Dans le Player déjà ouvert sur ce profil Windows, garder le parchemin affiché et cliquer **Transmettre** maintenant : l'API corrigée est redémarrée et `/health/ready` répond 200. Le dessin reste stocké sur cet appareil ; il n'est pas nécessaire de le refaire pour lever le plafond quotidien de l'application. Le message « Votre quota quotidien de générations est atteint » correspondait à ce plafond local, qui est retiré du backend. Quand le job est accepté, l'écran doit montrer la lecture d'Astra, la planification de Luna, puis la fiche du sort à lancer dans le laboratoire. **L'envoi réel de cette capture après correction n'est pas encore attesté.**
+
+La limite d'utilisation du compte Codex sur le serveur reste distincte. Si ce compte est à sa limite, il peut encore refuser la génération ; Palimpseste ne commande ni achat ni recharge. Voir [l'explication du quota](GENERATION_QUOTA.md) et [l'état technique](IMPLEMENTATION_STATUS.md).
+
 ## Essai actuel sur ce PC
 
 Ouvrir [Palimpseste.exe](../game/Build/WindowsEffectLibraryPlayable/Palimpseste.exe) en conservant ensemble les 29 fichiers du dossier. Dans la bibliothèque, ouvrir « Enclume filante », cliquer sur **Actualiser** si l'ancien échec s'affiche, puis sur **Lancer dans le laboratoire**. Ce dessin a déjà un sort compilé. Pour essayer un dessin neuf, tracer autant de traits que souhaité, cliquer sur **Dessin terminé**, lire l'interprétation d'Astra, puis ouvrir et lancer le sort une fois sa fiche prête. Si un échec de traduction admissible apparaît, **Réessayer ce dessin** conserve la capture.

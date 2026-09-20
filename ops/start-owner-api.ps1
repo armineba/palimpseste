@@ -28,10 +28,10 @@ foreach ($path in @($runtime, $child, $api)) {
     }
 }
 if (-not [string]::Equals((Get-FileHash -LiteralPath $child -Algorithm SHA256).Hash,
-        '6B71085864C175C96C538F9EF5507193DBE9304D1B15EBD776C47E50B8FEF02C',
+        '3655615CF544B6E757F33FC61B773C83943935E06B0C70559B7B20E2EA2D1762',
         [StringComparison]::OrdinalIgnoreCase) -or
     -not [string]::Equals((Get-FileHash -LiteralPath $api -Algorithm SHA256).Hash,
-        '8B280D15ADEA95D4322C8957913ED3A46659221E208A4938B391E9CDBFE1E825',
+        '1E530DAE4DB1680BBDB7E8388DF825D215C5BCF5B17DE50A7B5E4ACD4FA64B7C',
         [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Owner lab API binaries differ from reviewed hashes.'
 }

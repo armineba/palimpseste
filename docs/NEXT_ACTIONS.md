@@ -1,5 +1,11 @@
 # Point de reprise immédiat
 
+## Reprise du dessin refusé par le quota de l'application
+
+Le dessin affiché avec « Votre quota quotidien de générations est atteint » est conservé sur ce profil Windows, et **Transmettre** est disponible. Le refus vient du plafond de jobs sur 24 heures de Palimpseste (cinq jobs joueur constatés sur cinq permis), pas d'un diagnostic de l'abonnement Codex. Le correctif enlève ce plafond des deux créations de jobs. L'API corrigée est déployée sous `PalRuntimeSvc` et `/health/ready` répond 200 ; la solution compile sans avertissement ni erreur et la QA des contrats passe **61/61**. Cliquer maintenant **Transmettre** sur ce même parchemin, puis relever l'ID du nouveau job, la lecture Astra, le plan Luna, la fiche et le lancement dans le laboratoire. Ne déclarer ce parcours réussi qu'après observation : **aucune nouvelle capture HTTP réelle n'a encore été retentée**. Voir [le détail du quota](GENERATION_QUOTA.md).
+
+Le compte Codex peut encore imposer sa propre limite d'usage ou une indisponibilité. Aucun achat ni recharge n'est déclenché par Palimpseste ; vérifier la recharge automatique dans l'interface du compte. Le service reste local sur `127.0.0.1`, sans accès public multi-joueurs. La section suivante décrit les 141 recettes déjà présentes avant ce correctif.
+
 ## Reprise actuelle — catalogue de 141 recettes
 
 La source contient [141 recettes nommées](../contracts/effect-recipes.json) bâties avec les 24 effets primitifs déjà intégrés au Player. Le smoke Core a validé et compilé **705 couples recette/porteur** ; la QA des contrats a passé **61/61**. Le choix d'une recette par Astra et son expansion exacte par Luna sont contrôlés par le compilateur. Le Player actuel est [WindowsEffectLibraryPlayable](../game/Build/WindowsEffectLibraryPlayable/Palimpseste.exe), avec 29 fichiers et six tests PlayMode ciblés réussis sur les familles d'effets. « Enclume filante » est `ready` après reprise de la même capture ; ouvrir sa fiche avec **Actualiser**, puis **Lancer dans le laboratoire**. Ce lancement précis n'a pas encore été observé.

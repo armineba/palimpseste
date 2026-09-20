@@ -129,7 +129,7 @@ public static partial class ApiHandlers
         return Results.Content(response, "application/json", Encoding.UTF8, 201);
     }
 
-    public static async Task<IResult> AuthoringPlan(HttpContext context, NpgsqlDataSource db, IArtifactStore store, ApiConfig config, CancellationToken ct)
+    public static async Task<IResult> AuthoringPlan(HttpContext context, NpgsqlDataSource db, IArtifactStore store, CancellationToken ct)
     {
         var principal = Owner(context);
         if (principal.Role != "creator") return ApiProblem.Result(context, 403, "creator_required", "Rôle créateur requis.");
@@ -171,12 +171,6 @@ public static partial class ApiHandlers
             while (await reader.ReadAsync(ct)) allIds.Add(reader.GetGuid(0));
         }
         if (!allIds.SetEquals(requestedIds)) return ApiProblem.Result(context, 422, "geometry_incomplete", "Le diagnostic exige tous les JSON géométriques d'une seule banque appartenant au créateur.");
-        var admission = await GenerationQuota.CheckAsync(connection, transaction, principal.Id, config, ct);
-        if (admission != GenerationQuotaDecision.Allowed)
-            return ApiProblem.Result(context, 429, "generation_quota_exceeded",
-                admission == GenerationQuotaDecision.GlobalExceeded
-                    ? "Capacité quotidienne du laboratoire atteinte. Réessayez plus tard."
-                    : "Votre quota quotidien de générations est atteint. Réessayez plus tard.", true);
         var descriptionArtifact = await store.PutAsync(descriptionBytes, "json", "application/json", ct);
         await InsertArtifact(connection, transaction, principal.Id, "authored_description", descriptionArtifact, ct);
         var jobId = Guid.NewGuid();

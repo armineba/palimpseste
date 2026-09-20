@@ -39,6 +39,26 @@ New-Item -ItemType Directory -Force -Path (Join-Path $stage 'ops') | Out-Null
 Get-ChildItem -LiteralPath (Join-Path $projectRoot 'ops') -File |
     Where-Object { $_.Name.EndsWith('.ps1') -or $_.Name.EndsWith('.env.example') -or $_.Name -eq 'README.md' } |
     ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path (Join-Path $stage 'ops') $_.Name) }
+
+# Single-file publishing may change the executable bytes across publishes.
+# Bind the archive's worker launch scripts to the executable in this archive.
+function Set-ArchiveHashPin([string]$Path, [string]$Variable, [string]$Hash) {
+    $content = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    $pattern = '(?m)^\$' + [regex]::Escape($Variable) + " = '[0-9A-Fa-f]{64}'$"
+    if ([regex]::Matches($content, $pattern).Count -ne 1) { throw "Archive pin missing: $Variable" }
+    $line = [string]::Concat('$', $Variable, ' = ', [char]39, $Hash, [char]39)
+    $content = [regex]::Replace($content, $pattern,
+        [System.Text.RegularExpressions.MatchEvaluator] { param($match) $line })
+    [IO.File]::WriteAllText($Path, $content, [Text.UTF8Encoding]::new($false))
+}
+$archiveWorkerHash = (Get-FileHash -LiteralPath (Join-Path $stage 'worker/Palimpseste.Worker.exe') -Algorithm SHA256).Hash
+$archiveWorkerChild = Join-Path $stage 'ops/worker-service-child.ps1'
+$archiveWorkerLauncher = Join-Path $stage 'ops/start-owner-worker.ps1'
+Set-ArchiveHashPin $archiveWorkerChild 'expectedWorkerSha256' $archiveWorkerHash
+$archiveWorkerChildHash = (Get-FileHash -LiteralPath $archiveWorkerChild -Algorithm SHA256).Hash
+Set-ArchiveHashPin $archiveWorkerLauncher 'expectedWorkerSha256' $archiveWorkerHash
+Set-ArchiveHashPin $archiveWorkerLauncher 'expectedChildSha256' $archiveWorkerChildHash
+
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/IMPLEMENTATION_STATUS.md') -Destination (Join-Path $stage 'IMPLEMENTATION_STATUS.md')
 Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Destination (Join-Path $stage 'evidence') -Recurse
 

@@ -111,12 +111,6 @@ public static partial class ApiHandlers
                 await transaction.CommitAsync(ct);
                 return Results.Content(existingBody, "application/json", Encoding.UTF8, 202);
             }
-            var admission = await GenerationQuota.CheckAsync(dbConnection, transaction, principal.Id, config, ct);
-            if (admission != GenerationQuotaDecision.Allowed)
-                return ApiProblem.Result(context, 429, "generation_quota_exceeded",
-                    admission == GenerationQuotaDecision.GlobalExceeded
-                        ? "Capacité quotidienne du laboratoire atteinte. Réessayez plus tard."
-                        : "Votre quota quotidien de générations est atteint. Réessayez plus tard.", true);
             // The files become durable before their DB rows are attached. Holding the
             // parchment row lock avoids writing orphan files on ordinary duplicate uploads.
             var drawingArtifact = await store.PutAsync(drawing, "png", "image/png", ct);

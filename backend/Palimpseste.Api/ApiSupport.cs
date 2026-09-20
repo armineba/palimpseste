@@ -16,19 +16,6 @@ public sealed class ApiConfig
     public string CatalogVersion { get; init; } = "sp.capabilities/1.0";
     public string RulesProfile { get; init; } = "lab_v1";
     public string MinimumClientVersion { get; init; } = "0.1.0";
-    public int NewGenerationsPerPrincipal24h { get; init; } = 3;
-    public int NewGenerationsGlobal24h { get; init; } = 12;
-
-    private static int GenerationLimit(string variable, int fallback)
-    {
-        var value = Environment.GetEnvironmentVariable(variable);
-        if (string.IsNullOrWhiteSpace(value)) return fallback;
-        if (!int.TryParse(value, System.Globalization.NumberStyles.None,
-                System.Globalization.CultureInfo.InvariantCulture, out var limit) || limit is < 0 or > 10000)
-            throw new InvalidOperationException($"{variable} must be an integer from 0 to 10000.");
-        return limit;
-    }
-
     public static ApiConfig FromEnvironment()
     {
         var repositoryRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
@@ -59,9 +46,7 @@ public sealed class ApiConfig
             CatalogPath = Environment.GetEnvironmentVariable("CAPABILITY_CATALOG") ?? Path.Combine(specificationRoot, "contracts", "capability-catalog.json"),
             CatalogVersion = Environment.GetEnvironmentVariable("CATALOG_VERSION") ?? "sp.capabilities/1.0",
             RulesProfile = Environment.GetEnvironmentVariable("RULES_PROFILE") ?? "lab_v1",
-            MinimumClientVersion = Environment.GetEnvironmentVariable("ALLOWED_CLIENT_VERSION") ?? "0.1.0",
-            NewGenerationsPerPrincipal24h = GenerationLimit("PALIMPSESTE_GENERATIONS_PER_PRINCIPAL_24H", 3),
-            NewGenerationsGlobal24h = GenerationLimit("PALIMPSESTE_GENERATIONS_GLOBAL_24H", 12)
+            MinimumClientVersion = Environment.GetEnvironmentVariable("ALLOWED_CLIENT_VERSION") ?? "0.1.0"
         };
     }
 
