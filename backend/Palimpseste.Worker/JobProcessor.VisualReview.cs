@@ -14,7 +14,8 @@ public sealed partial class JobProcessor
     private async Task<byte[]?> RefineVisualsAsync(ClaimedJob job, byte[] description, byte[] plan,
         StoredDocument planRecord, string geometryContext, string capabilities,
         ProviderVisualReference reference, ContractVisualReference metadata, CompilationInput input,
-        IReadOnlyDictionary<string, byte[]> geometry, IReadOnlyDictionary<string, byte[]> masks, CancellationToken ct)
+        IReadOnlyDictionary<string, byte[]> geometry, IReadOnlyDictionary<string, byte[]> masks, CancellationToken ct,
+        SpellReferenceResearch? research = null)
     {
         // The skill's critic loop is translated into fixed application actions.
         // Codex sees only data and images. Neither critic nor planner can run this renderer or a software build.
@@ -73,8 +74,8 @@ public sealed partial class JobProcessor
             var revisionAttempt = await jobs.BeginAttemptAsync(job, "B", settings.Model, settings.Effort,
                 Sha256(Encoding.UTF8.GetBytes(Sha256(plan) + Sha256(capture.Manifest) + previousVerdict + provider.PromptBSha256)), ct);
             var result = await provider.RefineVisualAsync(job.Id.ToString("N"), revisionAttempt.ToString("N"), description,
-                plan, geometryContext, capabilities, reference, capture.Frames, previousVerdict, false, ct, rethink: round >= 2);
-            var issues = result.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, result.Utf8, geometry, masks, metadata);
+                plan, geometryContext, capabilities, reference, capture.Frames, previousVerdict, false, ct, rethink: round >= 2, research: research);
+            var issues = result.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, result.Utf8, geometry, masks, metadata, research?.Sha256);
             var mechanicsChanged = result.Utf8 is not null && issues.Count == 0 && Mechanics(result.Utf8) != originalMechanics;
             if (result.Utf8 is null || issues.Count != 0 || mechanicsChanged)
             {
@@ -118,12 +119,20 @@ public sealed partial class JobProcessor
     {
         var token = ContractJson.ParseStrict(plan);
         foreach (var node in (JArray)token["nodes"]!)
+        {
             if (node["appearance"] is JObject appearance)
             {
                 appearance.Property("construction")?.Remove();
                 appearance.Property("vfx")?.Remove();
                 appearance.Property("lifecycle")?.Remove();
+                appearance.Property("resource_id")?.Remove();
             }
+            // These six fields move only visual layers. Typed intent, cast range, offsets,
+            // gravity and launch pitch remain immutable and the compiler rechecks all bounds.
+            if (node["physics"] is JObject physics)
+                foreach (var key in new[] { "angular_speed_mdeg_s", "axial_speed_cm_s", "radial_speed_cm_s",
+                             "radius_cm", "turbulence_cm", "frequency_mhz" }) physics.Property(key)?.Remove();
+        }
         return Normalize(token).ToString(Newtonsoft.Json.Formatting.None);
     }
 

@@ -1,6 +1,16 @@
 # Point de reprise immédiat
 
-## Priorité actuelle — laisser finir l'affinage du sort repris en 1.4.1
+## Priorité D15 — laisser le créateur essayer un nouveau parchemin
+
+**Player et backend 1.5.0 construits, empaquetés et installés**, migration 010 appliquée, raccourci Bureau actualisé. Services démarrés : worker 38748 / API 37400, observation à 01:17 Paris le 21 septembre. [Preuve réelle](../evidence/public/backend/behavior-d15.json) · [Architecture](D15_BEHAVIOR_AND_RESEARCH.md).
+
+1. Laisser le créateur dessiner un nouveau parchemin et observer le sort dans le laboratoire ; recueillir son verdict sur description, placement, animation et disparition.
+2. Si un problème survient, lire le job et ses checkpoints de description/image/recherche/plan/captures. Corriger le mécanisme général concerné ; ne pas modifier un sort par son nom ou son identifiant.
+3. Ne pas lancer de tests, diagnostics, générations ni captures indépendantes : la consigne reste de laisser les essais au créateur. Aucun de ces essais n'a été exécuté pour D15.
+
+Les anciens documents restent figés. Les jobs antérieurs sans description utilisent désormais le prompt A 2.3 et son schéma/catalogue historiques, évitant une migration implicite vers les nouveaux profils.
+
+## Historique — affinage du sort repris en 1.4.1
 
 L'essai utilisateur `7ed4561feffd43ebbafe48d9b960716d` a réussi A/G/B, puis échoué dans la capture : processus Unity code 0, **quatre PNG noirs identiques**, mesure **11915,2178 FPS** rejetée par la borne `10000`, état remonté `worker_exception`. L'image générée et le plan existent ; ce blocage ne justifie pas de les régénérer.
 

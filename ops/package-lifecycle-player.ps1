@@ -7,15 +7,15 @@ param(
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $buildRoot = Join-Path $repo 'game\Build'
-$source = Join-Path $buildRoot 'WindowsLifecycleCaptureFixRelease'
-$playable = Join-Path $buildRoot 'WindowsLifecycleCaptureFixPlayable'
+$source = Join-Path $buildRoot 'WindowsBehaviorRelease'
+$playable = Join-Path $buildRoot 'WindowsBehaviorPlayable'
 $zipPath = Join-Path $repo 'deliverables\Palimpseste-Windows-x64-IL2CPP.zip'
 $proofPath = Join-Path $repo 'evidence\public\unity\lifecycle-delivery.json'
-$logPath = Join-Path $repo 'game\Logs\lifecycle-capture-fix-build.log'
+$logPath = Join-Path $repo 'game\Logs\behavior-build.log'
 $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
-$stage = Join-Path $buildRoot ('lifecycle-package-stage-' + $stamp)
+$stage = Join-Path $buildRoot ('behavior-package-stage-' + $stamp)
 $pendingZip = $stage + '.zip'
-$backup = Join-Path $buildRoot ('LifecycleDeliveryBackups\' + $stamp)
+$backup = Join-Path $buildRoot ('BehaviorDeliveryBackups\' + $stamp)
 
 function Assert-Under([string]$Path, [string]$Scope) {
     $absolute = [IO.Path]::GetFullPath($Path)
@@ -48,7 +48,7 @@ $resultMarkers = [regex]::Matches($logText, 'Build Finished, Result: (\w+)')
 if ($logText -notmatch ('PALIMPSESTE_BUILD_OK ' + [regex]::Escape($expectedExe) + ' bytes=') -or
     $resultMarkers.Count -eq 0 -or $resultMarkers[$resultMarkers.Count - 1].Groups[1].Value -ne 'Success' -or
     $exitMarkers.Count -eq 0 -or $exitMarkers[$exitMarkers.Count - 1].Groups[1].Value -ne '0') { throw 'Le journal ne prouve pas la réussite de ce build et sa sortie 0.' }
-if ([IO.File]::ReadAllText((Join-Path $repo 'game\ProjectSettings\ProjectSettings.asset')) -notmatch '(?m)^\s*bundleVersion:\s*1\.4\.1\s*$') { throw 'La version du projet doit être 1.4.1.' }
+if ([IO.File]::ReadAllText((Join-Path $repo 'game\ProjectSettings\ProjectSettings.asset')) -notmatch '(?m)^\s*bundleVersion:\s*1\.5\.0\s*$') { throw 'La version du projet doit être 1.5.0.' }
 $required = @('Palimpseste.exe', 'GameAssembly.dll', 'UnityPlayer.dll', 'Palimpseste_Data\globalgamemanagers', 'Palimpseste_Data\il2cpp_data\Metadata\global-metadata.dat')
 foreach ($relative in $required) {
     $file = Get-Item -LiteralPath (Join-Path $source $relative)
@@ -93,6 +93,24 @@ foreach ($file in (Get-ChildItem -LiteralPath $source -Recurse -File -Force | So
     $files += [pscustomobject][ordered]@{ file = $relative.Replace('\', '/'); bytes = $file.Length; sha256 = $digest }
 }
 if ($files.Count -lt $required.Count) { throw 'Build distribuable incomplet.' }
+$buildFilesVerified = $files.Count
+# Supplement the compiled files with notices for the reused PNGs and HLSL noise.
+# These are packaging inputs, not files claimed to have been produced by Unity.
+$licenseFiles = @()
+foreach ($name in @('Kenney-Particle-Pack-CC0.txt', 'Kenney-Smoke-Particles-CC0.txt', 'NoiseShader-MIT.txt')) {
+    $licenseSource = Join-Path $repo ('assets\sourced-vfx\licenses\' + $name)
+    Assert-Under $licenseSource $repo
+    $relative = 'ThirdPartyNotices/' + $name
+    $target = Join-Path $stage $relative
+    Assert-Under $target $stage
+    if (Test-Path -LiteralPath $target) { throw 'Third-party notice destination already exists in the build.' }
+    New-Item -ItemType Directory -Path ([IO.Path]::GetDirectoryName($target)) -Force | Out-Null
+    Copy-Item -LiteralPath $licenseSource -Destination $target
+    $digest = Hash $licenseSource
+    if ((Hash $target) -cne $digest) { throw 'Third-party notice copy differs.' }
+    $files += [pscustomobject][ordered]@{ file=$relative; bytes=(Get-Item -LiteralPath $target).Length; sha256=$digest; origin='reviewed_asset_license' }
+    $licenseFiles += $relative
+}
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 # Explicit ZIP names keep directory separators portable on .NET Framework as well.
 $zipWriter = [IO.Compression.ZipFile]::Open($pendingZip, [IO.Compression.ZipArchiveMode]::Create)
@@ -134,11 +152,12 @@ Assert-Under $playable $buildRoot
 Move-Item -LiteralPath $stage -Destination $playable
 Move-Item -LiteralPath $pendingZip -Destination $zipPath
 $proof = [ordered]@{
-    observed_at = [DateTime]::UtcNow.ToString('O'); client_version = '1.4.1'; unity = '6000.3.24f1'; backend = 'IL2CPP'
+    observed_at = [DateTime]::UtcNow.ToString('O'); client_version = '1.5.0'; delivery_name='D15 behavior and sourced VFX'; unity = '6000.3.24f1'; backend = 'IL2CPP'
     build_exit = 0; build_success_marker_observed = $true; build_log = Relative $logPath; build_log_sha256 = Hash $logPath
     source = Relative $source; playable = Relative $playable; zip = Relative $zipPath
     zip_bytes = (Get-Item -LiteralPath $zipPath).Length; zip_sha256 = Hash $zipPath
     files_verified = $files.Count; playable_bytes = ($files | Measure-Object -Property bytes -Sum).Sum; files = $files
+    build_files_verified = $buildFilesVerified; supplemental_license_files = $licenseFiles
     source_commit = ($head -join '').Trim(); source_snapshot_sha256 = $sourceDigest; source_files = $sourceRecords
     source_snapshot = 'working tree hashes observed after successful build; not a claim that the tree is committed'
     excluded_patterns = @('*DoNotShip*', '*DontShipItWithYourGame*'); previous_delivery_backup = Relative $backup
@@ -161,10 +180,10 @@ if ($UpdateDesktopShortcut) {
     try {
         $shortcut = $shell.CreateShortcut($shortcutPath)
         $shortcut.TargetPath = $executable; $shortcut.WorkingDirectory = $playable
-        $shortcut.Description = 'Palimpseste Spell Lab 1.4.1'; $shortcut.Save()
+        $shortcut.Description = 'Palimpseste Spell Lab 1.5.0'; $shortcut.Save()
         $verifiedShortcut = $shell.CreateShortcut($shortcutPath)
         if ($verifiedShortcut.TargetPath -ne $executable -or $verifiedShortcut.WorkingDirectory -ne $playable) {
-            throw 'Le raccourci enregistré ne cible pas la livraison 1.4.1.'
+            throw 'Le raccourci enregistré ne cible pas la livraison 1.5.0.'
         }
     }
     finally {
@@ -178,7 +197,7 @@ if ($UpdateDesktopShortcut) {
     }
     Save-Proof $proof
 }
-Write-Output "Player 1.4.1 : $playable"
+Write-Output "Player 1.5.0 : $playable"
 Write-Output "ZIP SHA256 : $($proof.zip_sha256) ($($proof.zip_bytes) octets)"
 Write-Output "Preuve : $proofPath"
 Write-Output "Livraison précédente conservée : $backup"

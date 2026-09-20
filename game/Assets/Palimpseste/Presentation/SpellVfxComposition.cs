@@ -31,6 +31,9 @@ namespace Palimpseste.Game.SpellRuntime
         private float dissolveStarted, dissolveDuration = .62f, pendingDissolve = -1;
         private float[] retiringOpacities;
         private SpellVisualLifecycle lifecycle;
+        private SpellBehaviorIntent behavior;
+        private SpellPhysicsProfile physicsProfile;
+        private string resourceId;
         private Material chargeMaterial, chargeCoronaMaterial;
         private Light localLight;
         private Mesh quad;
@@ -55,6 +58,11 @@ namespace Palimpseste.Game.SpellRuntime
         {
             Configure(node.appearance, fallback);
             lifecycle = node.appearance?.lifecycle;
+            if (SpellBehaviorMotion.Enabled(node))
+            {
+                behavior = node.behavior; physicsProfile = node.physics; resourceId = node.appearance.resource_id;
+                if (behavior.phenomenon == "vortex") motif = "vortex";
+            }
             carrier = node.carrier;
             born = Time.time;
             lifetime = Mathf.Max(.1f, (node.options?.lifetime_ticks ?? 150) * Time.fixedDeltaTime);
@@ -221,6 +229,7 @@ namespace Palimpseste.Game.SpellRuntime
             result.SetFloat("_Intensity", intensity);
             result.SetFloat("_Seed", FormSeed());
             result.SetFloat("_Motif", motif == "orbital" ? 1 : motif == "vortex" ? 2 : motif == "fracture" ? 3 : motif == "storm" ? 4 : motif == "petal" ? 5 : 0);
+            SpellResourceLibrary.Bind(result,resourceId);
             materials.Add(result); opacities.Add(opacity);
             return result;
         }
@@ -239,6 +248,7 @@ namespace Palimpseste.Game.SpellRuntime
             result.SetFloat("_Softness", .55f);
             result.SetFloat("_Phase", FormSeed() * 9f + materials.Count * .73f);
             result.SetFloat("_Motif", motif == "orbital" ? 1 : motif == "vortex" ? 2 : motif == "fracture" ? 3 : motif == "storm" ? 4 : motif == "petal" ? 5 : 0);
+            SpellResourceLibrary.Bind(result,resourceId);
             materials.Add(result); opacities.Add(opacity); styledMaterials.Add(result);
             return result;
         }
@@ -286,7 +296,8 @@ namespace Palimpseste.Game.SpellRuntime
         {
             chargeMaterial = StylizedMaterial(0, .9f, 2.7f, .5f);
             charge = Surface("Casting rune seal", transform, quad, chargeMaterial);
-            chargePosition = new Vector3(transform.position.x, .065f, transform.position.z);
+            chargePosition = behavior == null ? new Vector3(transform.position.x, .065f, transform.position.z)
+                : transform.position + transform.up * .015f;
             charge.rotation = Quaternion.Euler(90, 0, 0);
             charge.localScale = Vector3.one * Mathf.Clamp(span * 2.7f, 1.8f, 4.6f);
             chargeCoronaMaterial = StylizedMaterial(4, .8f, 2.6f, -1.1f);
@@ -384,6 +395,40 @@ namespace Palimpseste.Game.SpellRuntime
                 var noise = particles.noise; noise.enabled = layer != 0;
                 noise.strength = layer == 3 ? .14f : .07f;
                 noise.frequency = .65f; noise.scrollSpeed = .35f; noise.quality = ParticleSystemNoiseQuality.Low;
+                if (behavior != null)
+                {
+                    var axis = SpellBehaviorMotion.Axis(behavior);
+                    var speed = axis * Mathf.Clamp(physicsProfile.axial_speed_cm_s,-3000,3000) / 100f;
+                    var angular = axis * SpellBehaviorMotion.AngularSpeed(behavior,physicsProfile) * Mathf.Deg2Rad;
+                    var rotates = behavior.phenomenon == "vortex" || behavior.phenomenon == "orbit" || behavior.phenomenon == "spin";
+                    velocity.x = new ParticleSystem.MinMaxCurve(speed.x,speed.x);
+                    velocity.y = new ParticleSystem.MinMaxCurve(speed.y,speed.y);
+                    velocity.z = new ParticleSystem.MinMaxCurve(speed.z,speed.z);
+                    velocity.orbitalX = new ParticleSystem.MinMaxCurve(rotates ? angular.x : 0,rotates ? angular.x : 0);
+                    velocity.orbitalY = new ParticleSystem.MinMaxCurve(rotates ? angular.y : 0,rotates ? angular.y : 0);
+                    velocity.orbitalZ = new ParticleSystem.MinMaxCurve(rotates ? angular.z : 0,rotates ? angular.z : 0);
+                    var radialSpeed = Mathf.Clamp(physicsProfile.radial_speed_cm_s,-3000,3000) / 100f;
+                    velocity.radial = new ParticleSystem.MinMaxCurve(radialSpeed,radialSpeed);
+                    noise.enabled = physicsProfile.turbulence_cm > 0;
+                    noise.strength = Mathf.Clamp(physicsProfile.turbulence_cm,0,300) / 100f;
+                    noise.frequency = Mathf.Clamp(physicsProfile.frequency_mhz,0,6000) / 1000f;
+                    noise.scrollSpeed = Mathf.Max(.05f,Mathf.Abs(physicsProfile.axial_speed_cm_s) / 100f);
+                    if (rotates)
+                    {
+                        shape.shapeType = ParticleSystemShapeType.Circle;
+                        shape.rotation = Quaternion.FromToRotation(Vector3.forward,axis).eulerAngles;
+                        if (physicsProfile.radius_cm > 0) shape.radius = Mathf.Clamp(physicsProfile.radius_cm,0,1000) / 100f;
+                    }
+                    if (behavior.phenomenon == "flow") shape.radius = Mathf.Clamp(physicsProfile.radius_cm,0,1000) / 100f;
+                    main.simulationSpace = behavior.attachment == "caster" || groundComposition
+                        ? ParticleSystemSimulationSpace.Local : ParticleSystemSimulationSpace.World;
+                    if (behavior.phenomenon == "vortex")
+                    {
+                        shape.rotation = new Vector3(90,0,0);
+                        var spanSeconds = Mathf.Clamp(Mathf.Clamp(span * 3f,.5f,8f) / Mathf.Max(.1f,speed.magnitude),.12f,2.5f);
+                        main.startLifetime = new ParticleSystem.MinMaxCurve(spanSeconds * .7f,spanSeconds);
+                    }
+                }
             }
             var color = particles.colorOverLifetime; color.enabled = true;
             // Color is supplied by the shader. Neutral particle tint avoids
@@ -397,6 +442,7 @@ namespace Palimpseste.Game.SpellRuntime
             renderer.sharedMaterial = StylizedMaterial(layer == 0 ? 6 : layer == 3 ? 5 : 3,
                 layer == 3 ? form == "spirit" ? .18f : .13f : 1,
                 layer == 3 ? form == "spirit" ? 1.2f : .65f : layer == 2 ? 3.2f : 2.5f, .6f);
+            if (behavior != null) SpellResourceLibrary.Bind(renderer.sharedMaterial,resourceId,true);
             renderer.renderMode = layer == 0 ? ParticleSystemRenderMode.Stretch : ParticleSystemRenderMode.Billboard;
             if (layer == 0) { renderer.lengthScale = burst ? 3.4f : 4.5f; renderer.velocityScale = .22f; }
             renderer.shadowCastingMode = ShadowCastingMode.Off; renderer.receiveShadows = false;
@@ -602,6 +648,17 @@ namespace Palimpseste.Game.SpellRuntime
         private void TickVisuals(float age)
         {
             for (var i = 0; i < styledMaterials.Count; i++) styledMaterials[i].SetFloat("_Age", age);
+            if (behavior != null)
+            {
+                var flow = SpellBehaviorMotion.Flow(behavior,physicsProfile);
+                foreach (var material in materials)
+                {
+                    material.SetVector("_BehaviorFlow",new Vector4(flow.x,flow.y,0,0));
+                    material.SetFloat("_BehaviorAge",age);
+                    material.SetFloat("_BehaviorEnabled",1);
+                    material.SetFloat("_BehaviorMotion",behavior.phenomenon == "static" ? 0 : 1);
+                }
+            }
             if (dissolving)
             {
                 // The mechanical carrier has already retired. Its existing
@@ -670,15 +727,16 @@ namespace Palimpseste.Game.SpellRuntime
             }
             if (groundRoot != null)
             {
-                groundRoot.position = new Vector3(transform.position.x, .07f, transform.position.z);
-                groundRoot.rotation = Quaternion.identity;
+                groundRoot.position = behavior == null ? new Vector3(transform.position.x, .07f, transform.position.z) : transform.position;
+                groundRoot.rotation = behavior == null ? Quaternion.identity : transform.rotation;
             }
             var visualRadius = pulseRadius > 0 ? Mathf.Max(.1f, pulseRadius) : span;
             var expansion = Mathf.Lerp(.3f, 1, 1 - Mathf.Pow(1 - Mathf.Clamp01(age/.32f), 3));
             if (seal!=null)
             {
-                seal.position=new Vector3(transform.position.x,.07f,transform.position.z);
-                seal.rotation=Quaternion.Euler(90,age*(restorative ? 12 : 21),0);
+                seal.position=behavior == null ? new Vector3(transform.position.x,.07f,transform.position.z) : transform.position;
+                if (behavior == null) seal.rotation=Quaternion.Euler(90,age*(restorative ? 12 : 21),0);
+                else seal.localRotation=Quaternion.Euler(90,age*(restorative ? 12 : 21),0);
                 seal.localScale=Vector3.one*visualRadius*2.35f*expansion;
             }
             if (corona != null)
@@ -699,6 +757,9 @@ namespace Palimpseste.Game.SpellRuntime
                     ribbons[i].localScale=new Vector3(visualRadius*expansion,height*birth,visualRadius*expansion);
                     ribbons[i].localPosition=Vector3.up*(.035f+Mathf.Sin(age*2+i*1.7f)*.025f);
                 }
+                if (behavior != null && (behavior.phenomenon == "vortex" || behavior.phenomenon == "spin" || behavior.phenomenon == "orbit"))
+                    ribbons[i].localRotation = Quaternion.AngleAxis(age * SpellBehaviorMotion.AngularSpeed(behavior,physicsProfile) + i * 27,
+                        SpellBehaviorMotion.Axis(behavior));
             }
             if (localLight!=null) localLight.intensity=(1.1f+Mathf.Exp(-age*9)*1.4f+Mathf.Sin(age*3)*.1f)*fade;
             UpdateBeamFilaments();

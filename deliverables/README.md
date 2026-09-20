@@ -1,4 +1,12 @@
-# Livraison Windows — Palimpseste 1.4.1 / D14
+# Livraison Windows — préparation Palimpseste 1.5.0 / D15
+
+Les scripts de packaging sont adaptés à `WindowsBehaviorRelease` / `WindowsBehaviorPlayable`, version `1.5.0`, journal `behavior-build.log`. **Aucun build ou packaging D15 n'est attesté par cette mise à jour documentaire.** Les empreintes courantes ci-dessous désignent la livraison précédente jusqu'à remplacement effectif des archives et de leurs manifestes.
+
+La distribution Player D15 ajoutera les notices CC0 des textures et la licence MIT du bruit HLSL réutilisé sous `ThirdPartyNotices/`. La spécification backend inclura les catalogues de références et de ressources, leurs licences et leurs PNG, avec les migrations jusqu'à `010`. Les sources HLSL de référence et scripts d'import ne font pas partie de la spécification runtime : le renderer Unity intègre le code relu lors du développement. Voir [les ressources](../docs/references-vfx-sources.md) et [l'exploitation D15](../ops/README.md).
+
+Le déploiement sur le laboratoire D14 applique uniquement `010`, avec `009` déjà présent. Une nouvelle base exige toutes les migrations `001` à `010` dans l'ordre. Ne pas réappliquer `009` après D15 : l'ancienne contrainte exclut les jobs de version `3`.
+
+## Livraison précédente attestée — 1.4.1 / D14
 
 Les archives ont été construites et installées sur le poste d'origine. Pour transmettre les sources et reprendre ailleurs, lire [la passation](../docs/PASSATION.md).
 

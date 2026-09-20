@@ -133,6 +133,7 @@ namespace Palimpseste.Core
         {
             var token = Newtonsoft.Json.Linq.JObject.FromObject(description);
             if (description.lifecycle == null) token.Property("lifecycle")?.Remove();
+            if (description.behaviors == null) token.Property("behaviors")?.Remove();
             return SpellCompiler.Sha256(Encoding.UTF8.GetBytes(token.ToString(Formatting.None)));
         }
 

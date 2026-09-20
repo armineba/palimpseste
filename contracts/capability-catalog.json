@@ -723,5 +723,245 @@
     },
     "mechanics": "Decorative only. Intro overlaps the existing carrier lifetime and does not postpone movement or damage. Contact animates only on a real carrier contact; expiration handles normal retirement without adding contacts, hits, targets or damage. Animated scale and spread never change collider dimensions.",
     "precedence": "appearance.lifecycle defines launch, active and ending animation; appearance.vfx still supplies controlled secondary particles, materials and motifs. Contact/expiration profiles override legacy vfx.impact for their corresponding phase."
+  },
+  "physical_behavior": {
+    "schema_version": "sp.physical-behavior/1.0",
+    "minimum_client": "1.5.0",
+    "selection": "A supplies exactly one SpellBehaviorIntent per subject in behaviors before the generated image; B copies every field exactly into node.behavior and supplies bounded node.physics. Null is reserved for archived descriptions. Placement, attachment and ballistic motion affect carrier behavior; angular/axial/radial/turbulent flows affect visual layers only and never invent forces, targets or damage.",
+    "intent": {
+      "type": "object",
+      "properties": {
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "muzzle",
+            "aim_point",
+            "caster_ground",
+            "aim_ground",
+            "parent_event",
+            "parent_ground"
+          ]
+        },
+        "orientation": {
+          "type": "string",
+          "enum": [
+            "cast_forward",
+            "world_up",
+            "surface_normal"
+          ]
+        },
+        "attachment": {
+          "type": "string",
+          "enum": [
+            "world",
+            "caster"
+          ]
+        },
+        "phenomenon": {
+          "type": "string",
+          "enum": [
+            "static",
+            "spin",
+            "vortex",
+            "orbit",
+            "flow",
+            "flutter",
+            "turbulence"
+          ]
+        },
+        "axis": {
+          "type": "string",
+          "enum": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "sense": {
+          "type": "string",
+          "enum": [
+            "clockwise",
+            "counterclockwise"
+          ]
+        },
+        "intensity": {
+          "type": "string",
+          "enum": [
+            "gentle",
+            "brisk",
+            "violent"
+          ]
+        },
+        "travel": {
+          "type": "string",
+          "enum": [
+            "stationary",
+            "straight",
+            "curve",
+            "homing",
+            "ballistic"
+          ]
+        }
+      },
+      "required": [
+        "subject_id",
+        "origin",
+        "orientation",
+        "attachment",
+        "phenomenon",
+        "axis",
+        "sense",
+        "intensity",
+        "travel"
+      ],
+      "additionalProperties": false
+    },
+    "physics": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "cast_range_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "offset_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -500,
+            "maximum": 500
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "angular_speed_mdeg_s": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2880000
+        },
+        "axial_speed_cm_s": {
+          "type": "integer",
+          "minimum": -3000,
+          "maximum": 3000
+        },
+        "radial_speed_cm_s": {
+          "type": "integer",
+          "minimum": -3000,
+          "maximum": 3000
+        },
+        "radius_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "turbulence_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 300
+        },
+        "frequency_mhz": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6000
+        },
+        "gravity_cm_s2": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4000
+        },
+        "launch_pitch_mdeg": {
+          "type": "integer",
+          "minimum": -80000,
+          "maximum": 80000
+        }
+      },
+      "required": [
+        "cast_range_cm",
+        "offset_cm",
+        "angular_speed_mdeg_s",
+        "axial_speed_cm_s",
+        "radial_speed_cm_s",
+        "radius_cm",
+        "turbulence_cm",
+        "frequency_mhz",
+        "gravity_cm_s2",
+        "launch_pitch_mdeg"
+      ],
+      "additionalProperties": false
+    },
+    "anchor_mapping": {
+      "caster": "caster",
+      "muzzle": "caster",
+      "caster_ground": "caster",
+      "aim_point": "aim_point",
+      "aim_ground": "aim_point",
+      "parent_event": "parent_event",
+      "parent_ground": "parent_event"
+    },
+    "origin_rules": [
+      "Only aim_point and aim_ground use cast_range_cm>0; other origins set it to zero. The aimed position is limited from the caster.",
+      "Ground origins project onto a real eligible world surface; offset_cm.y=0. surface_normal orientation requires ground placement.",
+      "A child uses parent_event or parent_ground; roots never use parent origins.",
+      "A trap uses aim_ground or parent_ground. caster_ground is allowed only if explicitly selected and described by A as a trap at the caster feet.",
+      "caster attachment requires field, barrier or trap with stationary travel and origin caster/caster_ground. It is never inferred from appearance."
+    ],
+    "travel_rules": [
+      "For projectile, behavior.travel must equal the single motion fact and options.motion (straight,curve,homing,ballistic).",
+      "Other carrier centers use travel stationary; pulse radial expansion still uses its existing expanding motion fact.",
+      "Ballistic requires positive gravity_cm_s2 and bounded launch_pitch_mdeg; all other travel sets both to zero. turn_mdeg_s stays zero unless homing.",
+      "gravity_cm_s2 is cm per second squared, launch_pitch_mdeg is degrees times 1000. Existing projectile speed_cm_s is the magnitude of launch velocity."
+    ],
+    "phenomenon_rules": {
+      "static": "angular_speed, axial_speed, radial_speed, radius, turbulence and frequency must all be zero. Placement and ballistic gravity remain independent.",
+      "spin": "positive continuous angular_speed_mdeg_s; all other phenomenon parameters zero.",
+      "vortex": "axis=y; positive radius_cm and nonzero axial_speed_cm_s; angular_speed_mdeg_s >= gentle:180000, brisk:360000, violent:720000; radial flow and turbulence optional. Rotation is continuous, never sinusoidal oscillation.",
+      "orbit": "positive angular_speed_mdeg_s and radius_cm; all other phenomenon parameters zero.",
+      "flow": "nonzero axial_speed_cm_s and positive radius_cm; angular_speed_mdeg_s=0; radial flow and turbulence optional.",
+      "flutter": "positive turbulence_cm and frequency_mhz; angular/axial/radial speed and radius=0.",
+      "turbulence": "positive turbulence_cm and frequency_mhz; angular/axial/radial speed and radius=0."
+    },
+    "units": {
+      "angular_speed_mdeg_s": "millidegrees per second: 360000 = one complete turn per second; sense sets sign, axis sets local axis",
+      "axial_speed_cm_s": "signed centimeters per second along the declared local axis",
+      "radial_speed_cm_s": "signed centimeters per second: positive outward, negative inward",
+      "frequency_mhz": "millihertz: 1000 = 1 Hz",
+      "offset_cm": "local centimeters in deployment orientation, after origin resolution; all axes bounded independently"
+    },
+    "turbulence_rule": "Where turbulence is supported, turbulence_cm and frequency_mhz are both zero or both positive.",
+    "reference_research": "New physical plans must copy the exact server-provided REFERENCE_RESEARCH_SHA256. This context authorizes references and resource IDs, not arbitrary downloads or tools.",
+    "semantic_form_rule": "The controlled visual_form vortex requires phenomenon vortex. This is a typed capability constraint, never a rule inferred from a spell title or a job identifier."
+  },
+  "shipped_vfx_resources": {
+    "schema_version": "sp.vfx-resources/1.0",
+    "minimum_client": "1.5.0",
+    "ids": [
+      "kpp_circle_01",
+      "kpp_circle_03",
+      "kpp_fire_01",
+      "kpp_flame_01",
+      "kpp_magic_01",
+      "kpp_slash_01",
+      "kpp_smoke_01",
+      "kpp_spark_01",
+      "kpp_spark_05",
+      "kpp_star_01",
+      "kpp_trace_01",
+      "kpp_twirl_01",
+      "ksp_black_smoke_00",
+      "ksp_explosion_00",
+      "ksp_poison_puff_00",
+      "ksp_white_puff_00"
+    ],
+    "selection": "Each new appearance.resource_id selects one shipped Kenney CC0 texture appropriate to the visual material. It supports particle layers; it never replaces the constructed 3D spell. Null preserves archived behavior.",
+    "trust": "Fixed identifiers only. No paths, URLs, scripts, downloaded shaders or packages may be returned by the model.",
+    "source_catalog": "assets/sourced-vfx/catalogue.json"
   }
 }

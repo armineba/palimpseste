@@ -1,0 +1,4 @@
+# Keep downloaded source and license bytes identical to the recorded upstream SHA-256.
+licenses/*.txt -text
+reference-code/noise-shader/*.hlsl -text
+textures/**/*.png binary

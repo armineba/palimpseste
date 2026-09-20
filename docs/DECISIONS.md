@@ -1,5 +1,15 @@
 # Décisions de réalisation
 
+## D15 — Intentions physiques contrôlées et ressources gratuites avant construction
+
+Le créateur demande une correction systémique pour les prochains parchemins : le phénomène annoncé doit correspondre à un mouvement réel et le déploiement doit être décrit, notamment pour différencier un effet sur le lanceur d'un effet ciblé au sol. Aucun sort existant n'est corrigé par son titre ou identifiant.
+
+A déclare des intentions typées ; B les copie et règle des paramètres bornés ; le compilateur contrôle ces correspondances ; le moteur précompilé applique les déplacements et animations. La description conserve son rôle d'autorité. Les six paramètres d'écoulement visuel peuvent être affinés par la critique sans modifier l'intention, le placement, la gravité ni l'angle de lancement.
+
+Avant B, une recherche obligatoire par job choisit et consulte des références dans un index primaire revu, puis fournit les ressources gratuites importées et leurs licences. La sélection finale dépend aussi de l'image présentée à B. Les téléchargements et imports de code restent des opérations de développement ; aucun worker de génération joueur n'obtient d'outil d'installation, de shell ou de build. Gratuit uniquement, aucun achat ou nouvel abonnement.
+
+Dream-loop Pro reçoit désormais plusieurs instants actifs. Les anciens paquets conservent leur rendu historique ; les nouveaux nécessitent le client 1.5.0. La demande de laisser les essais au créateur reste en vigueur. [Architecture, état et limites D15](D15_BEHAVIOR_AND_RESEARCH.md).
+
 ## D14 — Le texte pilote le cycle complet, la critique indépendante compare le rendu
 
 La demande actuelle prolonge D13 avec une boucle **Dream-loop Pro**. La description est l'autorité pour chaque sujet du sort : **apparition, activité, réaction au contact et disparition naturelle sans contact**. Ces quatre phases doivent être décrites puis traduites en paramètres d'animation contrôlés. L'image générée représente un moment actif caractéristique et en fixe la cible d'apparence ; elle ne suffit pas à définir la chronologie ou les mécaniques.

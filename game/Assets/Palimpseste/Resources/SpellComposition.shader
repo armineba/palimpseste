@@ -10,6 +10,13 @@ Shader "Palimpseste/SpellComposition"
         _Progress ("Lifecycle", Float) = 0
         _Seed ("Controlled variation", Float) = 0
         _Motif ("Runic / orbital / vortex / fracture / storm / petal", Float) = 0
+        _ResourceTex ("Curated VFX texture", 2D) = "white" {}
+        _ResourceEnabled ("Curated texture enabled", Float) = 0
+        _ResourceParticle ("Particle mask", Float) = 0
+        _BehaviorFlow ("Authored surface advection", Vector) = (0,0,0,0)
+        _BehaviorAge ("Authored motion age", Float) = 0
+        _BehaviorEnabled ("Explicit behavior", Float) = 0
+        _BehaviorMotion ("Behavior moves", Float) = 1
     }
     SubShader
     {
@@ -29,7 +36,10 @@ Shader "Palimpseste/SpellComposition"
                 half4 _Color;
                 half4 _Accent;
                 float _Mode, _Intensity, _Opacity, _Progress, _Seed, _Motif;
+                float4 _BehaviorFlow;
+                float _BehaviorAge, _ResourceEnabled, _ResourceParticle, _BehaviorEnabled, _BehaviorMotion;
             CBUFFER_END
+            TEXTURE2D(_ResourceTex); SAMPLER(sampler_ResourceTex);
             struct Attributes { float4 positionOS : POSITION; float3 normalOS : NORMAL; float2 uv : TEXCOORD0; half4 color : COLOR; };
             struct Varyings
             {
@@ -86,7 +96,7 @@ Shader "Palimpseste/SpellComposition"
             }
             half4 frag(Varyings input) : SV_Target
             {
-                float t=_Time.y+_Seed*4.7;
+                float t=lerp(_Time.y,_BehaviorAge*_BehaviorMotion,saturate(_BehaviorEnabled))+_Seed*4.7;
                 float2 uv=input.uv, p=uv*2-1;
                 float shape=0, hot=0, alpha=1;
                 if (_Mode<.5)
@@ -141,6 +151,8 @@ Shader "Palimpseste/SpellComposition"
                     alpha=shape*.65; hot=strands*vertical*.42;
                 }
                 half3 chroma=lerp(_Color.rgb,_Accent.rgb,saturate(hot));
+                float resource=SAMPLE_TEXTURE2D(_ResourceTex,sampler_ResourceTex,frac(uv+_BehaviorFlow.xy*_BehaviorAge)).a;
+                alpha*=lerp(1,.4+.6*resource,saturate(_ResourceEnabled));
                 return half4(chroma*_Intensity*input.color.rgb, saturate(alpha*_Opacity*input.color.a));
             }
             ENDHLSL

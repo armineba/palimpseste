@@ -1,0 +1,61 @@
+{
+    "schema_version":  "sp.delivery-evidence/1.0",
+    "delivery":  "D15 behavior and sourced VFX",
+    "observed_at":  "2026-09-20T23:19:21.2662285+00:00",
+    "client_version":  "1.5.0",
+    "scope":  "Systemic generation for future parchments; no existing spell or job document rewritten",
+    "unity":  {
+                  "version":  "6000.3.24f1",
+                  "backend":  "IL2CPP",
+                  "build_exit":  0,
+                  "build_log_sha256":  "6df6d3247bc4b8b161a8fec58318742a4d785c4106b705e56f75d0ee279fc35d",
+                  "game_assembly_sha256":  "372e9aad2e0018961791c0a3f3a596ec8c5c5e2f4f350ae7ce385e88049dadc2",
+                  "player_zip_sha256":  "e8669bf3ffbcc77134186d2b1d6ed76702de9dac666e60a7d85c5d6a58e647b1",
+                  "player_zip_bytes":  46574212,
+                  "installed_shortcut":  "Palimpseste Spell Lab"
+              },
+    "backend":  {
+                    "publish_exit":  0,
+                    "build_log_sha256":  "4954eec7f0d7b6ad0e824727913efc49c6dcbf2c10f3603fd5d37bd0187e0687",
+                    "deploy_exit":  0,
+                    "installed":  true,
+                    "deployed_at":  "2026-09-20T23:17:58.6455010+00:00",
+                    "worker_pid":  38748,
+                    "api_pid":  37400,
+                    "worker_sha256":  "0357d4b30c903ecc716025b65a690391094db37300129883ec80f57002539782",
+                    "api_sha256":  "4246f335486a25f2dcac83a4516cff27a9e042c6097238ab99ef9b7a8f973fa6",
+                    "renderer_manifest_sha256":  "064bc8f4a7a85b7eebfb54c084fc0b9e0e384848fd332c95062cdc2bf36a6f45",
+                    "migration_010_applied":  true,
+                    "migration_010_sha256":  "b48181eca06e86e0a6ff896ad89d0ed855ca92570ad1b88cee74a2972931a6b3",
+                    "native_codex_sha256":  "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+                    "local_only":  true
+                },
+    "resources":  {
+                      "textures_imported":  16,
+                      "texture_license":  "CC0-1.0",
+                      "shader_reused":  "SimplexNoise3D/Common, NoiseShader MIT",
+                      "primary_reference_entries":  7,
+                      "catalog_sha256":  "c4348c1bee2aa41321d53e5c2aa88dd85b640ae0bcc631d6bc8aef7e4736c31b",
+                      "reference_index_sha256":  "5a136bf9b0bec36d7a9eb552fe97e142491a81e88b384ad315291675aa3a5569",
+                      "asset_purchases":  0
+                  },
+    "verification":  {
+                         "builds_and_installation_executed":  true,
+                         "test_suites_executed":  false,
+                         "developer_gameplay_trials":  0,
+                         "developer_capture_replays":  0,
+                         "developer_generation_calls":  0,
+                         "per_job_research_executed_for_d15":  false,
+                         "runtime_pro_loop_exercised_for_d15":  false,
+                         "artistic_acceptance":  "pending_owner",
+                         "physical_acceptance":  "pending_owner",
+                         "latency_measured_for_d15":  false
+                     },
+    "limitations":  [
+                        "Free resource research uses a curated primary-source index with explicit online fetch outcome, not general web exploration.",
+                        "Physical controllers are bounded stylized implementations, not a universal fluid solver.",
+                        "Temporal captures show presentation only; actual gameplay, collisions and fidelity are left to the owner.",
+                        "No public VPS or remote-player deployment performed."
+                    ],
+    "resume":  "Owner opens 1.5.0 and draws a new parchment; inspect the resulting interpretation, placement, motion, contact and retirement."
+}

@@ -42,7 +42,9 @@ public sealed record RepairAttempt(
     string? LayoutJson,
     string? GeometryJson,
     string CapabilitiesJson,
-    SpellVisualReference? VisualReference = null);
+    SpellVisualReference? VisualReference = null,
+    SpellReferenceResearch? Research = null,
+    bool LegacyInterpretation = false);
 
 public sealed record ProviderDocument(CodexResult Transport, byte[]? Utf8, string? Sha256);
 
@@ -53,20 +55,24 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
     public const string PlannerModel = "gpt-6-astra";
     public const string InterpreterEffort = "high";
     public const string PlannerEffort = "high";
-    public const string PromptAVersion = "sp.prompt.a/2.3";
-    public const string PromptBVersion = "sp.prompt.b/2.2";
-    public const string PromptGVersion = "sp.prompt.g/1.1";
+    public const string PromptAVersion = "sp.prompt.a/2.4";
+    public const string LegacyPromptAVersion = "sp.prompt.a/2.3";
+    public const string PromptBVersion = "sp.prompt.b/2.3";
+    public const string PromptGVersion = "sp.prompt.g/1.2";
     private readonly CodexProcessRunner runner;
     private readonly string promptA;
+    private readonly string legacyPromptA;
     private readonly string promptB;
     private readonly string promptRepair;
     private readonly string effectRecipesAContext;
     private readonly Dictionary<string, JsonElement> recipeDefinitions;
     private readonly string schemaA;
+    private readonly string legacySchemaA;
     private readonly string schemaB;
     private readonly string promptG;
     private readonly string schemaG;
     public string PromptASha256 { get; }
+    public string LegacyPromptASha256 { get; }
     public string PromptBSha256 { get; }
     public string PromptGSha256 { get; }
     public string EffectRecipesPromptSha256 { get; }
@@ -80,6 +86,10 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
         if (!promptA.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + PromptAVersion, StringComparison.Ordinal))
             throw new InvalidDataException("prompt_a_version_mismatch");
         PromptASha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(promptA)));
+        legacyPromptA = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "history", "01_MODEL_A_INTERPRETE_2_3.md"), Encoding.UTF8);
+        if (!legacyPromptA.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + LegacyPromptAVersion, StringComparison.Ordinal))
+            throw new InvalidDataException("legacy_prompt_a_version_mismatch");
+        LegacyPromptASha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(legacyPromptA)));
         promptB = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "02_MODEL_B_TRADUCTEUR.md"), Encoding.UTF8);
         if (!promptB.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + PromptBVersion, StringComparison.Ordinal))
             throw new InvalidDataException("prompt_b_version_mismatch");
@@ -105,6 +115,7 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
                 throw new InvalidDataException("effect_recipe_prompt_catalog_mismatch");
         }
         schemaA = Path.Combine(trustedSpecificationRoot, "contracts", "codex", "model-a.output-schema.json");
+        legacySchemaA = Path.Combine(trustedSpecificationRoot, "contracts", "legacy", "model-a-2.3.output-schema.json");
         schemaB = Path.Combine(trustedSpecificationRoot, "contracts", "codex", "model-b.output-schema.json");
         schemaG = Path.Combine(trustedSpecificationRoot, "contracts", "codex", "model-g.output-schema.json");
         promptG = File.ReadAllText(Path.Combine(trustedSpecificationRoot, "prompts", "04_IMAGE_REFERENCE.md"), Encoding.UTF8);
@@ -119,6 +130,18 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
             "\nEFFECT_RECIPES_CONTEXT\n" + effectRecipesAContext +
             "\nIMAGE 1 = référence neutre. IMAGE 2 = dessin engagé. Réponds avec le seul contrat JSON.\n";
         var result = await runner.RunAsync(new(attemptId, "A", prompt, schemaA,
+            [referencePng, drawingPng], jobId), ct);
+        return Parse(result, "sp.description/1.0");
+    }
+
+    /// <summary>Preserves the admitted interpretation contract for pre-D15 player jobs.</summary>
+    public async Task<ProviderDocument> InterpretLegacyAsync(string jobId, string attemptId, string referencePng, string drawingPng,
+        string layoutJson, string capabilitiesJson, CancellationToken ct)
+    {
+        var prompt = legacyPromptA + "\n\nLAYOUT_CONTEXT\n" + CompactJson(layoutJson) + "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilitiesJson, null) +
+            "\nEFFECT_RECIPES_CONTEXT\n" + effectRecipesAContext +
+            "\nIMAGE 1 = référence neutre. IMAGE 2 = dessin engagé. Réponds avec le seul contrat JSON.\n";
+        var result = await runner.RunAsync(new(attemptId, "A", prompt, legacySchemaA,
             [referencePng, drawingPng], jobId), ct);
         return Parse(result, "sp.description/1.0");
     }
@@ -143,8 +166,12 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
     public Task<ProviderDocument> PlanAsync(string jobId, string attemptId, byte[] frozenDescriptionUtf8, string geometryJson, string capabilitiesJson, CancellationToken ct) =>
         PlanAsync(jobId, attemptId, frozenDescriptionUtf8, geometryJson, capabilitiesJson, null, ct);
 
-    public async Task<ProviderDocument> PlanAsync(string jobId, string attemptId, byte[] frozenDescriptionUtf8,
-        string geometryJson, string capabilitiesJson, SpellVisualReference? visualReference, CancellationToken ct)
+    public Task<ProviderDocument> PlanAsync(string jobId, string attemptId, byte[] frozenDescriptionUtf8,
+        string geometryJson, string capabilitiesJson, SpellVisualReference? visualReference, CancellationToken ct) =>
+        PlanWithResearchAsync(jobId, attemptId, frozenDescriptionUtf8, geometryJson, capabilitiesJson, visualReference, null, ct);
+
+    public async Task<ProviderDocument> PlanWithResearchAsync(string jobId, string attemptId, byte[] frozenDescriptionUtf8,
+        string geometryJson, string capabilitiesJson, SpellVisualReference? visualReference, SpellReferenceResearch? research, CancellationToken ct)
     {
         if (frozenDescriptionUtf8.Length == 0 || frozenDescriptionUtf8.Length > 250_000) throw new ArgumentOutOfRangeException(nameof(frozenDescriptionUtf8));
         var hash = Convert.ToHexStringLower(SHA256.HashData(frozenDescriptionUtf8));
@@ -152,11 +179,11 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
             Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + CompactJson(geometryJson) +
             "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilitiesJson, frozenDescriptionUtf8) + "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(frozenDescriptionUtf8) +
             "\nRéponds avec le seul contrat JSON.\n";
-        prompt += VisualReferenceContext(visualReference);
+        prompt += VisualReferenceContext(visualReference) + ResearchContext(research);
         var result = await runner.RunAsync(new(attemptId, "B", prompt, schemaB,
             visualReference is null ? [] : [visualReference.PngPath], jobId, visualReference), ct);
         var document = Parse(result, "sp.plan/1.0");
-        return EnsureVisualReferenceHash(EnsureDescriptionHash(document, hash), visualReference);
+        return EnsureResearch(EnsureVisualReferenceHash(EnsureDescriptionHash(document, hash), visualReference), research);
     }
 
     /// <summary>Operator-only counterpart to PlanAsync for active compatibility doctor runs.</summary>
@@ -165,7 +192,8 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
         ProbePlanAsync(jobId, attemptId, frozenDescriptionUtf8, geometryJson, capabilitiesJson, null, ct);
 
     public async Task<ProviderDocument> ProbePlanAsync(string jobId, string attemptId, byte[] frozenDescriptionUtf8,
-        string geometryJson, string capabilitiesJson, SpellVisualReference? visualReference, CancellationToken ct)
+        string geometryJson, string capabilitiesJson, SpellVisualReference? visualReference, CancellationToken ct,
+        SpellReferenceResearch? research = null)
     {
         if (frozenDescriptionUtf8.Length == 0 || frozenDescriptionUtf8.Length > 250_000) throw new ArgumentOutOfRangeException(nameof(frozenDescriptionUtf8));
         var hash = Convert.ToHexStringLower(SHA256.HashData(frozenDescriptionUtf8));
@@ -173,11 +201,11 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
             Encoding.UTF8.GetString(frozenDescriptionUtf8) + "\nGEOMETRY_CONTEXT\n" + CompactJson(geometryJson) +
             "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilitiesJson, frozenDescriptionUtf8) + "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(frozenDescriptionUtf8) +
             "\nReturn only the JSON contract.\n";
-        prompt += VisualReferenceContext(visualReference);
+        prompt += VisualReferenceContext(visualReference) + ResearchContext(research);
         var result = await runner.ProbeAsync(new(attemptId, "B", prompt, schemaB,
             visualReference is null ? [] : [visualReference.PngPath], jobId, visualReference), ct);
         var document = Parse(result, "sp.plan/1.0");
-        return EnsureVisualReferenceHash(EnsureDescriptionHash(document, hash), visualReference);
+        return EnsureResearch(EnsureVisualReferenceHash(EnsureDescriptionHash(document, hash), visualReference), research);
     }
 
     public Task<ProviderVisualReference> GenerateVisualReferenceAsync(string jobId, string attemptId,
@@ -222,6 +250,7 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
     public async Task<ProviderDocument> RepairAsync(RepairAttempt attempt, CancellationToken ct)
     {
         if (attempt.Stage is not ("A" or "B")) throw new ArgumentException("stage must be A or B", nameof(attempt));
+        if (attempt.LegacyInterpretation && attempt.Stage != "A") throw new ArgumentException("Legacy interpretation applies only to A", nameof(attempt));
         if (attempt.Stage == "A" && attempt.VisualReference is not null) throw new ArgumentException("A repair cannot use a generated reference", nameof(attempt));
         if (attempt.AttemptNumber is < 1 or > 2) throw new ArgumentOutOfRangeException(nameof(attempt.AttemptNumber));
         if (string.IsNullOrWhiteSpace(attempt.JobId) || string.IsNullOrWhiteSpace(attempt.AttemptId))
@@ -254,7 +283,9 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
                 throw new ArgumentException("A repair requires both images and layout context", nameof(attempt));
             prompt.Append("LAYOUT_CONTEXT\n").Append(attempt.LayoutJson)
                 .Append("\nIMAGE 1 = référence neutre. IMAGE 2 = dessin engagé.\n");
-            schema = schemaA;
+            if (attempt.LegacyInterpretation)
+                prompt.Append("\nAUTHORIZED_INTERPRETATION_CONTRACT\n").Append(legacyPromptA).Append('\n');
+            schema = attempt.LegacyInterpretation ? legacySchemaA : schemaA;
             images = [attempt.ReferencePng, attempt.DrawingPng];
         }
         else
@@ -264,7 +295,7 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
             prompt.Append("GEOMETRY_CONTEXT\n").Append(attempt.GeometryJson)
                 .Append("\nSPELL_DESCRIPTION_REMAINS_IMMUTABLE\n");
             schema = schemaB;
-            prompt.Append(VisualReferenceContext(attempt.VisualReference));
+            prompt.Append(VisualReferenceContext(attempt.VisualReference)).Append(ResearchContext(attempt.Research));
             images = attempt.VisualReference is null ? [] : [attempt.VisualReference.PngPath];
         }
 
@@ -273,7 +304,7 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
         if (attempt.Stage == "B")
         {
             var descriptionHash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(attempt.OriginalAuthorizedInput)));
-            return EnsureVisualReferenceHash(EnsureDescriptionHash(document, descriptionHash), attempt.VisualReference);
+            return EnsureResearch(EnsureVisualReferenceHash(EnsureDescriptionHash(document, descriptionHash), attempt.VisualReference), attempt.Research);
         }
         return document;
     }

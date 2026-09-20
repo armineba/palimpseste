@@ -12,6 +12,13 @@ Shader "Palimpseste/SpellStylized"
         _Phase ("Variation", Float) = 0
         _Age ("Lifecycle", Range(0,1)) = 0
         _Motif ("Runic / orbital / vortex / fracture / storm / petal", Float) = 0
+        _ResourceTex ("Curated VFX texture", 2D) = "white" {}
+        _ResourceEnabled ("Curated texture enabled", Float) = 0
+        _ResourceParticle ("Particle mask", Float) = 0
+        _BehaviorFlow ("Authored surface advection", Vector) = (0,0,0,0)
+        _BehaviorAge ("Authored motion age", Float) = 0
+        _BehaviorEnabled ("Explicit behavior", Float) = 0
+        _BehaviorMotion ("Behavior moves", Float) = 1
     }
     SubShader
     {
@@ -31,7 +38,10 @@ Shader "Palimpseste/SpellStylized"
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color, _AccentColor;
                 float _Mode, _Intensity, _Opacity, _FlowSpeed, _Softness, _Phase, _Age, _Motif;
+                float4 _BehaviorFlow;
+                float _BehaviorAge, _ResourceEnabled, _ResourceParticle, _BehaviorEnabled, _BehaviorMotion;
             CBUFFER_END
+            TEXTURE2D(_ResourceTex); SAMPLER(sampler_ResourceTex);
 
             struct Attributes
             {
@@ -88,7 +98,7 @@ Shader "Palimpseste/SpellStylized"
             half4 frag(Varyings input) : SV_Target
             {
                 float2 uv = input.uv, p = uv*2-1;
-                float t = _Time.y * _FlowSpeed + _Phase;
+                float t = lerp(_Time.y,_BehaviorAge*_BehaviorMotion,saturate(_BehaviorEnabled)) * _FlowSpeed + _Phase;
                 float radius = length(p), angle = atan2(p.y, p.x);
                 float coverage = 0, highlight = 0;
                 float softness = saturate(_Softness);
@@ -202,6 +212,9 @@ Shader "Palimpseste/SpellStylized"
                 }
 
                 // Keep chroma around the hot core and honour particle colour-over-lifetime alpha.
+                float2 resourceUV=lerp(frac(uv+_BehaviorFlow.xy*_BehaviorAge),uv,saturate(_ResourceParticle));
+                float resource=SAMPLE_TEXTURE2D(_ResourceTex,sampler_ResourceTex,resourceUV).a;
+                coverage=lerp(coverage,lerp(coverage*(.4+.6*resource),resource,saturate(_ResourceParticle)),saturate(_ResourceEnabled));
                 float alpha = saturate(coverage * saturate(_Opacity) * input.color.a * _Color.a);
                 half3 colour = lerp(_Color.rgb,_AccentColor.rgb,saturate(highlight)*.83);
                 half3 emission = max(colour,0)*max(input.color.rgb,0)*clamp(_Intensity,0,8)*alpha;

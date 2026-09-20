@@ -9,8 +9,9 @@ namespace Palimpseste.Game.SpellRuntime
     {
         public int id, castId, born, nextTick, bouncesLeft, piercesLeft, triggersLeft, blocksLeft;
         public SpellNode node;
-        public Vector3 position, direction, origin;
-        public Quaternion rotation;
+        public Vector3 position, direction, origin, velocity, aim, surfaceNormal, attachedLocalPosition, attachedLocalForward;
+        public Quaternion rotation, trajectoryRotation;
+        public Quaternion attachedLocalRotation;
         public float travelled;
         public GameObject visual;
         public List<Vector3> path;
@@ -25,7 +26,7 @@ namespace Palimpseste.Game.SpellRuntime
     {
         public int dueTick, castId;
         public SpellNode node;
-        public Vector3 position, direction;
+        public Vector3 position, direction, normal, aim;
     }
 
     // The packet contains data only. This fixed engine is the only place that applies mechanics.
@@ -69,6 +70,14 @@ namespace Palimpseste.Game.SpellRuntime
             foreach (var node in spell.plan.nodes)
             {
                 if (node.activation?.parent_id != null) continue;
+                if (SpellBehaviorMotion.Enabled(node))
+                {
+                    if (!ResolvePlacement(node,position,aim,direction,position,Vector3.up,
+                        out var placed,out var forward,out var normal)) continue;
+                    Schedule(node,castId,placed,forward,TickCount,normal,aim);
+                    roots++;
+                    continue;
+                }
                 roots++;
                 Schedule(node, castId, node.anchor == "aim_point" ? aim : position, direction, TickCount);
             }
@@ -90,6 +99,8 @@ namespace Palimpseste.Game.SpellRuntime
             active.Sort((a, b) => a.id.CompareTo(b.id));
             foreach (var state in active)
             {
+                if (state.expired) continue;
+                FollowAttachment(state);
                 if (state.expired) continue;
                 var age = TickCount - state.born;
                 switch (state.node.carrier)
@@ -163,13 +174,80 @@ namespace Palimpseste.Game.SpellRuntime
 
         private static int Option(int? value, int fallback) => value ?? fallback;
 
-        private void Schedule(SpellNode node, int castId, Vector3 position, Vector3 direction, int parentTick)
+        private void Schedule(SpellNode node, int castId, Vector3 position, Vector3 direction, int parentTick,
+            Vector3? normal = null, Vector3? aim = null)
         {
             var key = castId + ":" + node.node_id;
             activationCounts.TryGetValue(key, out var count);
             if (count >= node.activation.max_activations) return;
             activationCounts[key] = count + 1;
-            scheduled.Add(new ScheduledCarrier { node = node, castId = castId, position = position, direction = direction.normalized, dueTick = parentTick + 1 + node.activation.delay_ticks });
+            scheduled.Add(new ScheduledCarrier { node = node, castId = castId, position = position, direction = direction.normalized,
+                normal = normal ?? Vector3.up, aim = aim ?? position, dueTick = parentTick + 1 + node.activation.delay_ticks });
+        }
+
+        private bool ResolvePlacement(SpellNode node, Vector3 source, Vector3 aim, Vector3 forward,
+            Vector3 eventPosition, Vector3 eventNormal, out Vector3 position, out Vector3 direction, out Vector3 normal)
+        {
+            var intent = node.behavior; var parameters = node.physics;
+            direction = forward.sqrMagnitude > .0001f ? forward.normalized : Vector3.forward;
+            normal = Vector3.up; position = source;
+            var boundedAim = source + Vector3.ClampMagnitude(aim - source,Mathf.Clamp(parameters.cast_range_cm,0,3000) / 100f);
+            switch (intent.origin)
+            {
+                case "aim_point": case "aim_ground": position = boundedAim; break;
+                case "parent_event": case "parent_ground": position = eventPosition; normal = eventNormal; break;
+                case "muzzle": position = source + direction * .8f; break;
+            }
+            var ground = intent.origin.EndsWith("_ground",StringComparison.Ordinal) || intent.origin == "parent_ground";
+            if (ground && !GroundPoint(position,out position,out normal)) return false;
+            var orientation = PlacementRotation(intent.orientation,direction,normal);
+            if (parameters.offset_cm != null && parameters.offset_cm.Length == 3)
+                position += orientation * new Vector3(Mathf.Clamp(parameters.offset_cm[0],-500,500),
+                    Mathf.Clamp(parameters.offset_cm[1],-500,500),Mathf.Clamp(parameters.offset_cm[2],-500,500)) / 100f;
+            if (ground && !GroundPoint(position,out position,out normal)) return false;
+            return true;
+        }
+
+        private static Quaternion PlacementRotation(string mode, Vector3 forward, Vector3 normal)
+        {
+            if (mode == "world_up") return Quaternion.identity;
+            if (mode == "surface_normal")
+            {
+                var tangent = Vector3.ProjectOnPlane(forward,normal);
+                if (tangent.sqrMagnitude < .0001f) tangent = Vector3.ProjectOnPlane(Vector3.forward,normal);
+                if (tangent.sqrMagnitude < .0001f) tangent = Vector3.Cross(normal,Vector3.right);
+                return Quaternion.LookRotation(tangent.normalized,normal.normalized);
+            }
+            return Quaternion.LookRotation(forward.sqrMagnitude > .0001f ? forward.normalized : Vector3.forward,Vector3.up);
+        }
+
+        private bool GroundPoint(Vector3 requested, out Vector3 point, out Vector3 normal)
+        {
+            point = requested; normal = Vector3.up;
+            var hits = Sorted(Physics.RaycastAll(requested + Vector3.up * 35,Vector3.down,75,~0,QueryTriggerInteraction.Ignore));
+            foreach (var hit in hits)
+            {
+                if (hit.collider == null || Receiver(hit.collider) != null || Barrier(hit.collider) != null ||
+                    caster != null && hit.collider.transform.IsChildOf(caster) || hit.normal.y < .25f) continue;
+                point = hit.point + hit.normal * .035f; normal = hit.normal;
+                return true;
+            }
+            return false; // no silent fallback to the caster or a fictitious floor
+        }
+
+        private void FollowAttachment(CarrierState state)
+        {
+            if (!SpellBehaviorMotion.Enabled(state.node) || state.node.behavior.attachment != "caster") return;
+            if (caster == null) { Expire(state); return; }
+            var position = caster.TransformPoint(state.attachedLocalPosition);
+            if (state.node.behavior.origin.EndsWith("_ground",StringComparison.Ordinal) &&
+                !GroundPoint(position,out position,out state.surfaceNormal)) { Expire(state); return; }
+            var delta = position - state.position;
+            state.position = position; state.origin += delta;
+            state.rotation = caster.rotation * state.attachedLocalRotation;
+            state.direction = caster.TransformDirection(state.attachedLocalForward).normalized;
+            state.trajectoryRotation = Quaternion.LookRotation(state.direction,Vector3.up) * Quaternion.Euler(0,state.node.rotation_mdeg / 1000f,0);
+            if (state.visual != null) state.visual.transform.SetPositionAndRotation(state.position,state.rotation);
         }
 
         private void Spawn(ScheduledCarrier pending)
@@ -184,13 +262,33 @@ namespace Palimpseste.Game.SpellRuntime
                 var state = new CarrierState
                 {
                     id = ++nextInstance, castId = pending.castId, born = TickCount,
-                    node = node, position = pending.position, origin = pending.position,
+                    node = node, position = pending.position, origin = pending.position, aim = pending.aim,
+                    surfaceNormal = pending.normal,
                     direction = direction.normalized,
                     rotation = Quaternion.LookRotation(direction.normalized, Vector3.up) * Quaternion.Euler(0, node.rotation_mdeg / 1000f, 0),
                     bouncesLeft = Option(node.options.bounces, 0), piercesLeft = Option(node.options.pierces, 0),
                     triggersLeft = Option(node.options.trigger_limit, 0), blocksLeft = Option(node.options.block_limit, 0),
                     nextTick = TickCount + Option(node.options.tick_interval, 1)
                 };
+                state.trajectoryRotation = state.rotation;
+                if (SpellBehaviorMotion.Enabled(node))
+                {
+                    state.rotation = PlacementRotation(node.behavior.orientation,state.direction,pending.normal) * Quaternion.Euler(0,node.rotation_mdeg / 1000f,0);
+                    if (caster != null)
+                    {
+                        state.attachedLocalPosition = caster.InverseTransformPoint(state.position);
+                        state.attachedLocalRotation = Quaternion.Inverse(caster.rotation) * state.rotation;
+                        state.attachedLocalForward = caster.InverseTransformDirection(state.direction);
+                    }
+                    if (node.options.motion == "ballistic")
+                    {
+                        var pitch = Mathf.Clamp(node.physics.launch_pitch_mdeg,-80000,80000) / 1000f * Mathf.Deg2Rad;
+                        var horizontal = Vector3.ProjectOnPlane(state.direction,Vector3.up).normalized;
+                        if (horizontal.sqrMagnitude < .0001f) horizontal = Vector3.forward;
+                        state.velocity = (horizontal * Mathf.Cos(pitch) + Vector3.up * Mathf.Sin(pitch)) * Option(node.options.speed_cm_s,100) / 100f;
+                        state.direction = state.velocity.normalized;
+                    }
+                }
                 state.path = geometry.Path(node);
                 state.visual = CarrierVisual.Create(state, geometry.Mask(node), geometry.SignatureMask(node));
                 active.Add(state);
@@ -234,7 +332,15 @@ namespace Palimpseste.Game.SpellRuntime
             }
             foreach (var child in spell.plan.nodes)
                 if (child.activation.parent_id == state.node.node_id && child.activation.@event == kind)
-                    Schedule(child, state.castId, position, state.direction, TickCount);
+                {
+                    if (SpellBehaviorMotion.Enabled(child))
+                    {
+                        var source = caster == null ? state.origin : caster.position;
+                        if (ResolvePlacement(child,source,state.aim,state.direction,position,normal,out var placed,out var forward,out var surface))
+                            Schedule(child,state.castId,placed,forward,TickCount,surface,state.aim);
+                    }
+                    else Schedule(child,state.castId,position,state.direction,TickCount);
+                }
         }
 
         private bool Matches(string filter, LabReceiver receiver)
@@ -328,7 +434,15 @@ namespace Palimpseste.Game.SpellRuntime
             var speed = Option(opts.speed_cm_s, 100) / 100f;
             var length = speed * .02f;
             var old = state.position;
-            if (opts.motion == "homing")
+            var ballistic = SpellBehaviorMotion.Enabled(state.node) && opts.motion == "ballistic";
+            if (ballistic)
+            {
+                var acceleration = Vector3.down * Mathf.Clamp(state.node.physics.gravity_cm_s2,0,4000) / 100f;
+                state.position += state.velocity * .02f + acceleration * .0002f;
+                state.velocity += acceleration * .02f;
+                if (state.velocity.sqrMagnitude > .0001f) state.direction = state.velocity.normalized;
+            }
+            else if (opts.motion == "homing")
             {
                 LabReceiver chosen = null;
                 var best = float.MaxValue;
@@ -354,13 +468,13 @@ namespace Palimpseste.Game.SpellRuntime
                     if (segment < .0001f) { state.pathSegment++; state.pathAlong = 0; continue; }
                     var advance = Mathf.Min(remaining, segment - state.pathAlong);
                     state.pathAlong += advance; remaining -= advance;
-                    state.direction = state.rotation * ((b - a).normalized);
-                    state.position = state.origin + state.rotation * (a - state.path[0] + (b - a).normalized * state.pathAlong);
+                    state.direction = state.trajectoryRotation * ((b - a).normalized);
+                    state.position = state.origin + state.trajectoryRotation * (a - state.path[0] + (b - a).normalized * state.pathAlong);
                     if (state.pathAlong >= segment - .0001f) { state.pathSegment++; state.pathAlong = 0; }
                 }
                 if (remaining > 0) state.position += state.direction * remaining;
             }
-            if (opts.motion != "curve" || state.path == null || state.path.Count < 2) state.position += state.direction * length;
+            if (!ballistic && (opts.motion != "curve" || state.path == null || state.path.Count < 2)) state.position += state.direction * length;
             state.travelled += Vector3.Distance(old, state.position);
             var movement = state.position - old;
             var radius = Option(opts.radius_cm, 5) / 100f;
@@ -390,6 +504,7 @@ namespace Palimpseste.Game.SpellRuntime
                         if (owner != null) Emit(owner, "block", null, hit.point, hit.normal);
                         state.position = hit.point;
                         if (barrier.BlocksLeft <= 0) barrier.StructureMilli = 0;
+                        if (SpellBehaviorMotion.Enabled(state.node)) Emit(state,"hit",null,hit.point,hit.normal);
                         Expire(state,true); break;
                     }
                     if (receiver != null && Matches(opts.contact_filter, receiver))
@@ -400,9 +515,12 @@ namespace Palimpseste.Game.SpellRuntime
                         Expire(state,true); break;
                     }
                     // A filtered actor is still a physical obstacle. A wall may bounce.
+                    if (receiver == null && SpellBehaviorMotion.Enabled(state.node))
+                        Emit(state,"hit",null,hit.point,hit.normal);
                     if (state.bouncesLeft-- > 0 && receiver == null)
                     {
                         state.direction = Vector3.Reflect(state.direction, hit.normal).normalized;
+                        if (ballistic) state.velocity = Vector3.Reflect(state.velocity,hit.normal);
                         state.position = hit.point + hit.normal * .02f;
                         break;
                     }
@@ -410,7 +528,13 @@ namespace Palimpseste.Game.SpellRuntime
                     Expire(state,true); break;
                 }
             }
-            if (state.visual != null) { state.visual.transform.position = state.position; state.visual.transform.rotation = Quaternion.LookRotation(state.direction); }
+            if (state.visual != null)
+            {
+                state.visual.transform.position = state.position;
+                state.visual.transform.rotation = SpellBehaviorMotion.Enabled(state.node)
+                    ? PlacementRotation(state.node.behavior.orientation,state.direction,state.surfaceNormal)
+                    : Quaternion.LookRotation(state.direction);
+            }
             if (state.travelled * 100f >= Option(opts.range_cm, 1)) Expire(state);
         }
 
@@ -562,7 +686,7 @@ namespace Palimpseste.Game.SpellRuntime
                 // without allowing the beam to run back toward the caster.
                 forwardDistance += Mathf.Abs(Vector3.Dot(step, forward));
                 var lateral = Vector3.Dot(current - start, sideways);
-                var next = state.position + state.rotation * new Vector3(lateral, 0, forwardDistance);
+                var next = state.position + state.trajectoryRotation * new Vector3(lateral, 0, forwardDistance);
                 var delta = next - output[output.Count - 1];
                 var length = delta.magnitude;
                 if (length < .0001f) continue;
@@ -577,7 +701,7 @@ namespace Palimpseste.Game.SpellRuntime
             // The painted path determines the first part of the beam. Any
             // remaining range continues straight from its endpoint.
             if (travelled < range && output.Count > 1)
-                output.Add(output[output.Count - 1] + state.rotation * Vector3.forward * (range - travelled));
+                output.Add(output[output.Count - 1] + state.trajectoryRotation * Vector3.forward * (range - travelled));
             return output;
         }
 

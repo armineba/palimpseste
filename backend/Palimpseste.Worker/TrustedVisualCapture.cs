@@ -88,6 +88,32 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
             !root.GetProperty("presentation_only").GetBoolean()) throw new InvalidDataException("visual_capture_manifest");
         var fps = root.GetProperty("measured_fps").GetDouble();
         if (!double.IsFinite(fps) || fps <= 0 || fps > 10000) throw new InvalidDataException("visual_capture_fps");
+        using var compiledPacket = JsonDocument.Parse(packet);
+        var behaviorRequired = compiledPacket.RootElement.GetProperty("plan").GetProperty("nodes").EnumerateArray()
+            .Any(n => n.TryGetProperty("behavior", out var b) && b.ValueKind == JsonValueKind.Object);
+        if (behaviorRequired)
+        {
+            if (!root.TryGetProperty("active_samples", out var samples) || samples.ValueKind != JsonValueKind.Array ||
+                samples.GetArrayLength() != 4) throw new InvalidDataException("visual_capture_temporal_samples");
+            double previousTime = -1;
+            double[] requested = [0, .073, .191, .347];
+            var index = 0;
+            foreach (var sample in samples.EnumerateArray())
+            {
+                var name = "active_" + index + ".png";
+                var observedTime = sample.GetProperty("time_seconds").GetDouble();
+                var requestTime = sample.GetProperty("requested_time_seconds").GetDouble();
+                if (sample.GetProperty("file").GetString() != name || !double.IsFinite(observedTime) ||
+                    observedTime <= previousTime || observedTime > 120 || !double.IsFinite(requestTime) ||
+                    Math.Abs(requestTime - requested[index]) > .00001)
+                    throw new InvalidDataException("visual_capture_temporal_order");
+                var data = await ReadBoundedAsync(Path.Combine(directory, "output", name), 8 * 1024 * 1024, ct);
+                var size = VisualReferencePng.Validate(data);
+                if (size.Width != 1024 || size.Height != 1024 || Hash(data) != sample.GetProperty("sha256").GetString())
+                    throw new InvalidDataException("visual_capture_temporal_hash");
+                previousTime = observedTime; index++;
+            }
+        }
         var frames = new List<RenderedSpellFrame>();
         foreach (var frame in root.GetProperty("frames").EnumerateArray())
         {
@@ -101,7 +127,8 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
             var hash = Hash(data);
             if (dimensions.Width != 1024 || dimensions.Height != 1024 || hash != frame.GetProperty("sha256").GetString())
                 throw new InvalidDataException("visual_capture_frame_hash");
-            frames.Add(new(phase, path, hash));
+            frames.Add(new(phase, path, hash, phase == "active" && root.TryGetProperty("active_samples", out var activeSamples)
+                ? activeSamples.GetRawText() : null));
         }
         if (frames.Count != 4) throw new InvalidDataException("visual_capture_phases_incomplete");
         // Re-read the immutable packet after rendering; the helper is not an editor.
@@ -154,7 +181,7 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
                     throw new InvalidDataException("visual_renderer_writable_by_worker");
         }
         using var manifest = JsonDocument.Parse(bytes);
-        if (manifest.RootElement.GetProperty("version").GetString() != "1.4.1") throw new InvalidDataException("visual_renderer_version");
+        if (manifest.RootElement.GetProperty("version").GetString() != "1.5.0") throw new InvalidDataException("visual_renderer_version");
         var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var file in manifest.RootElement.GetProperty("files").EnumerateArray())
         {

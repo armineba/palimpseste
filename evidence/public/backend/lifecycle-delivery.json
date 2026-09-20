@@ -1,12 +1,15 @@
 {
-    "observed_at":  "2026-09-20T21:32:31.8227914+00:00",
-    "version":  "1.4.1",
-    "file":  "deliverables/Palimpseste-Backend-Windows-x64.zip",
-    "bytes":  243840885,
-    "sha256":  "eb0d79847d6bb16b01516646c8cd1f62126ceeea5968e512036fe47a377d8637",
-    "publish_exit":  0,
-    "independent_tests_executed":  false,
-    "independent_diagnostics_executed":  false,
-    "runtime_deployment":  "evidence/public/backend/lifecycle-capture-fix-2026-09-20.json",
-    "notes":  "The user job resumed from frozen A/G/B checkpoints; runtime visual refinement is distinct from independent development tests."
+    "version":  "1.5.0",
+    "updated_at":  "2026-09-20T23:22:07.4190970+00:00",
+    "build_exit":  0,
+    "binary_stage":  "deliverables/.stage-backend/777f2153449f412ab57c7daa5e1dfe15",
+    "documentation_refreshed":  true,
+    "zip":  "deliverables/Palimpseste-Backend-Windows-x64.zip",
+    "bytes":  245666251,
+    "sha256":  "5378156279debadaa5c16c1ad7b7a579e1c8920ed5d5315c08535af4aa984654",
+    "worker_sha256":  "0357d4b30c903ecc716025b65a690391094db37300129883ec80f57002539782",
+    "api_sha256":  "4246f335486a25f2dcac83a4516cff27a9e042c6097238ab99ef9b7a8f973fa6",
+    "tests_executed":  false,
+    "gameplay_acceptance":  "pending_owner",
+    "evidence":  "evidence/public/backend/behavior-d15.json"
 }

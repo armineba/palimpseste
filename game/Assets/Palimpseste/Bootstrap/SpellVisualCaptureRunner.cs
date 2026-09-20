@@ -29,6 +29,7 @@ namespace Palimpseste.Game.Bootstrap
         private CompiledSpell packet;
         private readonly List<GameObject> carriers = new List<GameObject>();
         private readonly List<object> frames = new List<object>();
+        private readonly List<object> activeSamples = new List<object>();
         private Camera captureCamera;
         private RenderPipeline.StandardRequest renderRequest;
         private RenderTexture target;
@@ -105,7 +106,33 @@ namespace Palimpseste.Game.Bootstrap
                 measuredFrames++;
             }
             measuredSeconds = ElapsedSeconds(measuredStart);
-            Capture("active");
+            var activeStarted = Time.time;
+            var intervals = new[] { 0f,.073f,.191f,.347f };
+            var sheet = new Color32[Resolution * Resolution];
+            for (var sample = 0; sample < intervals.Length; sample++)
+            {
+                if (sample > 0) yield return null; // advance animation even if PNG encoding passed a requested timestamp
+                while (Time.time - activeStarted < intervals[sample]) yield return null;
+                var sampledAt = Time.time - activeStarted;
+                var file = "active_" + sample + ".png";
+                var pixels = Capture("active",file,false);
+                var offsetX = sample % 2 * (Resolution / 2);
+                var offsetY = (1 - sample / 2) * (Resolution / 2);
+                for (var y = 0; y < Resolution / 2; y++)
+                    for (var x = 0; x < Resolution / 2; x++)
+                    {
+                        var p = y * 2 * Resolution + x * 2;
+                        Color color = ((Color)pixels[p] + pixels[p + 1] + pixels[p + Resolution] + pixels[p + Resolution + 1]) * .25f;
+                        sheet[(offsetY + y) * Resolution + offsetX + x] = color;
+                    }
+                activeSamples.Add(new { time_seconds = sampledAt, requested_time_seconds = intervals[sample],file,
+                    sha256 = ParchmentStore.Hash(File.ReadAllBytes(Path.Combine(outputDirectory,file))) });
+            }
+            srgb.SetPixels32(sheet); srgb.Apply(false,false);
+            var activeBytes = srgb.EncodeToPNG();
+            File.WriteAllBytes(Path.Combine(outputDirectory,"active.png"),activeBytes);
+            frames.Add(new { phase = "active",file = "active.png",sha256 = ParchmentStore.Hash(activeBytes),
+                width_px = Resolution,height_px = Resolution });
 
             var contactDelay = BeginEnding(true);
             phaseStarted = Time.time;
@@ -316,7 +343,7 @@ namespace Palimpseste.Game.Bootstrap
             return Mathf.Max(.025f,minimumDuration * .35f);
         }
 
-        private void Capture(string phase)
+        private Color32[] Capture(string phase, string filename = null, bool includePhase = true)
         {
             RenderAndReadback();
             var pixels = readback.GetPixels();
@@ -339,11 +366,12 @@ namespace Palimpseste.Game.Bootstrap
             srgb.SetPixels(pixels); srgb.Apply(false,false);
             var bytes = srgb.EncodeToPNG();
             if (bytes == null || bytes.Length < 1000) throw new InvalidDataException("GPU capture produced no image");
-            var file = phase + ".png";
+            var file = filename ?? phase + ".png";
             var path = Path.Combine(outputDirectory,file);
             EnsureOrdinaryPath(path);
             File.WriteAllBytes(path,bytes);
-            frames.Add(new { phase,file,sha256 = ParchmentStore.Hash(bytes),width_px = Resolution,height_px = Resolution });
+            if (includePhase) frames.Add(new { phase,file,sha256 = ParchmentStore.Hash(bytes),width_px = Resolution,height_px = Resolution });
+            return srgb.GetPixels32();
         }
 
         private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
@@ -394,6 +422,8 @@ namespace Palimpseste.Game.Bootstrap
                 measurement_scope = "Explicit 1024x1024 URP requests completed with synchronous full-frame GPU readback; includes readback cost, excludes startup and PNG encoding; not gameplay FPS",
                 capture_method = "URP StandardRequest for one camera, including full frame initialization; separate precompiled three-quarter stage; carrier positions fixed; real lifecycle animation; independent contact and expiration replay",
                 completed_camera_renders = completedCameraRenders,
+                active_samples = activeSamples,
+                active_layout = "2x2 temporal contact sheet; chronological left-to-right, top-to-bottom; actual times in active_samples",
                 color_encoding = QualitySettings.activeColorSpace == ColorSpace.Linear ? "Linear HDR readback converted to display sRGB" : "Gamma project readback retained",
                 camera_position = captureCamera == null ? null : new[] { captureCamera.transform.position.x,captureCamera.transform.position.y,captureCamera.transform.position.z },
                 camera_field_of_view = captureCamera == null ? 0 : captureCamera.fieldOfView,

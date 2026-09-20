@@ -31,6 +31,8 @@ namespace Palimpseste.Game.SpellRuntime
         private bool initialized, impact, armed;
         private SpellVisualLifecycle lifecycle;
         private SpellVisualEnding ending;
+        private SpellBehaviorIntent behavior;
+        private SpellPhysicsProfile physicsProfile;
         private float pendingRetirement = -1;
         private bool pendingContact;
         private Bounds authoredBounds;
@@ -76,6 +78,7 @@ namespace Palimpseste.Game.SpellRuntime
             public Quaternion shownRotation, retirementRotation;
             public float retirementScale, retirementOpacity, retirementEmission, retirementReveal;
             public Mesh mesh;
+            public Vector3[] bindVertices, deformedVertices;
             public BeamVertex[] beamSource;
             public int[] beamSourceTriangles;
             public List<BeamVertex> beamSamples;
@@ -108,6 +111,7 @@ namespace Palimpseste.Game.SpellRuntime
             properties = new MaterialPropertyBlock();
             born = Time.time;
             lifecycle = node.appearance.lifecycle;
+            if (SpellBehaviorMotion.Enabled(node)) { behavior = node.behavior; physicsProfile = node.physics; }
             lifetime = Mathf.Max(.1f,(node.options?.lifetime_ticks ?? 150) * Time.fixedDeltaTime);
             birthDuration = lifecycle == null
                 ? Mathf.Clamp((node.appearance.vfx?.charge_ms ?? 280) / 1000f,.12f,.65f)
@@ -125,6 +129,12 @@ namespace Palimpseste.Game.SpellRuntime
                 child.gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
                 var renderer = child.gameObject.AddComponent<MeshRenderer>();
                 renderer.sharedMaterial = Own(MakeMaterial(shader,part));
+                if (behavior != null)
+                {
+                    SpellResourceLibrary.Bind(renderer.sharedMaterial,node.appearance.resource_id);
+                    renderer.sharedMaterial.SetFloat("_BehaviorEnabled",1);
+                    renderer.sharedMaterial.SetFloat("_BehaviorMotion",behavior.phenomenon == "static" ? 0 : 1);
+                }
                 renderer.shadowCastingMode = ShadowCastingMode.Off;
                 renderer.receiveShadows = false;
                 renderer.lightProbeUsage = LightProbeUsage.Off;
@@ -142,6 +152,12 @@ namespace Palimpseste.Game.SpellRuntime
                     seed = (i * .61803399f) % 1f,
                     emission = Mathf.Clamp(part.emission_milli / 1000f,0,6)
                 };
+                if (behavior != null && behavior.phenomenon != "static" && behavior.phenomenon != "spin" && behavior.phenomenon != "orbit")
+                {
+                    state.bindVertices = mesh.vertices;
+                    state.deformedVertices = new Vector3[state.bindVertices.Length];
+                    mesh.MarkDynamic();
+                }
                 state.velocity = (state.position.normalized * .6f + new Vector3(
                     Mathf.Sin(i * 2.39f),.4f + (i % 5) * .16f,Mathf.Cos(i * 2.39f))) * (1.2f + i % 4 * .24f);
                 for (var corner = 0; corner < 8; corner++)
@@ -637,6 +653,8 @@ namespace Palimpseste.Game.SpellRuntime
                             break;
                     }
                 }
+                if (!retiring && behavior != null)
+                    SpellBehaviorMotion.Pose(behavior,physicsProfile,authoredBounds,age,part.seed,ref position,ref rotation);
                 if (retiring)
                 {
                     // Snapshot the currently visible pose, including a partial
@@ -687,10 +705,27 @@ namespace Palimpseste.Game.SpellRuntime
                     part.transform.localRotation = Quaternion.identity;
                     part.transform.localScale = Vector3.one;
                 }
+                else if (!retiring && part.bindVertices != null)
+                {
+                    for (var vertex = 0; vertex < part.bindVertices.Length; vertex++)
+                        part.deformedVertices[vertex] = SpellBehaviorMotion.DeformLocal(behavior,physicsProfile,
+                            part.bindVertices[vertex],part.scale,age,part.seed);
+                    part.mesh.vertices = part.deformedVertices;
+                    part.mesh.RecalculateBounds();
+                    // Translucent effects use their authored smooth normals;
+                    // geometric surface normals follow the deformation too.
+                    part.mesh.RecalculateNormals();
+                }
                 properties.Clear(); properties.SetFloat(EnvelopeId,Mathf.Clamp01(opacity));
                 properties.SetFloat(EmissionId,emission); properties.SetFloat(RevealId,reveal);
                 properties.SetFloat(DissolveId,dissolve); properties.SetFloat(SeedId,part.seed);
                 properties.SetFloat(ArmedId,armed ? 1 : 0);
+                if (behavior != null)
+                {
+                    var flow = SpellBehaviorMotion.Flow(behavior,physicsProfile);
+                    properties.SetVector("_BehaviorFlow",new Vector4(flow.x,flow.y,0,0));
+                    properties.SetFloat("_BehaviorAge",age);
+                }
                 part.renderer.SetPropertyBlock(properties);
             }
             beamNeedsUpload = false;

@@ -1,6 +1,7 @@
 <# Operator installation only. Does not generate a spell, run a diagnostic, or build software.
    Reuses the existing native Codex identity and observed D13 binary evidence unchanged.
-   D14 prompt, gameplay and artistic acceptance remain pending the owner's own trial. #>
+   D15 / 1.5.0 gameplay and artistic acceptance remain pending the owner's own trial.
+   Updates an existing D14 database with migration010 only; migration009 is a prerequisite. #>
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$StageRoot,
     [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime')
@@ -11,7 +12,7 @@ $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $runtime = [IO.Path]::GetFullPath($RuntimeRoot).TrimEnd('\')
 $stage = [IO.Path]::GetFullPath($StageRoot).TrimEnd('\')
 if ($runtime -ine 'E:\PalimpsesteRuntime') { throw 'Unexpected runtime root.' }
-if (-not $PlayerRoot) { $PlayerRoot = Join-Path $repo 'game\Build\WindowsLifecycleCaptureFixPlayable' }
+if (-not $PlayerRoot) { $PlayerRoot = Join-Path $repo 'game\Build\WindowsBehaviorPlayable' }
 $player = [IO.Path]::GetFullPath($PlayerRoot).TrimEnd('\')
 $utf8 = [Text.UTF8Encoding]::new($false)
 $service = "$env:COMPUTERNAME\PalRuntimeSvc"
@@ -78,11 +79,29 @@ function Pin([string]$Path,[string]$Variable,[string]$Hash) {
     [IO.File]::WriteAllText($Path,[regex]::Replace($content,$pattern,[Text.RegularExpressions.MatchEvaluator]{param($m) $line}),$utf8)
 }
 foreach ($path in @($stage,$player,$runtime)) { Regular $path }
-foreach ($relative in @('worker\Palimpseste.Worker.exe','api\Palimpseste.Api.exe','doctor\ProviderDoctor.exe','visual-doctor\SpellVisualDoctor.exe','spec\prompts\05_VISUAL_CRITIC.md')) {
-    if (-not (Test-Path -LiteralPath (Join-Path $stage $relative) -PathType Leaf)) { throw 'D14 stage incomplete.' }
+foreach ($relative in @('worker\Palimpseste.Worker.exe','api\Palimpseste.Api.exe','doctor\ProviderDoctor.exe','visual-doctor\SpellVisualDoctor.exe','spec\prompts\05_VISUAL_CRITIC.md',
+    'spec\assets\sourced-vfx\catalogue.json','spec\assets\sourced-vfx\references.json',
+    'spec\assets\sourced-vfx\licenses\Kenney-Particle-Pack-CC0.txt','spec\assets\sourced-vfx\licenses\Kenney-Smoke-Particles-CC0.txt',
+    'migrations\010_behavior_research.sql')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $stage $relative) -PathType Leaf)) { throw 'D15 stage incomplete.' }
+}
+$stageVfx = Join-Path $stage 'spec\assets\sourced-vfx'
+foreach ($file in Get-ChildItem -LiteralPath $stageVfx -Recurse -File) {
+    Regular $file.FullName
+    $relative = $file.FullName.Substring($stageVfx.Length + 1).Replace('\','/')
+    if ($relative -notmatch '^(catalogue\.json|references\.json|licenses/[^/]+\.txt|textures/[A-Za-z0-9_/-]+\.png)$') {
+        throw 'Runtime VFX package contains files outside the reviewed data-only layout.'
+    }
+}
+$vfxCatalogue = Get-Content -LiteralPath (Join-Path $stageVfx 'catalogue.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+foreach ($texture in $vfxCatalogue.textures) {
+    $source = Join-Path $stageVfx $texture.path; Under $source $stageVfx
+    if ($texture.path -notmatch '^textures/[A-Za-z0-9_/-]+\.png$' -or (Digest $source) -cne $texture.sha256) {
+        throw 'Runtime VFX texture differs from its reviewed catalogue.'
+    }
 }
 $delivery = Get-Content -LiteralPath (Join-Path $repo 'evidence\public\unity\lifecycle-delivery.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ($delivery.client_version -cne '1.4.1' -or $delivery.build_exit -ne 0) { throw 'Successful 1.4.1 capture-fix build required.' }
+if ($delivery.client_version -cne '1.5.0' -or $delivery.build_exit -ne 0) { throw 'Successful D15 / 1.5.0 behavior build required.' }
 foreach ($file in $delivery.files) {
     $source = Join-Path $player $file.file; Under $source $player
     if ((Digest $source) -cne $file.sha256) { throw 'Player differs from compiled delivery.' }
@@ -90,20 +109,20 @@ foreach ($file in $delivery.files) {
 $envFile = Join-Path $runtime 'runtime.env'
 $originalNative = Digest (Join-Path $runtime 'bin\codex-image.exe')
 $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8)
-$logRoot = Join-Path $runtime ('evidence\pending\lifecycle-install-' + $stamp)
+$logRoot = Join-Path $runtime ('evidence\pending\behavior-install-' + $stamp)
 New-Item -ItemType Directory -Path $logRoot | Out-Null
 Protect $logRoot
-$record = [ordered]@{version='1.4.1'; started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
+$record = [ordered]@{version='1.5.0'; delivery_name='D15 behavior and sourced VFX'; started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
     spell_generations=0; diagnostics_executed=$false; gameplay_tested=$false; visual_acceptance='pending_owner'; native_sha256=$originalNative}
 function Save-Record { [IO.File]::WriteAllText((Join-Path $logRoot 'installation.json'),($record | ConvertTo-Json -Depth 7),$utf8) }
 Save-Record
-$render = Join-Path $runtime ('render-lifecycle-' + $stamp)
+$render = Join-Path $runtime ('render-behavior-' + $stamp)
 Install-Tree $player $render
 $renderFiles = @(Get-ChildItem -LiteralPath $render -Recurse -File | Sort-Object FullName | ForEach-Object {
     [ordered]@{file=$_.FullName.Substring($render.Length+1).Replace('\','/');sha256=Digest $_.FullName}
 })
 $renderManifest = Join-Path $render 'renderer-manifest.json'
-[IO.File]::WriteAllText($renderManifest,([ordered]@{version='1.4.1';files=$renderFiles} | ConvertTo-Json -Depth 5),$utf8)
+[IO.File]::WriteAllText($renderManifest,([ordered]@{version='1.5.0';files=$renderFiles} | ConvertTo-Json -Depth 5),$utf8)
 Protect $renderManifest
 $record.renderer_manifest_sha256 = Digest $renderManifest
 $record.renderer = Join-Path $render 'Palimpseste.exe'; Save-Record
@@ -120,17 +139,30 @@ function Active-Jobs {
     if ($code -ne 0 -or $null -eq $code -or $lines.Count -ne 1 -or $lines[0] -notmatch '^\d+$') { throw 'Could not read pending jobs.' }
     return [long]$lines[0]
 }
+function Assert-D14Schema {
+    $ErrorActionPreference='Continue'; $global:LASTEXITCODE=$null
+    $sql = "SELECT CASE WHEN to_regclass('public.visual_reviews') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='jobs' AND column_name='visual_pipeline_version') THEN 1 ELSE 0 END;"
+    $lines=@(& $psql -X -w -A -t -v ON_ERROR_STOP=1 -c $sql 2> (Join-Path $logRoot 'schema-prerequisite.stderr.txt'))
+    $code=$global:LASTEXITCODE
+    if ($code -ne 0 -or $null -eq $code -or $lines.Count -ne 1 -or $lines[0] -ne '1') {
+        throw 'D14 schema prerequisite missing. Fresh installations must apply migrations001 through010 in order; this updater applies010 only.'
+    }
+    $record.migration_009_prerequisite_present=$true; Save-Record
+}
 try {
+    Assert-D14Schema
     if ((Active-Jobs) -ne 0) { throw 'Existing job active; deployment has not stopped services.' }
     Stop-ServiceExecutable (Join-Path $runtime 'api\Palimpseste.Api.exe')
     if ((Active-Jobs) -ne 0) { throw 'Job arrived during admission shutdown; worker left running.' }
     Stop-ServiceExecutable (Join-Path $runtime 'bin\Palimpseste.Worker.exe')
     $record.phase='services_stopped'; Save-Record
     $savedPreference=$ErrorActionPreference; $ErrorActionPreference='Continue'; $global:LASTEXITCODE=$null
-    & $psql -X -w -v ON_ERROR_STOP=1 -f (Join-Path $repo 'backend\migrations\009_visual_review.sql') 1> (Join-Path $logRoot 'migration.stdout.txt') 2> (Join-Path $logRoot 'migration.stderr.txt')
+    # Never replay009 here: it would reject existing jobs at visual_pipeline_version3.
+    $migration = Join-Path $stage 'migrations\010_behavior_research.sql'
+    & $psql -X -w -v ON_ERROR_STOP=1 -f $migration 1> (Join-Path $logRoot 'migration.stdout.txt') 2> (Join-Path $logRoot 'migration.stderr.txt')
     $code=$global:LASTEXITCODE; $ErrorActionPreference=$savedPreference
-    if ($code -ne 0 -or $null -eq $code) { throw 'Migration009 failed; see private installation logs.' }
-    $record.migration_009_applied=$true; $record.phase='migration_complete'; Save-Record
+    if ($code -ne 0 -or $null -eq $code) { throw 'Migration010 failed; see private installation logs.' }
+    $record.migration_010_applied=$true; $record.migration_010_sha256=Digest $migration; $record.phase='migration_complete'; Save-Record
     Install-File (Join-Path $stage 'worker\Palimpseste.Worker.exe') (Join-Path $runtime 'bin\Palimpseste.Worker.exe')
     Install-File (Join-Path $stage 'doctor\ProviderDoctor.exe') (Join-Path $runtime 'bin\ProviderDoctor.exe')
     Install-File (Join-Path $stage 'visual-doctor\SpellVisualDoctor.exe') (Join-Path $runtime 'bin\SpellVisualDoctor.exe')
@@ -167,7 +199,7 @@ try {
     & $powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File (Join-Path $launch 'start-owner-api.ps1') -RuntimeRoot $runtime
     if ($LASTEXITCODE -ne 0) { throw 'API startup failed.' }
     $record.phase='services_started'; $record.completed=$true; $record.completed_at=[DateTimeOffset]::UtcNow.ToString('o'); Save-Record
-    Write-Output "D14 installed. Owner gameplay trial pending. Record: $logRoot\installation.json"
+    Write-Output "D15 / 1.5.0 installed. Owner gameplay trial pending. Record: $logRoot\installation.json"
 } finally {
     foreach ($key in $previous.Keys) { [Environment]::SetEnvironmentVariable($key,$previous[$key],'Process') }
 }

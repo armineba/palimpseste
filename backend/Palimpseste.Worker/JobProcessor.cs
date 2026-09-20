@@ -121,8 +121,14 @@ public sealed partial class JobProcessor
         // The reference image remains a visual guide only. Its former radial
         // role hints must not dictate what the player's drawing means.
         const string layout = "{\"canvas_width\":1024,\"canvas_height\":1024,\"reference_purpose\":\"identify_printed_guides_only\",\"semantic_regions\":false}";
-        var capabilities = await File.ReadAllTextAsync(Path.Combine(specRoot, "contracts", "capability-catalog.json"), ct);
-        var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + provider.PromptASha256 + provider.EffectRecipesPromptSha256));
+        var legacyInterpretation = job.VisualPipelineVersion < 3;
+        var capabilitiesPath = legacyInterpretation
+            ? Path.Combine(specRoot, "contracts", "legacy", "capability-catalog-pre-d15.json")
+            : Path.Combine(specRoot, "contracts", "capability-catalog.json");
+        var capabilities = await File.ReadAllTextAsync(capabilitiesPath, ct);
+        var interpretationPromptVersion = legacyInterpretation ? LunaCodexProvider.LegacyPromptAVersion : LunaCodexProvider.PromptAVersion;
+        var interpretationPromptHash = legacyInterpretation ? provider.LegacyPromptASha256 : provider.PromptASha256;
+        var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + interpretationPromptHash + provider.EffectRecipesPromptSha256));
 
         var descriptionRecord = await jobs.GetDescriptionAsync(job, ct);
         byte[] description;
@@ -130,9 +136,12 @@ public sealed partial class JobProcessor
         {
             await jobs.SetStateAsync(job, "interpreting", null, "Interprétation du dessin", false, ct);
             var attempt = await jobs.BeginAttemptAsync(job, "A", settings.InterpreterModel, settings.InterpreterEffort, inputHash, ct);
-            var result = await provider.InterpretAsync(job.Id.ToString("N"), attempt.ToString("N"),
-                files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, ct);
-            IReadOnlyList<ValidationIssue> issues = ValidateNewInterpretation(result.Utf8, requirePalette);
+            var result = legacyInterpretation
+                ? await provider.InterpretLegacyAsync(job.Id.ToString("N"), attempt.ToString("N"),
+                    files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, ct)
+                : await provider.InterpretAsync(job.Id.ToString("N"), attempt.ToString("N"),
+                    files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, ct);
+            IReadOnlyList<ValidationIssue> issues = ValidateNewInterpretation(result.Utf8, requirePalette, job.VisualPipelineVersion >= 3);
             for (var repairNumber = await jobs.CountAttemptsAsync(job, "repair_A", ct) + 1;
                  repairNumber <= 2 && CanRepair(result, issues); repairNumber++)
             {
@@ -144,8 +153,8 @@ public sealed partial class JobProcessor
                     job.Id.ToString("N"), attempt.ToString("N"), "A", layout,
                     result.Transport.FinalJson!, RepairErrors(result, issues), repairNumber,
                     files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout,
-                    null, capabilities), ct);
-                issues = ValidateNewInterpretation(result.Utf8, requirePalette);
+                    null, capabilities, LegacyInterpretation: legacyInterpretation), ct);
+                issues = ValidateNewInterpretation(result.Utf8, requirePalette, job.VisualPipelineVersion >= 3);
             }
             var status = result.Transport.Outcome == ProviderOutcome.Success && issues.Count == 0 ? "success" :
                 result.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid";
@@ -168,7 +177,7 @@ public sealed partial class JobProcessor
             }
             var artifact = await files.PutAsync(result.Utf8, "json", "application/json", ct);
             await jobs.SaveDescriptionAsync(job, attempt, artifact, Encoding.UTF8.GetString(result.Utf8), inputHash,
-                LunaCodexProvider.PromptAVersion, result.Transport, ct);
+                interpretationPromptVersion, result.Transport, ct);
             description = result.Utf8;
         }
         else description = await ReadCheckedAsync(descriptionRecord.StorageKey, descriptionRecord.Sha256, ct);
@@ -220,6 +229,22 @@ public sealed partial class JobProcessor
             };
         }
 
+        SpellReferenceResearch? research = null;
+        if (job.VisualPipelineVersion >= 3)
+        {
+            if (visualInput is null) throw new InvalidDataException("research_requires_generated_image");
+            var savedResearch = await jobs.GetReferenceResearchAsync(job, ct);
+            if (savedResearch is null)
+            {
+                await jobs.SetStateAsync(job, "resolving_geometry", null, "Recherche de références et de ressources visuelles", false, ct);
+                research = await new SpellReferenceResearchResolver(specRoot).ResolveAsync(description, visualInput, ct);
+                var artifact = await files.PutAsync(Encoding.UTF8.GetBytes(research.Json), "json", "application/json", ct);
+                await jobs.SaveReferenceResearchAsync(job, artifact, Sha256(description), visualInput.Sha256, ct);
+            }
+            else research = SpellReferenceResearch.Read(await ReadCheckedAsync(savedResearch.StorageKey, savedResearch.Sha256, ct),
+                Sha256(description), visualInput.Sha256);
+        }
+
         var geometryRecords = await jobs.GetGeometryAsync(job, ct);
         if (geometryRecords.Geometry.Count == 0)
         {
@@ -247,7 +272,7 @@ public sealed partial class JobProcessor
         foreach (var item in geometryRecords.Masks) maskPng[item.FileName] = await ReadCheckedAsync(item.StorageKey, item.Sha256, ct);
         var geometryContext = "[" + string.Join(",", geometryJson.OrderBy(x => x.Key, StringComparer.Ordinal)
             .Select(x => Encoding.UTF8.GetString(x.Value))) + "]";
-        var planInputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities + provider.PromptBSha256 + provider.EffectRecipesSha256 + visualMetadata?.sha256));
+        var planInputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + geometryContext + capabilities + provider.PromptBSha256 + provider.EffectRecipesSha256 + visualMetadata?.sha256 + research?.Sha256));
 
         var planRecord = await jobs.GetPlanAsync(job, ct);
         byte[] plan;
@@ -256,9 +281,9 @@ public sealed partial class JobProcessor
             await jobs.SetStateAsync(job, "planning", null, "Traduction des règles", false, ct);
             var attempt = await jobs.BeginAttemptAsync(job, "B", settings.Model, settings.Effort,
                 planInputHash, ct);
-            var result = await provider.PlanAsync(job.Id.ToString("N"), attempt.ToString("N"),
-                description, geometryContext, capabilities, visualInput, ct);
-            IReadOnlyList<ValidationIssue> issues = result.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, result.Utf8, geometryJson, maskPng, visualMetadata);
+            var result = await provider.PlanWithResearchAsync(job.Id.ToString("N"), attempt.ToString("N"),
+                description, geometryContext, capabilities, visualInput, research, ct);
+            IReadOnlyList<ValidationIssue> issues = result.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, result.Utf8, geometryJson, maskPng, visualMetadata, research?.Sha256);
             for (var repairNumber = await jobs.CountAttemptsAsync(job, "repair_B", ct) + 1;
                  repairNumber <= 2 && CanRepair(result, issues); repairNumber++)
             {
@@ -269,8 +294,8 @@ public sealed partial class JobProcessor
                 result = await provider.RepairAsync(new RepairAttempt(
                     job.Id.ToString("N"), attempt.ToString("N"), "B", Encoding.UTF8.GetString(description),
                     result.Transport.FinalJson!, RepairErrors(result, issues), repairNumber,
-                    null, null, null, geometryContext, capabilities, visualInput), ct);
-                issues = result.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, result.Utf8, geometryJson, maskPng, visualMetadata);
+                    null, null, null, geometryContext, capabilities, visualInput, research), ct);
+                issues = result.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, result.Utf8, geometryJson, maskPng, visualMetadata, research?.Sha256);
             }
             var status = result.Transport.Outcome == ProviderOutcome.Success && issues.Count == 0 ? "success" :
                 result.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid";
@@ -306,6 +331,7 @@ public sealed partial class JobProcessor
         {
             DescriptionJson = description, PlanJson = plan, GeometryJson = geometryJson, MaskPng = maskPng,
             VisualReference = visualMetadata,
+            ReferenceResearchSha256 = research?.Sha256,
             GeometryArtifactIds = geometryRecords.Geometry.ToDictionary(x => x.GeometryId, x => "a" + x.ArtifactId.ToString("N"), StringComparer.Ordinal),
             MaskArtifactIds = geometryRecords.Masks.ToDictionary(x => x.FileName, x => "a" + x.ArtifactId.ToString("N"), StringComparer.Ordinal),
             SpellId = spellId.ToString("N"), ParchmentId = job.ParchmentId.Value.ToString("N"),
@@ -316,7 +342,7 @@ public sealed partial class JobProcessor
                 // Read the persisted request, including when a legacy job
                 // resumes after the interpreter model changes.
                 model_a = actualARequestedModel, model_b = actualBRequestedModel,
-                prompt_a_version = descriptionRecord?.PromptVersion ?? LunaCodexProvider.PromptAVersion,
+                prompt_a_version = descriptionRecord?.PromptVersion ?? interpretationPromptVersion,
                 prompt_b_version = planRecord?.PromptVersion ?? LunaCodexProvider.PromptBVersion,
                 // Codex JSONL exposes a thread ID, not a provider response ID.
                 response_a_id = null, response_b_id = null
@@ -326,7 +352,7 @@ public sealed partial class JobProcessor
         {
             var currentPlan = await jobs.GetPlanAsync(job, ct) ?? throw new InvalidDataException("visual_plan_missing");
             var refined = await RefineVisualsAsync(job, description, plan, currentPlan, geometryContext, capabilities,
-                visualInput, visualMetadata, compilationInput, geometryJson, maskPng, ct);
+                visualInput, visualMetadata, compilationInput, geometryJson, maskPng, ct, research);
             if (refined is null) return;
             compilationInput.PlanJson = refined;
             var identity = await jobs.GetPlanProviderIdentityAsync(job, Sha256(refined), ct);
@@ -455,10 +481,10 @@ public sealed partial class JobProcessor
             : issues.Take(32).Select(issue => $"{issue.Code} {issue.Path}: {issue.Message}")
                 .Select(message => message[..Math.Min(4000, message.Length)]).ToArray();
 
-    private static IReadOnlyList<ValidationIssue> ValidateNewInterpretation(byte[]? utf8, bool requirePalette)
+    private static IReadOnlyList<ValidationIssue> ValidateNewInterpretation(byte[]? utf8, bool requirePalette, bool requireBehavior)
     {
         if (utf8 is null) return [];
-        return SpellCompiler.ValidateWholeImageDescriptionJson(utf8, requirePalette, requireVisualForm: true, requireLifecycle: true);
+        return SpellCompiler.ValidateWholeImageDescriptionJson(utf8, requirePalette, requireVisualForm: true, requireLifecycle: true, requireBehavior: requireBehavior);
     }
 
     private static string Sha256(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));

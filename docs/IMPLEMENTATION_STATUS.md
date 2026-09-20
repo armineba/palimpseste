@@ -1,6 +1,14 @@
 # État de réalisation et point de reprise
 
-## État courant — correctif D14 / 1.4.1 livré, reprise du sort en affinage
+## État courant — D15 / 1.5.0 construit et installé
+
+**La chaîne des prochains parchemins est mise à jour**, sans réécrire les sorts ou documents existants. Placement, trajectoire et phénomène sont déclarés par A, repris par B et contrôlés avant exécution. Le moteur applique rotation continue, écoulement, orbite, turbulence et balistique. Une recherche de références précède chaque construction ; 16 textures CC0 et du bruit Simplex MIT sont effectivement utilisés. La critique Pro dispose de quatre instants actifs.
+
+Player Unity 6000.3.24f1 / IL2CPP : **build et packaging code 0**, version 1.5.0, ZIP **46 574 212 octets**, SHA `e8669bf3ffbcc77134186d2b1d6ed76702de9dac666e60a7d85c5d6a58e647b1`. Backend publié et **installé code 0**, migration 010 appliquée le 21 septembre à 01:17 Paris ; worker PID 38748 et API PID 37400 prêts au démarrage. Le raccourci Bureau pointe sur `WindowsBehaviorPlayable`. [Preuve D15](../evidence/public/backend/behavior-d15.json) · [Player et fichiers](../evidence/public/unity/lifecycle-delivery.json).
+
+**Aucun essai de jeu, appel de génération, capture indépendante ni campagne de tests exécuté pour D15.** La recherche par job et la boucle Pro modifiées sont installées mais n'ont pas encore été exercées sur un nouveau parchemin par l'agent. Interprétation, comportement physique, fluidité, latence et fidélité artistique restent à valider par le créateur. [Essayer](TESTER_MAINTENANT.md) · [Architecture et limites](D15_BEHAVIOR_AND_RESEARCH.md).
+
+## Historique — correctif D14 / 1.4.1 livré, reprise du sort en affinage
 
 Le job joueur réel `7ed4561feffd43ebbafe48d9b960716d` a réussi **A, G et B**, puis s'est arrêté après l'image. Le processus de capture Unity a quitté avec le code 0, mais ses **quatre PNG sont noirs et identiques**. Son manifeste rapporte **11915,2178 FPS**, au-dessus de la borne `10000` du lecteur de capture ; le rejet est remonté sous le message générique `worker_exception`. Une sortie de processus réussie ne prouve donc pas qu'une image du sort a été rendue.
 

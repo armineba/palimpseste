@@ -199,7 +199,8 @@
                         "curve",
                         "homing",
                         "stationary",
-                        "expanding"
+                        "expanding",
+                        "ballistic"
                       ]
                     }
                   },
@@ -663,6 +664,104 @@
       },
       "minItems": 1,
       "maxItems": 16
+    },
+    "behaviors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "caster",
+              "muzzle",
+              "aim_point",
+              "caster_ground",
+              "aim_ground",
+              "parent_event",
+              "parent_ground"
+            ]
+          },
+          "orientation": {
+            "type": "string",
+            "enum": [
+              "cast_forward",
+              "world_up",
+              "surface_normal"
+            ]
+          },
+          "attachment": {
+            "type": "string",
+            "enum": [
+              "world",
+              "caster"
+            ]
+          },
+          "phenomenon": {
+            "type": "string",
+            "enum": [
+              "static",
+              "spin",
+              "vortex",
+              "orbit",
+              "flow",
+              "flutter",
+              "turbulence"
+            ]
+          },
+          "axis": {
+            "type": "string",
+            "enum": [
+              "x",
+              "y",
+              "z"
+            ]
+          },
+          "sense": {
+            "type": "string",
+            "enum": [
+              "clockwise",
+              "counterclockwise"
+            ]
+          },
+          "intensity": {
+            "type": "string",
+            "enum": [
+              "gentle",
+              "brisk",
+              "violent"
+            ]
+          },
+          "travel": {
+            "type": "string",
+            "enum": [
+              "stationary",
+              "straight",
+              "curve",
+              "homing",
+              "ballistic"
+            ]
+          }
+        },
+        "required": [
+          "subject_id",
+          "origin",
+          "orientation",
+          "attachment",
+          "phenomenon",
+          "axis",
+          "sense",
+          "intensity",
+          "travel"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 16
     }
   },
   "required": [
@@ -673,7 +772,8 @@
     "clauses",
     "relations",
     "shape_requests",
-    "lifecycle"
+    "lifecycle",
+    "behaviors"
   ],
   "additionalProperties": false
 }

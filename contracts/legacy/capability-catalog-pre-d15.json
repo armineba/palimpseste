@@ -1,0 +1,727 @@
+{
+  "schema_version": "sp.capabilities/1.0",
+  "status": "RUNTIME_AND_CONTRACT",
+  "rules_profile": "lab_v1",
+  "fixed_tick_ms": 20,
+  "carriers": [
+    {
+      "id": "projectile",
+      "emits": [
+        "spawn",
+        "hit",
+        "expire"
+      ],
+      "effect_events": [
+        "hit"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_projectile/properties/options"
+    },
+    {
+      "id": "beam",
+      "emits": [
+        "spawn",
+        "hit",
+        "tick",
+        "expire"
+      ],
+      "effect_events": [
+        "hit"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_beam/properties/options"
+    },
+    {
+      "id": "field",
+      "emits": [
+        "spawn",
+        "enter",
+        "tick",
+        "expire"
+      ],
+      "effect_events": [
+        "enter",
+        "tick"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_field/properties/options"
+    },
+    {
+      "id": "pulse",
+      "emits": [
+        "spawn",
+        "hit",
+        "expire"
+      ],
+      "effect_events": [
+        "hit"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_pulse/properties/options"
+    },
+    {
+      "id": "barrier",
+      "emits": [
+        "spawn",
+        "block",
+        "expire"
+      ],
+      "effect_events": [
+        "block"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_barrier/properties/options"
+    },
+    {
+      "id": "trap",
+      "emits": [
+        "spawn",
+        "trigger",
+        "expire"
+      ],
+      "effect_events": [
+        "trigger"
+      ],
+      "options_schema": "spell-plan.schema.json#/$defs/node_trap/properties/options"
+    }
+  ],
+  "effects": [
+    {
+      "id": "damage",
+      "amount_unit": "milli_health",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "zero",
+      "direction_rule": "none"
+    },
+    {
+      "id": "heal",
+      "amount_unit": "milli_health",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "zero",
+      "direction_rule": "none"
+    },
+    {
+      "id": "impulse",
+      "amount_unit": "milli_newton_second",
+      "min_amount": 0,
+      "max_amount": 200000,
+      "duration_rule": "zero",
+      "direction_rule": "non_none"
+    },
+    {
+      "id": "burn",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none"
+    },
+    {
+      "id": "wet",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "positive",
+      "direction_rule": "none"
+    },
+    {
+      "id": "slow",
+      "amount_unit": "per_mille_speed_reduction",
+      "min_amount": 0,
+      "max_amount": 750,
+      "duration_rule": "positive",
+      "direction_rule": "none"
+    },
+    {
+      "id": "bleed",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "poison",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "freeze_damage",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "regen",
+      "amount_unit": "milli_health_per_50_ticks",
+      "min_amount": 0,
+      "max_amount": 10000,
+      "duration_rule": "positive_multiple_of_50",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "barrier_health",
+      "amount_unit": "milli_health_capacity",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "vulnerability",
+      "amount_unit": "per_mille_incoming_damage_increase",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "weakness",
+      "amount_unit": "per_mille_outgoing_damage_reduction",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "haste",
+      "amount_unit": "per_mille_movement_speed_increase",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "armor_break",
+      "amount_unit": "per_mille_active_damage_reduction_removed",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "damage_reduction",
+      "amount_unit": "per_mille_incoming_damage_reduction",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "healing_reduction",
+      "amount_unit": "per_mille_incoming_heal_reduction",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "positive",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "root",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "positive_max_100",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "stun",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "positive_max_100",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "cleanse",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "ally_or_self"
+    },
+    {
+      "id": "dispel",
+      "amount_unit": "none",
+      "min_amount": 0,
+      "max_amount": 0,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "life_steal",
+      "amount_unit": "per_mille_actual_same_event_damage",
+      "min_amount": 0,
+      "max_amount": 500,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "hostile_only_requires_damage"
+    },
+    {
+      "id": "execute",
+      "amount_unit": "milli_health_below_25_percent",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "hostile_only"
+    },
+    {
+      "id": "shatter",
+      "amount_unit": "milli_structure",
+      "min_amount": 0,
+      "max_amount": 100000,
+      "duration_rule": "zero",
+      "direction_rule": "none",
+      "target_rule": "breakable_environment_only"
+    }
+  ],
+  "reactions": [
+    {
+      "incoming": "wet",
+      "existing": "burn",
+      "result": "remove_burn_apply_wet"
+    },
+    {
+      "incoming": "burn",
+      "existing": "wet",
+      "result": "remove_wet_discard_incoming_burn"
+    }
+  ],
+  "limits": {
+    "nodes": 16,
+    "copies": 8,
+    "activations": 8,
+    "total_instances": 128,
+    "effect_applications": 8192,
+    "lifetime_ticks": 500,
+    "cast_end_ticks": 1500,
+    "targets_per_instance": 32,
+    "path_points": 128,
+    "barrier_colliders": 64,
+    "range_cm": 3000,
+    "scale_cm": 1200,
+    "concurrent_casts": 8
+  },
+  "effect_recipes": {
+    "schema_version": "sp.effect-recipes/1.0",
+    "catalog_file": "effect-recipes.json",
+    "prompt_projection_file": "effect-recipes-prompt.json",
+    "count": 141,
+    "execution": "fixed_composition_of_catalog_effects"
+  },
+  "visual_forms": {
+    "schema_version": "sp.visual-forms/1.0",
+    "selection": "Exactly one visual_form fact per subject. Luna copies it to appearance.form. This is a reusable rendered form, not a complete predefined spell. Creature forms are visual manifestations on the chosen carrier; they do not imply autonomous companion AI.",
+    "geometry": "sp.geometry.resolver/2.0.semantic produces clean paths or circular footprints from interpreted carrier/motion; no ink contours or signature mask.",
+    "forms": [
+      {
+        "id": "boulder",
+        "description": "Rock volume with clean facets",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "meteor",
+        "description": "Falling or flying meteor with core and trail",
+        "minimum_projectile_radius_cm": 30
+      },
+      {
+        "id": "crystal",
+        "description": "Faceted crystal cluster",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "blade",
+        "description": "Forged blade",
+        "minimum_projectile_radius_cm": 10
+      },
+      {
+        "id": "spear",
+        "description": "Long spear and point",
+        "minimum_projectile_radius_cm": 10
+      },
+      {
+        "id": "hammer",
+        "description": "Hammer head and handle",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "orb",
+        "description": "Layered magical orb",
+        "minimum_projectile_radius_cm": 10
+      },
+      {
+        "id": "fireball",
+        "description": "Flame core and tongues",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "lightning",
+        "description": "Branching electric arcs",
+        "minimum_projectile_radius_cm": 5
+      },
+      {
+        "id": "wave",
+        "description": "Water or energy crest",
+        "minimum_projectile_radius_cm": 30
+      },
+      {
+        "id": "vortex",
+        "description": "Spiral funnel",
+        "minimum_projectile_radius_cm": 30
+      },
+      {
+        "id": "chain",
+        "description": "Connected metal links",
+        "minimum_projectile_radius_cm": 12
+      },
+      {
+        "id": "vine",
+        "description": "Branching organic vines",
+        "minimum_projectile_radius_cm": 12
+      },
+      {
+        "id": "tentacle",
+        "description": "Curved tapered tentacle",
+        "minimum_projectile_radius_cm": 15
+      },
+      {
+        "id": "shield",
+        "description": "Solid shield volume",
+        "minimum_projectile_radius_cm": 25
+      },
+      {
+        "id": "skull",
+        "description": "Skull with visible jaw and eye sockets",
+        "minimum_projectile_radius_cm": 15
+      },
+      {
+        "id": "spirit",
+        "description": "Floating spectral body",
+        "minimum_projectile_radius_cm": 25
+      },
+      {
+        "id": "wolf",
+        "description": "Spectral quadruped wolf",
+        "minimum_projectile_radius_cm": 35
+      },
+      {
+        "id": "bird",
+        "description": "Bird with wings and body",
+        "minimum_projectile_radius_cm": 20
+      },
+      {
+        "id": "serpent",
+        "description": "Serpentine body and head",
+        "minimum_projectile_radius_cm": 25
+      },
+      {
+        "id": "golem",
+        "description": "Massive articulated stone humanoid",
+        "minimum_projectile_radius_cm": 45
+      }
+    ]
+  },
+  "visual_composition": {
+    "schema_version": "sp.visual-composition/1.0",
+    "selection": "Optional decorative appearance.vfx chosen by planner from frozen interpretation text, visual form, palette and effects. It cannot add mechanics, targets, carriers, code or assets.",
+    "style": [
+      "arcane",
+      "fire",
+      "frost",
+      "lightning",
+      "earth",
+      "poison",
+      "holy",
+      "shadow",
+      "nature",
+      "water"
+    ],
+    "motif": [
+      "runic",
+      "orbital",
+      "vortex",
+      "fracture",
+      "storm",
+      "petal"
+    ],
+    "density": {
+      "minimum": 1,
+      "maximum": 3
+    },
+    "aura_cm": {
+      "minimum": 80,
+      "maximum": 400
+    },
+    "charge_ms": {
+      "minimum": 100,
+      "maximum": 800
+    },
+    "impact": [
+      "nova",
+      "shatter",
+      "ripple",
+      "pillar"
+    ],
+    "minimum_client": "1.2.0"
+  },
+  "image_guided_construction": {
+    "schema_version": "sp.visual-construction/1.0",
+    "minimum_client_version": "1.3.0",
+    "source": "frozen_generated_image_plus_description",
+    "max_parts_per_node": 64,
+    "max_parts_per_plan": 128,
+    "max_expanded_parts": 1024,
+    "kinds": [
+      "ellipsoid",
+      "shard",
+      "feather",
+      "ribbon",
+      "ring",
+      "arc"
+    ],
+    "materials": [
+      "glass",
+      "energy",
+      "mist",
+      "stone",
+      "metal"
+    ],
+    "motions": [
+      "still",
+      "flutter",
+      "orbit",
+      "drift"
+    ],
+    "bounds": {
+      "position_cm": [
+        -1000,
+        1000
+      ],
+      "scale_cm": [
+        1,
+        1000
+      ],
+      "rotation_mdeg": [
+        -360000,
+        360000
+      ],
+      "color_rgb": [
+        0,
+        255
+      ],
+      "opacity_milli": [
+        0,
+        1000
+      ],
+      "emission_milli": [
+        0,
+        6000
+      ],
+      "points_cm": [
+        -1000,
+        1000
+      ],
+      "max_points": 16,
+      "amplitude_cm": [
+        0,
+        150
+      ],
+      "frequency_mhz": [
+        0,
+        6000
+      ],
+      "phase_mdeg": [
+        0,
+        360000
+      ]
+    },
+    "coordinate_system": {
+      "forward": "+Z",
+      "up": "+Y",
+      "right": "+X",
+      "rotation": "Euler XYZ in millidegrees",
+      "position": "centimeters relative to the carrier node",
+      "ellipsoid_shard": "scale_cm is the full bounding size XYZ",
+      "feather": "root at Z=0, tip along +Z; X=width,Y=thickness,Z=length",
+      "ribbon_arc": "points_cm are local path positions; scale_cm.x is full ribbon width or arc tube diameter; scale_cm.y/z do not affect path; 2..16 distinct path points",
+      "ring": "lies in local XZ; scale_cm.x/z give diameters and scale_cm.y thickness",
+      "motion_frequency": "frequency_mhz / 1000 hertz"
+    },
+    "mechanics": "Decorative only; image and construction never alter collision, effects or target filtering."
+  },
+  "visual_lifecycle": {
+    "schema_version": "sp.visual-lifecycle/1.0",
+    "minimum_client": "1.4.0",
+    "selection": "Mandatory per subject when SpellDescription.lifecycle is present. The frozen French text defines appearance, active animation, contact reaction and independent natural expiration; the generated image is the target for the representative active moment. An image never invents chronology or mechanics. Null preserves archived descriptions only.",
+    "intro": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "grow",
+            "assemble",
+            "ignite",
+            "draw",
+            "emerge"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 3000
+        },
+        "scale_start_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "opacity_start_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "emission_start_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6000
+        }
+      },
+      "required": [
+        "kind",
+        "duration_ms",
+        "scale_start_milli",
+        "opacity_start_milli",
+        "emission_start_milli"
+      ],
+      "additionalProperties": false
+    },
+    "active": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "steady",
+            "pulse",
+            "breathe",
+            "swirl",
+            "surge"
+          ]
+        },
+        "period_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 6000
+        },
+        "amplitude_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "kind",
+        "period_ms",
+        "amplitude_milli"
+      ],
+      "additionalProperties": false
+    },
+    "contact": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "burst",
+            "shatter",
+            "dissolve",
+            "collapse",
+            "ripple"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 3000
+        },
+        "spread_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "scale_end_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        }
+      },
+      "required": [
+        "kind",
+        "duration_ms",
+        "spread_cm",
+        "scale_end_milli"
+      ],
+      "additionalProperties": false
+    },
+    "expiration": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "burst",
+            "shatter",
+            "dissolve",
+            "collapse",
+            "ripple"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 3000
+        },
+        "spread_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "scale_end_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        }
+      },
+      "required": [
+        "kind",
+        "duration_ms",
+        "spread_cm",
+        "scale_end_milli"
+      ],
+      "additionalProperties": false
+    },
+    "mechanics": "Decorative only. Intro overlaps the existing carrier lifetime and does not postpone movement or damage. Contact animates only on a real carrier contact; expiration handles normal retirement without adding contacts, hits, targets or damage. Animated scale and spread never change collider dimensions.",
+    "precedence": "appearance.lifecycle defines launch, active and ending animation; appearance.vfx still supplies controlled secondary particles, materials and motifs. Contact/expiration profiles override legacy vfx.impact for their corresponding phase."
+  }
+}

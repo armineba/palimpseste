@@ -26,6 +26,7 @@ namespace Palimpseste.Core
         public string MinimumClientVersion = "1.0.0";
         public SpellProvenance Provenance;
         public SpellVisualReference VisualReference;
+        public string ReferenceResearchSha256;
     }
 
     public sealed class CompilationResult
@@ -89,6 +90,7 @@ namespace Palimpseste.Core
             CheckPlan(description, plan, geometry, issues);
             CheckVisualReference(input.DescriptionJson, plan, input.VisualReference, issues);
             CheckVisualConstruction(plan, issues);
+            CheckReferenceResearch(description, plan, input.ReferenceResearchSha256, issues);
             if (input.GeometryJson == null || input.MaskPng == null) return new CompilationResult { Issues = issues };
             if (issues.Count != 0) return new CompilationResult { Issues = issues };
             var bounds = ComputeBounds(plan, geometry, input, issues);
@@ -97,7 +99,10 @@ namespace Palimpseste.Core
 
             var minimumClient = input.MinimumClientVersion;
             if (!System.Version.TryParse(minimumClient, out var parsedClient)) parsedClient = new System.Version(0, 0, 0);
-            if (plan.nodes.Any(node => node.appearance.lifecycle != null) && parsedClient < new System.Version(1, 4, 0))
+            if (plan.nodes.Any(node => node.behavior != null || node.physics != null || node.appearance.resource_id != null) &&
+                parsedClient < new System.Version(1, 5, 0))
+                minimumClient = "1.5.0";
+            else if (plan.nodes.Any(node => node.appearance.lifecycle != null) && parsedClient < new System.Version(1, 4, 0))
                 minimumClient = "1.4.0";
             else if (input.VisualReference != null && parsedClient < new System.Version(1, 3, 0))
                 minimumClient = "1.3.0";
@@ -138,8 +143,12 @@ namespace Palimpseste.Core
             var planToken = (JObject)token["plan"];
             if (planToken["visual_reference_sha256"]?.Type == JTokenType.Null)
                 planToken.Property("visual_reference_sha256")?.Remove();
+            if (planToken["reference_research_sha256"]?.Type == JTokenType.Null)
+                planToken.Property("reference_research_sha256")?.Remove();
             foreach (var node in (JArray)token["plan"]["nodes"])
             {
+                if (node["behavior"]?.Type == JTokenType.Null) ((JObject)node).Property("behavior")?.Remove();
+                if (node["physics"]?.Type == JTokenType.Null) ((JObject)node).Property("physics")?.Remove();
                 var options = (JObject)node["options"];
                 foreach (var property in options.Properties().ToList())
                     if (property.Value.Type == JTokenType.Null) property.Remove();
@@ -154,6 +163,8 @@ namespace Palimpseste.Core
                     appearance.Property("construction")?.Remove();
                 if (appearance["lifecycle"]?.Type == JTokenType.Null)
                     appearance.Property("lifecycle")?.Remove();
+                if (appearance["resource_id"]?.Type == JTokenType.Null)
+                    appearance.Property("resource_id")?.Remove();
                 if (appearance["signature_geometry_id"]?.Type == JTokenType.Null)
                     appearance.Property("signature_geometry_id")?.Remove();
             }
@@ -270,7 +281,7 @@ namespace Palimpseste.Core
         // New player captures use one composition. The palette gate applies only
         // to free_canvas_v2; older saved descriptions remain compilable offline.
         public static IReadOnlyList<ValidationIssue> ValidateWholeImageDescriptionJson(byte[] descriptionJson,
-            bool requirePalette, bool requireVisualForm = false, bool requireLifecycle = false)
+            bool requirePalette, bool requireVisualForm = false, bool requireLifecycle = false, bool requireBehavior = false)
         {
             var issues = ValidateDescriptionJson(descriptionJson).ToList();
             if (issues.Count != 0) return issues;
@@ -278,6 +289,9 @@ namespace Palimpseste.Core
             if (requireLifecycle && description.lifecycle == null)
                 Add(issues, "lifecycle_required", "$.lifecycle",
                     "New spells require a complete launch, active, contact and expiration description for every subject");
+            if (requireBehavior && description.behaviors == null)
+                Add(issues, "behavior_required", "$.behaviors",
+                    "New spells require explicit deployment, travel and phenomenon choices for every subject");
             if (description.shape_requests == null || description.shape_requests.Count != 0)
                 Add(issues, "regional_shape_request", "$.shape_requests",
                     "New drawings must use the whole-image geometry bank");
@@ -301,7 +315,7 @@ namespace Palimpseste.Core
 
         public static IReadOnlyList<ValidationIssue> ValidatePlanJson(byte[] descriptionJson, byte[] planJson,
             IReadOnlyDictionary<string, byte[]> geometryJson, IReadOnlyDictionary<string, byte[]> maskPng,
-            SpellVisualReference visualReference = null)
+            SpellVisualReference visualReference = null, string referenceResearchSha256 = null)
         {
             try {
                 var description = ContractJson.DeserializeStrict<SpellDescription>(descriptionJson, "spell-description");
@@ -316,6 +330,7 @@ namespace Palimpseste.Core
                 CheckPlan(description, plan, geometry, issues);
                 CheckVisualReference(descriptionJson, plan, visualReference, issues);
                 CheckVisualConstruction(plan, issues);
+                CheckReferenceResearch(description, plan, referenceResearchSha256, issues);
                 if (geometryJson != null && maskPng != null && issues.Count == 0)
                     ComputeBounds(plan, geometry, input, issues);
                 return issues;
@@ -509,7 +524,7 @@ namespace Palimpseste.Core
                         Add(issues, "motion_fact", subject, "Stationary fact cannot map to this carrier");
                     if (motions[0] == "expanding" && carriers[0] != "pulse")
                         Add(issues, "motion_fact", subject, "Expanding fact requires pulse");
-                    if (new[] { "straight", "curve", "homing" }.Contains(motions[0]) && carriers[0] != "projectile")
+                    if (new[] { "straight", "curve", "homing", "ballistic" }.Contains(motions[0]) && carriers[0] != "projectile")
                         Add(issues, "motion_fact", subject, "Travel motion requires projectile");
                 }
                 if (d.shape_requests != null && d.shape_requests.Count > 0 &&
@@ -521,6 +536,158 @@ namespace Palimpseste.Core
             if (GeometryResolver.UsesSemanticForms(d) && d.shape_requests?.Count > 0)
                 Add(issues, "semantic_shape_request", "$.shape_requests", "Semantic forms cannot request traced ink geometry");
             CheckLifecycleDescription(d, subjects, issues);
+            CheckBehaviorDescription(d, subjects, issues);
+        }
+
+        private static void CheckReferenceResearch(SpellDescription description, SpellPlan plan,
+            string expectedHash, List<ValidationIssue> issues)
+        {
+            if (description.behaviors == null && plan.reference_research_sha256 == null) return;
+            if (!HexDigest(expectedHash) || plan.reference_research_sha256 != expectedHash)
+                Add(issues, "reference_research_hash", "$.reference_research_sha256",
+                    "Plan must cite the exact frozen research context supplied by the server");
+        }
+
+        private static void CheckBehaviorDescription(SpellDescription description,
+            IEnumerable<string> subjects, List<ValidationIssue> issues)
+        {
+            if (description.behaviors == null)
+            {
+                if (description.clauses.SelectMany(clause => clause.facts).Any(fact => fact.dimension == "motion" && fact.value == "ballistic"))
+                    Add(issues, "behavior_required", "$.behaviors", "Ballistic travel requires an explicit behavior and physics profile");
+                return;
+            }
+            if (description.lifecycle == null)
+                Add(issues, "lifecycle_required", "$.lifecycle", "Behavior intents require the complete described lifecycle");
+            var expected = new HashSet<string>(subjects, StringComparer.Ordinal);
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var behavior in description.behaviors)
+            {
+                if (behavior == null || string.IsNullOrWhiteSpace(behavior.subject_id))
+                {
+                    Add(issues, "behavior_subject", "$.behaviors", "Behavior requires a known subject");
+                    continue;
+                }
+                var path = "$.behaviors." + behavior.subject_id;
+                if (!expected.Contains(behavior.subject_id)) Add(issues, "behavior_subject", path, "Unknown behavior subject");
+                if (!seen.Add(behavior.subject_id)) Add(issues, "behavior_duplicate", path, "One behavior intent per subject is required");
+                if (!BehaviorVocabularyValid(behavior)) Add(issues, "behavior_vocabulary", path, "Unsupported behavior vocabulary");
+                var clauses = description.clauses.Where(clause => clause.subject_id == behavior.subject_id).ToArray();
+                var facts = clauses.Where(clause => clause.kind == "mechanical").SelectMany(clause => clause.facts).ToArray();
+                var carrier = facts.FirstOrDefault(fact => fact.dimension == "carrier")?.value;
+                var motions = facts.Where(fact => fact.dimension == "motion").Select(fact => fact.value).ToArray();
+                if (clauses.SelectMany(clause => clause.facts).Count(fact => fact.dimension == "visual_form") != 1 ||
+                    clauses.SelectMany(clause => clause.facts).Count(fact => fact.dimension == "palette") != 1)
+                    Add(issues, "behavior_visual_identity", path, "Behavior requires exactly one interpreted form and palette");
+                var isChild = description.relations.Any(relation => relation.target_subject_id == behavior.subject_id);
+                if (isChild != SpellPhysicsLimits.IsParentOrigin(behavior.origin))
+                    Add(issues, "behavior_parent_origin", path, "Child origins must be tied to their described parent event");
+                if (carrier == "projectile")
+                {
+                    if (behavior.travel == "stationary" || motions.Length != 1 || motions[0] != behavior.travel)
+                        Add(issues, "behavior_travel", path, "Projectile travel must equal its single motion fact");
+                }
+                else if (behavior.travel != "stationary")
+                    Add(issues, "behavior_travel", path, "Only a projectile carrier can travel; other carrier centers remain stationary");
+                if (behavior.attachment == "caster" &&
+                    (behavior.travel != "stationary" || !new[] { "field", "barrier", "trap" }.Contains(carrier) ||
+                     behavior.origin != "caster" && behavior.origin != "caster_ground"))
+                    Add(issues, "behavior_attachment", path, "Caster attachment requires a stationary carrier originating at its caster");
+                if (behavior.orientation == "surface_normal" && !SpellPhysicsLimits.IsGroundOrigin(behavior.origin))
+                    Add(issues, "behavior_surface", path, "Surface orientation requires a ground origin");
+                if (behavior.phenomenon == "vortex" && behavior.axis != "y")
+                    Add(issues, "behavior_vortex_axis", path, "A vortex rotates around its declared vertical Y axis");
+                if (clauses.SelectMany(clause => clause.facts).Any(fact => fact.dimension == "visual_form" && fact.value == "vortex") &&
+                    behavior.phenomenon != "vortex")
+                    Add(issues, "behavior_form", path, "The controlled vortex form requires a vortex phenomenon");
+                if (carrier == "trap" && !new[] { "aim_ground", "parent_ground", "caster_ground" }.Contains(behavior.origin))
+                    Add(issues, "behavior_trap_origin", path,
+                        "A trap requires an interpreted ground origin, never a planner's default caster position");
+            }
+            if (!seen.SetEquals(expected))
+                Add(issues, "behavior_subjects", "$.behaviors", "Behavior intents must cover every subject exactly once");
+        }
+
+        private static bool BehaviorVocabularyValid(SpellBehaviorIntent value) =>
+            SpellPhysicsLimits.Origins.Contains(value.origin) && SpellPhysicsLimits.Orientations.Contains(value.orientation) &&
+            SpellPhysicsLimits.Attachments.Contains(value.attachment) && SpellPhysicsLimits.Phenomena.Contains(value.phenomenon) &&
+            SpellPhysicsLimits.Axes.Contains(value.axis) && SpellPhysicsLimits.Senses.Contains(value.sense) &&
+            SpellPhysicsLimits.Intensities.Contains(value.intensity) && SpellPhysicsLimits.Travels.Contains(value.travel);
+
+        private static bool BehaviorEquals(SpellBehaviorIntent expected, SpellBehaviorIntent actual) =>
+            expected.subject_id == actual.subject_id && expected.origin == actual.origin && expected.orientation == actual.orientation &&
+            expected.attachment == actual.attachment && expected.phenomenon == actual.phenomenon && expected.axis == actual.axis &&
+            expected.sense == actual.sense && expected.intensity == actual.intensity && expected.travel == actual.travel;
+
+        private static void CheckBehaviorPlan(SpellDescription description, SpellNode node, List<ValidationIssue> issues)
+        {
+            var intent = description.behaviors?.FirstOrDefault(item => item.subject_id == node.subject_id);
+            var path = node.node_id + ".behavior";
+            if (intent == null)
+            {
+                if (node.behavior != null || node.physics != null || node.appearance.resource_id != null || node.options.motion == "ballistic")
+                    Add(issues, "behavior_trace", path, "New physics and resources require an interpreted behavior for the same subject");
+                return;
+            }
+            if (node.behavior == null || node.physics == null)
+            {
+                Add(issues, "behavior_required", path, "Every interpreted behavior requires its complete copied intent and physics profile");
+                return;
+            }
+            if (!BehaviorEquals(intent, node.behavior))
+                Add(issues, "behavior_trace", path, "Planner altered deployment, travel or phenomenon selected by the interpreter");
+            if (node.anchor != SpellPhysicsLimits.AnchorForOrigin(intent.origin))
+                Add(issues, "behavior_anchor", path, "Legacy anchor must match the explicit origin");
+            if (SpellPhysicsLimits.IsParentOrigin(intent.origin) != (node.activation.parent_id != null))
+                Add(issues, "behavior_parent_origin", path, "Deployment must preserve the parent event relation");
+            if (node.carrier == "projectile" && node.options.motion != intent.travel)
+                Add(issues, "behavior_travel", path, "Projectile options.motion differs from interpreted travel");
+            if (node.appearance.resource_id == null || !SpellVfxResources.All.Contains(node.appearance.resource_id))
+                Add(issues, "visual_resource_required", node.node_id + ".appearance.resource_id", "Select one shipped texture resource");
+            if (node.appearance.construction == null || node.appearance.lifecycle == null)
+                Add(issues, "behavior_visual_construction", path, "Physical behavior requires explicit image construction and lifecycle");
+            var physics = node.physics;
+            var numericPath = node.node_id + ".physics";
+            if (physics.cast_range_cm < 0 || physics.cast_range_cm > SpellPhysicsLimits.MaximumCastRangeCm ||
+                !VectorInRange(physics.offset_cm, -SpellPhysicsLimits.MaximumOffsetCm, SpellPhysicsLimits.MaximumOffsetCm) ||
+                physics.angular_speed_mdeg_s < 0 || physics.angular_speed_mdeg_s > SpellPhysicsLimits.MaximumAngularSpeedMdegS ||
+                physics.axial_speed_cm_s < -SpellPhysicsLimits.MaximumFlowSpeedCmS || physics.axial_speed_cm_s > SpellPhysicsLimits.MaximumFlowSpeedCmS ||
+                physics.radial_speed_cm_s < -SpellPhysicsLimits.MaximumFlowSpeedCmS || physics.radial_speed_cm_s > SpellPhysicsLimits.MaximumFlowSpeedCmS ||
+                physics.radius_cm < 0 || physics.radius_cm > SpellPhysicsLimits.MaximumRadiusCm ||
+                physics.turbulence_cm < 0 || physics.turbulence_cm > SpellPhysicsLimits.MaximumTurbulenceCm ||
+                physics.frequency_mhz < 0 || physics.frequency_mhz > SpellPhysicsLimits.MaximumFrequencyMhz ||
+                physics.gravity_cm_s2 < 0 || physics.gravity_cm_s2 > SpellPhysicsLimits.MaximumGravityCmS2 ||
+                physics.launch_pitch_mdeg < -SpellPhysicsLimits.MaximumLaunchPitchMdeg || physics.launch_pitch_mdeg > SpellPhysicsLimits.MaximumLaunchPitchMdeg)
+                Add(issues, "physics_bounds", numericPath, "Physics parameters exceed the controlled units or numeric bounds");
+            if (SpellPhysicsLimits.IsAimOrigin(intent.origin) ? physics.cast_range_cm <= 0 : physics.cast_range_cm != 0)
+                Add(issues, "physics_cast_range", numericPath, "Only an aimed origin has a positive bounded cast range");
+            if (SpellPhysicsLimits.IsGroundOrigin(intent.origin) && physics.offset_cm?.Length == 3 && physics.offset_cm[1] != 0)
+                Add(issues, "physics_ground_offset", numericPath, "Ground placement must remain on the resolved surface");
+            if (intent.travel == "ballistic")
+            {
+                if (node.carrier != "projectile" || physics.gravity_cm_s2 <= 0)
+                    Add(issues, "physics_ballistic", numericPath, "Ballistic travel requires a projectile and positive gravity");
+            }
+            else if (physics.gravity_cm_s2 != 0 || physics.launch_pitch_mdeg != 0)
+                Add(issues, "physics_unused_gravity", numericPath, "Gravity and launch pitch are zero outside ballistic travel");
+            var rotating = intent.phenomenon == "spin" || intent.phenomenon == "vortex" || intent.phenomenon == "orbit";
+            if (rotating ? physics.angular_speed_mdeg_s <= 0 : physics.angular_speed_mdeg_s != 0)
+                Add(issues, "physics_rotation", numericPath, "Rotating phenomena require continuous angular speed; other phenomena use zero");
+            if (intent.phenomenon == "vortex" &&
+                (physics.angular_speed_mdeg_s < SpellPhysicsLimits.MinimumVortexAngularSpeed(intent.intensity) || physics.axial_speed_cm_s == 0))
+                Add(issues, "physics_vortex", numericPath, "Vortex intensity requires its minimum continuous angular speed and a nonzero axial flow");
+            var flowing = intent.phenomenon == "vortex" || intent.phenomenon == "flow";
+            if (!flowing && (physics.axial_speed_cm_s != 0 || physics.radial_speed_cm_s != 0) ||
+                intent.phenomenon == "flow" && physics.axial_speed_cm_s == 0)
+                Add(issues, "physics_flow", numericPath, "Axial/radial flow belongs only to a vortex or flow phenomenon, with nonzero flow travel");
+            var needsRadius = flowing || intent.phenomenon == "orbit";
+            if (needsRadius ? physics.radius_cm <= 0 : physics.radius_cm != 0)
+                Add(issues, "physics_radius", numericPath, "Only vortex, flow and orbit have a positive bounded decorative radius");
+            var noisy = flowing || intent.phenomenon == "flutter" || intent.phenomenon == "turbulence";
+            if (!noisy && (physics.turbulence_cm != 0 || physics.frequency_mhz != 0) ||
+                noisy && ((physics.turbulence_cm == 0) != (physics.frequency_mhz == 0)) ||
+                (intent.phenomenon == "flutter" || intent.phenomenon == "turbulence") && physics.turbulence_cm <= 0)
+                Add(issues, "physics_turbulence", numericPath, "Animated turbulence requires positive amplitude and frequency; unused parameters remain zero");
         }
 
         private static void CheckLifecycleDescription(SpellDescription description,
@@ -609,6 +776,7 @@ namespace Palimpseste.Core
             {
                 var p = node.node_id;
                 CheckLifecyclePlan(d, node, issues);
+                CheckBehaviorPlan(d, node, issues);
                 if (!Emitted.ContainsKey(node.carrier)) { Add(issues, "carrier", p, "Unknown carrier"); continue; }
                 var allSubjectClauses = d.clauses.Where(c => c.subject_id == node.subject_id).ToArray();
                 var subjectClauses = allSubjectClauses.Where(c => c.kind == "mechanical").ToArray();
@@ -725,7 +893,7 @@ namespace Palimpseste.Core
                     Add(issues, "motion_fact", p, "Stationary fact cannot map to this carrier");
                 if (motion == "expanding" && node.carrier != "pulse")
                     Add(issues, "motion_fact", p, "Expanding fact requires pulse");
-                if (new[] { "straight", "curve", "homing" }.Contains(motion) && node.carrier != "projectile")
+                if (new[] { "straight", "curve", "homing", "ballistic" }.Contains(motion) && node.carrier != "projectile")
                     Add(issues, "motion_fact", p, "Travel motion requires projectile");
                 var request = d.shape_requests?.FirstOrDefault(s => s.subject_id == node.subject_id);
                 if (!geometry.TryGetValue(node.geometry_id, out var main))

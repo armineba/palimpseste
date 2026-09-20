@@ -409,7 +409,7 @@ namespace Palimpseste.Game.Bootstrap
                 "queued" => "En file d'attente pour la lecture du dessin",
                 "interpreting" => "Lecture du dessin et création de son interprétation",
                 "generating_visual_reference" => "Création de l’image de référence depuis la description",
-                "resolving_geometry" => "Interprétation reçue · préparation des volumes 3D",
+                "resolving_geometry" => "Recherche de références et de ressources visuelles",
                 "planning" => "Construction du sort et de son animation depuis la description",
                 "refining_visuals" => "Comparaison du rendu Unity à l’image · ajustements visuels",
                 "validating" => "Plan compilé et ressources contrôlées avant publication",
@@ -457,6 +457,8 @@ namespace Palimpseste.Game.Bootstrap
             }
             var content = new StringBuilder();
             content.AppendLine(descriptionView.Title).AppendLine().AppendLine(descriptionView.Summary).AppendLine();
+            if (descriptionView.Behaviors?.Length > 0)
+                foreach (var behavior in descriptionView.Behaviors) content.AppendLine(behavior).AppendLine();
             if (descriptionView.Lifecycle?.Length > 0)
             {
                 content.AppendLine("Du lancement à la disparition").AppendLine();
@@ -489,7 +491,7 @@ namespace Palimpseste.Game.Bootstrap
                 "queued" => "Lecture en attente",
                 "interpreting" => "Lecture du dessin",
                 "generating_visual_reference" => "Image du sort en création",
-                "resolving_geometry" => "Formes en préparation",
+                "resolving_geometry" => "Références et ressources",
                 "refining_visuals" => "Finition visuelle et animations",
                 "planning" => "Construction du sort décrit",
                 "validating" => "Compilation du sort",

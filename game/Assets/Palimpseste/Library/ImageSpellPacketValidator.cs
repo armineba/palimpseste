@@ -108,6 +108,14 @@ namespace Palimpseste.Game.Library
                     ValidateLifecycle(lifecycle);
                 }
                 else Require(minimumVersion == null || minimumVersion < new Version(1,4,0),"Client 1.4.0 requires a lifecycle per node");
+                var hasBehavior = node["behavior"] != null && node["behavior"].Type != JTokenType.Null;
+                var hasPhysics = node["physics"] != null && node["physics"].Type != JTokenType.Null;
+                if (hasBehavior || hasPhysics || minimumVersion != null && minimumVersion >= new Version(1,5,0))
+                {
+                    Require(minimumVersion != null && minimumVersion >= new Version(1,5,0),"Behavior requires client 1.5.0");
+                    Require(Digest(Text(plan,"reference_research_sha256")),"Behavior requires reference research provenance");
+                    ValidateBehavior(node,appearance);
+                }
                 var constructionJson = (JObject)appearance["construction"];
                 Require(constructionJson["parts"] is JArray,"Missing construction parts");
                 var parts = (JArray)constructionJson["parts"];
@@ -167,6 +175,41 @@ namespace Palimpseste.Game.Library
         }
 
         private static string Text(JObject value, string key) => value?[key]?.Type == JTokenType.String ? value[key].Value<string>() : null;
+        private static void ValidateBehavior(JObject node, JObject appearance)
+        {
+            Require(node["behavior"] is JObject && node["physics"] is JObject,"Behavior and physics must both be present");
+            var behavior = (JObject)node["behavior"]; var physics = (JObject)node["physics"];
+            var origin = Text(behavior,"origin"); var phenomenon = Text(behavior,"phenomenon");
+            Require(Text(behavior,"subject_id") == Text(node,"subject_id"),"Behavior subject mismatch");
+            Require(SpellPhysicsLimits.Origins.Contains(origin) && SpellPhysicsLimits.Orientations.Contains(Text(behavior,"orientation")) &&
+                SpellPhysicsLimits.Attachments.Contains(Text(behavior,"attachment")) && SpellPhysicsLimits.Phenomena.Contains(phenomenon) &&
+                SpellPhysicsLimits.Axes.Contains(Text(behavior,"axis")) && SpellPhysicsLimits.Senses.Contains(Text(behavior,"sense")) &&
+                SpellPhysicsLimits.Intensities.Contains(Text(behavior,"intensity")) && SpellPhysicsLimits.Travels.Contains(Text(behavior,"travel")),
+                "Unknown behavior vocabulary");
+            Require(Text(node,"anchor") == SpellPhysicsLimits.AnchorForOrigin(origin),"Placement anchor mismatch");
+            Require(SpellResourceLibrary.Contains(Text(appearance,"resource_id")),"Unknown sourced VFX resource");
+            var range = Integer(physics,"cast_range_cm",0,3000);
+            Require(SpellPhysicsLimits.IsAimOrigin(origin) ? range > 0 : range == 0,"Invalid placement range");
+            IntegerVector(physics["offset_cm"],-500,500);
+            if (SpellPhysicsLimits.IsGroundOrigin(origin)) Require(physics["offset_cm"][1].Value<int>() == 0,"Ground origin requires zero vertical offset");
+            var angular = Integer(physics,"angular_speed_mdeg_s",0,2880000);
+            var axial = Integer(physics,"axial_speed_cm_s",-3000,3000);
+            Integer(physics,"radial_speed_cm_s",-3000,3000);
+            var radius = Integer(physics,"radius_cm",0,1000);
+            Integer(physics,"turbulence_cm",0,300); Integer(physics,"frequency_mhz",0,6000);
+            var gravity = Integer(physics,"gravity_cm_s2",0,4000);
+            var pitch = Integer(physics,"launch_pitch_mdeg",-80000,80000);
+            if (phenomenon == "vortex") Require(Text(behavior,"axis") == "y" && radius > 0 && axial != 0 &&
+                angular >= SpellPhysicsLimits.MinimumVortexAngularSpeed(Text(behavior,"intensity")),"Vortex requires continuous rotating axial flow");
+            if (Text(behavior,"travel") == "ballistic") Require(Text(node,"carrier") == "projectile" && gravity > 0 &&
+                node["options"]?["motion"]?.Value<string>() == "ballistic","Ballistic trajectory is missing");
+            else Require(gravity == 0 && pitch == 0,"Gravity is exclusive to ballistic travel");
+            if (Text(behavior,"attachment") == "caster") Require(new[] { "field","barrier","trap" }.Contains(Text(node,"carrier")) &&
+                (origin == "caster" || origin == "caster_ground") && Text(behavior,"travel") == "stationary","Invalid caster attachment");
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None,
+                MetadataPropertyHandling = MetadataPropertyHandling.Ignore, MissingMemberHandling = MissingMemberHandling.Error });
+            behavior.ToObject<SpellBehaviorIntent>(serializer); physics.ToObject<SpellPhysicsProfile>(serializer);
+        }
         private static void ValidateLifecycle(JToken token)
         {
             Require(token is JObject,"Lifecycle must be an object");

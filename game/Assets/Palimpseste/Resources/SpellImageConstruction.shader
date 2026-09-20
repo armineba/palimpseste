@@ -10,6 +10,13 @@ Shader "Palimpseste/SpellImageConstruction"
         _Envelope ("Lifecycle", Range(0,1)) = 1
         _Reveal ("Authored entrance reveal", Range(0,1)) = 1
         _Dissolve ("Authored ending erosion", Range(0,1)) = 0
+        _ResourceTex ("Curated VFX texture", 2D) = "white" {}
+        _ResourceEnabled ("Curated texture enabled", Float) = 0
+        _ResourceParticle ("Particle mask", Float) = 0
+        _BehaviorFlow ("Authored surface advection", Vector) = (0,0,0,0)
+        _BehaviorAge ("Authored motion age", Float) = 0
+        _BehaviorEnabled ("Explicit behavior", Float) = 0
+        _BehaviorMotion ("Behavior moves", Float) = 1
         _Armed ("Armed presentation", Range(0,1)) = 0
         _Seed ("Controlled variation", Float) = 0
         [Enum(Off,0,On,1)] _ZWrite ("Depth write", Float) = 0
@@ -30,11 +37,17 @@ Shader "Palimpseste/SpellImageConstruction"
             #pragma target 3.0
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            // Ashima/stegu simplex, Unity adaptation by Keijiro; MIT license
+            // retained in SourcedNoise/LICENSE.txt alongside reviewed sources.
+            #include "SourcedNoise/SimplexNoise3D.hlsl"
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
                 float _Material, _Shape, _Opacity, _Emission, _Envelope, _Seed, _Armed;
                 float _Reveal, _Dissolve;
+                float4 _BehaviorFlow;
+                float _BehaviorAge, _ResourceEnabled, _ResourceParticle, _BehaviorEnabled, _BehaviorMotion;
             CBUFFER_END
+            TEXTURE2D(_ResourceTex); SAMPLER(sampler_ResourceTex);
             struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv:TEXCOORD0; };
             struct Varyings { float4 positionHCS:SV_POSITION; float3 positionWS:TEXCOORD0; float3 normalWS:TEXCOORD1; float2 uv:TEXCOORD2; };
             Varyings vert(Attributes input)
@@ -59,9 +72,12 @@ Shader "Palimpseste/SpellImageConstruction"
                 float3 normal=SafeNormalize(input.normalWS);
                 float3 view=GetWorldSpaceNormalizeViewDir(input.positionWS);
                 float fres=pow(saturate(1-abs(dot(normal,view))),2.4);
-                float t=_Time.y;
-                float fabric=fbm(uv*float2(8,5)+_Seed*3.7);
-                float streams=fbm(uv*float2(13,4)+float2(-t*.42,_Seed*7));
+                float t=lerp(_Time.y,_BehaviorAge*_BehaviorMotion,saturate(_BehaviorEnabled));
+                float2 advected=uv+_BehaviorFlow.xy*_BehaviorAge;
+                float fabric=fbm(advected*float2(8,5)+_Seed*3.7);
+                if (_ResourceEnabled>.5)
+                    fabric=lerp(fabric,SimplexNoise(float3(advected*3.5,_BehaviorAge*_BehaviorMotion*.37+_Seed*7))*.5+.5,.45);
+                float streams=fbm(advected*float2(13,4)+float2(-t*.42,_Seed*7));
                 float ridges=pow(saturate(1-abs(streams-.54)*13),2);
                 float edge=abs(uv.y*2-1);
                 float feather=step(.5,_Shape)*(1-step(1.5,_Shape));
@@ -134,6 +150,8 @@ Shader "Palimpseste/SpellImageConstruction"
                     radiance=(frac(uv.x*7+_Seed)*.02+outerEdge*.15)*_Emission;
                 }
                 float envelope=saturate(_Envelope);
+                float resource=SAMPLE_TEXTURE2D(_ResourceTex,sampler_ResourceTex,frac(advected)).a;
+                envelope*=lerp(1,.48+.52*resource,saturate(_ResourceEnabled));
                 float reveal=saturate((_Reveal*1.08-uv.x)/.08);
                 float erosion=saturate((fabric-_Dissolve*1.15+.10)/.10);
                 envelope*=reveal*erosion;

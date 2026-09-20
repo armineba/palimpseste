@@ -1,0 +1,53 @@
+# Recherche et ressources VFX réutilisables
+
+Recherche et téléchargements effectués le **21 septembre 2026, heure de Paris**, à la demande du créateur. Le [catalogue exploitable](../assets/sourced-vfx/catalogue.json) relie chaque ingrédient à sa source, sa licence et son SHA. La sélection ne nécessite aucun achat, abonnement supplémentaire, API payante ou installation de plugin.
+
+## Ressources réellement récupérées
+
+| Source primaire | Fichiers retenus | Licence et usage dans Unity 1.5.0 |
+| --- | --- | --- |
+| [Kenney Particle Pack](https://kenney.nl/assets/particle-pack) | 12 PNG 512 × 512 : anneaux, sceau, volute, fumée, feu, flamme, deux éclairs, étoile, balayage, traînée. | CC0 ; couches de particules et masques lumineux réutilisables. |
+| [Kenney Smoke Particles](https://kenney.nl/assets/smoke-particles) | 4 PNG : vapeur blanche, fumée sombre, explosion orange, nuage vert. | CC0 ; apparition, contact, gaz et dissipation. |
+| [Keijiro NoiseShader, commit épinglé](https://github.com/keijiro/NoiseShader/tree/550100d4a74de1ba90eb1b8e90f25f9dbeec28d2) | `Common.hlsl`, `SimplexNoise2D.hlsl`, `SimplexNoise3D.hlsl`. | MIT ; Common et SimplexNoise3D intégrés à la turbulence du shader. SimplexNoise2D reste une référence. |
+
+Les licences ont été lues sur les sources primaires, puis celles présentes dans les archives avant extraction des textures. [Licences et attributions conservées](../assets/sourced-vfx/ATTRIBUTION.md). Les téléchargements ont conservé leurs octets ; les archives sont identifiées par SHA et les HLSL par commit et SHA. Aucun ancien `.unitypackage` du pack n'a été importé.
+
+## Association avec les sorts
+
+Ces associations sont des choix de conception, pas des résultats de tests :
+
+| Famille recherchée | Identifiants disponibles à combiner |
+| --- | --- |
+| Électricité / tempête | `kpp_spark_01`, `kpp_spark_05`, `kpp_trace_01` |
+| Feu / lave / explosion | `kpp_fire_01`, `kpp_flame_01`, `ksp_explosion_00`, `ksp_black_smoke_00` |
+| Soin / aura / rituel | `kpp_circle_03`, `kpp_magic_01`, `kpp_star_01` |
+| Spectre / vent / dissolution | `kpp_twirl_01`, `kpp_smoke_01`, `ksp_white_puff_00` |
+| Poison / gaz | `ksp_poison_puff_00`, `kpp_smoke_01` |
+| Bouclier / impact / frappe | `kpp_circle_01`, `kpp_circle_03`, `kpp_slash_01` |
+
+Le resolver D15 consulte le catalogue **avant la construction du plan** pour choisir des ingrédients appropriés à la description, puis alimenter la boucle de comparaison à l'image. Les 16 PNG sont copiés dans `game/Assets/Palimpseste/Resources/SourcedVfx/` ; `appearance.resource_id` relie le choix du plan aux matériaux de construction, couches VFX et particules. Chaque sort choisit sa ressource parmi les 16 disponibles. Un sprite de particule n'impose pas la forme du sort entier. L'image cible, les quatre phases textuelles et les mécaniques contrôlées gardent leurs rôles.
+
+## Repères Unity et revue des sources
+
+Le [catalogue des techniques](../assets/sourced-vfx/references.json) contient sept références primaires, avec `id`, `url`, `technique`, `tags`, familles et ingrédients associés. Les six pages suivantes ont été réellement récupérées dans leur version **6000.3** :
+
+- [Vitesses orbitales et radiales](https://docs.unity3d.com/6000.3/Documentation/Manual/PartSysVelOverLifeModule.html) : spirales, couronnes et attraction visuelle.
+- [Bruit de mouvement](https://docs.unity3d.com/6000.3/Documentation/Manual/PartSysNoiseModule.html) : turbulence pour fumée, feu et voiles.
+- [Traînées](https://docs.unity3d.com/6000.3/Documentation/Manual/PartSysTrailsModule.html) : historique dans l'espace et extinction indépendante.
+- [Émetteurs secondaires](https://docs.unity3d.com/6000.3/Documentation/Manual/PartSysSubEmitModule.html) : bouffées distinctes à la naissance ou à l'extinction, avec déclenchement manuel possible.
+- [Particules Unlit URP](https://docs.unity3d.com/6000.3/Documentation/Manual/urp/particles-unlit-shader.html) : mélange alpha/additif et adoucissement des intersections avec profondeur activée.
+- [Bloom URP](https://docs.unity3d.com/6000.3/Documentation/Manual/urp/post-processing-bloom.html) : contrôle de la diffusion lumineuse.
+
+Les recommandations `suggested_blend` des textures sont des points de départ de conception : alpha pour fumée sombre et nuages, additif pour éclairs et éclats. Le catalogue conserve des résumés originaux et des liens, pas des copies des manuels Unity. La récupération effectuée pendant cette préparation ne prouve pas la récupération lors d'un futur job : le resolver doit conserver son propre résultat et ses empreintes.
+
+**Périmètre de recherche implémenté par job : bibliothèque de sources primaires sélectionnées.** Le resolver choisit jusqu'à quatre références selon la description et les tags, puis lit leurs pages HTTPS autorisées en parallèle, avec délai borné à sept secondes. Les notes de catalogue servent de repli explicite si une lecture échoue. Le dossier de recherche conserve le résultat de chaque lecture et ses empreintes. Ce fonctionnement est une recherche dans cette bibliothèque, pas une exploration générale de tout le Web. La réutilisation des textures sélectionnées reste liée aux 16 identifiants contrôlés. Aucun appel de génération n'a été lancé pour valider cette intégration.
+
+Les [sources Simplex de Keijiro](https://github.com/keijiro/NoiseShader/blob/550100d4a74de1ba90eb1b8e90f25f9dbeec28d2/Packages/jp.keijiro.noiseshader/Shader/SimplexNoise3D.hlsl) fournissent le bruit analytique de `SpellImageConstruction.shader`. Les copies relues de Common et SimplexNoise3D sont dans `Resources/SourcedNoise/`, avec adaptation de l'include de Common au chemin relatif ; les originaux du catalogue restent inchangés. La licence MIT est conservée et livrée dans `ThirdPartyNotices/NoiseShader-MIT.txt`. SimplexNoise2D n'est pas intégré. Le worker reçoit le renderer précompilé ; aucun shader téléchargé n'est exécuté automatiquement à la demande d'un joueur.
+
+## État initial et intégration livrée
+
+**Sélection initiale :** recherche web primaire, lecture des licences, téléchargement, extraction de 16 PNG et trois sources HLSL, observation des aperçus et de six textures, inventaire des dimensions/empreintes, catalogue et notices. Le champ `status_at_curation` conserve cet état historique.
+
+**Intégration 1.5.0 :** les 16 textures sont importées et reliées au rendu ; Common et SimplexNoise3D sont utilisés par le shader. Le build Unity 6000.3.24f1 et le packaging du Player ont réussi, selon la [preuve de livraison](../evidence/public/unity/lifecycle-delivery.json). Le champ `integration` et les entrées individuelles du catalogue décrivent ces usages.
+
+**Non exécuté pour cette intégration :** test de jeu, capture de gameplay, appel de génération et démonstration réelle de recherche par job. L'acceptation humaine de la qualité visuelle et de la fidélité reste en attente.

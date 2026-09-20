@@ -14,6 +14,8 @@ namespace Palimpseste.Contracts
         public List<ShapeRequest> shape_requests;
         // Null only for archived descriptions. New spells describe every subject from launch to retirement.
         public List<SpellLifecycleDescription> lifecycle;
+        // D15 intent selected before image generation; null preserves archived semantics.
+        public List<SpellBehaviorIntent> behaviors;
     }
 
     public sealed class SpellLifecycleDescription
@@ -72,6 +74,7 @@ namespace Palimpseste.Contracts
         // Hash of the actual generated reference image supplied to the planner.
         // Null is reserved for plans produced before image-guided construction.
         public string visual_reference_sha256;
+        public string reference_research_sha256;
         public string catalog_version;
         public string rules_profile;
         public List<SpellNode> nodes;
@@ -91,6 +94,8 @@ namespace Palimpseste.Contracts
         public SpellAppearance appearance;
         public List<SpellEffect> effects;
         public SpellOptions options;
+        public SpellBehaviorIntent behavior;
+        public SpellPhysicsProfile physics;
     }
 
     public sealed class SpellActivation
@@ -116,7 +121,72 @@ namespace Palimpseste.Contracts
         public SpellVisualConstruction construction;
         // Decorative animation of the frozen description. Never changes carrier timing or collisions.
         public SpellVisualLifecycle lifecycle;
+        // A shipped resource ID, never an arbitrary filename or external URL.
+        public string resource_id;
         public string signature_geometry_id;
+    }
+
+    public sealed class SpellBehaviorIntent
+    {
+        public string subject_id;
+        public string origin;
+        public string orientation;
+        public string attachment;
+        public string phenomenon;
+        public string axis;
+        public string sense;
+        public string intensity;
+        public string travel;
+    }
+
+    public sealed class SpellPhysicsProfile
+    {
+        public int cast_range_cm;
+        public int[] offset_cm;
+        public int angular_speed_mdeg_s;
+        public int axial_speed_cm_s;
+        public int radial_speed_cm_s;
+        public int radius_cm;
+        public int turbulence_cm;
+        public int frequency_mhz;
+        public int gravity_cm_s2;
+        public int launch_pitch_mdeg;
+    }
+
+    public static class SpellPhysicsLimits
+    {
+        public static readonly string[] Origins = { "caster", "muzzle", "aim_point", "caster_ground", "aim_ground", "parent_event", "parent_ground" };
+        public static readonly string[] Orientations = { "cast_forward", "world_up", "surface_normal" };
+        public static readonly string[] Attachments = { "world", "caster" };
+        public static readonly string[] Phenomena = { "static", "spin", "vortex", "orbit", "flow", "flutter", "turbulence" };
+        public static readonly string[] Axes = { "x", "y", "z" };
+        public static readonly string[] Senses = { "clockwise", "counterclockwise" };
+        public static readonly string[] Intensities = { "gentle", "brisk", "violent" };
+        public static readonly string[] Travels = { "stationary", "straight", "curve", "homing", "ballistic" };
+        public const int MaximumCastRangeCm = 3000;
+        public const int MaximumOffsetCm = 500;
+        public const int MaximumAngularSpeedMdegS = 2880000;
+        public const int MaximumFlowSpeedCmS = 3000;
+        public const int MaximumRadiusCm = 1000;
+        public const int MaximumTurbulenceCm = 300;
+        public const int MaximumFrequencyMhz = 6000;
+        public const int MaximumGravityCmS2 = 4000;
+        public const int MaximumLaunchPitchMdeg = 80000;
+        public static bool IsGroundOrigin(string origin) => origin == "caster_ground" || origin == "aim_ground" || origin == "parent_ground";
+        public static bool IsParentOrigin(string origin) => origin == "parent_event" || origin == "parent_ground";
+        public static bool IsAimOrigin(string origin) => origin == "aim_point" || origin == "aim_ground";
+        public static string AnchorForOrigin(string origin) => IsParentOrigin(origin) ? "parent_event" : IsAimOrigin(origin) ? "aim_point" : "caster";
+        public static int MinimumVortexAngularSpeed(string intensity) => intensity == "violent" ? 720000 : intensity == "brisk" ? 360000 : 180000;
+    }
+
+    public static class SpellVfxResources
+    {
+        public static readonly string[] All = {
+            "kpp_circle_01", "kpp_circle_03", "kpp_fire_01", "kpp_flame_01",
+            "kpp_magic_01", "kpp_slash_01", "kpp_smoke_01", "kpp_spark_01",
+            "kpp_spark_05", "kpp_star_01", "kpp_trace_01", "kpp_twirl_01",
+            "ksp_black_smoke_00", "ksp_explosion_00", "ksp_poison_puff_00", "ksp_white_puff_00"
+        };
     }
 
     public sealed class SpellVisualLifecycle

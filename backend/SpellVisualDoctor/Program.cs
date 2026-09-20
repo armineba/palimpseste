@@ -119,7 +119,8 @@ internal static class VisualDoctor
                 description = a.Utf8!;
             }
             phase = "description_validation";
-            var descriptionIssues = SpellCompiler.ValidateWholeImageDescriptionJson(description, true, true, requireLifecycle: true);
+            var descriptionIssues = SpellCompiler.ValidateWholeImageDescriptionJson(description, true, true,
+                requireLifecycle: true, requireBehavior: true);
             report["description_issue_codes"] = descriptionIssues.Select(issue => issue.Code).Distinct().ToArray();
             if (descriptionIssues.Count != 0) throw new ProbeFailure("description_rejected");
             await File.WriteAllBytesAsync(Path.Combine(cache, "description.json"), description, ct);
@@ -170,19 +171,60 @@ internal static class VisualDoctor
                 size_bytes = visualBytes.Length, width_px = dimensions.Width, height_px = dimensions.Height,
                 description_sha256 = Hash(description), prompt_version = LunaCodexProvider.PromptGVersion };
 
+            SpellReferenceResearch? research = null;
+            if (typedDescription.behaviors is not null)
+            {
+                phase = "reference_research";
+                await CheckpointAsync();
+                byte[] researchBytes;
+                var reusedResearch = reused is { } historicReport &&
+                    historicReport.TryGetProperty("reference_research_completed", out var researchCompleted) && researchCompleted.GetBoolean();
+                if (reusedResearch)
+                {
+                    var previousResearch = reused!.Value;
+                    var previousResearchPath = Path.Combine(previousResearch.GetProperty("cache_directory").GetString()!, "reference-research.json");
+                    if (!settings.IsTrustedInputFile(previousResearchPath)) throw new ProbeFailure("reuse_research_untrusted");
+                    researchBytes = await ReadBoundedAsync(previousResearchPath, 160_000, ct);
+                    if (Hash(researchBytes) != previousResearch.GetProperty("reference_research_sha256").GetString())
+                        throw new ProbeFailure("reuse_research_hash");
+                    research = SpellReferenceResearch.Read(researchBytes, Hash(description), imageHash);
+                }
+                else
+                {
+                    if (CanReuse("b")) throw new ProbeFailure("reuse_plan_research_missing");
+                    research = await new SpellReferenceResearchResolver(spec).ResolveAsync(description, reference, ct);
+                    researchBytes = Encoding.UTF8.GetBytes(research.Json);
+                }
+                using (var researchDocument = JsonDocument.Parse(researchBytes))
+                {
+                    var researchRoot = researchDocument.RootElement;
+                    if (researchRoot.GetProperty("catalog_sha256").GetString() != specHashes["assets/sourced-vfx/catalogue.json"] ||
+                        researchRoot.GetProperty("reference_index_sha256").GetString() != specHashes["assets/sourced-vfx/references.json"])
+                        throw new ProbeFailure("research_spec_binding");
+                }
+                var researchPath = Path.Combine(cache, "reference-research.json");
+                await using (var researchFile = new FileStream(researchPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                    await researchFile.WriteAsync(researchBytes, ct);
+                report["reference_research_sha256"] = research.Sha256;
+                report["reference_research_path"] = researchPath;
+                report["reference_research_reused"] = reusedResearch;
+                report["reference_research_completed"] = true;
+                await CheckpointAsync();
+            }
+
             byte[] plan;
             if (CanReuse("b")) plan = await ReuseDocumentAsync("b", "plan.json");
             else
             {
                 await BeforeCallAsync("b");
                 var b = await provider.ProbePlanAsync(runId.ToString("N"), Guid.NewGuid().ToString("N"), description,
-                    geometryContext, capabilities, reference, ct);
+                    geometryContext, capabilities, reference, ct, research: research);
                 await RecordStageAsync("b", b.Transport, b.Utf8, b.Sha256);
                 RequireStage(b.Transport, b.Utf8, settings, "B");
                 plan = b.Utf8!;
             }
             phase = "plan_validation";
-            var planIssues = SpellCompiler.ValidatePlanJson(description, plan, geometry.GeometryJson, geometry.MaskPng, metadata);
+            var planIssues = SpellCompiler.ValidatePlanJson(description, plan, geometry.GeometryJson, geometry.MaskPng, metadata, research?.Sha256);
             report["plan_issue_codes"] = planIssues.Select(issue => issue.Code).Distinct().ToArray();
             report["plan_validation_status"] = planIssues.Count == 0 ? "success" : "rejected";
             if (planIssues.Count != 0) throw new ProbeFailure("plan_rejected");
@@ -197,8 +239,8 @@ internal static class VisualDoctor
                 GeometryArtifactIds = geometry.GeometryJson.ToDictionary(pair => pair.Key, pair => ArtifactId("geometry:" + pair.Key, Hash(pair.Value))),
                 MaskArtifactIds = geometry.MaskPng.ToDictionary(pair => pair.Key, pair => ArtifactId("mask:" + pair.Key, Hash(pair.Value))),
                 SpellId = "visual-probe-" + runId.ToString("N"), ParchmentId = "visual-probe-" + runId.ToString("N"),
-                CreatedAt = DateTimeOffset.UtcNow.ToString("o"), MinimumClientVersion = "1.4.0",
-                SignatureSeedHex = inputHashes["drawing"][..16], VisualReference = metadata,
+                CreatedAt = DateTimeOffset.UtcNow.ToString("o"), MinimumClientVersion = "1.5.0",
+                SignatureSeedHex = inputHashes["drawing"][..16], VisualReference = metadata, ReferenceResearchSha256 = research?.Sha256,
                 Provenance = new SpellProvenance { mode = "drawing", capture_sha256 = inputHashes["drawing"], reference_sha256 = inputHashes["reference"],
                     model_a = settings.InterpreterModel, model_b = settings.Model, prompt_a_version = LunaCodexProvider.PromptAVersion,
                     prompt_b_version = LunaCodexProvider.PromptBVersion, response_a_id = null, response_b_id = null }
@@ -364,7 +406,8 @@ internal static class VisualDoctor
         string[] files = ["prompts/01_MODEL_A_INTERPRETE.md", "prompts/02_MODEL_B_TRADUCTEUR.md", "prompts/03_REPARATION_TECHNIQUE.md",
             "prompts/04_IMAGE_REFERENCE.md", "prompts/05_VISUAL_CRITIC.md", "contracts/capability-catalog.json", "contracts/effect-recipes.json",
             "contracts/effect-recipes-prompt.json", "contracts/codex/model-a.output-schema.json", "contracts/codex/model-b.output-schema.json",
-            "contracts/codex/model-g.output-schema.json", "contracts/codex/model-j.output-schema.json"];
+            "contracts/codex/model-g.output-schema.json", "contracts/codex/model-j.output-schema.json",
+            "assets/sourced-vfx/catalogue.json", "assets/sourced-vfx/references.json"];
         return files.ToDictionary(file => file, file => {
             var path = Path.Combine(spec, file);
             if (!CodexSettings.IsTrustedFile(path, settings.TrustedSpecificationRoot)) throw new ProbeFailure("spec_file_untrusted");
@@ -386,7 +429,7 @@ internal static class VisualDoctor
             new FileInfo(manifestPath).Length > 128_000 || CodexSettings.ComputeExecutableSha256(manifestPath) != hash)
             throw new ProbeFailure("renderer_manifest_mismatch");
         using var manifest = JsonDocument.Parse(File.ReadAllBytes(manifestPath));
-        if (manifest.RootElement.GetProperty("version").GetString() != "1.4.0") throw new ProbeFailure("renderer_version_mismatch");
+        if (manifest.RootElement.GetProperty("version").GetString() != "1.5.0") throw new ProbeFailure("renderer_version_mismatch");
         foreach (var entry in manifest.RootElement.GetProperty("files").EnumerateArray())
         {
             var file = Path.GetFullPath(Path.Combine(directory, entry.GetProperty("file").GetString()!));

@@ -1,0 +1,679 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "sp.description/1.0"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1800
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "core",
+              "ring",
+              "outer",
+              "full"
+            ]
+          },
+          "visible_feature": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 320
+          },
+          "interpretation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400
+          }
+        },
+        "required": [
+          "id",
+          "region",
+          "visible_feature",
+          "interpretation"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 24
+    },
+    "clauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "mechanical",
+              "visual_only"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "observation_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "minItems": 1,
+            "maxItems": 12
+          },
+          "facts": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "carrier"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "projectile",
+                        "beam",
+                        "field",
+                        "pulse",
+                        "barrier",
+                        "trap"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "effect"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "damage",
+                        "heal",
+                        "impulse",
+                        "burn",
+                        "wet",
+                        "slow",
+                        "bleed",
+                        "poison",
+                        "freeze_damage",
+                        "regen",
+                        "barrier_health",
+                        "vulnerability",
+                        "weakness",
+                        "haste",
+                        "armor_break",
+                        "damage_reduction",
+                        "healing_reduction",
+                        "root",
+                        "stun",
+                        "cleanse",
+                        "dispel",
+                        "life_steal",
+                        "execute",
+                        "shatter"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "target"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "hostile",
+                        "ally",
+                        "self",
+                        "all_actors",
+                        "environment"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "motion"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "straight",
+                        "curve",
+                        "homing",
+                        "stationary",
+                        "expanding"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "event"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "spawn",
+                        "hit",
+                        "enter",
+                        "tick",
+                        "trigger",
+                        "block",
+                        "expire"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "affinity"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "fire",
+                        "water",
+                        "stone",
+                        "air"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "pattern"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "solid",
+                        "double",
+                        "dotted",
+                        "irregular"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "palette"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "ember",
+                        "lava",
+                        "ice",
+                        "water",
+                        "moss",
+                        "stone",
+                        "storm",
+                        "arcane",
+                        "shadow",
+                        "light"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "const": "recipe",
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "r_armure_fendue",
+                        "r_averse",
+                        "r_benediction_complete",
+                        "r_braise",
+                        "r_braise_de_grace",
+                        "r_braises_entravantes",
+                        "r_cautere_de_soin",
+                        "r_cendre_affaiblissante",
+                        "r_cendre_exposante",
+                        "r_cendre_lourde",
+                        "r_choc_neural",
+                        "r_coup_epuisant",
+                        "r_crochet_entravant",
+                        "r_dard_venimeux",
+                        "r_dard_venimeux_armure",
+                        "r_dard_venimeux_choc",
+                        "r_dard_venimeux_faible",
+                        "r_dard_venimeux_fin",
+                        "r_dard_venimeux_fragile",
+                        "r_dard_venimeux_lent",
+                        "r_dard_venimeux_lien",
+                        "r_dard_venimeux_recul",
+                        "r_dard_venimeux_soin",
+                        "r_dissipation",
+                        "r_dissipation_exposante",
+                        "r_dissipation_siderante",
+                        "r_eau_liante",
+                        "r_eau_lourde",
+                        "r_eclat_givre_armure",
+                        "r_eclat_givre_choc",
+                        "r_eclat_givre_faible",
+                        "r_eclat_givre_fin",
+                        "r_eclat_givre_fragile",
+                        "r_eclat_givre_lent",
+                        "r_eclat_givre_lien",
+                        "r_eclat_givre_recul",
+                        "r_eclat_glacial",
+                        "r_egide",
+                        "r_egide_mobile",
+                        "r_egide_resistante",
+                        "r_elan",
+                        "r_entaille",
+                        "r_entaille_liante_sterile",
+                        "r_entaille_lourde_epuisante",
+                        "r_entaille_recul_expose",
+                        "r_eruption_repulsive",
+                        "r_estoc_saignant_armure",
+                        "r_estoc_saignant_choc",
+                        "r_estoc_saignant_faible",
+                        "r_estoc_saignant_fin",
+                        "r_estoc_saignant_fragile",
+                        "r_estoc_saignant_lent",
+                        "r_estoc_saignant_lien",
+                        "r_estoc_saignant_recul",
+                        "r_estoc_saignant_soin",
+                        "r_faille",
+                        "r_fin_exposante",
+                        "r_fin_perforante",
+                        "r_fin_sanglante",
+                        "r_fin_venimeuse",
+                        "r_finisseur",
+                        "r_fracas_de_caisse",
+                        "r_frappe_pesante",
+                        "r_fusion_d_armure",
+                        "r_gelure",
+                        "r_givre_assommant",
+                        "r_givre_exposant",
+                        "r_givre_faible",
+                        "r_givre_immobilisant",
+                        "r_givre_lourd_liant",
+                        "r_givre_pesant",
+                        "r_givre_recul_siderant",
+                        "r_impact",
+                        "r_impact_dissipant",
+                        "r_inertie",
+                        "r_lame_incandescente",
+                        "r_lame_ouverte",
+                        "r_lave_assommante",
+                        "r_lave_cauterisante",
+                        "r_lave_corrosive",
+                        "r_lave_entravante",
+                        "r_lave_epuisante",
+                        "r_lave_fissurante",
+                        "r_lave_liante_sterile",
+                        "r_lave_lourde_exposante",
+                        "r_lave_recul_perforant",
+                        "r_lave_visqueuse",
+                        "r_lien_immobile",
+                        "r_marteau_assommant",
+                        "r_masse_repulsive",
+                        "r_perce_armure",
+                        "r_plaie_fermee",
+                        "r_pointe_de_grace",
+                        "r_pointe_fragilisante",
+                        "r_ponction",
+                        "r_ponction_ardente",
+                        "r_ponction_epuisante",
+                        "r_ponction_exposante",
+                        "r_ponction_glaciale",
+                        "r_ponction_perforante",
+                        "r_ponction_pesante",
+                        "r_ponction_sanglante",
+                        "r_ponction_venimeuse",
+                        "r_projection_exposante",
+                        "r_projection_liante",
+                        "r_projection_siderante",
+                        "r_purge",
+                        "r_purge_regenerante",
+                        "r_purge_resistante",
+                        "r_recul",
+                        "r_regain",
+                        "r_regain_mobile",
+                        "r_regain_protege",
+                        "r_regain_resistant",
+                        "r_resistance",
+                        "r_restauration_renforcee",
+                        "r_saignee_anti_soin",
+                        "r_saignee_corrosive",
+                        "r_saignee_entravante",
+                        "r_saignee_epuisante",
+                        "r_saignee_exposante",
+                        "r_saignee_lente",
+                        "r_secours_purifiant",
+                        "r_soin",
+                        "r_soin_durable",
+                        "r_soin_etrangle",
+                        "r_soin_mobile",
+                        "r_soin_protege",
+                        "r_soin_purifiant",
+                        "r_soin_resistant",
+                        "r_souffle_ardent",
+                        "r_torpeur",
+                        "r_venin",
+                        "r_venin_anti_soin",
+                        "r_venin_debilitant",
+                        "r_venin_entravant",
+                        "r_venin_epuisant_expose",
+                        "r_venin_exposant",
+                        "r_venin_fissurant",
+                        "r_venin_lourd_sterile",
+                        "r_venin_pesant"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "dimension": {
+                      "type": "string",
+                      "const": "visual_form"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "boulder",
+                        "meteor",
+                        "crystal",
+                        "blade",
+                        "spear",
+                        "hammer",
+                        "orb",
+                        "fireball",
+                        "lightning",
+                        "wave",
+                        "vortex",
+                        "chain",
+                        "vine",
+                        "tentacle",
+                        "shield",
+                        "skull",
+                        "spirit",
+                        "wolf",
+                        "bird",
+                        "serpent",
+                        "golem"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "dimension",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "minItems": 0,
+            "maxItems": 16
+          }
+        },
+        "required": [
+          "id",
+          "subject_id",
+          "kind",
+          "text",
+          "observation_ids",
+          "facts"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 16
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source_subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "event": {
+            "type": "string",
+            "enum": [
+              "hit",
+              "expire",
+              "trigger",
+              "tick",
+              "block",
+              "enter"
+            ]
+          },
+          "target_subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "max_activations": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "clause_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+            },
+            "minItems": 1,
+            "maxItems": 8
+          }
+        },
+        "required": [
+          "source_subject_id",
+          "event",
+          "target_subject_id",
+          "max_activations",
+          "clause_ids"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 16
+    },
+    "shape_requests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "core",
+              "ring",
+              "outer",
+              "full"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "path",
+              "footprint",
+              "silhouette",
+              "distribution"
+            ]
+          }
+        },
+        "required": [
+          "subject_id",
+          "region",
+          "role"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 16
+    },
+    "lifecycle": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "appearance": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800,
+            "pattern": "\\S"
+          },
+          "active": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800,
+            "pattern": "\\S"
+          },
+          "contact": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800,
+            "pattern": "\\S"
+          },
+          "expiration": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "subject_id",
+          "appearance",
+          "active",
+          "contact",
+          "expiration"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 16
+    }
+  },
+  "required": [
+    "schema_version",
+    "title",
+    "summary",
+    "observations",
+    "clauses",
+    "relations",
+    "shape_requests",
+    "lifecycle"
+  ],
+  "additionalProperties": false
+}

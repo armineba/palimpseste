@@ -15,6 +15,7 @@ namespace Palimpseste.Game.Service
         public string[] Observations { get; private set; }
         public string[] Clauses { get; private set; }
         public string[] Lifecycle { get; private set; }
+        public string[] Behaviors { get; private set; }
 
         public static bool TryRead(byte[] utf8, out SpellDescriptionView view)
         {
@@ -70,11 +71,32 @@ namespace Palimpseste.Game.Service
                     }
                 }
 
+                var behaviorLines = new List<string>();
+                if (root["behaviors"] is JArray behaviors)
+                    foreach (var item in behaviors)
+                    {
+                        if (item is not JObject behavior) return false;
+                        var origin = Text(behavior,"origin",1,32);
+                        var phenomenon = Text(behavior,"phenomenon",1,24);
+                        var travel = Text(behavior,"travel",1,24);
+                        if (origin == null || phenomenon == null || travel == null) return false;
+                        var placement = origin switch {
+                            "aim_ground" => "Au sol à l'endroit visé", "caster_ground" => "Au sol sous le lanceur",
+                            "aim_point" => "Au point visé", "muzzle" => "Devant le lanceur", "caster" => "Depuis le lanceur",
+                            "parent_ground" => "Au sol au point de contact", _ => "À l'endroit de l'événement précédent"
+                        };
+                        var motion = phenomenon switch {
+                            "vortex" => "tourbillon en rotation continue", "spin" => "rotation continue", "orbit" => "mouvement orbital",
+                            "flow" => "matière en écoulement", "flutter" => "ondulations", "turbulence" => "mouvement turbulent", _ => "forme stable"
+                        };
+                        behaviorLines.Add(placement + " · " + motion + (travel == "ballistic" ? " · trajectoire en cloche" : "") +
+                            (Text(behavior,"attachment",1,16) == "caster" ? " · suit le lanceur" : ""));
+                    }
                 view = new SpellDescriptionView
                 {
                     Title = title, Summary = summary,
                     Observations = observationLines.ToArray(), Clauses = clauseLines.ToArray(),
-                    Lifecycle = lifecycleLines.ToArray()
+                    Lifecycle = lifecycleLines.ToArray(), Behaviors = behaviorLines.ToArray()
                 };
                 return true;
             }

@@ -50,6 +50,13 @@
         "null"
       ],
       "pattern": "^[0-9a-f]{64}$"
+    },
+    "reference_research_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
     }
   },
   "required": [
@@ -58,7 +65,8 @@
     "catalog_version",
     "rules_profile",
     "nodes",
-    "visual_reference_sha256"
+    "visual_reference_sha256",
+    "reference_research_sha256"
   ],
   "additionalProperties": false,
   "$defs": {
@@ -413,6 +421,31 @@
             },
             "lifecycle": {
               "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
             }
           },
           "required": [
@@ -423,7 +456,8 @@
             "form",
             "vfx",
             "construction",
-            "lifecycle"
+            "lifecycle",
+            "resource_id"
           ],
           "additionalProperties": false
         },
@@ -463,7 +497,8 @@
               "enum": [
                 "straight",
                 "curve",
-                "homing"
+                "homing",
+                "ballistic"
               ]
             },
             "turn_mdeg_s": {
@@ -504,6 +539,12 @@
             "pierces"
           ],
           "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
         }
       },
       "required": [
@@ -518,7 +559,9 @@
         "rotation_mdeg",
         "appearance",
         "effects",
-        "options"
+        "options",
+        "behavior",
+        "physics"
       ],
       "additionalProperties": false
     },
@@ -720,6 +763,31 @@
             },
             "lifecycle": {
               "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
             }
           },
           "required": [
@@ -730,7 +798,8 @@
             "form",
             "vfx",
             "construction",
-            "lifecycle"
+            "lifecycle",
+            "resource_id"
           ],
           "additionalProperties": false
         },
@@ -796,6 +865,12 @@
             "chain_filter"
           ],
           "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
         }
       },
       "required": [
@@ -810,7 +885,9 @@
         "rotation_mdeg",
         "appearance",
         "effects",
-        "options"
+        "options",
+        "behavior",
+        "physics"
       ],
       "additionalProperties": false
     },
@@ -1012,6 +1089,31 @@
             },
             "lifecycle": {
               "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
             }
           },
           "required": [
@@ -1022,7 +1124,8 @@
             "form",
             "vfx",
             "construction",
-            "lifecycle"
+            "lifecycle",
+            "resource_id"
           ],
           "additionalProperties": false
         },
@@ -1059,6 +1162,12 @@
             "tick_interval"
           ],
           "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
         }
       },
       "required": [
@@ -1073,7 +1182,9 @@
         "rotation_mdeg",
         "appearance",
         "effects",
-        "options"
+        "options",
+        "behavior",
+        "physics"
       ],
       "additionalProperties": false
     },
@@ -1275,6 +1386,31 @@
             },
             "lifecycle": {
               "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
             }
           },
           "required": [
@@ -1285,7 +1421,8 @@
             "form",
             "vfx",
             "construction",
-            "lifecycle"
+            "lifecycle",
+            "resource_id"
           ],
           "additionalProperties": false
         },
@@ -1322,6 +1459,12 @@
             "front_width_cm"
           ],
           "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
         }
       },
       "required": [
@@ -1336,7 +1479,9 @@
         "rotation_mdeg",
         "appearance",
         "effects",
-        "options"
+        "options",
+        "behavior",
+        "physics"
       ],
       "additionalProperties": false
     },
@@ -1538,6 +1683,31 @@
             },
             "lifecycle": {
               "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
             }
           },
           "required": [
@@ -1548,7 +1718,8 @@
             "form",
             "vfx",
             "construction",
-            "lifecycle"
+            "lifecycle",
+            "resource_id"
           ],
           "additionalProperties": false
         },
@@ -1597,6 +1768,12 @@
             "block_limit"
           ],
           "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
         }
       },
       "required": [
@@ -1611,7 +1788,9 @@
         "rotation_mdeg",
         "appearance",
         "effects",
-        "options"
+        "options",
+        "behavior",
+        "physics"
       ],
       "additionalProperties": false
     },
@@ -1813,6 +1992,31 @@
             },
             "lifecycle": {
               "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
             }
           },
           "required": [
@@ -1823,7 +2027,8 @@
             "form",
             "vfx",
             "construction",
-            "lifecycle"
+            "lifecycle",
+            "resource_id"
           ],
           "additionalProperties": false
         },
@@ -1883,6 +2088,12 @@
             "height_cm"
           ],
           "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
         }
       },
       "required": [
@@ -1897,7 +2108,9 @@
         "rotation_mdeg",
         "appearance",
         "effects",
-        "options"
+        "options",
+        "behavior",
+        "physics"
       ],
       "additionalProperties": false
     },
@@ -2224,6 +2437,178 @@
         "active",
         "contact",
         "expiration"
+      ],
+      "additionalProperties": false
+    },
+    "behavior_intent": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "muzzle",
+            "aim_point",
+            "caster_ground",
+            "aim_ground",
+            "parent_event",
+            "parent_ground"
+          ]
+        },
+        "orientation": {
+          "type": "string",
+          "enum": [
+            "cast_forward",
+            "world_up",
+            "surface_normal"
+          ]
+        },
+        "attachment": {
+          "type": "string",
+          "enum": [
+            "world",
+            "caster"
+          ]
+        },
+        "phenomenon": {
+          "type": "string",
+          "enum": [
+            "static",
+            "spin",
+            "vortex",
+            "orbit",
+            "flow",
+            "flutter",
+            "turbulence"
+          ]
+        },
+        "axis": {
+          "type": "string",
+          "enum": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "sense": {
+          "type": "string",
+          "enum": [
+            "clockwise",
+            "counterclockwise"
+          ]
+        },
+        "intensity": {
+          "type": "string",
+          "enum": [
+            "gentle",
+            "brisk",
+            "violent"
+          ]
+        },
+        "travel": {
+          "type": "string",
+          "enum": [
+            "stationary",
+            "straight",
+            "curve",
+            "homing",
+            "ballistic"
+          ]
+        }
+      },
+      "required": [
+        "subject_id",
+        "origin",
+        "orientation",
+        "attachment",
+        "phenomenon",
+        "axis",
+        "sense",
+        "intensity",
+        "travel"
+      ],
+      "additionalProperties": false
+    },
+    "physics_profile": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "cast_range_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "offset_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -500,
+            "maximum": 500
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "angular_speed_mdeg_s": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2880000
+        },
+        "axial_speed_cm_s": {
+          "type": "integer",
+          "minimum": -3000,
+          "maximum": 3000
+        },
+        "radial_speed_cm_s": {
+          "type": "integer",
+          "minimum": -3000,
+          "maximum": 3000
+        },
+        "radius_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "turbulence_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 300
+        },
+        "frequency_mhz": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6000
+        },
+        "gravity_cm_s2": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4000
+        },
+        "launch_pitch_mdeg": {
+          "type": "integer",
+          "minimum": -80000,
+          "maximum": 80000
+        }
+      },
+      "required": [
+        "cast_range_cm",
+        "offset_cm",
+        "angular_speed_mdeg_s",
+        "axial_speed_cm_s",
+        "radial_speed_cm_s",
+        "radius_cm",
+        "turbulence_cm",
+        "frequency_mhz",
+        "gravity_cm_s2",
+        "launch_pitch_mdeg"
       ],
       "additionalProperties": false
     }

@@ -4,6 +4,18 @@ Ces scripts configurent le profil du worker runtime hors du dÃ©pÃ´t. Ils ne
 copient pas `auth.json`, ne lisent pas le `CODEX_HOME` personnel et ne crÃ©ent
 aucun endpoint de prompt libre.
 
+## Mise à jour D15 / 1.5.0
+
+Les scripts sont préparés pour **`WindowsBehaviorRelease` → `WindowsBehaviorPlayable`**, journal `game/Logs/behavior-build.log`. Cette préparation ne constitue pas une preuve de build ou de déploiement ; consulter [l'état réel](../docs/IMPLEMENTATION_STATUS.md).
+
+- `package-lifecycle-player.ps1` attend un build réussi `1.5.0`. Il conserve le chemin historique `evidence/public/unity/lifecycle-delivery.json`, avec version et nom D15 explicites, sauvegarde la livraison précédente et ajoute les deux notices CC0 des textures ainsi que la licence MIT du bruit HLSL sous `ThirdPartyNotices/`. Le manifeste distingue fichiers du build et licences ajoutées au packaging. Le script n'ouvre jamais le jeu.
+- `package-backend.ps1` publie les programmes et inclut les migrations `001` à `010`. La spécification exporte `assets/sourced-vfx/catalogue.json`, `references.json`, les licences et les PNG. Les exemples HLSL `reference-code` et scripts d'import restent hors de la spécification runtime.
+- `deploy-lifecycle.ps1 -StageRoot <stage-publié>` installe le Player protégé `1.5.0` et met à jour **le laboratoire existant**. Il vérifie le prérequis de schéma D14 et applique **uniquement `010_behavior_research.sql`** provenant du stage, après arrêt de l'admission et du worker sans job actif. Il ne lance aucun diagnostic, modèle ou essai de jeu.
+
+**Ne pas rejouer `009_visual_review.sql` après D15** : sa contrainte n'autorise que les versions de parcours `0,1,2`, alors que `010` permet aussi `3`. Pour une **base neuve**, l'opérateur applique une seule fois toutes les migrations `001` à `010` dans l'ordre des noms, après préparation de sa connexion privée. Le script de mise à jour ci-dessus ne remplace pas cette initialisation complète. Les archives conservent les migrations triées pour cette installation.
+
+La recherche avant construction consulte les sources primaires sélectionnées dans `references.json` ; les PNG réutilisés restent liés à 16 identifiants connus. Le renderer s'appuie sur des données contrôlées, sans chargement de shader source ou installation de plugin à la demande du joueur. Voir [les ressources et licences](../docs/references-vfx-sources.md).
+
 ## Archive réservée à l'opérateur
 
 Le ZIP backend contient des scripts `ops` de provisionnement, sauvegarde et

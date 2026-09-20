@@ -1,6 +1,16 @@
 # Tester le lecteur actuel
 
-## Essayer le nouveau parcours — D13 / 1.3.0
+## Parcours D15 / 1.5.0
+
+Le Player 1.5.0 a été construit et empaqueté. L'état d'installation du service est indiqué dans [le point de reprise](NEXT_ACTIONS.md) et [la preuve D15](../evidence/public/backend/behavior-d15.json).
+
+Ouvrir le raccourci Bureau **Palimpseste Spell Lab**, puis dessiner **un nouveau parchemin**. Relâcher la souris entre les traits ; cliquer **Dessin terminé** une fois le dessin complet. Attendre la description, l'image cible, la recherche de ressources, la construction et les ajustements Pro. Ouvrir ensuite le laboratoire et cliquer dans l'arène pour lancer le sort.
+
+Les nouveaux sorts portent leurs intentions de placement, déplacement et animation. Le mouvement de la matière est distinct du voyage du projectile et de ses effets. Dans un sort au sol ciblé, viser le lieu où l'on veut le poser. Les paquets déjà enregistrés gardent leurs données ; les rouvrir ne les convertit pas au nouveau système.
+
+Comparer librement ce qui est décrit au placement, au mouvement, au contact et à la disparition observés. Les compilations réussies ne valent pas validation de ces comportements ni acceptation artistique : les essais de cette version sont laissés au créateur.
+
+## Historique — parcours D13 / 1.3.0
 
 **Le jeu `1.3.0` est ouvert et le service local est prêt.** Le Player PID `39012` a été lancé le 20 septembre à 20:11:04 UTC, fenêtre réactive, et le raccourci Bureau **Palimpseste Spell Lab** est actualisé. [Preuve de livraison](../evidence/public/unity/image-reference-delivery.json) · [Déploiement local](../evidence/public/backend/image-reference-deployment-2026-09-20.json). Dans le jeu :
 
