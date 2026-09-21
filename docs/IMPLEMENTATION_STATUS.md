@@ -1,6 +1,14 @@
 # État de réalisation et point de reprise
 
-## État courant — D16 / 1.6.0 construit et installé
+## État courant — correctif backend D16.1, Player 1.6.0 conservé
+
+Le dernier parcours joueur « Foudre sous l’Enclume » a produit sa description, sa planche 3 × 7, trois plans et deux verdicts admissibles. Le troisième J avait renvoyé un hash de plan erroné, bloquant la livraison. Le backend corrige cette cause par des empreintes imposées dans le schéma J, des diagnostics précis et une finalisation depuis le meilleur candidat déjà évalué en cas de J définitivement invalide.
+
+**Publication et installation réussies avec le code 0.** La reprise ciblée du job est **ready à 07:33:56 Paris le 21 septembre**, avec **8 appels avant et après**, deux critiques admises et trois dossiers de capture avant et après. Révision 1 sélectionnée, score réel **4190/10000**, cycle encore jugé non fidèle. Aucun nouveau modèle, capture ou test exécuté pour cette reprise ; aucun rebuild Unity. [Preuve D16.1](../evidence/public/backend/visual-judge-fix-d16-1.json) · [Explication](D16_JUDGE_RECOVERY.md) · [Point de reprise](NEXT_ACTIONS.md).
+
+Le joueur peut actualiser son parchemin et lancer le sort disponible. Le rendu reste à apprécier humainement ; les prochains appels J avec schéma fixé restent à observer. Le ZIP backend courant est indexé dans [la livraison](../evidence/public/backend/lifecycle-delivery.json).
+
+## Historique — D16 / 1.6.0 construit et installé
 
 Le format demandé est implémenté : titre, fond sombre, trois lignes APPARITION / STABLE / DISPARITION et sept cases numérotées. La description reste l’autorité du comportement, la planche guide sa réalisation visuelle. Le PNG natif est conservé avant la mise en page fixe, avec un SHA distinct. B construit un seul sort animé ; J compare sept poses réelles de chaque phase dans la boucle de génération joueur.
 

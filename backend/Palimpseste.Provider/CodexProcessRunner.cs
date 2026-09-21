@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Encodings.Web;
 
 namespace Palimpseste.Provider;
@@ -67,6 +68,13 @@ public sealed class CodexProcessRunner
             (!string.Equals(attempt.Images[0], visualReference.PngPath, StringComparison.OrdinalIgnoreCase) ||
              visualReference.Sha256.Length != 64 || visualReference.Sha256.Any(c => c is not (>= 'a' and <= 'f') and not (>= '0' and <= '9'))))
             return Failure(ProviderOutcome.IsolationViolation, "visual_reference_binding_invalid", started);
+        if (attempt.Stage == "J" && attempt.JudgementBinding is null ||
+            attempt.JudgementBinding is { } binding &&
+            (attempt.Stage != "J" || !IsLowerSha256(binding.DescriptionSha) ||
+             !IsLowerSha256(binding.PlanSha) || !IsLowerSha256(binding.ReferenceSha) ||
+             binding.ReferenceSha != attempt.VisualReference?.Sha256 ||
+             binding.ReferenceSha != attempt.ImageSha256?[0]))
+            return Failure(ProviderOutcome.IsolationViolation, "visual_judgement_binding_invalid", started);
         if (!settings.IsTrustedSpecificationFile(attempt.SchemaPath) ||
             string.IsNullOrWhiteSpace(attempt.Prompt) || attempt.Prompt.Length > 200_000 ||
             string.IsNullOrWhiteSpace(attempt.JobId) || attempt.JobId.Length > 256)
@@ -93,9 +101,19 @@ public sealed class CodexProcessRunner
         {
             // Whitespace and escaped French text inflated each isolated call.
             // Compact the same schema without removing any constraint.
-            using var schema = JsonDocument.Parse(await File.ReadAllTextAsync(attempt.SchemaPath, cancellationToken));
-            await File.WriteAllTextAsync(schemaPath, JsonSerializer.Serialize(schema.RootElement,
-                new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }), new UTF8Encoding(false), cancellationToken);
+            var schema = JsonNode.Parse(await File.ReadAllTextAsync(attempt.SchemaPath, cancellationToken))
+                ?? throw new InvalidDataException("trusted_schema_missing");
+            if (attempt.JudgementBinding is { } expected)
+            {
+                // Only the private per-attempt copy is constrained. The trusted
+                // source, its patterns and every other constraint stay intact.
+                PinJudgementHash(schema, "description_sha256", expected.DescriptionSha);
+                PinJudgementHash(schema, "plan_sha256", expected.PlanSha);
+                PinJudgementHash(schema, "visual_reference_sha256", expected.ReferenceSha);
+            }
+            var schemaBytes = Encoding.UTF8.GetBytes(schema.ToJsonString(
+                new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+            await File.WriteAllBytesAsync(schemaPath, schemaBytes, cancellationToken);
             await File.WriteAllTextAsync(Path.Combine(directory, "prompt.txt"), attempt.Prompt, Encoding.UTF8, cancellationToken);
             await File.WriteAllTextAsync(Path.Combine(directory, "attempt.json"), JsonSerializer.Serialize(new
             {
@@ -103,13 +121,20 @@ public sealed class CodexProcessRunner
                 requested_model = requestedModel, requested_effort = requestedEffort,
                 reported_model = (string?)null, reported_effort = (string?)null,
                 prompt_utf8_bytes = Encoding.UTF8.GetByteCount(attempt.Prompt),
-                schema_utf8_bytes = new FileInfo(schemaPath).Length,
+                schema_utf8_bytes = schemaBytes.Length,
+                schema_sha256 = Convert.ToHexStringLower(SHA256.HashData(schemaBytes)),
+                expected_bindings = attempt.JudgementBinding is { } provenance ? new
+                {
+                    description_sha256 = provenance.DescriptionSha,
+                    plan_sha256 = provenance.PlanSha,
+                    visual_reference_sha256 = provenance.ReferenceSha
+                } : null,
                 visual_reference_sha256 = attempt.VisualReference?.Sha256,
                 image_sha256 = attempt.ImageSha256,
                 prompt_sha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(attempt.Prompt)))
             }), Encoding.UTF8, cancellationToken);
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
         {
             return Failure(ProviderOutcome.IsolationViolation, "attempt_input_materialization_failed", started, directory: directory);
         }
@@ -314,6 +339,22 @@ public sealed class CodexProcessRunner
             try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
             return Failure(ProviderOutcome.IsolationViolation, "provider_access_denied", started, directory: directory, processStarted: processStarted);
         }
+    }
+
+    private static bool IsLowerSha256(string? value) => value is { Length: 64 } &&
+        value.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f');
+
+    private static void PinJudgementHash(JsonNode schema, string propertyName, string expected)
+    {
+        if (schema is not JsonObject root || root["properties"] is not JsonObject properties ||
+            properties[propertyName] is not JsonObject property ||
+            property["type"]?.GetValue<string>() != "string" ||
+            property["pattern"]?.GetValue<string>() != "^[0-9a-f]{64}$")
+            throw new InvalidDataException("trusted_judgement_schema_invalid");
+        if (property["enum"] is { } existing &&
+            (existing is not JsonArray allowed || !allowed.Any(value => value?.GetValue<string>() == expected)))
+            throw new InvalidDataException("trusted_judgement_schema_conflict");
+        property["enum"] = new JsonArray(JsonValue.Create(expected));
     }
 
     private CodexResult CreateFailure(string requestedModel, string requestedEffort, ProviderOutcome outcome, string code, DateTimeOffset started, int? exitCode = null,

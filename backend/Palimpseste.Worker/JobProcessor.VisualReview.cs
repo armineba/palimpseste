@@ -19,6 +19,9 @@ public sealed partial class JobProcessor
     {
         // The skill's critic loop is translated into fixed application actions.
         // Codex sees only data and images. Neither critic nor planner can run this renderer or a software build.
+        var reviewedFallback = await jobs.GetReviewedFallbackAfterInvalidJudgeAsync(job, Sha256(plan), ct);
+        if (reviewedFallback is not null)
+            return await FinalizeReviewedVisualPlanAsync(job, reviewedFallback, ct);
         const int targetScore = 10000;
         var originalMechanics = Mechanics(plan);
         string? previousVerdict = null;
@@ -47,6 +50,11 @@ public sealed partial class JobProcessor
                         judged.Document.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid",
                         judged.Document.Sha256, judged.Document.Transport.CliVersion, judged.Document.Transport.SessionId,
                         judged.Document.Transport.UsageJson, judged.Document.Transport.ErrorCode ?? "visual_judge_failed", ct);
+                    if (judged.Document.Transport.Outcome == ProviderOutcome.InvalidSchema)
+                    {
+                        reviewedFallback = await jobs.GetReviewedFallbackAfterInvalidJudgeAsync(job, Sha256(plan), ct);
+                        if (reviewedFallback is not null) break;
+                    }
                     await jobs.SetStateAsync(job, "needs_operator", "visual_judge_failed",
                         "Comparaison visuelle interrompue ; dessin, description, image et construction conservés", false, ct);
                     return null;
@@ -79,10 +87,21 @@ public sealed partial class JobProcessor
             var mechanicsChanged = result.Utf8 is not null && issues.Count == 0 && Mechanics(result.Utf8) != originalMechanics;
             if (result.Utf8 is null || issues.Count != 0 || mechanicsChanged)
             {
+                var stopForProvider = result.Transport.Outcome is ProviderOutcome.IsolationViolation or
+                    ProviderOutcome.Refusal or ProviderOutcome.TransportUncertain;
+                var refinementError = stopForProvider
+                    ? result.Transport.ErrorCode ?? "visual_refinement_" + result.Transport.Outcome.ToString().ToLowerInvariant()
+                    : mechanicsChanged ? "visual_refinement_changed_mechanics" : "visual_refinement_invalid";
                 await jobs.CompleteAttemptAsync(job, revisionAttempt,
                     result.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid",
                     result.Sha256, result.Transport.CliVersion, result.Transport.SessionId, result.Transport.UsageJson,
-                    mechanicsChanged ? "visual_refinement_changed_mechanics" : "visual_refinement_invalid", ct);
+                    refinementError, ct);
+                if (stopForProvider)
+                {
+                    await jobs.SetStateAsync(job, "needs_operator", "visual_refinement_failed",
+                        "Finalisation interrompue ; dessin, image et constructions conservés", false, ct);
+                    return null;
+                }
                 // Preserve the best already rendered and judged valid plan, never a broken refinement.
                 break;
             }
@@ -92,7 +111,12 @@ public sealed partial class JobProcessor
             plan = result.Utf8;
             planRecord = (await jobs.GetPlanAsync(job, ct))!;
         }
-        var best = await jobs.GetBestReviewedPlanAsync(job, ct);
+        var best = reviewedFallback ?? await jobs.GetBestReviewedPlanAsync(job, ct);
+        return await FinalizeReviewedVisualPlanAsync(job, best, ct);
+    }
+
+    private async Task<byte[]?> FinalizeReviewedVisualPlanAsync(ClaimedJob job, StoredDocument? best, CancellationToken ct)
+    {
         if (best is null)
         {
             await jobs.SetStateAsync(job, "needs_operator", "visual_review_missing", "Comparaison visuelle non terminée ; construction conservée", false, ct);

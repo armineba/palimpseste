@@ -1,0 +1,75 @@
+{
+    "schema_version":  "sp.delivery-evidence/1.0",
+    "delivery":  "D16.1 visual judge recovery",
+    "observed_at":  "2026-09-21T05:36:37.3226595+00:00",
+    "client_version":  "1.6.0",
+    "backend":  {
+                    "publish_exit":  0,
+                    "build_log_sha256":  "98021e6a90e114cacec8fe41bc5fd972ddcb0a545668d9c04fd72f96fd5f98a8",
+                    "deploy_exit":  0,
+                    "installed":  true,
+                    "deployed_at":  "2026-09-21T05:33:01.4105741+00:00",
+                    "worker_pid":  27356,
+                    "api_pid":  7512,
+                    "worker_sha256":  "b536dc0f78c2a5a991e96454822bc69c7749a5a0b7447427863b6a2fb3ba7abb",
+                    "api_sha256":  "47d50034ee315e64ae070282e171186a50cbcacc1d4f168129a61b5b600ea119",
+                    "renderer_manifest_sha256":  "487175e3182a03995b30687c7738251ec32020cbdb265e2794155d3aee9f2bf0",
+                    "native_codex_sha256":  "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+                    "local_only":  true
+                },
+    "unity":  {
+                  "build_reused":  true,
+                  "new_build_executed":  false,
+                  "client_version":  "1.6.0",
+                  "player_zip_sha256":  "24ca0f949892fd3017889e8c0a1f23c48cd69f63125174a36951525739c5507f",
+                  "player_zip_bytes":  46591080
+              },
+    "incident":  {
+                     "job_id":  "a5c8847cc9a141098d6d8dbd9b5a460e",
+                     "failed_attempt_id":  "b7559ea34fe247b7b58a042315b3ea02",
+                     "failed_stage":  "J",
+                     "worker_error":  "visual_judge_failed",
+                     "provider_error":  "visual_judgement_invalid",
+                     "precise_cause":  "plan_sha256 differs from immutable plan supplied to judge",
+                     "expected_plan_sha256":  "f712e4a7e44839dd8921f451d9e9f9f9f53d6a79f64d28f5509825eeb7e4f76f",
+                     "returned_plan_sha256":  "f712e4a7e44839dd8921f451d9e9f9f53d6a79f64d28f5509825eeb7e4f76f3e",
+                     "receipt_sha256":  "2f6c119910c18f4e04bf3ff791b0b5b02a3391df21ee5279d42baad995912c66",
+                     "rejected_score_not_used":  4000,
+                     "preceding_valid_scores":  [
+                                                    3420,
+                                                    4190
+                                                ]
+                 },
+    "recovery":  {
+                     "state":  "ready",
+                     "ready_at":  "2026-09-21T07:33:56.592985+02:00",
+                     "spell_id":  "d9edb40804314e0ea53fbc3c4fe221de",
+                     "compiled_sha256":  "52d4db1fc047de16b37512308a1b866348ec8b7d5ee3115d6ba264f77967bc1a",
+                     "selected_revision":  1,
+                     "selected_plan_sha256":  "c8401e51ff11af988975fdbd0e882ac24a16378ace329f8cb381a1bd77c7aea0",
+                     "selected_score":  4190,
+                     "selected_lifecycle_faithful":  false,
+                     "published_plan_diff_from_selected":  "Only the compiler omission of null nodes[0].appearance.signature_geometry_id",
+                     "attempts_before":  8,
+                     "attempts_after":  8,
+                     "provider_calls_added":  0,
+                     "capture_directories_before":  3,
+                     "capture_directories_after":  3,
+                     "captures_added":  0,
+                     "accepted_reviews_after":  2,
+                     "description_preserved":  true,
+                     "reference_sha256":  "4d18e78a9e02c9198a1d33770497c3b75f537b0e63718bb23c62c4c9c9253a3b",
+                     "raw_atlas_sha256":  "9ad48c958cfa64155c4445bab1da7b0d16fa4968b61a801602806074fd9d326a",
+                     "resume_sql_sha256":  "ce0ab5fac777b4bbcefe487f0497f51e79bbaade542862be3bcbe41bedb00e13"
+                 },
+    "verification":  {
+                         "test_suites_executed":  false,
+                         "developer_gameplay_trials":  0,
+                         "developer_generation_calls":  0,
+                         "developer_capture_replays":  0,
+                         "existing_player_job_recovered":  true,
+                         "new_schema_binding_live_call_executed":  false,
+                         "artistic_acceptance":  "pending_owner"
+                     },
+    "resume":  "Owner refreshes the existing parchment and tries the available spell. Its fidelity remains below the target according to the persisted critic."
+}

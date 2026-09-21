@@ -12,6 +12,13 @@ public sealed record StoredPlanProviderIdentity(string? Model, string? SessionId
 
 public sealed partial class JobRepository
 {
+    private static readonly string[] DefinitiveVisualJudgementErrors =
+    [
+        "visual_judgement_invalid", "visual_judgement_keys", "visual_judgement_description_hash",
+        "visual_judgement_plan_hash", "visual_judgement_reference_hash", "visual_judgement_score_range",
+        "visual_judgement_score_sum", "visual_judgement_issues_count", "visual_judgement_issue_text"
+    ];
+
     public async Task<StoredVisualReview?> GetVisualReviewAsync(ClaimedJob job, string planSha256, CancellationToken ct)
     {
         await using var cmd = source.CreateCommand("""
@@ -124,6 +131,42 @@ public sealed partial class JobRepository
         var count = await cmd.ExecuteScalarAsync(ct);
         if (count is null) throw new InvalidOperationException("fence_lost_on_visual_review_count");
         return checked((int)(long)count);
+    }
+
+    public async Task<StoredDocument?> GetReviewedFallbackAfterInvalidJudgeAsync(ClaimedJob job,
+        string currentPlanSha256, CancellationToken ct)
+    {
+        await using var cmd = source.CreateCommand("""
+            SELECT EXISTS (
+                SELECT 1 FROM jobs j
+                JOIN spell_plans current_plan ON current_plan.job_id=j.id AND current_plan.plan_sha256=$3
+                    AND current_plan.validation_errors IS NULL
+                JOIN artifacts current_artifact ON current_artifact.id=current_plan.plan_artifact_id
+                    AND current_artifact.owner_id=j.owner_id AND current_artifact.sha256=current_plan.plan_sha256
+                    AND current_artifact.kind='plan' AND current_artifact.content_type='application/json'
+                JOIN provider_attempts planner ON planner.id=current_plan.provider_attempt_id AND planner.job_id=j.id
+                    AND planner.stage IN ('B','repair_B') AND planner.status='success'
+                JOIN LATERAL (
+                    SELECT pa.stage,pa.status,pa.error_code,pa.started_at,pa.finished_at
+                    FROM provider_attempts pa WHERE pa.job_id=j.id
+                    ORDER BY pa.started_at DESC,pa.id DESC LIMIT 1
+                ) latest ON true
+                WHERE j.id=$1 AND j.fence_token=$2 AND j.kind='production' AND j.visual_pipeline_version>=2
+                  AND j.spell_id IS NULL AND NOT EXISTS(SELECT 1 FROM spells published WHERE published.job_id=j.id)
+                  AND latest.stage='J' AND latest.status='invalid' AND latest.error_code=ANY($4)
+                  AND latest.finished_at IS NOT NULL AND latest.started_at>current_plan.created_at
+                  AND NOT EXISTS(SELECT 1 FROM spell_plans newer WHERE newer.job_id=j.id
+                      AND newer.revision>current_plan.revision AND newer.validation_errors IS NULL)
+                  AND NOT EXISTS(SELECT 1 FROM provider_attempts uncertain WHERE uncertain.job_id=j.id
+                      AND uncertain.status IN ('running','transport_uncertain'))
+            )
+            """);
+        cmd.Parameters.AddWithValue(job.Id); cmd.Parameters.AddWithValue(job.Fence);
+        cmd.Parameters.AddWithValue(currentPlanSha256); cmd.Parameters.AddWithValue(DefinitiveVisualJudgementErrors);
+        if (await cmd.ExecuteScalarAsync(ct) is not true) return null;
+        // The rejected judgement contributes no score, verdict or candidate. The normal
+        // selector admits only separately persisted, successfully reviewed plans.
+        return await GetBestReviewedPlanAsync(job, ct);
     }
 
     public async Task<StoredDocument?> GetBestReviewedPlanAsync(ClaimedJob job, CancellationToken ct)

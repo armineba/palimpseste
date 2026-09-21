@@ -30,42 +30,77 @@ public sealed partial class LunaCodexProvider
         var images = new[] { reference.PngPath }.Concat(frames.Select(f => f.PngPath)).ToArray();
         var hashes = new[] { reference.Sha256 }.Concat(frames.Select(f => f.Sha256)).ToArray();
         var request = new CodexAttempt(attemptId, "J", prompt,
-            Path.Combine(visualReviewSpecRoot, "contracts", "codex", "model-j.output-schema.json"), images, jobId, reference, hashes);
+            Path.Combine(visualReviewSpecRoot, "contracts", "codex", "model-j.output-schema.json"), images, jobId, reference, hashes,
+            new VisualJudgementBinding(descriptionHash, planHash, reference.Sha256));
         var transport = probe ? await runner.ProbeAsync(request, ct) : await runner.RunAsync(request, ct);
-        var document = Parse(transport, "sp.visual-judgement/1.0");
-        if (document.Utf8 is null) return new(document, 0, false);
+        if (transport.Outcome == ProviderOutcome.InvalidSchema)
+            return new(new(transport with { ErrorCode = "visual_judgement_invalid" }, null, null), 0, false);
+        if (transport.Outcome != ProviderOutcome.Success || transport.FinalJson is null)
+            return new(new(transport, null, null), 0, false);
+        var bytes = Encoding.UTF8.GetBytes(transport.FinalJson);
         try
         {
-            using var json = JsonDocument.Parse(document.Utf8);
+            using var json = JsonDocument.Parse(bytes);
             var root = json.RootElement;
             string[] keys = ["schema_version", "description_sha256", "plan_sha256", "visual_reference_sha256",
                 "composition", "lighting", "materials", "details", "score", "lifecycle_faithful", "issues"];
-            if (!root.EnumerateObject().Select(p => p.Name).ToHashSet().SetEquals(keys) ||
-                root.GetProperty("description_sha256").GetString() != descriptionHash ||
-                root.GetProperty("plan_sha256").GetString() != planHash ||
-                root.GetProperty("visual_reference_sha256").GetString() != reference.Sha256)
-                throw new InvalidDataException("visual_judgement_provenance");
+            if (root.ValueKind != JsonValueKind.Object || root.EnumerateObject().Count() != keys.Length ||
+                !root.EnumerateObject().Select(p => p.Name).ToHashSet(StringComparer.Ordinal).SetEquals(keys))
+                throw new InvalidDataException("visual_judgement_keys");
+            if (root.GetProperty("schema_version").ValueKind != JsonValueKind.String ||
+                root.GetProperty("schema_version").GetString() != "sp.visual-judgement/1.0")
+                throw new InvalidDataException("visual_judgement_invalid");
+            foreach (var (key, expected, code) in new[]
+            {
+                ("description_sha256", descriptionHash, "visual_judgement_description_hash"),
+                ("plan_sha256", planHash, "visual_judgement_plan_hash"),
+                ("visual_reference_sha256", reference.Sha256, "visual_judgement_reference_hash")
+            })
+            {
+                var value = root.GetProperty(key);
+                if (value.ValueKind != JsonValueKind.String || value.GetString() != expected)
+                    throw new InvalidDataException(code);
+            }
             var total = 0;
             foreach (var key in new[] { "composition", "lighting", "materials", "details" })
             {
-                var value = root.GetProperty(key).GetInt32();
-                if (value < 0 || value > (key == "details" ? 1000 : 3000)) throw new InvalidDataException("visual_score_range");
+                var property = root.GetProperty(key);
+                if (property.ValueKind != JsonValueKind.Number || !property.TryGetInt32(out var value) ||
+                    value < 0 || value > (key == "details" ? 1000 : 3000))
+                    throw new InvalidDataException("visual_judgement_score_range");
                 total += value;
             }
-            if (total != root.GetProperty("score").GetInt32()) throw new InvalidDataException("visual_score_sum");
+            var score = root.GetProperty("score");
+            if (score.ValueKind != JsonValueKind.Number || !score.TryGetInt32(out var reportedScore) || reportedScore is < 0 or > 10000)
+                throw new InvalidDataException("visual_judgement_score_range");
+            if (total != reportedScore) throw new InvalidDataException("visual_judgement_score_sum");
             var faithful = root.GetProperty("lifecycle_faithful").GetBoolean();
             var issues = root.GetProperty("issues");
-            if (issues.ValueKind != JsonValueKind.Array || issues.GetArrayLength() > 24) throw new InvalidDataException("visual_issues_count");
+            if (issues.ValueKind != JsonValueKind.Array || issues.GetArrayLength() > 24)
+                throw new InvalidDataException("visual_judgement_issues_count");
             foreach (var issue in issues.EnumerateArray())
             {
                 if (issue.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(issue.GetString()) || issue.GetString()!.Length > 1200)
-                    throw new InvalidDataException("visual_issue_text");
+                    throw new InvalidDataException("visual_judgement_issue_text");
             }
-            return new(document, total, faithful);
+            return new(new(transport, bytes, Digest(bytes)), total, faithful);
         }
         catch (Exception e) when (e is JsonException or InvalidDataException or InvalidOperationException or KeyNotFoundException or FormatException)
         {
-            return new(new(transport with { Outcome = ProviderOutcome.InvalidSchema, ErrorCode = "visual_judgement_invalid" }, null, null), 0, false);
+            // Model text and exception messages cannot introduce diagnostic codes.
+            var code = e is InvalidDataException ? e.Message switch
+            {
+                "visual_judgement_keys" => "visual_judgement_keys",
+                "visual_judgement_description_hash" => "visual_judgement_description_hash",
+                "visual_judgement_plan_hash" => "visual_judgement_plan_hash",
+                "visual_judgement_reference_hash" => "visual_judgement_reference_hash",
+                "visual_judgement_score_range" => "visual_judgement_score_range",
+                "visual_judgement_score_sum" => "visual_judgement_score_sum",
+                "visual_judgement_issues_count" => "visual_judgement_issues_count",
+                "visual_judgement_issue_text" => "visual_judgement_issue_text",
+                _ => "visual_judgement_invalid"
+            } : "visual_judgement_invalid";
+            return new(new(transport with { Outcome = ProviderOutcome.InvalidSchema, ErrorCode = code }, null, null), 0, false);
         }
     }
 

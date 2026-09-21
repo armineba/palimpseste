@@ -4,6 +4,8 @@ Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le p
 
 ## Version courante — D16 / Player 1.6.0
 
+**Correctif backend D16.1 installé** : une critique finale au hash invalide avait bloqué « Foudre sous l’Enclume ». Le sort est récupéré depuis une version déjà évaluée, sans nouvel appel ni capture ; fidélité encore à améliorer. [Preuve et reprise](evidence/public/backend/visual-judge-fix-d16-1.json) · [Mécanisme général](docs/D16_JUDGE_RECOVERY.md).
+
 Le **Player 1.6.0 est construit et empaqueté**, selon son [manifeste réel](evidence/public/unity/lifecycle-delivery.json). Le backend, le déploiement et le jeu ouvert sont suivis dans [IMPLEMENTATION_STATUS](docs/IMPLEMENTATION_STATUS.md) et [NEXT_ACTIONS](docs/NEXT_ACTIONS.md). Aucun nouveau parcours joueur, test ou verdict visuel réussi n'est revendiqué ici : le créateur souhaite essayer lui-même.
 
 La référence comporte **APPARITION / STABLE / DISPARITION**, sept cases numérotées par ligne. G génère un atlas ; le compositeur serveur ajoute titres et cadres pour produire la planche **1536 × 1152**. Atlas natif et planche finale conservent des artefacts et SHA distincts. Le texte fixe mécaniques et chronologie ; B construit le VFX depuis la planche et les ressources gratuites sélectionnées. J compare ensuite les bandes temporelles du renderer précompilé. Voir [l'architecture D16](docs/D16_ANIMATION_SHEET.md), [le protocole Unity](docs/UNITY_ANIMATION_SHEET_D16.md) et [comment essayer](docs/TESTER_MAINTENANT.md).

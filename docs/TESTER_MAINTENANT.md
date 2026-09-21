@@ -1,5 +1,9 @@
 # Tester le lecteur actuel
 
+## Dernier sort récupéré — D16.1
+
+« **Foudre sous l’Enclume** » est disponible après correction du blocage de critique. Cliquer **Actualiser** sur ce parchemin, puis lancer le sort dans le laboratoire. Le dessin et la planche sont conservés ; aucun besoin de redessiner pour cette reprise. La version récupérée a réellement été évaluée à 4190/10000, avec une animation encore jugée imparfaite : elle est disponible pour recueillir les corrections du créateur. [Preuve](../evidence/public/backend/visual-judge-fix-d16-1.json).
+
 ## Parcours D16 / 1.6.0 — planche d’animation
 
 Ouvrir **Palimpseste Spell Lab** depuis le raccourci Bureau actualisé. L’état réel du service et de son installation figure dans [le point de reprise](NEXT_ACTIONS.md).

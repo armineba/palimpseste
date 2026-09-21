@@ -1,15 +1,15 @@
 {
     "version":  "1.6.0",
-    "updated_at":  "2026-09-20T23:51:45.7825842+00:00",
+    "updated_at":  "2026-09-21T05:37:51.7792129+00:00",
     "build_exit":  0,
-    "binary_stage":  "deliverables/.stage-backend/22bf76e06c9a4b4bb9e194faf97c7e1d",
+    "binary_stage":  "deliverables/.stage-backend/0dbeecd509ec4ba8a7b573d4ed300553",
     "documentation_refreshed":  true,
     "zip":  "deliverables/Palimpseste-Backend-Windows-x64.zip",
-    "bytes":  247753524,
-    "sha256":  "da81603cfccf638aa5328ce30f7fe9d4b336320f3d24acb270547251c9b5a741",
-    "worker_sha256":  "28044b85e462b575fcb424faa111d2444eb7baa58a0535395422772c4bb93913",
-    "api_sha256":  "755d3eeeafea435610b6b762df0fee311f3cc4a82ca324522694b60b2e218fcb",
+    "bytes":  247769107,
+    "sha256":  "ba708432c50d141566cb4f415b0b580873bdb8242f17d232153ff6a475c28dbb",
+    "worker_sha256":  "b536dc0f78c2a5a991e96454822bc69c7749a5a0b7447427863b6a2fb3ba7abb",
+    "api_sha256":  "47d50034ee315e64ae070282e171186a50cbcacc1d4f168129a61b5b600ea119",
     "tests_executed":  false,
     "gameplay_acceptance":  "pending_owner",
-    "evidence":  "evidence/public/backend/animation-sheet-d16.json"
+    "evidence":  "evidence/public/backend/visual-judge-fix-d16-1.json"
 }

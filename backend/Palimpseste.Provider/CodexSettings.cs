@@ -958,9 +958,13 @@ public enum ProviderOutcome
     Quota, TransportUncertain, Timeout, ProcessFailure, InvalidSchema, BusinessViolation, IsolationViolation
 }
 
+// Created from the immutable inputs by the visual judge, never parsed from model text.
+public sealed record VisualJudgementBinding(string DescriptionSha, string PlanSha, string ReferenceSha);
+
 public sealed record CodexAttempt(
     string AttemptId, string Stage, string Prompt, string SchemaPath, IReadOnlyList<string> Images,
-    string JobId, SpellVisualReference? VisualReference = null, IReadOnlyList<string>? ImageSha256 = null);
+    string JobId, SpellVisualReference? VisualReference = null, IReadOnlyList<string>? ImageSha256 = null,
+    VisualJudgementBinding? JudgementBinding = null);
 
 public sealed record CodexResult(
     ProviderOutcome Outcome, string? FinalJson, int? ExitCode, string? SessionId,
