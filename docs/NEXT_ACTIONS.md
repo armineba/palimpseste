@@ -1,5 +1,13 @@
 # Point de reprise immédiat
 
+## 22 septembre — accès au dessin rétabli après arrêt des services
+
+Le bouton « Dessiner un parchemin » était désactivé parce que l’API et le worker locaux étaient arrêtés. PostgreSQL était encore actif. La bibliothèque affiche alors une invitation à ouvrir, même lorsque le jeton Windows existe toujours ; le code ne supprime ce jeton que sur HTTP 401.
+
+Services relancés avec les lanceurs protégés de l’installation `animation-sheet-install-20260921-053249-6cb61478`, dont les empreintes correspondent aux exécutables installés : worker **11000**, API **5576**, disponibilité HTTP **200**. Player 1.6.0 rouvert, PID **22420**, fenêtre « Palimpseste Spell Lab » réactive. Aucun jeton remplacé, aucun sort modifié, aucun build ni essai de génération lancé.
+
+Laisser le créateur dessiner. Le rétablissement du service et l’ouverture du Player sont observés ; le dessin lui-même reste à essayer par le créateur. Limite actuelle : aucun démarrage automatique des services trouvé, et aucune reconnexion proposée dans la bibliothèque après une panne. Après un nouvel arrêt des services, les relancer puis rouvrir le Player. Une correction ultérieure de l’interface devra distinguer panne réseau et invitation absente.
+
 ## Priorité D16.1 — essayer le sort récupéré
 
 Le job joueur `a5c8847cc9a141098d6d8dbd9b5a460e`, « Foudre sous l’Enclume », est **ready depuis le 21 septembre à 07:33:56 Paris**. Le backend corrigé est publié et installé, API **7512**, worker **27356**. Le dernier J avait mal recopié le hash du plan ; le correctif général impose ces empreintes par schéma et permet de finaliser une construction admissible déjà évaluée. [Cause et mécanisme](D16_JUDGE_RECOVERY.md) · [Preuve réelle](../evidence/public/backend/visual-judge-fix-d16-1.json).
