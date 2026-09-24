@@ -106,3 +106,9 @@ automatique à un autre joueur n'est faite.
 ## D16 — Planche d’animation 3 × 7 (21 septembre 2026)
 
 Le créateur remplace l’image cible unique par sa référence de planche : APPARITION, STABLE, DISPARITION, sept cases par ligne. Un atlas natif G précède une mise en page fixe du serveur ; les deux SHA et artefacts sont conservés séparément. La description demeure l’autorité du cycle et des mécaniques. B construit un seul sort animé et J examine sept poses réelles par phase. Pipeline 4 / client 1.6.0 ; aucun sort existant modifié. Les essais restent au créateur. Voir [D16](D16_ANIMATION_SHEET.md).
+
+## D17 — Bibliothèques obligatoires avant reconstruction (24 septembre 2026)
+
+Le créateur impose TinyPlay URPShadersCollection, xtaja VFX-Shader, Magic Effects FREE, Unity VisualEffectGraph-Samples et Keijiro VfxGraphAssets comme bases de recherche pour reconstruire le visuel de la planche. Les cinq sources doivent être examinées à l'étape **planche → recherche → construction B**, puis les ressources et techniques pertinentes servir de point de départ à Dream-loop Pro. La description conserve l'autorité sur la chronologie et la physique. Les URL, conditions de réutilisation et organisation sont dans le [document texte demandé](BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt).
+
+Les imports se font dans le développement, avec licences et compatibilité URP vérifiées. Le worker consulte les fiches contrôlées ; aucun accès au code du projet, script tiers, installation ou build logiciel n'est ouvert au joueur. Les recherches déjà enregistrées restent immuables. Le prompt B passe à 2.5 pour exploiter les cinq fiches lorsqu'elles sont présentes. L'état de téléchargement et d'intégration doit rester distinct de la fidélité visuelle réellement observée.

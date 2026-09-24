@@ -3,7 +3,8 @@
 **16 textures PNG originales** de deux packs Kenney CC0 et trois fichiers HLSL de NoiseShader sous MIT. Dans Unity **1.5.0**, les 16 textures sont importées et reliées aux matériaux et particules du renderer ; `Common.hlsl` et `SimplexNoise3D.hlsl` sont utilisés pour la turbulence. Le build et le packaging du Player ont réussi. Aucun test de jeu, appel de génération ou validation visuelle n'est revendiqué pour cette intégration.
 
 - [catalogue.json](catalogue.json) : identifiants stables, familles, tags, usages, chemins, SHA-256 et provenance. `status_at_curation` conserve l'état initial ; `integration` décrit l'état Unity 1.5.0.
-- [references.json](references.json) : six pages officielles Unity 6.3 et une référence HLSL MIT vérifiées en ligne, à sélectionner avant la construction d'un sort.
+- [references.json](references.json) : cinq bibliothèques obligatoires pour reconstruire la planche (D17), en complément des six pages officielles Unity 6.3 et d'une référence HLSL MIT. Les nouveaux packages sont documentés comme non embarqués ; seuls les ingrédients du catalogue sont sélectionnables.
+- [Consigne et liens complets](../../docs/BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) · [Inventaire des copies locales](../../reference/vfx-libraries.inventory.json).
 - [SOURCE_MANIFEST.sha256](SOURCE_MANIFEST.sha256) : empreintes des fichiers de ce dossier, sources et métadonnées comprises ; le manifeste lui-même est exclu.
 - [ATTRIBUTION.md](ATTRIBUTION.md) : auteurs et conditions de redistribution.
 - [Notes d'intégration et recherche](../../docs/references-vfx-sources.md).

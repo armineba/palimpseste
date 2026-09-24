@@ -1,5 +1,17 @@
 # Point de reprise immédiat
 
+## 24 septembre — D17, bibliothèques obligatoires dans la reconstruction
+
+Le créateur précise le point d'application : **planche d'animation générée → examen des cinq bibliothèques → construction B → critique et révisions Dream-loop Pro**. [Document texte demandé](BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) · [Inventaire des clones](../reference/vfx-libraries.inventory.json) · [Détails du fonctionnement](references-vfx-sources.md).
+
+Code du resolver et prompt B **2.5** modifiés. Chaque nouvelle recherche exige les cinq sources exactes et ajoute une référence complémentaire selon la description. Les quatre GitHub sont consultés en parallèle ; Magic Effects FREE fournit une fiche locale de disponibilité et de licence, sans contenu du package. B et ses révisions réutilisent la même recherche liée aux SHA de la description et de la planche. Les dossiers anciens restent immuables.
+
+**Compilation Release du worker réussie, 0 avertissement et 0 erreur**, sans test, appel modèle, capture ni parcours joueur. [Journal réel](../deliverables/vfx-library-d17-build.log). Les clones sont hors dépôt dans `E:\Palimpseste\VFX_Libraries`. Les nouvelles ressources ne sont pas encore intégrées au Player et le worker compilé n'est pas publié ni déployé : le service installé reste D16.1. Le simple téléchargement ne change pas son rendu.
+
+Suite : publier le backend avec son prompt et son catalogue D17 cohérents, puis le déployer avant les nouvelles générations. Intégrer côté développement les ressources compatibles et autorisées sélectionnées pour le moteur, avec notices et identifiants contrôlés. Unity 6.3 URP reste la cible ; ne pas importer le projet HDRP complet. Laisser ensuite le créateur juger les sorts : aucune fidélité visuelle identique n'est encore démontrée.
+
+Dernière observation du lancement le 24 septembre : Player ouvert, worker démarré, API encore indisponible ; le contrôle automatique a refusé la commande administrative de redémarrage API (`blocked by policy`, sans détail). Cette opération n'a pas été contournée et la tâche D17 n'affirme pas que le laboratoire est reconnecté.
+
 ## 22 septembre — accès au dessin rétabli après arrêt des services
 
 Le bouton « Dessiner un parchemin » était désactivé parce que l’API et le worker locaux étaient arrêtés. PostgreSQL était encore actif. La bibliothèque affiche alors une invitation à ouvrir, même lorsque le jeton Windows existe toujours ; le code ne supprime ce jeton que sur HTTP 401.

@@ -4,6 +4,8 @@ Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le p
 
 ## Version courante — D16 / Player 1.6.0
 
+**D17 dans les sources :** la reconstruction de la planche doit examiner [cinq bibliothèques VFX obligatoires](docs/BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) avant de composer et d'itérer avec Dream-loop Pro. [Inventaire local](reference/vfx-libraries.inventory.json). Ce changement de recherche n'est pas encore déployé ; les nouveaux packages ne sont pas intégrés au Player.
+
 **Correctif backend D16.1 installé** : une critique finale au hash invalide avait bloqué « Foudre sous l’Enclume ». Le sort est récupéré depuis une version déjà évaluée, sans nouvel appel ni capture ; fidélité encore à améliorer. [Preuve et reprise](evidence/public/backend/visual-judge-fix-d16-1.json) · [Mécanisme général](docs/D16_JUDGE_RECOVERY.md).
 
 Le **Player 1.6.0 est construit et empaqueté**, selon son [manifeste réel](evidence/public/unity/lifecycle-delivery.json). Le backend, le déploiement et le jeu ouvert sont suivis dans [IMPLEMENTATION_STATUS](docs/IMPLEMENTATION_STATUS.md) et [NEXT_ACTIONS](docs/NEXT_ACTIONS.md). Aucun nouveau parcours joueur, test ou verdict visuel réussi n'est revendiqué ici : le créateur souhaite essayer lui-même.

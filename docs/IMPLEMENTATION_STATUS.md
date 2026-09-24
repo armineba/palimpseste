@@ -1,5 +1,11 @@
 # État de réalisation et point de reprise
 
+## Sources courantes — D17, bibliothèques avant reconstruction
+
+Les cinq sources imposées par le créateur sont documentées et deviennent obligatoires dans les nouveaux dossiers de recherche entre la planche et B. Le prompt B **2.5** utilise leurs techniques pertinentes pour reconstruire les phases de la planche, puis reprendre les corrections Dream-loop Pro. Les recherches persistées restent immuables. [Consigne](BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) · [Inventaire](../reference/vfx-libraries.inventory.json).
+
+Worker compilé en Release avec code 0, sans avertissement ni erreur : [journal](../deliverables/vfx-library-d17-build.log). **D17 non publié/non déployé ; packages non importés dans le Player ; aucun test ou appel modèle effectué.** Les quatre clones de consultation ne constituent pas une nouvelle version du jeu. Voir [la reprise](NEXT_ACTIONS.md) pour les étapes restantes et l'état réel des services.
+
 ## État courant — correctif backend D16.1, Player 1.6.0 conservé
 
 Le dernier parcours joueur « Foudre sous l’Enclume » a produit sa description, sa planche 3 × 7, trois plans et deux verdicts admissibles. Le troisième J avait renvoyé un hash de plan erroné, bloquant la livraison. Le backend corrige cette cause par des empreintes imposées dans le schéma J, des diagnostics précis et une finalisation depuis le meilleur candidat déjà évalué en cas de J définitivement invalide.

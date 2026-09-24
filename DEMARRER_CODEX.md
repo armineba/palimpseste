@@ -1,5 +1,7 @@
 # À coller dans Codex
 
+Consigne VFX actuelle : lire [les cinq bibliothèques obligatoires](docs/BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) et [AGENTS.md](AGENTS.md). Toute construction part de l'exploration de ces sources et des ressources pertinentes réutilisables.
+
 Place ce dossier décompressé dans l'espace de travail du projet. Sélectionne Luna et le niveau maximal disponible dans ton client Codex avant de lancer la tâche. Le texte d'un prompt ne change pas à lui seul le modèle ou le réglage de la session qui le reçoit.
 
 ```text

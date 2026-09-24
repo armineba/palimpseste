@@ -1,0 +1,11 @@
+  Palimpseste.Contracts -> E:\Palimpseste\Palimpseste_GitHub\.runtime\contracts-bin\Release\netstandard2.1\Palimpseste.Contracts.dll
+  Palimpseste.Storage -> E:\Palimpseste\Palimpseste_GitHub\backend\Palimpseste.Storage\bin\Release\net10.0\Palimpseste.Storage.dll
+  Palimpseste.Core -> E:\Palimpseste\Palimpseste_GitHub\shared\Palimpseste.Core\bin\Release\netstandard2.1\Palimpseste.Core.dll
+  Palimpseste.Provider -> E:\Palimpseste\Palimpseste_GitHub\backend\Palimpseste.Provider\bin\Release\net10.0\Palimpseste.Provider.dll
+  Palimpseste.Worker -> E:\Palimpseste\Palimpseste_GitHub\backend\Palimpseste.Worker\bin\Release\net10.0\Palimpseste.Worker.dll
+
+La génération a réussi.
+    0 Avertissement(s)
+    0 Erreur(s)
+
+Temps écoulé 00:00:03.82

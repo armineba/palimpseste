@@ -1,0 +1,30 @@
+{
+    "change":  "D17",
+    "recorded_utc":  "2026-09-24T19:53:43.0551343Z",
+    "pipeline_stage":  "after_generated_animation_sheet_before_B_with_same_research_in_B_refinement",
+    "mandatory_sources":  5,
+    "extra_relevant_references":  1,
+    "prompt_b":  "sp.prompt.b/2.5",
+    "compilation":  {
+                        "command":  "dotnet build backend/Palimpseste.Worker/Palimpseste.Worker.csproj -c Release --no-restore --nologo",
+                        "errors":  0,
+                        "warnings":  0,
+                        "log":  "deliverables/vfx-library-d17-build.log",
+                        "exit_code":  0
+                    },
+    "tests_run":  false,
+    "model_calls_started":  false,
+    "player_captures_taken":  false,
+    "unity_imports_performed":  false,
+    "backend_published":  false,
+    "backend_deployed":  false,
+    "visual_fidelity_accepted":  false,
+    "digests":  {
+                    "backend/Palimpseste.Provider/SpellReferenceResearch.cs":  "09d9eca26f5cdf0a0fd7633ad83a6e480d2a0772a809a05a99472a68a4969e76",
+                    "backend/Palimpseste.Provider/LunaCodexProvider.cs":  "988ba9f2b1aa201b8bcb1654bd02100515e86fbaeb456793874275955ddd1872",
+                    "prompts/02_MODEL_B_TRADUCTEUR.md":  "dbeaa2cfb40bcad34d8f1d33f04ec5341bef7724ae113b51d52d07dd776a9189",
+                    "assets/sourced-vfx/references.json":  "bcc12e3f5ee365fa777057775e7c197e0ac1f52df1129bfdf778587a88f7a810",
+                    "reference/vfx-libraries.inventory.json":  "d5a4b11037202c5b889e0b7062c5844d44e60c509de29e24d0e6c7264fe62881",
+                    "deliverables/vfx-library-d17-build.log":  "268728dbd3b0b36c40df43108cfc856bfc11454b858111ec4dece25f26b5d574"
+                }
+}

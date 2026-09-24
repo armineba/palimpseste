@@ -1,5 +1,15 @@
 # Recherche et ressources VFX réutilisables
 
+## D17 — bibliothèques obligatoires pour reconstruire la planche
+
+Depuis la décision du **24 septembre 2026**, le passage **planche générée → recherche → construction B** doit consulter les cinq [bibliothèques imposées](BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt). L'[inventaire local](../reference/vfx-libraries.inventory.json) conserve commits, licences, exemples et fichiers réellement récupérés. Ces fiches orientent la reconstruction des 21 cases d'un même sort animé ; elles servent également aux révisions B de Dream-loop Pro, qui reprennent le dossier immuable lié à la description et à la planche.
+
+Le code D17 inclut systématiquement ces cinq fiches et une référence complémentaire classée selon le sort. Les pages GitHub autorisées et la référence complémentaire sont lues en parallèle, avec les limites réseau existantes. Magic Effects FREE reste une fiche factuelle locale, sans acquisition, extraction automatisée ni contenu propriétaire fourni au modèle. Chaque fiche distingue consultation, licence, compatibilité et présence réelle dans le Player. Les échecs de lecture en ligne conservent un statut explicite et les notes examinées.
+
+Le prompt B **2.5** impose leur examen avant la composition et l'emploi des techniques pertinentes dans les limites du moteur. Il ne donne pas accès à des prefabs absents : les nouveaux packages ne sont pas encore intégrés au Player. L'import des ressources et graphes compatibles appartient au développement ; il précède leur exposition sous forme d'identifiants contrôlés. **Sources modifiées, déploiement D17 non effectué** ; le binaire déjà installé conserve son comportement précédent jusqu'à sa mise à jour. Aucun rendu identique ou parcours joueur D17 n'est revendiqué.
+
+## Historique — socle livré D15
+
 Recherche et téléchargements effectués le **21 septembre 2026, heure de Paris**, à la demande du créateur. Le [catalogue exploitable](../assets/sourced-vfx/catalogue.json) relie chaque ingrédient à sa source, sa licence et son SHA. La sélection ne nécessite aucun achat, abonnement supplémentaire, API payante ou installation de plugin.
 
 ## Ressources réellement récupérées
@@ -40,7 +50,7 @@ Le [catalogue des techniques](../assets/sourced-vfx/references.json) contient se
 
 Les recommandations `suggested_blend` des textures sont des points de départ de conception : alpha pour fumée sombre et nuages, additif pour éclairs et éclats. Le catalogue conserve des résumés originaux et des liens, pas des copies des manuels Unity. La récupération effectuée pendant cette préparation ne prouve pas la récupération lors d'un futur job : le resolver doit conserver son propre résultat et ses empreintes.
 
-**Périmètre de recherche implémenté par job : bibliothèque de sources primaires sélectionnées.** Le resolver choisit jusqu'à quatre références selon la description et les tags, puis lit leurs pages HTTPS autorisées en parallèle, avec délai borné à sept secondes. Les notes de catalogue servent de repli explicite si une lecture échoue. Le dossier de recherche conserve le résultat de chaque lecture et ses empreintes. Ce fonctionnement est une recherche dans cette bibliothèque, pas une exploration générale de tout le Web. La réutilisation des textures sélectionnées reste liée aux 16 identifiants contrôlés. Aucun appel de génération n'a été lancé pour valider cette intégration.
+**Périmètre de recherche livré D15/D16 : bibliothèque de sources primaires sélectionnées.** Le resolver de cette version choisit jusqu'à quatre références selon la description et les tags, puis lit leurs pages HTTPS autorisées en parallèle, avec délai borné à sept secondes. Les notes de catalogue servent de repli explicite si une lecture échoue. Le dossier de recherche conserve le résultat de chaque lecture et ses empreintes. Ce fonctionnement est une recherche dans cette bibliothèque, pas une exploration générale de tout le Web. La réutilisation des textures sélectionnées reste liée aux 16 identifiants contrôlés. Aucun appel de génération n'a été lancé pour valider cette intégration. D17 remplace cette sélection par les cinq fiches obligatoires et une référence complémentaire pour les nouvelles recherches, après déploiement.
 
 Les [sources Simplex de Keijiro](https://github.com/keijiro/NoiseShader/blob/550100d4a74de1ba90eb1b8e90f25f9dbeec28d2/Packages/jp.keijiro.noiseshader/Shader/SimplexNoise3D.hlsl) fournissent le bruit analytique de `SpellImageConstruction.shader`. Les copies relues de Common et SimplexNoise3D sont dans `Resources/SourcedNoise/`, avec adaptation de l'include de Common au chemin relatif ; les originaux du catalogue restent inchangés. La licence MIT est conservée et livrée dans `ThirdPartyNotices/NoiseShader-MIT.txt`. SimplexNoise2D n'est pas intégré. Le worker reçoit le renderer précompilé ; aucun shader téléchargé n'est exécuté automatiquement à la demande d'un joueur.
 

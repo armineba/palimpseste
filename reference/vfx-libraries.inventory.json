@@ -1,0 +1,636 @@
+{
+  "schema_version": "palimpseste.vfx-library-inventory/1.0",
+  "observed_date": "2026-09-24",
+  "purpose": "Bibliothèques demandées par le propriétaire pour préparer systématiquement les futurs sorts. Cet inventaire décrit une acquisition et une exploration de sources, pas une intégration Unity.",
+  "local_library_root": "E:/Palimpseste/VFX_Libraries",
+  "acquisition": {
+    "method": "git clone --depth 1",
+    "git_lfs_skip_smudge": true,
+    "third_party_scripts_executed": false,
+    "unity_import_performed": false,
+    "unity_build_performed": false,
+    "gameplay_tests_performed": false,
+    "model_calls_performed": false
+  },
+  "target": {
+    "unity_editor": "6000.3.24f1",
+    "render_pipeline": "URP",
+    "urp_manifest_version": "17.0.1",
+    "vfx_graph_explicit_dependency_present": false,
+    "evidence": [
+      "game/ProjectSettings/ProjectVersion.txt",
+      "game/Packages/manifest.json"
+    ],
+    "compatibility_status": "non vérifiée dans Unity ; aucune promesse de compatibilité sans adaptation/import"
+  },
+  "runtime_boundary": "Les clones sont hors dépôt et hors entrée du worker joueur. L'agent de développement sélectionne, vérifie et adapte les ressources autorisées ; le worker ne reçoit que des données et des ressources approuvées.",
+  "asset_store_entry": "Magic Effects FREE est traité dans le document de bibliothèques associé ; ce fichier inventorie uniquement les quatre dépôts GitHub réellement clonés.",
+  "repositories": [
+    {
+      "id": "tinyplay-urp-shaders-collection",
+      "url": "https://github.com/TinyPlay/URPShadersCollection",
+      "branch": "main",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "local_directory": "URPShadersCollection",
+      "acquisition_status": "downloaded",
+      "integration_status": "not_integrated",
+      "working_tree_bytes": 39414912,
+      "downloaded_total_bytes_including_git_at_inspection": 56963874,
+      "working_file_count": 245,
+      "working_tree_status": "clean",
+      "lfs_missing_pointer_count": 0,
+      "license": {
+        "identifier": "MIT",
+        "evidence": [
+          {
+            "path": "LICENSE",
+            "sha256": "fa5e30bee17e429e5831a9f70089f669ea64fdf5a2aa13a383f864197b8ae7ae"
+          }
+        ],
+        "conditions": [
+          "Conserver le copyright TinyPlay 2022 et la permission MIT avec les copies ou portions substantielles."
+        ],
+        "file_level_cautions": [
+          "Shaders/Other/WireFrame.shader cite UnityCommunity/UnityLibrary et Catlike Coding : vérifier ces provenances avant de le redistribuer.",
+          "Example/Fox contient modèles et animations ; provenance spécifique non établie dans cette exploration. Ne pas importer automatiquement la scène entière."
+        ]
+      },
+      "declared_requirements": {
+        "pipeline": "URP",
+        "unity_version": null,
+        "package_manifest_present": false,
+        "notes": [
+          "README exige Camera Depth Texture pour les effets fondés sur la profondeur.",
+          "Certains shaders sont signalés coûteux sur GPU mobile."
+        ]
+      },
+      "inspected_sources": [
+        "README.md",
+        "LICENSE",
+        "Shaders/VFX/*.shadergraph",
+        "Shaders/Other/WireFrame.shader"
+      ],
+      "candidates": [
+        {
+          "path": "Shaders/VFX/ForceFieldShader.shadergraph",
+          "uses": [
+            "barrière",
+            "bouclier",
+            "frontière énergétique"
+          ],
+          "observed_techniques": [
+            "FresnelNode",
+            "SceneDepthNode",
+            "TilingAndOffsetNode",
+            "TimeNode"
+          ],
+          "reuse": "Adapter le graphe URP et ses sous-graphes/matériaux/textures référencés ; préserver la notice MIT."
+        },
+        {
+          "path": "Shaders/VFX/PlasmaShader.shadergraph",
+          "uses": [
+            "plasma",
+            "lave magique",
+            "noyau énergétique"
+          ],
+          "observed_techniques": [
+            "FresnelNode",
+            "GradientNoiseNode",
+            "NoiseNode",
+            "TilingAndOffsetNode",
+            "TimeNode"
+          ],
+          "reuse": "Utiliser comme départ pour une matière lumineuse animée, puis relier les paramètres à apparition/stable/disparition."
+        },
+        {
+          "path": "Shaders/VFX/BubbleShader.shadergraph",
+          "uses": [
+            "bulle",
+            "aura",
+            "enveloppe translucide"
+          ],
+          "observed_techniques": [
+            "FresnelNode",
+            "GradientNoiseNode",
+            "TilingAndOffsetNode",
+            "TimeNode"
+          ]
+        },
+        {
+          "path": "Shaders/VFX/SciFiShader.shadergraph",
+          "uses": [
+            "motifs orbitaux",
+            "énergie structurée"
+          ],
+          "observed_techniques": [
+            "FresnelNode",
+            "GradientNoiseNode",
+            "RotateNode",
+            "TilingAndOffsetNode",
+            "TimeNode"
+          ]
+        },
+        {
+          "path": "Shaders/_Includes/DepthFade.shadersubgraph",
+          "uses": [
+            "intersections douces au sol et sur les cibles"
+          ]
+        },
+        {
+          "path": "Textures/flowmap.png",
+          "uses": [
+            "advection de texture"
+          ],
+          "reuse": "Candidat de texture sous licence générale du dépôt ; vérifier l'import, le guid et l'espace colorimétrique avant copie."
+        }
+      ],
+      "adaptation_notes": [
+        "Ne pas remplacer URPAsset, renderer, postprocessing ou la scène Palimpseste par ceux du dépôt.",
+        "Les nœuds de temps et d'UV fournissent une animation de matière ; ils ne garantissent pas seuls le mouvement physique du sort.",
+        "Relier explicitement les paramètres de rotation, vitesse, fondu et taille au contrat de comportement."
+      ],
+      "recommended_starting_point": true
+    },
+    {
+      "id": "xtaja-vfx-shader",
+      "url": "https://github.com/xtaja/VFX-Shader",
+      "branch": "main",
+      "commit": "aa4d626cbea273caed0507a7c3dc4b5795d0fcb6",
+      "local_directory": "VFX-Shader",
+      "acquisition_status": "downloaded",
+      "integration_status": "not_integrated_license_missing",
+      "working_tree_bytes": 13246319,
+      "downloaded_total_bytes_including_git_at_inspection": 25211012,
+      "working_file_count": 49,
+      "working_tree_status": "clean",
+      "lfs_missing_pointer_count": 0,
+      "license": {
+        "identifier": null,
+        "status": "Aucun fichier LICENSE ni permission générale explicite trouvé au commit inspecté.",
+        "evidence": [
+          {
+            "path": "README.md",
+            "sha256": "bce503d267a06959a2c3c7c30f6e0010a942630d86287d73d131db11ff5c9196"
+          }
+        ],
+        "reuse_policy": "Exploration de l'organisation et des techniques ; ne pas copier, distribuer ou importer le code/package dans Palimpseste sans autorisation explicite.",
+        "file_level_cautions": [
+          "Assets/HLSL/GradientNoise.hlsl et SimpleNoise.hlsl annoncent du code provenant de la documentation Shader Graph 17.5.",
+          "Assets/HLSL/Voronoi.hlsl annonce une adaptation de cette documentation. Ces liens ne constituent pas une licence générale pour le dépôt."
+        ]
+      },
+      "declared_requirements": {
+        "unity_version": "6000.0.51f1",
+        "pipeline": "URP",
+        "particle_vertex_streams": [
+          "Color",
+          "AgePercent (uv.z)"
+        ],
+        "notes": [
+          "README décrit la configuration de Custom Vertex Streams comme obligatoire.",
+          "L'animation fondée sur la durée de vie exige AgePercent ; le temps global fournit l'animation continue."
+        ]
+      },
+      "inspected_sources": [
+        "README.md",
+        "Assets/HLSL/VFXShader.shader",
+        "Assets/HLSL/GradientNoise.hlsl",
+        "Assets/HLSL/SimpleNoise.hlsl",
+        "Assets/HLSL/Voronoi.hlsl"
+      ],
+      "candidates": [
+        {
+          "path": "Assets/HLSL/VFXShader.shader",
+          "status": "reference_only_no_redistribution_permission",
+          "uses": [
+            "shader modulaire de particules"
+          ],
+          "observed_techniques": [
+            "défilement et rotation UV",
+            "distorsion par texture/bruit",
+            "masque canal rouge",
+            "distorsion canal vert",
+            "dissolution canal bleu",
+            "apparition/disparition selon AgePercent",
+            "profondeur adoucie",
+            "Fresnel",
+            "couleurs HDR"
+          ]
+        },
+        {
+          "path": "Assets/ShaderGraphs/VFX_ShaderGraph.shadergraph",
+          "status": "reference_only_no_redistribution_permission",
+          "uses": [
+            "organisation visuelle modulaire"
+          ]
+        },
+        {
+          "path": "Assets/ShaderGraphs/VFXCullOff_ShaderGraph.shadergraph",
+          "status": "reference_only_no_redistribution_permission",
+          "uses": [
+            "rendu recto verso"
+          ]
+        },
+        {
+          "path": "Assets/Scripts/VFXShaderGUI.cs",
+          "status": "not_executed_no_redistribution_permission",
+          "uses": [
+            "organisation d'inspecteur"
+          ],
+          "notes": [
+            "Ne jamais exécuter ce script depuis un worker joueur."
+          ]
+        }
+      ],
+      "adaptation_notes": [
+        "La vitesse de rotation fondée sur AgePercent correspond à une rotation sur la vie entière ; ne pas la confondre avec des degrés par seconde.",
+        "Le shader déclaré utilise transparence alpha et ZWrite Off : le coût d'overdraw et le tri restent à étudier.",
+        "Réutiliser les concepts génériques à partir de documentation autorisée tant que la licence du dépôt manque."
+      ],
+      "recommended_starting_point": false
+    },
+    {
+      "id": "unity-visual-effect-graph-samples",
+      "url": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+      "branch": "master",
+      "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+      "local_directory": "VisualEffectGraph-Samples",
+      "acquisition_status": "downloaded_with_missing_lfs_payloads",
+      "integration_status": "not_integrated",
+      "working_tree_bytes": 1392244358,
+      "downloaded_total_bytes_including_git_at_inspection": 2326412748,
+      "working_file_count": 3375,
+      "working_tree_status": "5 TGA apparaissent modifiés après le clone à cause de la configuration LFS amont ; aucun fichier tiers édité manuellement.",
+      "checkout_warnings": {
+        "raw_tga_files_matching_lfs_pattern": 18,
+        "status_modified_paths": [
+          "Assets/Samples/SpaceshipHoloTable/Lighting/Textures/Cookies/PointlightGradient_C.tga",
+          "Assets/Samples/SpaceshipHoloTable/Lighting/Textures/Cookies/SoftSquare01_C.tga",
+          "Assets/Samples/SpaceshipHoloTable/Lighting/Textures/Core_Distortion_noise.tga",
+          "Assets/Samples/SpaceshipHoloTable/Lighting/Textures/core_gradient_01.tga",
+          "Assets/Samples/SpaceshipHoloTable/VFX/Textures/DotCircle.tga"
+        ]
+      },
+      "lfs_missing_pointer_count": 7,
+      "lfs_missing_declared_bytes": 56371088,
+      "lfs_missing_payloads": [
+        {
+          "path": "Assets/Samples/SmokePortal/6way_Textures/BonefireWind_E.tga",
+          "bytes": 8388652
+        },
+        {
+          "path": "Assets/Samples/SmokePortal/6way_Textures/Bonefire_E.tga",
+          "bytes": 8388652
+        },
+        {
+          "path": "Assets/Samples/SmokePortal/6way_Textures/Portal_B3-64_A.tga",
+          "bytes": 16777260
+        },
+        {
+          "path": "Assets/Samples/SmokePortal/6way_Textures/Portal_B3-64_B.tga",
+          "bytes": 12582956
+        },
+        {
+          "path": "Assets/Samples/SmokePortal/6way_Textures/TX_Pyro_SteamBall_A_N.tga",
+          "bytes": 3145772
+        },
+        {
+          "path": "Assets/Samples/SmokePortal/6way_Textures/TX_Pyro_SteamBall_A_P.tga",
+          "bytes": 4194348
+        },
+        {
+          "path": "Assets/Samples/Visual Effect Graph/17.0.3/VisualEffectGraph Additions/Textures/Explosion/Explosion0_01_5x5_motion.tga",
+          "bytes": 2893448
+        }
+      ],
+      "license": {
+        "identifier": "Unity Companion License",
+        "evidence": [
+          {
+            "path": "LICENSE.md",
+            "sha256": "cf54929fbeabb474897755774be57ceb8ed46c49672b4c77efe70d735536625c"
+          },
+          {
+            "path": "LICENSE-3rdParty.md",
+            "sha256": "af61a22eb0c5b8391aa2fc6cb393d38bbf914dd12bf0d3246e5e150e4010bdd5"
+          }
+        ],
+        "license_url": "https://unity.com/legal/licenses/unity-companion-license",
+        "conditions": [
+          "Licence destinée aux projets dépendant de Unity ; conserver et vérifier les conditions lors d'une sélection de fichiers.",
+          "Ne pas reclasser l'ensemble du dépôt en MIT ou CC0."
+        ],
+        "file_level_cautions": [
+          {
+            "paths": [
+              "Assets/Samples/Common/Kenney/**"
+            ],
+            "license": "CC0-1.0",
+            "evidence": [
+              "Assets/Samples/Common/Kenney/License.txt",
+              "Assets/Samples/Common/Kenney/CharacterKit/License.txt"
+            ],
+            "notes": [
+              "CharacterKit : attribution Kenney / Kay Lousberg disponible, non obligatoire selon la notice."
+            ]
+          },
+          {
+            "paths": [
+              "Assets/Samples/EllenSkinnedMesh/Mixamo/**"
+            ],
+            "license": "Mixamo Additional Terms (2021-06-23), restriction AI/ML",
+            "policy": "Exclure de la sélection, de la redistribution Palimpseste et des entrées de modèles. Aucun besoin pour les effets magiques étudiés."
+          },
+          {
+            "component": "Game Options",
+            "license": "MIT",
+            "copyright": "2018 Thomas ICHÉ",
+            "evidence": [
+              "LICENSE-3rdParty.md"
+            ],
+            "notes": [
+              "La notice ne fournit pas de mapping exact de fichiers ; conserver la notice et vérifier les fichiers avant réutilisation."
+            ]
+          }
+        ]
+      },
+      "declared_requirements": {
+        "unity_version": "6000.0.23f1",
+        "pipeline": "HDRP",
+        "hdrp_version": "17.0.3",
+        "vfx_graph_samples_version": "17.0.3",
+        "evidence": [
+          "ProjectSettings/ProjectVersion.txt",
+          "Packages/manifest.json",
+          "Assets/Samples/Visual Effect Graph/17.0.3"
+        ],
+        "notes": [
+          "Le README contient encore un changelog 2022.3/14.0.8 ; les fichiers de projet présents font foi.",
+          "Les sorties et shadergraphs HDRP demandent adaptation URP ; les scènes HDRP ne sont pas directement utilisables dans Palimpseste."
+        ]
+      },
+      "inspected_sources": [
+        "README.md",
+        "LICENSE.md",
+        "LICENSE-3rdParty.md",
+        "Packages/manifest.json",
+        "ProjectSettings/ProjectVersion.txt",
+        "Assets/Samples/Portal/Portal.vfx",
+        "Assets/Samples/RibbonPack/RibbonPack.vfx",
+        "Assets/Samples/Meteorite/VFX/MainMeteorite/01_Anticipation.vfx",
+        "Assets/Samples/Meteorite/VFX/MainMeteorite/03_GroundImpact.vfx",
+        "Assets/Samples/Visual Effect Graph/17.0.3/VisualEffectGraph Additions/Subgraphs/Blocks/Vortex.vfxblock"
+      ],
+      "candidates": [
+        {
+          "path": "Assets/Samples/Visual Effect Graph/17.0.3/VisualEffectGraph Additions/Subgraphs/Blocks/Vortex.vfxblock",
+          "uses": [
+            "tornade",
+            "tourbillon",
+            "attraction orbitale"
+          ],
+          "observed_techniques": [
+            "distance à l'axe",
+            "plan de vortex",
+            "drag",
+            "composantes canal/gravité/vortex selon distance"
+          ],
+          "reuse": "Point de départ pour la rotation continue et les forces ; expliciter les unités et raccorder les paramètres au contrat du sort."
+        },
+        {
+          "path": "Assets/Samples/Portal/Portal.vfx",
+          "uses": [
+            "portail",
+            "anneau de particules",
+            "bord énergétique"
+          ],
+          "observed_techniques": [
+            "tangente au tore",
+            "Rotation Speed",
+            "coordonnées animées de bruit",
+            "étincelles",
+            "distorsion"
+          ]
+        },
+        {
+          "path": "Assets/Samples/RibbonPack/RibbonPack.vfx",
+          "uses": [
+            "rubans",
+            "traînées organiques",
+            "magie sans corps solide"
+          ],
+          "observed_techniques": [
+            "systèmes head/trail",
+            "phase",
+            "débit de traînée"
+          ]
+        },
+        {
+          "path": "Assets/Samples/Meteorite/VFX/MainMeteorite",
+          "uses": [
+            "lancement",
+            "projectile",
+            "impact",
+            "résidus"
+          ],
+          "files": [
+            "01_Anticipation.vfx",
+            "02_Meteorite.vfx",
+            "03_GroundImpact.vfx",
+            "04_GroundImpactAdds.vfx"
+          ],
+          "observed_techniques": [
+            "anticipation séparée",
+            "roches vibrantes",
+            "force attractive",
+            "cible explicite",
+            "décal/mesh au sol",
+            "fumée"
+          ]
+        },
+        {
+          "path": "Assets/Samples/MagicBook/VFX/JacobsLadder.vfx",
+          "uses": [
+            "électricité",
+            "arcs"
+          ],
+          "inspection": "fichier local identifié ; graphe détaillé à explorer au moment de sa sélection"
+        },
+        {
+          "path": "Assets/Samples/BonFire/VFX/BonFire.vfx",
+          "uses": [
+            "feu",
+            "fumée",
+            "braises"
+          ],
+          "inspection": "fichier local identifié ; graphe détaillé à explorer au moment de sa sélection"
+        },
+        {
+          "path": "Assets/Samples/SmokePortal/VFXGraphs",
+          "uses": [
+            "portail de fumée",
+            "aspiration"
+          ],
+          "notes": [
+            "Les graphes sont présents mais six textures LFS de ce sample manquent. Ne pas annoncer un sample complet."
+          ]
+        }
+      ],
+      "adaptation_notes": [
+        "Sélectionner les blocs de simulation, événements et structures de phases ; remplacer les sorties HDRP par des sorties URP adaptées.",
+        "Le package Visual Effect Graph compatible doit être ajouté par l'agent de développement avant une intégration réelle, avec dépendances épinglées.",
+        "Résoudre seulement les objets LFS nécessaires aux ressources retenues ; conserver leur provenance.",
+        "Ne jamais importer les scènes complètes ou les animations Mixamo comme étape implicite d'une génération joueur."
+      ],
+      "recommended_starting_point": true
+    },
+    {
+      "id": "keijiro-vfx-graph-assets",
+      "url": "https://github.com/keijiro/VfxGraphAssets",
+      "branch": "main",
+      "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+      "local_directory": "VfxGraphAssets",
+      "acquisition_status": "downloaded",
+      "integration_status": "not_integrated",
+      "working_tree_bytes": 6633316,
+      "downloaded_total_bytes_including_git_at_inspection": 7001127,
+      "working_file_count": 264,
+      "working_tree_status": "clean",
+      "lfs_missing_pointer_count": 0,
+      "license": {
+        "identifier": "Unlicense",
+        "evidence": [
+          {
+            "path": "LICENSE",
+            "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+          },
+          {
+            "path": "Packages/jp.keijiro.vfxgraphassets/LICENSE",
+            "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+          }
+        ],
+        "conditions": [
+          "Le dépôt et le package déclarent Unlicense ; conserver la provenance et la notice dans notre inventaire.",
+          "Les dépendances ont leur propre provenance et doivent être examinées séparément avant installation."
+        ]
+      },
+      "declared_requirements": {
+        "unity_minimum": "6000.0",
+        "project_unity_version": "6000.0.62f1",
+        "pipelines": [
+          "URP",
+          "HDRP"
+        ],
+        "package": "jp.keijiro.vfxgraphassets",
+        "package_version": "3.10.1",
+        "dependencies": {
+          "com.unity.visualeffectgraph": "17.0.0",
+          "jp.keijiro.shadergraphassets": "2.5.2"
+        },
+        "demo_pipeline_versions": {
+          "URP": "17.0.4",
+          "HDRP": "17.0.4"
+        },
+        "notes": [
+          "Le package.json mentionne une signature ajoutée pour Unity6.3 ; cela ne constitue pas un test dans Palimpseste.",
+          "Le package ShaderGraphAssets requis n'est pas téléchargé par ce clone.",
+          "Ne pas importer le manifeste du projet démo avec ses deux pipelines et ses outils Klutter."
+        ]
+      },
+      "inspected_sources": [
+        "README.md",
+        "LICENSE",
+        "Packages/jp.keijiro.vfxgraphassets/package.json",
+        "Packages/manifest.json",
+        "ProjectSettings/ProjectVersion.txt",
+        "Packages/jp.keijiro.vfxgraphassets/Subgraph/DF Noise Turbulence.vfxblock",
+        "Packages/jp.keijiro.vfxgraphassets/CHANGELOG.md"
+      ],
+      "candidates": [
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/DF Noise Turbulence.vfxblock",
+          "uses": [
+            "fumée organique",
+            "écoulement magique",
+            "traînées"
+          ],
+          "observed_techniques": [
+            "bruit sans divergence",
+            "fréquence et turbulence paramétrées"
+          ]
+        },
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Divergence Free Noise 3D.vfxoperator",
+          "uses": [
+            "champs de vitesse",
+            "advection organique"
+          ]
+        },
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Rotate Axes.vfxblock",
+          "uses": [
+            "rotation locale",
+            "axes de particules"
+          ]
+        },
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Random Direction Per Strip.vfxoperator",
+          "uses": [
+            "variation cohérente par ruban"
+          ]
+        },
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Damped Spring Motion Vector3.vfxoperator",
+          "uses": [
+            "oscillation amortie",
+            "réponse à impulsion"
+          ]
+        },
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Exponential Easing.vfxoperator",
+          "uses": [
+            "montée en puissance",
+            "fondu temporel"
+          ]
+        },
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Shader/Textureless Strip.shadergraph",
+          "uses": [
+            "rubans sans texture",
+            "traînées lumineuses"
+          ]
+        },
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Mesh/Rock1.obj",
+          "uses": [
+            "débris rocheux"
+          ],
+          "notes": [
+            "Mesh disponible ; employer seulement pour une matière explicitement solide dans la description."
+          ]
+        },
+        {
+          "path": "Packages/jp.keijiro.vfxgraphassets/Mesh/Shard1.obj",
+          "uses": [
+            "éclats"
+          ],
+          "notes": [
+            "Candidat disponible, non importé."
+          ]
+        }
+      ],
+      "adaptation_notes": [
+        "Candidat directement orienté Unity6 URP/HDRP ; ajouter uniquement le package sélectionné avec ses dépendances vérifiées.",
+        "Contrôler paramètres, budgets de particules et event bindings avant exposition au catalogue du worker.",
+        "Les scripts de liaison et éditeurs sont présents dans le clone ; aucun n'a été exécuté."
+      ],
+      "recommended_starting_point": true
+    }
+  ],
+  "completion_limits": [
+    "Les quatre dépôts ont été clonés et leur structure, documentation, licences et certains graphes inspectés.",
+    "Les objets LFS manquants sont listés explicitement.",
+    "Aucune ressource de ces quatre clones n'a encore été intégrée dans les assets/runtime/builds de Palimpseste par cette tâche.",
+    "Aucun test, build Unity, appel modèle ou nouveau sort n'a été lancé."
+  ]
+}

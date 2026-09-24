@@ -1,5 +1,7 @@
 # PROMPT MAÎTRE — PALIMPSESTE / UNITY / LUNA AU MAXIMUM
 
+> **D17 — 24 septembre 2026 :** pour chaque travail de construction VFX, explorer les cinq [bibliothèques obligatoires](../docs/BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt), puis partir de leurs ressources et techniques pertinentes avant les itérations Dream-loop Pro. Respecter les licences, les dépendances et Unity 6.3 URP. Les imports se font côté développement ; le worker consulte les fiches contrôlées et compose avec les ressources réellement embarquées. Les copies locales, commits et limites de téléchargement sont consignés dans `reference/vfx-libraries.inventory.json`.
+
 Version SP-1.1-LUNA · 19 septembre 2026. Mission de développement, pas preuve d'un logiciel déjà réalisé.
 
 > **Priorité actuelle D14 :** respecter le cycle complet décrit en texte pour chaque sujet : apparition, activité, contact et disparition naturelle. L'image générée est la cible d'apparence du moment actif. La boucle **Dream-loop Pro** compare cette cible à quatre captures du renderer Unity précompilé via une **nouvelle session critique J**, puis révise seulement les profils visuels bornés du plan. Modèles inchangés : A `gpt-5.6-sol` / `high`, G/B/J `gpt-6-astra` / `high` ; prompts A `2.3`, B `2.2`, J `1.0`. Voir [D14](../docs/DECISIONS.md).

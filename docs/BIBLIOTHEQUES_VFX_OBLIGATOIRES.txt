@@ -1,0 +1,103 @@
+PALIMPSESTE — BIBLIOTHÈQUES VFX OBLIGATOIRES
+Décision du créateur : 24 septembre 2026
+Cible : Unity 6.3 LTS, Universal Render Pipeline (URP).
+
+RÈGLE POUR CHAQUE FUTUR SORT ET CHAQUE AMÉLIORATION VFX
+
+Explorer les cinq sources ci-dessous avant de construire. Partir des éléments
+existants les mieux adaptés à la description et à la planche d'animation :
+shaders, textures, graphes, exemples de mouvement, composition et particules.
+Réutiliser les éléments dont la licence et les dépendances le permettent.
+Adapter leur couleur, leur silhouette, leur mouvement et leurs trois phases
+au sort demandé, puis travailler la fidélité avec Dream-loop Pro.
+
+La consultation des cinq sources est obligatoire. Leur emploi simultané dans
+un même sort ne l'est pas : choisir les ingrédients réellement pertinents.
+Le dessin inspire le sort décrit ; le contour brut du dessin n'impose pas la
+géométrie. La description définit apparition, activité, contact et extinction.
+
+1. TINYPLAY — URP SHADERS COLLECTION
+https://github.com/TinyPlay/URPShadersCollection
+
+Collection de Shader Graph et shaders URP : plasma, champ de force, bulles,
+hexagones, brume, matières stylisées. Examiner Shaders/, Materials/, Textures/
+et les exemples. Point de départ pour barrières, énergie, poison et halos.
+Licence MIT ; conserver la notice pour toute copie. Certains effets demandent
+la texture de profondeur URP. Compatibilité Unity 6.3 à vérifier lors du portage.
+
+2. XTAJA — VFX-SHADER
+https://github.com/xtaja/VFX-Shader
+
+Shader URP HLSL et Shader Graph développé avec Unity 6000.0.51f1 : distorsion,
+masque, dissolution, adoucissement des intersections, Fresnel, mouvement UV.
+Examiner Assets/ et Documentation/. Les Custom Vertex Streams comprennent
+AgePercent pour piloter l'apparition et la disparition avec l'âge des particules.
+Aucune licence explicite détectée : consultation technique ; ne pas intégrer
+ou redistribuer son code et ses assets sans autorisation de réutilisation.
+
+3. HS HOVL STUDIO — MAGIC EFFECTS FREE
+https://assetstore.unity.com/packages/vfx/particles/spells/magic-effects-free-247933
+
+Référence pour la composition d'effets magiques, cercles, portails, impacts,
+explosions et particules stylisées. Fiche consultée : gratuit, version 1.6,
+compatibilité URP annoncée pour Unity 2021.3 et 2022.3, pas de preuve Unity 6.3.
+Licence Standard Unity Asset Store EULA ; gratuit ne signifie pas libre de
+redistribution. Le package n'est pas acquis ni importé dans cette livraison.
+L'acquisition doit passer par le compte Unity autorisé et les mécanismes officiels.
+Ne pas publier les sources du package dans le Git public. Le worker reçoit
+uniquement notre fiche factuelle ; aucun asset propriétaire comme entrée modèle.
+Conditions : https://unity.com/legal/as-terms
+
+4. UNITY — VISUAL EFFECT GRAPH SAMPLES
+https://github.com/Unity-Technologies/VisualEffectGraph-Samples
+
+Explorer notamment Portal, Bonfire, RibbonPack, MagicBook et les exemples de
+flux et de particules. Point de départ pour rubans, feu/fumée, émissions,
+transitions et superposition de couches. Le projet contient des exemples HDRP :
+ne pas importer son pipeline, ses scènes ou ses réglages globaux dans notre jeu.
+Licence Unity Companion et notices tierces à respecter fichier par fichier.
+Le clone de référence peut contenir des pointeurs Git LFS : vérifier qu'un
+fichier contient ses vrais octets avant de le considérer comme récupéré.
+
+5. KEIJIRO — VFX GRAPH ASSETS
+https://github.com/keijiro/VfxGraphAssets
+
+Sous-graphes, opérateurs, blocs, shaders et meshes pour VFX Graph. L'amont
+annonce Unity 6 et URP/HDRP. Licence Unlicense, avec notices tierces éventuelles
+à conserver. Examiner le package jp.keijiro.vfxgraphassets : utiliser ses
+briques pertinentes pour le mouvement organique, les surfaces et les flux,
+en vérifiant les dépendances réellement requises par l'exemple retenu.
+
+ORGANISATION
+
+Copies locales de consultation : E:\Palimpseste\VFX_Libraries\
+Inventaire des commits, licences, chemins et téléchargements :
+reference/vfx-libraries.inventory.json
+Fiches consultées par la recherche du worker : assets/sourced-vfx/references.json
+Ressources réellement disponibles dans le Player : assets/sourced-vfx/catalogue.json
+
+Les clones restent séparés du projet Unity. Aucun script tiers n'est exécuté
+par leur téléchargement. Un futur import se fait côté développement, avec
+provenance, licence, dépendances et adaptation URP consignées. Le worker utilise
+uniquement des identifiants contrôlés de ressources déjà embarquées.
+
+POUR CHAQUE CONSTRUCTION
+
+1. Lire description, placement, mouvement attendu et les 21 cases de la planche.
+2. Explorer les cinq bibliothèques via leurs fiches et leurs exemples pertinents.
+3. Sélectionner les ressources et techniques utiles ; relever source, chemin,
+   commit/version, licence, dépendances et adaptation nécessaire.
+4. Composer le sort avec les ressources disponibles ; un nom de bibliothèque
+   ne remplace pas une intégration réelle. Ne pas inventer un resource_id.
+5. Préserver la physique, animer chaque couche et prévoir impact/extinction.
+6. Affiner avec Dream-loop Pro selon la planche ; garder les écarts explicites.
+7. Laisser le créateur tester et donner son verdict visuel.
+
+ÉTAT DE CETTE LIVRAISON
+
+Consigne durable et catalogue de recherche mis à jour dans les sources.
+Les téléchargements précis sont consignés dans l'inventaire séparé.
+Les nouveaux packages ne sont pas encore embarqués dans le Player ; les
+16 textures Kenney et le bruit NoiseShader restent les ressources livrées.
+Le nouveau code de recherche doit être publié et déployé avant d'affecter
+les générations du service déjà installé. Aucun nouveau rendu n'est validé.
