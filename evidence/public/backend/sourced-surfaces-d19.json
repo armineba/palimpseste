@@ -1,0 +1,79 @@
+{
+    "change":  "D19",
+    "recorded_utc":  "2026-09-24T21:21:47.0900568+00:00",
+    "client_version":  "1.7.0",
+    "prompt_b":  "sp.prompt.b/2.6",
+    "change_summary":  "Executable source-derived surface profiles per construction part, separately advertised from the sixteen CC0 particle textures",
+    "profiles":  [
+                     "plasma",
+                     "force_field",
+                     "toxic",
+                     "spectral_flow"
+                 ],
+    "minimum_client_for_new_profiles":  "1.7.0",
+    "mandatory_libraries_still_examined":  5,
+    "integrated_sources":  [
+                               "TinyPlay/URPShadersCollection MIT",
+                               "keijiro/VfxGraphAssets Unlicense"
+                           ],
+    "graphs_imported":  false,
+    "third_party_prefabs_imported":  false,
+    "backend":  {
+                    "publish_exit":  0,
+                    "publish_log":  "deliverables/sourced-surfaces-d19-publish.log",
+                    "stage":  "deliverables/.stage-backend/8678b52da34145259053ca01ed572602",
+                    "worker_sha256":  "523f8659469e73fa268aba49af62102d0fcabed1efa9a053fc7558ce6cb93160",
+                    "api_sha256":  "392200703a88ca9cfa6d735ea86b56816192401a7a443a8f7f323532b407ae28",
+                    "installation_report":  "evidence/public/backend/sourced-surfaces-d19-installation.json",
+                    "installation_completed":  true,
+                    "phase":  "services_started",
+                    "installed_at":  "2026-09-24T21:20:40.5133051+00:00",
+                    "max_concurrent_jobs":  0,
+                    "claims_paused_after_installation":  false
+                },
+    "compilation":  {
+                        "exit_code":  0,
+                        "errors":  0,
+                        "warnings":  0,
+                        "log":  "deliverables/sourced-surfaces-d19-build.log",
+                        "earlier_attempt":  {
+                                                "exit_code":  1,
+                                                "reason":  "Duplicate compiledPacket local declaration; corrected before final compilation",
+                                                "log":  "deliverables/sourced-surfaces-d19-build-attempt-01.log"
+                                            }
+                    },
+    "player":  {
+                   "build_exit":  0,
+                   "zip_sha256":  "f0ab5363281eaf560df14aeae5038a7e3ad03232e87a7ee03887dce6d6c24c1c",
+                   "zip_bytes":  46852159,
+                   "files_verified":  34,
+                   "manifest":  "evidence/public/unity/lifecycle-delivery.json",
+                   "build_log_sha256":  "b1743de127ef53e9c56b11f543a66151e631e0674a0a7a0cf87296fda2f315e1",
+                   "compiler_excerpt":  "evidence/public/unity/sourced-surfaces-d19-build.txt",
+                   "final_shader_errors":  0,
+                   "earlier_build_rejected":  "Unity exit 0 but HLSL reserved point name failed; fixed and rebuilt",
+                   "reopened":  true,
+                   "opened_at":  "2026-09-24T21:20:41.6365462+00:00",
+                   "pid":  33920,
+                   "opening_report":  "evidence/public/unity/sourced-surfaces-d19-open.json"
+               },
+    "tests_executed":  false,
+    "diagnostic_model_calls_started":  false,
+    "demonstration_spells_started":  false,
+    "validation_captures_taken":  false,
+    "static_review_completed":  true,
+    "visual_judge_run_for_development":  false,
+    "visual_fidelity_accepted":  false,
+    "owner_trial":  "pending",
+    "digests":  {
+                    "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader":  "a073894edbb341b653f86eb3c9aa952247499b6bdcf7c5452d942ee3a9446407",
+                    "game/Assets/Palimpseste/Resources/SourcedSurfaces/KeijiroDivergenceFreeNoise.hlsl":  "02014c4f7ef9687933f0209bb1ed4a9c2c249e2170a3437320b1ba3cbd306d98",
+                    "game/Assets/Palimpseste/Presentation/ImageConstructedSpellVisual.cs":  "c3700acdd4e7cc8c25d467633dd672f98e9c5aa9cb1b47395a1f00fe1b4f1efc",
+                    "prompts/02_MODEL_B_TRADUCTEUR.md":  "1500e5e0d7e36de5c2a045415ccebe379922776e0bf72d914c23f054bac8655f",
+                    "assets/sourced-vfx/catalogue.json":  "a5d433789767cf33aab73103ee913d6a9fe8f49d7dc8216bd0af2125ecd2c4e6",
+                    "assets/sourced-vfx/references.json":  "1f2adbdff503e9c67562f0537ce336e0fcf2d05b8e603058ca8de6d53bffeb26",
+                    "backend/Palimpseste.Provider/SpellReferenceResearch.cs":  "6492e80aedb97ec6d87db8dbba400bb611edce66b53c1793aa22e92c3b3a42ba",
+                    "backend/Palimpseste.Worker/TrustedVisualCapture.cs":  "cb04c1da86023456963d9d53da2451aa686ded08f820e4c62407a559dd6b0d2b",
+                    "ops/deploy-lifecycle.ps1":  "2815902d8d668553c4fa9f3eab9db6e47c6d507d3fb13aca066d058681dbd3ba"
+                }
+}

@@ -29,8 +29,9 @@ foreach ($path in @($stage,$zip,$pending)) {
 }
 $files = [ordered]@{}
 $files['README.txt'] = Join-Path $stage 'README.txt'
+$files['spec/assets/sourced-vfx/catalogue.json'] = Join-Path $repo 'assets\sourced-vfx\catalogue.json'
 $files['IMPLEMENTATION_STATUS.md'] = Join-Path $repo 'docs\IMPLEMENTATION_STATUS.md'
-foreach ($name in @('D15_BEHAVIOR_AND_RESEARCH.md','D18_CONCURRENT_JOBS.md','UNITY_BEHAVIORS_D15.md','UNITY_ANIMATION_SHEET_D16.md','references-vfx-sources.md','BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt','NEXT_ACTIONS.md','TESTER_MAINTENANT.md')) {
+foreach ($name in @('D15_BEHAVIOR_AND_RESEARCH.md','D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','UNITY_BEHAVIORS_D15.md','UNITY_ANIMATION_SHEET_D16.md','references-vfx-sources.md','BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt','NEXT_ACTIONS.md','TESTER_MAINTENANT.md')) {
     $files['docs/' + $name] = Join-Path $repo ('docs\' + $name)
 }
 foreach ($file in Get-ChildItem -LiteralPath (Join-Path $repo 'docs') -Filter 'D16*.md' -File) {

@@ -99,7 +99,11 @@ namespace Palimpseste.Core
 
             var minimumClient = input.MinimumClientVersion;
             if (!System.Version.TryParse(minimumClient, out var parsedClient)) parsedClient = new System.Version(0, 0, 0);
-            if (input.VisualReference?.animation_sheet != null && parsedClient < new System.Version(1, 6, 0))
+            if (plan.nodes.Any(node => node.appearance.construction?.parts.Any(part =>
+                    SpellVisualConstructionLimits.SourcedMaterials.Contains(part.material)) == true) &&
+                parsedClient < new System.Version(1, 7, 0))
+                minimumClient = "1.7.0";
+            else if (input.VisualReference?.animation_sheet != null && parsedClient < new System.Version(1, 6, 0))
                 minimumClient = "1.6.0";
             else if (plan.nodes.Any(node => node.behavior != null || node.physics != null || node.appearance.resource_id != null) &&
                 parsedClient < new System.Version(1, 5, 0))
@@ -564,7 +568,9 @@ namespace Palimpseste.Core
         private static void CheckReferenceResearch(SpellDescription description, SpellPlan plan,
             string expectedHash, List<ValidationIssue> issues)
         {
-            if (description.behaviors == null && plan.reference_research_sha256 == null) return;
+            var usesSourcedMaterial = plan.nodes.Any(node => node.appearance.construction?.parts?.Any(part =>
+                part != null && SpellVisualConstructionLimits.SourcedMaterials.Contains(part.material)) == true);
+            if (description.behaviors == null && plan.reference_research_sha256 == null && !usesSourcedMaterial) return;
             if (!HexDigest(expectedHash) || plan.reference_research_sha256 != expectedHash)
                 Add(issues, "reference_research_hash", "$.reference_research_sha256",
                     "Plan must cite the exact frozen research context supplied by the server");

@@ -473,6 +473,7 @@ namespace Palimpseste.Game.SpellRuntime
         private static Material MakeMaterial(Shader shader, SpellVisualPart part)
         {
             float mode;
+            var surfaceProfile = 0;
             switch (part.material)
             {
                 case "glass": mode = 0; break;
@@ -480,19 +481,37 @@ namespace Palimpseste.Game.SpellRuntime
                 case "mist": mode = 2; break;
                 case "stone": mode = 3; break;
                 case "metal": mode = 4; break;
+                case "plasma": mode = 1; surfaceProfile = 1; break;
+                case "force_field": mode = 1; surfaceProfile = 2; break;
+                case "toxic": mode = 2; surfaceProfile = 3; break;
+                case "spectral_flow": mode = 2; surfaceProfile = 4; break;
                 default: throw new ArgumentException("Unsupported image construction material");
             }
             var rgb = Vector(part.color_rgb,0,255) / 255f;
             var material = new Material(shader) { name = "Image construction " + part.material };
             material.SetColor("_Color",new Color(rgb.x,rgb.y,rgb.z,1));
             material.SetFloat("_Material",mode);
+            // Curated source-derived programs are compiled into the Player.
+            // The plan selects an enum, never a shader, path or downloaded code.
+            material.SetFloat("_SurfaceProfile",surfaceProfile);
+            if (surfaceProfile == 1)
+                material.SetTexture("_SurfaceTex",SourcedSurfaceTexture("tinyplay_plasma"));
+            else if (surfaceProfile == 2 || surfaceProfile == 4)
+                material.SetTexture("_SurfaceTex",SourcedSurfaceTexture("tinyplay_noise"));
             material.SetFloat("_Opacity",Mathf.Clamp01(part.opacity_milli / 1000f));
             material.SetFloat("_Emission",Mathf.Clamp(part.emission_milli / 1000f,0,6));
             material.SetFloat("_Shape",part.kind == "feather" ? 1 : part.kind == "ribbon" ? 2 : part.kind == "arc" ? 3 : 0);
             material.SetFloat("_ZWrite",mode >= 3 ? 1 : 0);
-            material.SetFloat("_Cull",part.kind == "ribbon" ? 0 : 2);
-            material.renderQueue = mode >= 3 ? 2500 : part.material == "energy" ? 3022 : 3018;
+            material.SetFloat("_Cull",part.kind == "ribbon" || surfaceProfile > 0 ? 0 : 2);
+            material.renderQueue = mode >= 3 ? 2500 : mode == 1 ? 3022 : 3018;
             return material;
+        }
+
+        private static Texture2D SourcedSurfaceTexture(string name)
+        {
+            var texture = Resources.Load<Texture2D>("SourcedVfx/" + name);
+            if (texture == null) throw new InvalidOperationException("Sourced surface texture missing from Player: " + name);
+            return texture;
         }
 
         private void Update()

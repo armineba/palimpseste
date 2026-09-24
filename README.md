@@ -2,7 +2,11 @@
 
 Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le parcours D16 est : **dessin libre → description → planche d’animation 3 × 7 → composition 3D/VFX contrôlée → sort jouable dans le laboratoire**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
-## Version courante — backend D18 / Player 1.6.0
+## Version courante — backend D19 / Player 1.7.0
+
+**D19 installé, jeu rouvert le 24 septembre à 23:20 Paris.** Le moteur exécute quatre nouveaux profils par partie, issus de TinyPlay et Keijiro : plasma, champ de force, matière toxique et flux spectral. Les calculs et les deux textures originales sont réellement livrés dans le Player ; le constructeur B **2.6** peut les sélectionner depuis la recherche liée à la planche. [Provenance et limites](docs/D19_SOURCED_SURFACES.md) · [Compilation et livraison](evidence/public/backend/sourced-surfaces-d19.json) · [Installation](evidence/public/backend/sourced-surfaces-d19-installation.json).
+
+Pour essayer, créer **un nouveau parchemin**. Le créateur teste lui-même : aucun essai de jeu ou de fidélité visuelle n'a été lancé par l'agent. Les bibliothèques complètes ne sont pas importées ; les autres sources gardent leur état explicite. Les livraisons précédentes ci-dessous constituent l'historique.
 
 **D18 publié et installé le 24 septembre à 22:52 Paris :** plusieurs parchemins peuvent progresser en parallèle, sans plafond applicatif de jobs (`PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0`). Les captures Unity partagent le GPU à tour de rôle. [Fonctionnement](docs/D18_CONCURRENT_JOBS.md) · [Installation](evidence/public/backend/parallel-jobs-d18-installation.json). Aucun test ni génération de démonstration lancé ; l'essai simultané après installation reste au créateur.
 

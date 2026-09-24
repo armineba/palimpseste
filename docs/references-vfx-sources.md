@@ -1,5 +1,13 @@
 # Recherche et ressources VFX réutilisables
 
+## D19 — des sources aux programmes réellement exécutés
+
+Le Player **1.7.0** ajoute quatre profils par partie : plasma, force_field et toxic issus des graphes TinyPlay MIT, spectral_flow utilisant l'opérateur Keijiro Unlicense. Les deux textures TinyPlay livrées sont lues en RGB et le shader exécute les portages. [Chemins amont, commits, licences et adaptations](D19_SOURCED_SURFACES.md). Aucun package complet HDRP ni prefab propriétaire n'est importé.
+
+La recherche des nouveaux jobs fournit `surface_profiles` indépendamment des seize textures de particules. B **2.6** choisit la matière selon la description et les phases de la planche. Le compilateur impose le client 1.7 dès qu'un nouveau profil apparaît ; le renderer vérifie aussi que sa version permet d'afficher le paquet. Les anciens dossiers de recherche restent figés et ne gagnent pas de profils absents de leurs données.
+
+Backend et Player sont compilés et empaquetés ; [le rapport d'installation](../evidence/public/backend/sourced-surfaces-d19-installation.json) indique l'état effectif de la bascule. Aucun essai visuel ou score de fidélité n'est acquis par cette intégration. Les sections suivantes décrivent les étapes historiques.
+
 ## D17 — bibliothèques obligatoires pour reconstruire la planche
 
 Depuis la décision du **24 septembre 2026**, le passage **planche générée → recherche → construction B** doit consulter les cinq [bibliothèques imposées](BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt). L'[inventaire local](../reference/vfx-libraries.inventory.json) conserve commits, licences, exemples et fichiers réellement récupérés. Ces fiches orientent la reconstruction des 21 cases d'un même sort animé ; elles servent également aux révisions B de Dream-loop Pro, qui reprennent le dossier immuable lié à la description et à la planche.

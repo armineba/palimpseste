@@ -1,6 +1,18 @@
 {
   "schema_version": "palimpseste.vfx-library-inventory/1.0",
   "observed_date": "2026-09-24",
+  "current_renderer_integration": {
+    "revision": "D19",
+    "client_version": "1.7.0",
+    "compiled_player": true,
+    "implemented_profiles": ["plasma", "force_field", "toxic", "spectral_flow"],
+    "integrated_sources": ["tinyplay-urp-shaders-collection", "keijiro-vfx-graph-assets"],
+    "integration_kind": "Selected HLSL ports and two original textures; complete graph packages are not imported",
+    "provenance": "docs/D19_SOURCED_SURFACES.md",
+    "installation_record": "evidence/public/backend/sourced-surfaces-d19-installation.json",
+    "owner_visual_acceptance": "pending",
+    "historical_snapshot_note": "The acquisition and repository inspection sections below describe the earlier D17 download, before these selected renderer ports."
+  },
   "purpose": "Bibliothèques demandées par le propriétaire pour préparer systématiquement les futurs sorts. Cet inventaire décrit une acquisition et une exploration de sources, pas une intégration Unity.",
   "local_library_root": "E:/Palimpseste/VFX_Libraries",
   "acquisition": {

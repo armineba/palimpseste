@@ -1,0 +1,13 @@
+D19 Unity compiler evidence. Extracted log lines; no gameplay test or capture.
+Attempt 1: rejected because shader compilation failed
+Log SHA256: 1aa47173c16b86aba05b3c3f6883c135cdf34b0470e48a8a076487ae84b33a22
+Shader error in 'Palimpseste/SpellImageConstruction': syntax error: unexpected token 'point' at Assets/Palimpseste/Resources/SpellImageConstruction.shader(96) (on d3d11)
+Shader error in 'Palimpseste/SpellImageConstruction': syntax error: unexpected token 'point' at Assets/Palimpseste/Resources/SpellImageConstruction.shader(97) (on d3d11)
+Build Finished, Result: Success.
+PALIMPSESTE_BUILD_OK E:/Palimpseste/Palimpseste_GitHub/game/Build/WindowsAnimationSheetRelease/Palimpseste.exe bytes=1406125074
+Exiting without the bug reporter. Application will terminate with return code 0
+Attempt 2: final Player build
+Log SHA256: b1743de127ef53e9c56b11f543a66151e631e0674a0a7a0cf87296fda2f315e1
+Build Finished, Result: Success.
+PALIMPSESTE_BUILD_OK E:/Palimpseste/Palimpseste_GitHub/game/Build/WindowsAnimationSheetRelease/Palimpseste.exe bytes=1406140066
+Exiting without the bug reporter. Application will terminate with return code 0

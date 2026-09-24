@@ -1,20 +1,20 @@
 {
-    "observed_at":  "2026-09-20T23:40:45.0151865Z",
-    "client_version":  "1.6.0",
-    "delivery_name":  "D16 strict 3x7 animation sheet",
+    "observed_at":  "2026-09-24T21:14:39.8144596Z",
+    "client_version":  "1.7.0",
+    "delivery_name":  "D19 sourced surface profiles / animation sheet",
     "unity":  "6000.3.24f1",
     "backend":  "IL2CPP",
     "build_exit":  0,
     "build_success_marker_observed":  true,
     "build_log":  "game/Logs/animation-sheet-build.log",
-    "build_log_sha256":  "773d9ce368182c0e8440b9699cf84a252457039a05d65a0a2b399fb6d40059cd",
+    "build_log_sha256":  "b1743de127ef53e9c56b11f543a66151e631e0674a0a7a0cf87296fda2f315e1",
     "source":  "game/Build/WindowsAnimationSheetRelease",
     "playable":  "game/Build/WindowsAnimationSheetPlayable",
     "zip":  "deliverables/Palimpseste-Windows-x64-IL2CPP.zip",
-    "zip_bytes":  46591080,
-    "zip_sha256":  "24ca0f949892fd3017889e8c0a1f23c48cd69f63125174a36951525739c5507f",
-    "files_verified":  32,
-    "playable_bytes":  131782732,
+    "zip_bytes":  46852159,
+    "zip_sha256":  "f0ab5363281eaf560df14aeae5038a7e3ad03232e87a7ee03887dce6d6c24c1c",
+    "files_verified":  34,
+    "playable_bytes":  132056125,
     "files":  [
                   {
                       "file":  "baselib.dll",
@@ -28,8 +28,8 @@
                   },
                   {
                       "file":  "GameAssembly.dll",
-                      "bytes":  51350528,
-                      "sha256":  "4a43ae59f07a5d23db7f74cacf5edb4191df6e6220e67db46dc1059181e96e2a"
+                      "bytes":  51352576,
+                      "sha256":  "c9e058ae378f5850febe1f728e9b4a12c3d3c7a81b94d926d1c9044264e99edb"
                   },
                   {
                       "file":  "Palimpseste.exe",
@@ -44,12 +44,12 @@
                   {
                       "file":  "Palimpseste_Data/boot.config",
                       "bytes":  156,
-                      "sha256":  "5a8bed9e25aae0739643d8d6d54b9d21a2c4aff4f00c157f4c4463877c8056e8"
+                      "sha256":  "f90fe8adc075f358a204081d170a4b134f38e571f1b6be3b2046ddce44d8b073"
                   },
                   {
                       "file":  "Palimpseste_Data/globalgamemanagers",
-                      "bytes":  215748,
-                      "sha256":  "ac7d606f3a873e98d93817cea5e05c243324e80f356873c915f5c008d7aab1c2"
+                      "bytes":  216020,
+                      "sha256":  "bfdd172348128ad564cd0c127b2a821f0cbd1d83fd59528b2969a60af30cff71"
                   },
                   {
                       "file":  "Palimpseste_Data/globalgamemanagers.assets",
@@ -63,8 +63,8 @@
                   },
                   {
                       "file":  "Palimpseste_Data/il2cpp_data/Metadata/global-metadata.dat",
-                      "bytes":  10605488,
-                      "sha256":  "fcf945ed17107ef15e96160e73c703a6f17d84240acd2daa26e21d1b80ec0925"
+                      "bytes":  10605800,
+                      "sha256":  "e400efc5a303475b611be5436c24093ce898b331126f36e431bfdc2bd06c9cfb"
                   },
                   {
                       "file":  "Palimpseste_Data/il2cpp_data/Resources/mscorlib.dll-resources.dat",
@@ -103,13 +103,13 @@
                   },
                   {
                       "file":  "Palimpseste_Data/resources.assets",
-                      "bytes":  572072,
-                      "sha256":  "e854818b7fcdea6ad2a091a21b3ab3264f8d6f2c17af1f0cf71b5ea6dbbc5c63"
+                      "bytes":  581720,
+                      "sha256":  "1d0e685d45e85bd2ecf0ff10af42550f0cfafbe328f068d74fe87203f6e8561f"
                   },
                   {
                       "file":  "Palimpseste_Data/resources.assets.resS",
-                      "bytes":  10197200,
-                      "sha256":  "8d42eb485d39a9f2bf71ca3075d276f0bf4a72cf0ebe76764926f524f560124a"
+                      "bytes":  10456016,
+                      "sha256":  "e25d6ec60c16115eb301ccdb6e2c94805b837aa0521f59365f5c8fb197b25e88"
                   },
                   {
                       "file":  "Palimpseste_Data/Resources/unity default resources",
@@ -178,16 +178,30 @@
                       "bytes":  1145,
                       "sha256":  "bdafce1bb01517c9ae6c4f3620c01340790b5e9d039ae9e356347d1174250916",
                       "origin":  "reviewed_asset_license"
+                  },
+                  {
+                      "file":  "ThirdPartyNotices/TinyPlay-URPShadersCollection-MIT.txt",
+                      "bytes":  1086,
+                      "sha256":  "fa5e30bee17e429e5831a9f70089f669ea64fdf5a2aa13a383f864197b8ae7ae",
+                      "origin":  "reviewed_asset_license"
+                  },
+                  {
+                      "file":  "ThirdPartyNotices/Keijiro-VfxGraphAssets-Unlicense.txt",
+                      "bytes":  1211,
+                      "sha256":  "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+                      "origin":  "reviewed_asset_license"
                   }
               ],
     "build_files_verified":  29,
     "supplemental_license_files":  [
                                        "ThirdPartyNotices/Kenney-Particle-Pack-CC0.txt",
                                        "ThirdPartyNotices/Kenney-Smoke-Particles-CC0.txt",
-                                       "ThirdPartyNotices/NoiseShader-MIT.txt"
+                                       "ThirdPartyNotices/NoiseShader-MIT.txt",
+                                       "ThirdPartyNotices/TinyPlay-URPShadersCollection-MIT.txt",
+                                       "ThirdPartyNotices/Keijiro-VfxGraphAssets-Unlicense.txt"
                                    ],
-    "source_commit":  "3d9a9f398fa06dc466a3603a28d1cb0913ffac6f",
-    "source_snapshot_sha256":  "cdca983d6cefa8db01a512c4226719e38f69f90a90d179895560d4aa1778d984",
+    "source_commit":  "bc668261d7a84ace54d7101596cab196702f97e5",
+    "source_snapshot_sha256":  "8d28b8edefaf6367bf78d100647ff791db012912385984b70be4764c68130dc4",
     "source_files":  [
                          {
                              "file":  "game/Assets/InputSystem_Actions.inputactions",
@@ -267,7 +281,7 @@
                          {
                              "file":  "game/Assets/Palimpseste/Editor/BuildPalimpseste.cs",
                              "bytes":  5731,
-                             "sha256":  "0fe92eef3f13a48e0389923bbe6271cbd84f0bf8e474f666a0aee545b0d196b9"
+                             "sha256":  "404460642b13a09beabb400dcab5b8cf9c2c58a3c2c7c1cfbe5b130ef1eb5ff2"
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Editor/BuildPalimpseste.cs.meta",
@@ -291,8 +305,8 @@
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Library/CachedSpellVerifier.cs",
-                             "bytes":  4972,
-                             "sha256":  "da5713ed6525a02339c0698a28576e1339308305bc6e6dec07f7e5a36ea99aa0"
+                             "bytes":  4994,
+                             "sha256":  "ceb64147496e49c937331d98bc1258e78f95be8b060cbd1dfed44191d1733258"
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Library/CachedSpellVerifier.cs.meta",
@@ -311,8 +325,8 @@
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Library/ImageSpellPacketValidator.cs",
-                             "bytes":  20497,
-                             "sha256":  "3c4323bc7182cf9cc668dd6fa94bd00792662bbb1158d2c392ac11ba7b5ad842"
+                             "bytes":  20747,
+                             "sha256":  "0254a7cd2a87451b6d95081542d31b62b7c69d22f4995832d6b1dcb1e542671a"
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Library/ImageSpellPacketValidator.cs.meta",
@@ -376,8 +390,8 @@
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Presentation/ImageConstructedSpellVisual.cs",
-                             "bytes":  56600,
-                             "sha256":  "19f23c94d77d1ef6bde93b26e527a844b1978626cf86e8067f0656fc304d9c6d"
+                             "bytes":  57744,
+                             "sha256":  "c3700acdd4e7cc8c25d467633dd672f98e9c5aa9cb1b47395a1f00fe1b4f1efc"
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Presentation/ImageConstructedSpellVisual.cs.meta",
@@ -525,9 +539,34 @@
                              "sha256":  "5644f8bc37d6daee08d331123687e73dc7464dc6ff1bae0a01c3ba0c7de05e27"
                          },
                          {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedSurfaces.meta",
+                             "bytes":  172,
+                             "sha256":  "2ad2bc5ad15453fbe521e926b4851aa03f1eed88b665d1ce36d5865050a19c97"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedSurfaces/KeijiroDivergenceFreeNoise.hlsl",
+                             "bytes":  1244,
+                             "sha256":  "02014c4f7ef9687933f0209bb1ed4a9c2c249e2170a3437320b1ba3cbd306d98"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedSurfaces/KeijiroDivergenceFreeNoise.hlsl.meta",
+                             "bytes":  161,
+                             "sha256":  "7f0d61de563c4a4c8ca530967265bfffb2ae4bf5c77daecafc5c4fc8e8d80cd5"
+                         },
+                         {
                              "file":  "game/Assets/Palimpseste/Resources/SourcedVfx.meta",
                              "bytes":  172,
                              "sha256":  "b8d4fb5c2ed2905c3b2b18c58394145f33f8f094daed8892fc8ba2e643870139"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/Keijiro-VfxGraphAssets-Unlicense.txt",
+                             "bytes":  1211,
+                             "sha256":  "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/Keijiro-VfxGraphAssets-Unlicense.txt.meta",
+                             "bytes":  158,
+                             "sha256":  "713af8e8baae00a7afb3fc099b587f57e4c26556c9173537bdd3bd1dc2fb3a94"
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_circle_01.png",
@@ -690,6 +729,36 @@
                              "sha256":  "4678265477ae73cc86a19f535de25c599aa28dfca67296a180e0340153b53616"
                          },
                          {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_noise.png",
+                             "bytes":  7111,
+                             "sha256":  "da338fcff419c98214a1723239a1f1234e9c4d57c795d1ac35e958e58cb3993e"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_noise.png.meta",
+                             "bytes":  3585,
+                             "sha256":  "b1a0da0b948ac642623aa10995d3b6e80263e89babef32667ddc0728f4e3f465"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_plasma.jpg",
+                             "bytes":  1541998,
+                             "sha256":  "e60137678e9caf011d113b42ae44aba05efb6393243005c1fa520c35d16554c5"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_plasma.jpg.meta",
+                             "bytes":  2895,
+                             "sha256":  "2142a1920833283c84b8256df19abeefa935496b4725299c950b25a84ac87292"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/TinyPlay-URPShadersCollection-MIT.txt",
+                             "bytes":  1086,
+                             "sha256":  "fa5e30bee17e429e5831a9f70089f669ea64fdf5a2aa13a383f864197b8ae7ae"
+                         },
+                         {
+                             "file":  "game/Assets/Palimpseste/Resources/SourcedVfx/TinyPlay-URPShadersCollection-MIT.txt.meta",
+                             "bytes":  158,
+                             "sha256":  "1a0c8f22fc7ac4e0f39633346a0101d2d1785427b797c99caba4feb860e01bd7"
+                         },
+                         {
                              "file":  "game/Assets/Palimpseste/Resources/SpellComposition.shader",
                              "bytes":  8516,
                              "sha256":  "b951d84e58dde2b575630ff4c2643a8d8bf8a9656ae699afa2c1cb613e95ea07"
@@ -711,8 +780,8 @@
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader",
-                             "bytes":  9782,
-                             "sha256":  "a76961f97fb20e78ebc1a67bb9a5f6d1203358fa407e9a0575cf8e2883140c20"
+                             "bytes":  19092,
+                             "sha256":  "a073894edbb341b653f86eb3c9aa952247499b6bdcf7c5452d942ee3a9446407"
                          },
                          {
                              "file":  "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader.meta",
@@ -1362,7 +1431,7 @@
                          {
                              "file":  "game/ProjectSettings/ProjectSettings.asset",
                              "bytes":  25565,
-                             "sha256":  "6b885f44b06b4bb4e35ac3508039b08fdcdfb1f9d6c0be614e7b7a69de98baed"
+                             "sha256":  "0fe440ac2bc626965dd1d9728811edb6baf42b3854150425016cf3021ed02847"
                          },
                          {
                              "file":  "game/ProjectSettings/ProjectVersion.txt",
@@ -1461,8 +1530,8 @@
                          },
                          {
                              "file":  "shared/Palimpseste.Contracts/SpellContracts.cs",
-                             "bytes":  17886,
-                             "sha256":  "85455ffce48d735da5ef43c82db3fa0f0f85c39d3e1392a043a4d02cdde75e12"
+                             "bytes":  18050,
+                             "sha256":  "f51da30ab39b119163630d0ab23d32b656bcbd5c3c1eb61ae521d4a00a7c7fca"
                          },
                          {
                              "file":  "shared/Palimpseste.Contracts/SpellContracts.cs.meta",
@@ -1475,13 +1544,13 @@
                               "*DoNotShip*",
                               "*DontShipItWithYourGame*"
                           ],
-    "previous_delivery_backup":  "game/Build/AnimationSheetDeliveryBackups/20260920-234038-99d9205f",
+    "previous_delivery_backup":  "game/Build/AnimationSheetDeliveryBackups/20260924-211431-afbf0862",
     "model_calls":  0,
     "tests_executed_by_packager":  false,
     "art_acceptance":  "not_claimed",
     "player_launch":  null,
     "desktop_shortcut":  {
-                             "updated_at":  "2026-09-20T23:40:45.1623577Z",
+                             "updated_at":  "2026-09-24T21:14:40.0329877Z",
                              "name":  "Palimpseste Spell Lab.lnk",
                              "target":  "game/Build/WindowsAnimationSheetPlayable/Palimpseste.exe",
                              "launch_executed":  false

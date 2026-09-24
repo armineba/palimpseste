@@ -120,3 +120,9 @@ Les imports se font dans le développement, avec licences et compatibilité URP 
 Le créateur demande que plusieurs parchemins puissent être construits simultanément, puis précise « pas de limite ». La valeur opérateur `0` signifie donc aucun plafond applicatif de jobs actifs. Un unique processus worker distribue les jobs vers des tâches indépendantes, avec bail, renouvellement et résultat séparés. Le rendu de capture Unity garde un seul créneau GPU ; cette attente n'empêche pas les autres jobs de poursuivre leurs appels et ne consomme pas leur délai de capture.
 
 Le déploiement termine les jobs déjà admis avant remplacement et conserve les jobs en attente pour D18. Aucun modèle, budget d'abonnement ou réglage de recharge n'est changé. La capacité physique et les refus du fournisseur demeurent des contraintes réelles. [Architecture et installation](D18_CONCURRENT_JOBS.md).
+
+## D19 — Ressources de bibliothèque exécutées par le moteur (24 septembre 2026)
+
+Le créateur juge le rendu insuffisant et demande si la recherche utilise réellement les bibliothèques. La recherche D17 ne suffisait pas : elle exposait des fiches mais le Player conservait ses cinq matières génériques. D19 ajoute quatre profils par partie, issus de TinyPlay et Keijiro, avec leurs deux textures RGB et un opérateur HLSL réellement exécuté dans le shader.
+
+Le constructeur B 2.6 reçoit ces profils dans la recherche figée, choisit selon le texte et les phases, puis le compilateur impose le client 1.7. Le service ne peut toujours pas importer du code ou des ressources à la demande d'un joueur. La critique Pro runtime conserve le texte et la planche ; aucune critique de développement ni validation visuelle n'est inventée. [Provenance et limites](D19_SOURCED_SURFACES.md).

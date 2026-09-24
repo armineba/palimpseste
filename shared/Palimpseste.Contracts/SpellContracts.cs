@@ -296,7 +296,8 @@ namespace Palimpseste.Contracts
     public static class SpellVisualConstructionLimits
     {
         public static readonly string[] Kinds = { "ellipsoid", "shard", "feather", "ribbon", "ring", "arc" };
-        public static readonly string[] Materials = { "glass", "energy", "mist", "stone", "metal" };
+        public static readonly string[] Materials = { "glass", "energy", "mist", "stone", "metal", "plasma", "force_field", "toxic", "spectral_flow" };
+        public static readonly string[] SourcedMaterials = { "plasma", "force_field", "toxic", "spectral_flow" };
         public static readonly string[] Motions = { "still", "flutter", "orbit", "drift" };
         public const int MaximumPartsPerNode = 64;
         public const int MaximumPartsPerPlan = 128;

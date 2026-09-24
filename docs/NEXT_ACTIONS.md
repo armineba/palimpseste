@@ -1,5 +1,17 @@
 # Point de reprise immédiat
 
+## D19 installé et jeu rouvert — laisser le créateur essayer
+
+Le créateur rejette encore le rendu et demande si les bibliothèques ont réellement servi. D17 ne livrait que leur recherche, sans nouveau programme de surface dans Unity. La correction D19 ajoute des profils par partie issus des graphes TinyPlay MIT et de l'opérateur de flux Keijiro Unlicense : `plasma`, `force_field`, `toxic`, `spectral_flow`. Leur choix doit être présent dans la recherche figée du job et le paquet doit exiger le Player 1.7.0. Les textures sources doivent être échantillonnées en couleur/luminance, pas seulement comme masque alpha.
+
+**Backend compilé et publié ; Player 1.7.0 construit et empaqueté.** Sorties finales 0 ; aucune erreur de shader dans le build final. Un premier build avait indiqué Success malgré une erreur HLSL, corrigée avant reconstruction ; le packaging refuse désormais cette situation. [Preuves réelles](../evidence/public/backend/sourced-surfaces-d19.json).
+
+**Installation terminée le 24 septembre à 23:20:40 Paris** : `completed=true`, `services_started`, `claims_paused=false`, concurrence applicative `0`. Le job encore actif a terminé avant la bascule ; aucun appel en cours n'a été annulé pour la forcer. Renderer protégé 1.7.0 installé avec le même binaire natif Codex, prompt B **2.6** et profils disponibles dans les nouvelles recherches. [Rapport réel](../evidence/public/backend/sourced-surfaces-d19-installation.json).
+
+**Player 1.7.0 rouvert à 23:20:41 Paris, PID 33920**, après vérification des 34 fichiers contre le manifeste ; raccourci Bureau actualisé. [Ouverture](../evidence/public/unity/sourced-surfaces-d19-open.json). Le créateur peut dessiner un **nouveau parchemin** pour essayer le choix des profils ; les anciens paquets gardent leurs choix enregistrés.
+
+Ne pas lancer de tests, captures ou générations indépendantes. La fidélité visuelle reste à juger par le créateur ; aucune boucle Dream-loop de développement n'a été exécutée en dérogation à sa consigne. Le retour « catastrophique » porte sur les essais précédents, pas sur une validation de D19. Les bibliothèques complètes et les trois sources non intégrées ne sont pas présentées comme embarquées. Le point restant est le verdict sur le nouveau rendu et son cycle complet.
+
 ## 24 septembre — D18 installé, plusieurs parchemins en parallèle
 
 **Publication code 0 et installation terminée à 22:52:32 Paris.** Le worker accepte plusieurs jobs asynchrones dans un même processus. `PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0` retire le plafond applicatif de jobs actifs, à la demande du créateur. Les captures Unity partagent un seul créneau GPU ; les autres étapes continuent en parallèle. [Fonctionnement](D18_CONCURRENT_JOBS.md) · [Installation réelle](../evidence/public/backend/parallel-jobs-d18-installation.json) · [Preuve de livraison](../evidence/public/backend/parallel-jobs-d18.json).

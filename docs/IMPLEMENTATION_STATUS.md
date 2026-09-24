@@ -1,6 +1,14 @@
 # État de réalisation et point de reprise
 
-## État courant — D18 déployé, jobs sans plafond applicatif
+## État courant — D19 / Player 1.7.0 installé et ouvert
+
+**Backend et Player compilés, empaquetés et installés ; jeu rouvert le 24 septembre à 23:20:41 Paris**, PID **33920**. Quatre profils par partie sont exécutés dans le shader : plasma, force_field, toxic et spectral_flow. Ils portent des calculs TinyPlay MIT et Keijiro Unlicense, avec deux textures TinyPlay originales échantillonnées en RGB. B **2.6** reçoit leurs capacités dans les nouveaux dossiers de recherche ; les paquets les utilisant exigent le client 1.7.0. [Provenance](D19_SOURCED_SURFACES.md) · [Preuves](../evidence/public/backend/sourced-surfaces-d19.json) · [Installation](../evidence/public/backend/sourced-surfaces-d19-installation.json).
+
+Build Unity final : sortie **0**, sans erreur de shader ; Player livré en **34 fichiers / 132 056 125 octets**, ZIP de **46 852 159 octets**. La première tentative Unity comportait une erreur HLSL malgré son résultat Success : elle est conservée comme tentative rejetée, corrigée puis reconstruite. Compilation backend finale : **0 erreur / 0 avertissement** ; première tentative en erreur sur une variable locale dupliquée, corrigée. Aucun test, appel modèle de diagnostic, capture ou essai de jeu exécuté par l'agent.
+
+La génération déjà en cours s'est terminée avant la bascule. Suspension des prises de jobs retirée ; concurrence toujours **sans plafond applicatif**, captures GPU à tour de rôle. Les anciens paquets restent identiques. **Fidélité visuelle et acceptation humaine D19 encore ouvertes** : le créateur essaie un nouveau parchemin dans le jeu rouvert. [Point de reprise](NEXT_ACTIONS.md).
+
+## Historique — D18 déployé, jobs sans plafond applicatif
 
 **Backend D18 publié et installé le 24 septembre à 22:52:32 Paris**, avec `PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0`. Un seul worker traite plusieurs jobs indépendants ; chacun garde son bail et ses checkpoints. Les captures Unity passent à tour de rôle sur le GPU, sans bloquer les autres étapes des autres parchemins. Le Player **1.6.0** reste celui déjà livré. [Architecture](D18_CONCURRENT_JOBS.md) · [Preuve](../evidence/public/backend/parallel-jobs-d18.json) · [Installation](../evidence/public/backend/parallel-jobs-d18-installation.json).
 

@@ -95,6 +95,15 @@ POUR CHAQUE CONSTRUCTION
 
 ÉTAT DE CETTE LIVRAISON
 
+Actualisation D19 : quatre profils de surface sont réellement portés dans le
+shader Unity et sélectionnables par partie : plasma, force_field, toxic,
+spectral_flow. Deux textures TinyPlay originales sont embarquées et lues en RGB ;
+l'opérateur de bruit sans divergence Keijiro est exécuté dans le shader.
+Backend publié et Player 1.7.0 construit ; voir docs/D19_SOURCED_SURFACES.md
+et evidence/public/backend/sourced-surfaces-d19-installation.json pour
+l'installation effective. Le verdict artistique reste au créateur.
+Les paragraphes ci-dessous conservent l'état historique de D17.
+
 Consigne durable et catalogue de recherche mis à jour dans les sources.
 Les téléchargements précis sont consignés dans l'inventaire séparé.
 Les nouveaux packages ne sont pas encore embarqués dans le Player ; les

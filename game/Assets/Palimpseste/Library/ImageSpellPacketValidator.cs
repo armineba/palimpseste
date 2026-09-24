@@ -145,6 +145,8 @@ namespace Palimpseste.Game.Library
                 {
                     Require(rawPart is JObject,"Invalid construction part");
                     var part = (JObject)rawPart;
+                    if (Array.IndexOf(SpellVisualConstructionLimits.SourcedMaterials,Text(part,"material")) >= 0)
+                        Require(minimumVersion != null && minimumVersion >= new Version(1,7,0),"Sourced surfaces require client 1.7.0");
                     IntegerVector(part["position_cm"],-1000,1000); IntegerVector(part["scale_cm"],1,1000);
                     IntegerVector(part["rotation_mdeg"],-360000,360000); IntegerVector(part["color_rgb"],0,255);
                     Integer(part,"opacity_milli",0,1000); Integer(part,"emission_milli",0,6000);

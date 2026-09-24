@@ -759,5 +759,199 @@
     "gameplay_captures_executed_for_integration": false,
     "model_calls_executed_for_integration": 0,
     "human_visual_acceptance": "pending"
+  },
+  "surface_profiles": [
+    {
+      "minimum_client_version": "1.7.0",
+      "available_in_player": true,
+      "selection_field": "appearance.construction.parts[].material",
+      "unity_shader": "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader",
+      "runtime_loading": "compiled renderer profile; no runtime graph, package, path or code loading",
+      "lifecycle": "Opacity and emission follow the validated intro, active, contact and expiration envelopes; shader surface motion does not replace carrier physics.",
+      "id": "plasma",
+      "label": "Flowing plasma surface",
+      "license_spdx": "MIT",
+      "families": [
+        "arcane",
+        "fire",
+        "electric",
+        "water"
+      ],
+      "tags": [
+        "plasma",
+        "energy",
+        "fluid",
+        "refraction",
+        "membrane",
+        "flow"
+      ],
+      "usage_note": "Use for a flowing energetic core or membrane; opposing UV layers, twirl, a Fresnel rim and scene-color refraction. Keep the description palette and open transparent spaces.",
+      "source_files": [
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "source_path": "Shaders/VFX/PlasmaShader.shadergraph",
+          "sha256": "ffda0166ffddde2dac622f310b28f63268a4183f0ffa9d196d9c9edabc7f1c14",
+          "license_spdx": "MIT"
+        },
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "source_path": "Textures/jellyPlasmaTexture.jpg",
+          "sha256": "e60137678e9caf011d113b42ae44aba05efb6393243005c1fa520c35d16554c5",
+          "license_spdx": "MIT"
+        }
+      ],
+      "unity_assets": [
+        "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_plasma.jpg"
+      ]
+    },
+    {
+      "minimum_client_version": "1.7.0",
+      "available_in_player": true,
+      "selection_field": "appearance.construction.parts[].material",
+      "unity_shader": "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader",
+      "runtime_loading": "compiled renderer profile; no runtime graph, package, path or code loading",
+      "lifecycle": "Opacity and emission follow the validated intro, active, contact and expiration envelopes; shader surface motion does not replace carrier physics.",
+      "id": "force_field",
+      "label": "Fresnel and intersection field",
+      "license_spdx": "MIT",
+      "families": [
+        "arcane",
+        "holy",
+        "electric",
+        "barrier"
+      ],
+      "tags": [
+        "shield",
+        "field",
+        "barrier",
+        "rim",
+        "intersection",
+        "shell"
+      ],
+      "usage_note": "Use for a translucent energy shell or barrier with a moving noise mask, Fresnel rim and depth-intersection glow. Adds no collision or protection mechanics.",
+      "source_files": [
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "source_path": "Shaders/VFX/ForceFieldShader.shadergraph",
+          "sha256": "04cb9ff124063e162c8842363d29c18a46ded5042f37d365938b18e50705380a",
+          "license_spdx": "MIT"
+        },
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "source_path": "Textures/Noise.png",
+          "sha256": "da338fcff419c98214a1723239a1f1234e9c4d57c795d1ac35e958e58cb3993e",
+          "license_spdx": "MIT"
+        }
+      ],
+      "unity_assets": [
+        "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_noise.png"
+      ]
+    },
+    {
+      "minimum_client_version": "1.7.0",
+      "available_in_player": true,
+      "selection_field": "appearance.construction.parts[].material",
+      "unity_shader": "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader",
+      "runtime_loading": "compiled renderer profile; no runtime graph, package, path or code loading",
+      "lifecycle": "Opacity and emission follow the validated intro, active, contact and expiration envelopes; shader surface motion does not replace carrier physics.",
+      "id": "toxic",
+      "label": "Animated cellular fluid",
+      "license_spdx": "MIT",
+      "families": [
+        "poison",
+        "fire",
+        "water",
+        "nature"
+      ],
+      "tags": [
+        "toxic",
+        "voronoi",
+        "cellular",
+        "liquid",
+        "boiling",
+        "alchemy"
+      ],
+      "usage_note": "Use for boiling, cellular or alchemical matter with animated Voronoi cells and luminous apparent relief. No forced green palette and no implicit poison effect.",
+      "source_files": [
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "source_path": "Shaders/Environment/ToxicShader.shadergraph",
+          "sha256": "58cb3c73e18b0029d59b90fd6feb68ae6122d5af582cb2975410d3d435eddeb6",
+          "license_spdx": "MIT"
+        }
+      ],
+      "unity_assets": []
+    },
+    {
+      "minimum_client_version": "1.7.0",
+      "available_in_player": true,
+      "selection_field": "appearance.construction.parts[].material",
+      "unity_shader": "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader",
+      "runtime_loading": "compiled renderer profile; no runtime graph, package, path or code loading",
+      "lifecycle": "Opacity and emission follow the validated intro, active, contact and expiration envelopes; shader surface motion does not replace carrier physics.",
+      "id": "spectral_flow",
+      "label": "Soft divergence-free spectral flow",
+      "license_spdx": "MIT AND Unlicense",
+      "families": [
+        "wind",
+        "spirit",
+        "shadow",
+        "smoke",
+        "arcane"
+      ],
+      "tags": [
+        "spectral",
+        "veil",
+        "ribbon",
+        "wake",
+        "advection",
+        "organic",
+        "turbulence"
+      ],
+      "usage_note": "Use for bodyless veils, ribbons, wakes and moving wisps. Divergence-free noise and soft strip coverage shape the surface; keep the specified rotation and translation in physics.",
+      "source_files": [
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "source_path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Divergence Free Noise 3D.vfxoperator",
+          "sha256": "a9956b90aa18dc05e90fda5da5c000d7f46aa4ffda3701bd3957cff433fd8109",
+          "license_spdx": "Unlicense"
+        },
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "source_path": "Packages/jp.keijiro.vfxgraphassets/Shader/Textureless Strip.shadergraph",
+          "sha256": "a4b925868e86a165e305e9a01a2d634947eebae6aaef1044ab98e1d1a6483a4b",
+          "license_spdx": "Unlicense"
+        },
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "source_path": "Textures/Noise.png",
+          "sha256": "da338fcff419c98214a1723239a1f1234e9c4d57c795d1ac35e958e58cb3993e",
+          "license_spdx": "MIT"
+        }
+      ],
+      "unity_assets": [
+        "game/Assets/Palimpseste/Resources/SourcedSurfaces/KeijiroDivergenceFreeNoise.hlsl",
+        "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_noise.png"
+      ],
+      "additional_dependency": "The existing reviewed MIT SimplexNoise3D implementation supplies the scalar noise gradients."
+    }
+  ],
+  "surface_integration": {
+    "minimum_client_version": "1.7.0",
+    "selection_field": "appearance.construction.parts[].material",
+    "implementation": "Four controlled renderer profiles from reviewed TinyPlay and Keijiro sources; two RGB textures bound by the renderer, separate from the sixteen selectable particle textures.",
+    "state": "compiled_player_1.7.0_owner_acceptance_pending",
+    "graphs_imported": false,
+    "third_party_prefabs_imported": false,
+    "tests_executed": false,
+    "model_calls_executed_for_integration": 0
   }
 }

@@ -2135,7 +2135,11 @@
             "energy",
             "mist",
             "stone",
-            "metal"
+            "metal",
+            "plasma",
+            "force_field",
+            "toxic",
+            "spectral_flow"
           ]
         },
         "position_cm": {

@@ -57,7 +57,7 @@ public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescrip
     public const string PlannerEffort = "high";
     public const string PromptAVersion = "sp.prompt.a/2.4";
     public const string LegacyPromptAVersion = "sp.prompt.a/2.3";
-    public const string PromptBVersion = "sp.prompt.b/2.5";
+    public const string PromptBVersion = "sp.prompt.b/2.6";
     public const string PromptGVersion = "sp.prompt.g/1.3";
     public const string LegacyPromptGVersion = "sp.prompt.g/1.2";
     private readonly CodexProcessRunner runner;

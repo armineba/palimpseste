@@ -1,5 +1,13 @@
 # Tester le lecteur actuel
 
+## D19 / 1.7.0 — profils issus des bibliothèques
+
+Une fois [l'installation D19](../evidence/public/backend/sourced-surfaces-d19-installation.json) terminée, ouvrir le raccourci Bureau et créer **un nouveau parchemin**. Le constructeur peut choisir pour chaque partie les surfaces plasma, champ de force, matière toxique et flux spectral livrées dans le moteur. La sélection dépend de la description et de la planche ; il ne faut pas ajouter les quatre à tous les sorts.
+
+Suivre **Dessin terminé → description → planche → construction → laboratoire**. Comparer la matière, son mouvement et sa disparition à la planche, puis donner le verdict. Rejouer un ancien sort utilise ses matériaux déjà enregistrés ; les nouveaux profils ne lui sont pas appliqués automatiquement. Plusieurs nouveaux parchemins peuvent progresser simultanément ; les captures de critique partagent le GPU.
+
+Aucun essai visuel D19 n'a été exécuté par le développement. Le résultat doit être apprécié par le créateur. Les sections suivantes sont historiques.
+
 ## Dernier sort récupéré — D16.1
 
 « **Foudre sous l’Enclume** » est disponible après correction du blocage de critique. Cliquer **Actualiser** sur ce parchemin, puis lancer le sort dans le laboratoire. Le dessin et la planche sont conservés ; aucun besoin de redessiner pour cette reprise. La version récupérée a réellement été évaluée à 4190/10000, avec une animation encore jugée imparfaite : elle est disponible pour recueillir les corrections du créateur. [Preuve](../evidence/public/backend/visual-judge-fix-d16-1.json).

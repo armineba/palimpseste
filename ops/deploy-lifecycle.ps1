@@ -1,11 +1,12 @@
 <# Operator installation only. Does not generate a spell, run a diagnostic, or build software.
    Reuses the existing native Codex identity and observed D13 binary evidence unchanged.
-   D16 / 1.6.0 gameplay and artistic acceptance remain pending the owner's own trial.
+   Gameplay and artistic acceptance remain pending the owner's own trial.
    Updates an existing D15 database with migration011 only; migration010 is a prerequisite. #>
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$StageRoot,
     [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime',
     [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D16',
+    [ValidateSet('1.6.0','1.7.0')][string]$ClientVersion = '1.7.0',
     [string]$PublicReportPath = '',
     [ValidateRange(-1,2147483647)][int]$JobConcurrency = -1,
     [ValidateRange(0,86400)][int]$WaitForIdleSeconds = 0,
@@ -113,7 +114,7 @@ foreach ($texture in $vfxCatalogue.textures) {
     }
 }
 $delivery = Get-Content -LiteralPath (Join-Path $repo 'evidence\public\unity\lifecycle-delivery.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ($delivery.client_version -cne '1.6.0' -or $delivery.build_exit -ne 0) { throw 'Successful D16 / 1.6.0 animation-sheet build required.' }
+if ($delivery.client_version -cne $ClientVersion -or $delivery.build_exit -ne 0) { throw 'Successful build of the selected client version required.' }
 foreach ($file in $delivery.files) {
     $source = Join-Path $player $file.file; Under $source $player
     if ((Digest $source) -cne $file.sha256) { throw 'Player differs from compiled delivery.' }
@@ -124,7 +125,7 @@ $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid(
 $logRoot = Join-Path $runtime ('evidence\pending\animation-sheet-install-' + $stamp)
 New-Item -ItemType Directory -Path $logRoot | Out-Null
 Protect $logRoot
-$record = [ordered]@{version='1.6.0'; backend_revision=$BackendRevision; delivery_name=($BackendRevision + ' backend / Player 1.6 animation sheet'); started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
+$record = [ordered]@{version=$ClientVersion; backend_revision=$BackendRevision; delivery_name=($BackendRevision + ' backend / Player ' + $ClientVersion); started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
     spell_generations=0; diagnostics_executed=$false; gameplay_tested=$false; visual_acceptance='pending_owner'; native_sha256=$originalNative}
 function Save-Record {
     $json = $record | ConvertTo-Json -Depth 7
@@ -138,7 +139,7 @@ $renderFiles = @(Get-ChildItem -LiteralPath $render -Recurse -File | Sort-Object
     [ordered]@{file=$_.FullName.Substring($render.Length+1).Replace('\','/');sha256=Digest $_.FullName}
 })
 $renderManifest = Join-Path $render 'renderer-manifest.json'
-[IO.File]::WriteAllText($renderManifest,([ordered]@{version='1.6.0';files=$renderFiles} | ConvertTo-Json -Depth 5),$utf8)
+[IO.File]::WriteAllText($renderManifest,([ordered]@{version=$ClientVersion;files=$renderFiles} | ConvertTo-Json -Depth 5),$utf8)
 Protect $renderManifest
 $record.renderer_manifest_sha256 = Digest $renderManifest
 $record.renderer = Join-Path $render 'Palimpseste.exe'; Save-Record
@@ -294,7 +295,7 @@ try {
     & $powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File (Join-Path $launch 'start-owner-api.ps1') -RuntimeRoot $runtime
     if ($LASTEXITCODE -ne 0) { throw 'API startup failed.' }
     $record.phase='services_started'; $record.completed=$true; $record.completed_at=[DateTimeOffset]::UtcNow.ToString('o'); Save-Record
-    Write-Output "$BackendRevision backend / Player 1.6.0 installed. Owner gameplay trial pending. Record: $logRoot\installation.json"
+    Write-Output "$BackendRevision backend / Player $ClientVersion installed. Owner gameplay trial pending. Record: $logRoot\installation.json"
 } finally {
     if ($claimPauseInstalled) {
         try { Set-ClaimPause $false; $record.claims_paused=$false; Save-Record }

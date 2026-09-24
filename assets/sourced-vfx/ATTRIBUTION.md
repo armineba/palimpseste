@@ -1,5 +1,13 @@
 # Auteurs, licences et provenance
 
+## Surfaces TinyPlay et Keijiro — D19
+
+Les profils plasma, force_field et toxic du renderer sont des portages adaptés des graphes **TinyPlay / URPShadersCollection**, commit `6e663fffccd00a4cce837644a29f6e8f82a6e372`, sous [MIT, copyright TinyPlay 2022](licenses/TinyPlay-URPShadersCollection-MIT.txt). Les images `jellyPlasmaTexture.jpg` et `Noise.png` sont copiées sans modification dans `game/Assets/Palimpseste/Resources/SourcedVfx/`, sous les noms `tinyplay_plasma.jpg` et `tinyplay_noise.png`.
+
+Le profil spectral_flow réutilise l'opérateur HLSL Divergence Free Noise 3D et adapte les opérations de Textureless Strip de **Keijiro / VfxGraphAssets**, commit `5013c195305288fab61cd71f72a4628dbe9d0ea4`, sous [Unlicense](licenses/Keijiro-VfxGraphAssets-Unlicense.txt). La dépendance SimplexNoiseGrad conserve sa licence MIT ci-dessous. Les notices sont livrées dans les ressources Unity et dans ThirdPartyNotices du Player.
+
+Voir [les chemins, empreintes et adaptations](../../docs/D19_SOURCED_SURFACES.md). Aucun code xtaja sans licence, aucun package Magic Effects FREE non acquis, aucun graphe HDRP des Samples Unity n'est redistribué comme partie de ces profils.
+
 ## Textures Kenney — CC0 1.0
 
 Les 12 textures de `textures/kenney-particle/` viennent de **Particle Pack**, créé par **Kenney Vleugels / Kenney.nl**. La licence incluse nomme la version **1.1** ; la page web indique la publication 1.0. Le SHA de l'archive identifie précisément la source utilisée. Crédits additionnels des modèles de filtres conservés : Indigo Ray, Craig Nisbet, Zoltan Erdokovy, Heliagon, ThreeDee, Killst4r et Tim2501.

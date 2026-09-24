@@ -27,7 +27,7 @@ namespace Palimpseste.Game.Editor
             EditorBuildSettings.scenes = Array.ConvertAll(Scenes, scene => new EditorBuildSettingsScene(scene, true));
             PlayerSettings.companyName = "Palimpseste";
             PlayerSettings.productName = "Palimpseste Spell Lab";
-            PlayerSettings.bundleVersion = "1.6.0";
+            PlayerSettings.bundleVersion = "1.7.0";
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.IL2CPP);
             PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
             var directory = Environment.GetEnvironmentVariable("PALIMPSESTE_BUILD_DIR");

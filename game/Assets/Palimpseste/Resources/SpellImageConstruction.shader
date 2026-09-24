@@ -4,6 +4,8 @@ Shader "Palimpseste/SpellImageConstruction"
     {
         [HDR] _Color ("Image palette", Color) = (.3,.6,1,1)
         _Material ("Glass / energy / mist / stone / metal", Float) = 0
+        _SurfaceProfile ("Legacy / plasma / force field / toxic / spectral flow", Float) = 0
+        _SurfaceTex ("Sourced surface pattern (RGB)", 2D) = "white" {}
         _Shape ("Volume / feather / ribbon / filament", Float) = 0
         _Opacity ("Surface opacity", Range(0,1)) = .7
         _Emission ("Radiance", Range(0,6)) = 1
@@ -37,22 +39,35 @@ Shader "Palimpseste/SpellImageConstruction"
             #pragma target 3.0
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
             // Ashima/stegu simplex, Unity adaptation by Keijiro; MIT license
             // retained in SourcedNoise/LICENSE.txt alongside reviewed sources.
             #include "SourcedNoise/SimplexNoise3D.hlsl"
+            #include "SourcedSurfaces/KeijiroDivergenceFreeNoise.hlsl"
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
                 float _Material, _Shape, _Opacity, _Emission, _Envelope, _Seed, _Armed;
                 float _Reveal, _Dissolve;
                 float4 _BehaviorFlow;
                 float _BehaviorAge, _ResourceEnabled, _ResourceParticle, _BehaviorEnabled, _BehaviorMotion;
+                float _SurfaceProfile;
             CBUFFER_END
             TEXTURE2D(_ResourceTex); SAMPLER(sampler_ResourceTex);
+            TEXTURE2D(_SurfaceTex); SAMPLER(sampler_SurfaceTex);
             struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv:TEXCOORD0; };
             struct Varyings { float4 positionHCS:SV_POSITION; float3 positionWS:TEXCOORD0; float3 normalWS:TEXCOORD1; float2 uv:TEXCOORD2; };
             Varyings vert(Attributes input)
             {
                 Varyings output;
+                // TinyPlay Plasma's noise-driven normal displacement, adapted to
+                // a small bounded ripple so the authored silhouette stays intact.
+                if (_SurfaceProfile > .5 && _SurfaceProfile < 1.5)
+                {
+                    float age=lerp(_Time.y,_BehaviorAge*_BehaviorMotion,saturate(_BehaviorEnabled));
+                    float ripple=SimplexNoise(float3(input.positionOS.xy*12+age*.12,_Seed*8));
+                    input.positionOS.xyz+=input.normalOS*(ripple*.018*saturate(_Envelope));
+                }
                 output.positionHCS=TransformObjectToHClip(input.positionOS.xyz);
                 output.positionWS=TransformObjectToWorld(input.positionOS.xyz);
                 output.normalWS=TransformObjectToWorldNormal(input.normalOS);
@@ -66,6 +81,34 @@ Shader "Palimpseste/SpellImageConstruction"
                 return lerp(lerp(hash21(i),hash21(i+float2(1,0)),f.x),lerp(hash21(i+float2(0,1)),hash21(i+1),f.x),f.y);
             }
             float fbm(float2 p) { return noise(p)*.58+noise(p*2.07+7.3)*.29+noise(p*4.13+13.1)*.13; }
+            // TinyPlay ToxicShader graph: animated Voronoi distance drives
+            // emission and surface relief. The 3x3 search is the node's bounded
+            // neighbourhood; coordinates and time remain application-controlled.
+            float surfaceVoronoi(float2 uv, float angle)
+            {
+                float2 cell=floor(uv),local=frac(uv);
+                float nearest=8;
+                [unroll] for (int y=-1;y<=1;y++)
+                [unroll] for (int x=-1;x<=1;x++)
+                {
+                    float2 neighbour=float2(x,y);
+                    float2 random=float2(hash21(cell+neighbour),hash21(cell+neighbour+37.2));
+                    float2 cellPoint=.5+.44*sin(random*6.2831853+angle);
+                    float2 delta=neighbour+cellPoint-local;
+                    nearest=min(nearest,dot(delta,delta));
+                }
+                return sqrt(nearest);
+            }
+            float surfaceSceneEyeDepth(float rawDepth)
+            {
+                float perspective=LinearEyeDepth(rawDepth,_ZBufferParams);
+                #if UNITY_REVERSED_Z
+                    float orthographic=lerp(_ProjectionParams.z,_ProjectionParams.y,rawDepth);
+                #else
+                    float orthographic=lerp(_ProjectionParams.y,_ProjectionParams.z,rawDepth);
+                #endif
+                return lerp(perspective,orthographic,unity_OrthoParams.w);
+            }
             half4 frag(Varyings input):SV_Target
             {
                 float2 uv=input.uv;
@@ -92,7 +135,104 @@ Shader "Palimpseste/SpellImageConstruction"
                 half3 colour=_Color.rgb;
                 half3 accent=lerp(_Color.rgb,half3(1,1,1),.68);
                 float emissionCoverage=_Opacity;
-                if (_Material<.5)
+                [branch] if (_SurfaceProfile>.5 && _SurfaceProfile<1.5)
+                {
+                    // HLSL port of TinyPlay Shaders/VFX/PlasmaShader.shadergraph:
+                    // opposite pattern scrolls, coloured Fresnel border, twirled
+                    // refraction and the small normal displacement above.
+                    float2 p=uv-.5;
+                    float angle=length(p)*6;
+                    float sine=sin(angle),cosine=cos(angle);
+                    float2 swirl=float2(p.x*cosine-p.y*sine,p.x*sine+p.y*cosine)+.5;
+                    float distortion=SimplexNoise(float3(swirl*4,t*.1+_Seed))*.065;
+                    float2 drift=float2(t*.10,t*.07)+_BehaviorFlow.xy*_BehaviorAge;
+                    half3 a=SAMPLE_TEXTURE2D(_SurfaceTex,sampler_SurfaceTex,swirl+drift+distortion).rgb;
+                    half3 b=SAMPLE_TEXTURE2D(_SurfaceTex,sampler_SurfaceTex,swirl-drift-distortion).rgb;
+                    float plasma=dot(a+b,half3(.2126,.7152,.0722));
+                    float border=pow(saturate(1-abs(dot(normal,view))),2);
+                    float2 screenUv=GetNormalizedScreenSpaceUV(input.positionHCS);
+                    float2 bend=float2(ddx(distortion),ddy(distortion))*8;
+                    half3 refraction=SampleSceneColor(saturate(screenUv+clamp(bend,-.012,.012)));
+                    colour=_Color.rgb*(.16+plasma*.75)+refraction*.14;
+                    accent=lerp(_Color.rgb,half3(1,1,1),.18);
+                    radiance=(pow(saturate(plasma),2)*2.4+border*2.1)*_Emission*taper;
+                    opacity=_Opacity*(.26+plasma*.46+border*.18)*taper;
+                    fabric=saturate(plasma*.65+fabric*.35);
+                    emissionCoverage=sqrt(saturate(_Opacity));
+                }
+                else if (_SurfaceProfile>1.5 && _SurfaceProfile<2.5)
+                {
+                    // TinyPlay ForceFieldShader: pattern*(Fresnel+intersection)
+                    // plus a sparse fill. RGB is used: the source Noise.png has
+                    // no useful alpha mask. Depth is valid for both lab cameras.
+                    float2 screenUv=GetNormalizedScreenSpaceUV(input.positionHCS);
+                    float sceneEye=surfaceSceneEyeDepth(SampleSceneDepth(screenUv));
+                    float fragmentEye=-TransformWorldToView(input.positionWS).z;
+                    float gap=max(0,sceneEye-fragmentEye);
+                    float intersection=pow(saturate(1-gap/.32),2);
+                    float rim=pow(saturate(1-abs(dot(normal,view))),3);
+                    half3 source=SAMPLE_TEXTURE2D(_SurfaceTex,sampler_SurfaceTex,
+                        uv*3+float2(t*.05,t*.07)+_BehaviorFlow.xy*_BehaviorAge).rgb;
+                    float pattern=smoothstep(.18,.72,dot(source,half3(.2126,.7152,.0722)));
+                    float boundary=saturate(rim+intersection);
+                    float field=pattern*(boundary*.86+.10);
+                    colour=_Color.rgb*(.28+field*.58);
+                    accent=lerp(_Color.rgb,half3(1,1,1),.12);
+                    radiance=(boundary*(.28+pattern*1.5)+pattern*.055)*_Emission*2.5;
+                    opacity=_Opacity*saturate(field*.60+boundary*.32+.015)*taper;
+                    fabric=pattern;
+                    emissionCoverage=sqrt(saturate(_Opacity));
+                }
+                else if (_SurfaceProfile>2.5 && _SurfaceProfile<3.5)
+                {
+                    // TinyPlay Environment/ToxicShader graph topology: moving
+                    // Voronoi, power-shaped emissive cells and height-derived
+                    // normals. Palette and lifecycle come from the spell data.
+                    float2 liquidUv=uv*5+float2(t*.06,t*.18)+_BehaviorFlow.xy*_BehaviorAge;
+                    float cells=surfaceVoronoi(liquidUv,t*.65+_Seed*6.28);
+                    float pools=pow(saturate(cells*1.6),4);
+                    float film=.5+.5*SimplexNoise(float3(liquidUv*1.4,t*.13+_Seed*3));
+                    float height=cells*.72+film*.28;
+                    float3 tangentX=ddx(input.positionWS),tangentY=ddy(input.positionWS);
+                    float3 slope=SafeNormalize(tangentX)*ddx(height)+SafeNormalize(tangentY)*ddy(height);
+                    float3 wetNormal=SafeNormalize(normal-slope*2.2);
+                    Light light=GetMainLight();
+                    float lighting=.25+saturate(dot(wetNormal,light.direction))*.75;
+                    float spec=pow(saturate(dot(wetNormal,SafeNormalize(light.direction+view))),38);
+                    colour=_Color.rgb*(.18+pools*.42)*lighting+light.color*spec*.16;
+                    accent=lerp(_Color.rgb,half3(1,1,1),.14);
+                    radiance=(pools*2.7+pow(saturate(1-abs(dot(wetNormal,view))),3)*.4)*_Emission*taper;
+                    opacity=_Opacity*(.30+film*.36+pools*.28)*taper;
+                    fabric=saturate(cells*.8+film*.2);
+                    emissionCoverage=sqrt(saturate(_Opacity));
+                }
+                else if (_SurfaceProfile>3.5)
+                {
+                    // Keijiro's actual cross-gradient operator drives organic
+                    // surface advection. This is a visual field, not a substitute
+                    // for the authored transform, projectile or vortex physics.
+                    float3 coordinate=float3(uv*2.8,_Seed*7+t*.20);
+                    float3 flow=PalimpsesteDFNoise3D(coordinate,coordinate.yzx+float3(7.1,3.7,13.4));
+                    flow/=1+length(flow);
+                    float2 flowUv=uv*float2(3,1.8)+flow.xy*.32+float2(-t*.24,t*.035)
+                        +_BehaviorFlow.xy*_BehaviorAge;
+                    half3 source=SAMPLE_TEXTURE2D(_SurfaceTex,sampler_SurfaceTex,flowUv).rgb;
+                    float density=dot(source,half3(.2126,.7152,.0722));
+                    // Thin emissive contours carry the silhouette. The broad
+                    // noise field is only a trace of vapour, never a solid skin.
+                    float lineWidth=.018+min(.018,fwidth(density)*.65);
+                    float veins=pow(saturate(1-abs(density-.51)/lineWidth),2);
+                    float softness=PalimpsesteTexturelessStrip(uv,.48);
+                    float silhouette=lerp(.35+fres*.65,softness,saturate(feather+ribbon+filament));
+                    float cloud=smoothstep(.16,.72,density)*silhouette;
+                    colour=_Color.rgb*(.12+cloud*.20);
+                    accent=lerp(_Color.rgb,half3(1,1,1),.20);
+                    radiance=(veins*3.4+cloud*.06+filament*.32)*_Emission*silhouette;
+                    opacity=_Opacity*(cloud*.07+veins*.16)*silhouette;
+                    fabric=saturate(density*.7+fabric*.3);
+                    emissionCoverage=sqrt(saturate(_Opacity));
+                }
+                else if (_Material<.5)
                 {
                     // Emission is a perceptual control: even low-energy glass
                     // needs bright thin contours around its dark body. Keep

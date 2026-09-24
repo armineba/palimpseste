@@ -501,7 +501,11 @@
       "energy",
       "mist",
       "stone",
-      "metal"
+      "metal",
+      "plasma",
+      "force_field",
+      "toxic",
+      "spectral_flow"
     ],
     "motions": [
       "still",
@@ -564,7 +568,49 @@
       "ring": "lies in local XZ; scale_cm.x/z give diameters and scale_cm.y thickness",
       "motion_frequency": "frequency_mhz / 1000 hertz"
     },
-    "mechanics": "Decorative only; image and construction never alter collision, effects or target filtering."
+    "mechanics": "Decorative only; image and construction never alter collision, effects or target filtering.",
+    "sourced_materials": {
+      "minimum_client_version": "1.7.0",
+      "selection_field": "appearance.construction.parts[].material",
+      "available_only_when_listed_in": "REFERENCE_RESEARCH_DATA.surface_profiles",
+      "materials": [
+        "plasma",
+        "force_field",
+        "toxic",
+        "spectral_flow"
+      ],
+      "legacy_materials": [
+        "glass",
+        "energy",
+        "mist",
+        "stone",
+        "metal"
+      ],
+      "texture_selection_is_independent": "appearance.resource_id keeps the sixteen shipped Kenney particle textures",
+      "selection_basis": "Match each part to the frozen description and all animation-sheet phases. Select actual delivered surfaces; no shader paths, URLs or executable code in a plan.",
+      "profiles": [
+        {
+          "id": "plasma",
+          "minimum_client_version": "1.7.0",
+          "usage": "Use for a flowing energetic core or membrane; opposing UV layers, twirl, a Fresnel rim and scene-color refraction. Keep the description palette and open transparent spaces."
+        },
+        {
+          "id": "force_field",
+          "minimum_client_version": "1.7.0",
+          "usage": "Use for a translucent energy shell or barrier with a moving noise mask, Fresnel rim and depth-intersection glow. Adds no collision or protection mechanics."
+        },
+        {
+          "id": "toxic",
+          "minimum_client_version": "1.7.0",
+          "usage": "Use for boiling, cellular or alchemical matter with animated Voronoi cells and luminous apparent relief. No forced green palette and no implicit poison effect."
+        },
+        {
+          "id": "spectral_flow",
+          "minimum_client_version": "1.7.0",
+          "usage": "Use for bodyless veils, ribbons, wakes and moving wisps. Divergence-free noise and soft strip coverage shape the surface; keep the specified rotation and translation in physics."
+        }
+      ]
+    }
   },
   "visual_lifecycle": {
     "schema_version": "sp.visual-lifecycle/1.0",

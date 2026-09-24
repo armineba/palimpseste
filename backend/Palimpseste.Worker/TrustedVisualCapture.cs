@@ -53,7 +53,9 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
         var executable = Environment.GetEnvironmentVariable("PALIMPSESTE_VISUAL_RENDERER_EXE") ?? "";
         var manifestHash = Environment.GetEnvironmentVariable("PALIMPSESTE_VISUAL_RENDERER_MANIFEST_SHA256") ?? "";
         if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException("Unity capture requires the configured Windows renderer");
-        ValidateRenderer(executable, manifestHash);
+        using var compiledPacket = JsonDocument.Parse(packet);
+        var minimumClient = compiledPacket.RootElement.GetProperty("versions").GetProperty("min_client").GetString();
+        ValidateRenderer(executable, manifestHash, minimumClient);
         var captureRoot = Path.Combine(settings.TrustedInputRoot, "visual-captures");
         var directory = Path.Combine(captureRoot, jobId.ToString("N") + "-" + Guid.NewGuid().ToString("N"));
         if (!CodexSettings.IsPathInside(directory, settings.TrustedInputRoot, false) || CodexSettings.HasReparsePoint(directory))
@@ -106,7 +108,6 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
             !root.GetProperty("presentation_only").GetBoolean()) throw new InvalidDataException("visual_capture_manifest");
         var fps = root.GetProperty("measured_fps").GetDouble();
         if (!double.IsFinite(fps) || fps <= 0 || fps > 10000) throw new InvalidDataException("visual_capture_fps");
-        using var compiledPacket = JsonDocument.Parse(packet);
         var reference = compiledPacket.RootElement.GetProperty("visual_reference");
         var sheetRequired = reference.TryGetProperty("animation_sheet", out var sheet) && sheet.ValueKind == JsonValueKind.Object;
         var phaseTimings = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -272,7 +273,7 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
     }
 
     [SupportedOSPlatform("windows")]
-    private void ValidateRenderer(string executable, string expectedManifestHash)
+    private void ValidateRenderer(string executable, string expectedManifestHash, string? minimumClient)
     {
         if (!Path.IsPathFullyQualified(executable) || Path.GetFileName(executable) != "Palimpseste.exe" ||
             expectedManifestHash.Length != 64 || !File.Exists(executable) || CodexSettings.HasReparsePoint(executable))
@@ -301,7 +302,11 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
                     throw new InvalidDataException("visual_renderer_writable_by_worker");
         }
         using var manifest = JsonDocument.Parse(bytes);
-        if (manifest.RootElement.GetProperty("version").GetString() != "1.6.0") throw new InvalidDataException("visual_renderer_version");
+        var rendererVersion = manifest.RootElement.GetProperty("version").GetString();
+        if (rendererVersion is not ("1.6.0" or "1.7.0") ||
+            !System.Version.TryParse(minimumClient, out var requiredVersion) ||
+            System.Version.Parse(rendererVersion) < requiredVersion)
+            throw new InvalidDataException("visual_renderer_version");
         var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var file in manifest.RootElement.GetProperty("files").EnumerateArray())
         {

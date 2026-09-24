@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [switch]$UpdateDesktopShortcut,
+    [ValidateSet('1.6.0','1.7.0')][string]$ClientVersion = '1.7.0',
     [ValidateRange(1, 48)][int]$MaximumBuildAgeHours = 6
 )
 
@@ -42,13 +43,14 @@ $log = Get-Item -LiteralPath $logPath
 $now = [DateTime]::UtcNow
 if ($log.LastWriteTimeUtc -lt $now.AddHours(-$MaximumBuildAgeHours) -or $log.LastWriteTimeUtc -gt $now.AddMinutes(2)) { throw 'Journal de build absent, trop ancien ou daté dans le futur.' }
 $logText = [IO.File]::ReadAllText($logPath).Replace('\', '/')
+if ($logText -match '(?m)^Shader error\b') { throw 'Le build contient une erreur de shader ; la livraison est refusée même si Unity termine avec le code 0.' }
 $expectedExe = (Join-Path $source 'Palimpseste.exe').Replace('\', '/')
 $exitMarkers = [regex]::Matches($logText, 'Application will terminate with return code (\d+)')
 $resultMarkers = [regex]::Matches($logText, 'Build Finished, Result: (\w+)')
 if ($logText -notmatch ('PALIMPSESTE_BUILD_OK ' + [regex]::Escape($expectedExe) + ' bytes=') -or
     $resultMarkers.Count -eq 0 -or $resultMarkers[$resultMarkers.Count - 1].Groups[1].Value -ne 'Success' -or
     $exitMarkers.Count -eq 0 -or $exitMarkers[$exitMarkers.Count - 1].Groups[1].Value -ne '0') { throw 'Le journal ne prouve pas la réussite de ce build et sa sortie 0.' }
-if ([IO.File]::ReadAllText((Join-Path $repo 'game\ProjectSettings\ProjectSettings.asset')) -notmatch '(?m)^\s*bundleVersion:\s*1\.6\.0\s*$') { throw 'La version du projet doit être 1.6.0.' }
+if ([IO.File]::ReadAllText((Join-Path $repo 'game\ProjectSettings\ProjectSettings.asset')) -notmatch ('(?m)^\s*bundleVersion:\s*' + [regex]::Escape($ClientVersion) + '\s*$')) { throw 'La version du projet ne correspond pas à la livraison demandée.' }
 $required = @('Palimpseste.exe', 'GameAssembly.dll', 'UnityPlayer.dll', 'Palimpseste_Data\globalgamemanagers', 'Palimpseste_Data\il2cpp_data\Metadata\global-metadata.dat')
 foreach ($relative in $required) {
     $file = Get-Item -LiteralPath (Join-Path $source $relative)
@@ -97,7 +99,7 @@ $buildFilesVerified = $files.Count
 # Supplement the compiled files with notices for the reused PNGs and HLSL noise.
 # These are packaging inputs, not files claimed to have been produced by Unity.
 $licenseFiles = @()
-foreach ($name in @('Kenney-Particle-Pack-CC0.txt', 'Kenney-Smoke-Particles-CC0.txt', 'NoiseShader-MIT.txt')) {
+foreach ($name in @('Kenney-Particle-Pack-CC0.txt', 'Kenney-Smoke-Particles-CC0.txt', 'NoiseShader-MIT.txt', 'TinyPlay-URPShadersCollection-MIT.txt', 'Keijiro-VfxGraphAssets-Unlicense.txt')) {
     $licenseSource = Join-Path $repo ('assets\sourced-vfx\licenses\' + $name)
     Assert-Under $licenseSource $repo
     $relative = 'ThirdPartyNotices/' + $name
@@ -152,7 +154,7 @@ Assert-Under $playable $buildRoot
 Move-Item -LiteralPath $stage -Destination $playable
 Move-Item -LiteralPath $pendingZip -Destination $zipPath
 $proof = [ordered]@{
-    observed_at = [DateTime]::UtcNow.ToString('O'); client_version = '1.6.0'; delivery_name='D16 strict 3x7 animation sheet'; unity = '6000.3.24f1'; backend = 'IL2CPP'
+    observed_at = [DateTime]::UtcNow.ToString('O'); client_version = $ClientVersion; delivery_name='D19 sourced surface profiles / animation sheet'; unity = '6000.3.24f1'; backend = 'IL2CPP'
     build_exit = 0; build_success_marker_observed = $true; build_log = Relative $logPath; build_log_sha256 = Hash $logPath
     source = Relative $source; playable = Relative $playable; zip = Relative $zipPath
     zip_bytes = (Get-Item -LiteralPath $zipPath).Length; zip_sha256 = Hash $zipPath
@@ -180,10 +182,10 @@ if ($UpdateDesktopShortcut) {
     try {
         $shortcut = $shell.CreateShortcut($shortcutPath)
         $shortcut.TargetPath = $executable; $shortcut.WorkingDirectory = $playable
-        $shortcut.Description = 'Palimpseste Spell Lab 1.6.0'; $shortcut.Save()
+        $shortcut.Description = 'Palimpseste Spell Lab ' + $ClientVersion; $shortcut.Save()
         $verifiedShortcut = $shell.CreateShortcut($shortcutPath)
         if ($verifiedShortcut.TargetPath -ne $executable -or $verifiedShortcut.WorkingDirectory -ne $playable) {
-            throw 'Le raccourci enregistré ne cible pas la livraison 1.6.0.'
+            throw 'Le raccourci enregistré ne cible pas la livraison demandée.'
         }
     }
     finally {
@@ -197,7 +199,7 @@ if ($UpdateDesktopShortcut) {
     }
     Save-Proof $proof
 }
-Write-Output "Player 1.6.0 : $playable"
+Write-Output "Player $ClientVersion : $playable"
 Write-Output "ZIP SHA256 : $($proof.zip_sha256) ($($proof.zip_bytes) octets)"
 Write-Output "Preuve : $proofPath"
 Write-Output "Livraison précédente conservée : $backup"
