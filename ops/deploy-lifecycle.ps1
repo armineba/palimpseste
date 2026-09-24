@@ -4,7 +4,9 @@
    Updates an existing D15 database with migration011 only; migration010 is a prerequisite. #>
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$StageRoot,
-    [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime')
+    [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime',
+    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D16',
+    [string]$PublicReportPath = '')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -79,6 +81,12 @@ function Pin([string]$Path,[string]$Variable,[string]$Hash) {
     [IO.File]::WriteAllText($Path,[regex]::Replace($content,$pattern,[Text.RegularExpressions.MatchEvaluator]{param($m) $line}),$utf8)
 }
 foreach ($path in @($stage,$player,$runtime)) { Regular $path }
+if ($PublicReportPath) {
+    $PublicReportPath = [IO.Path]::GetFullPath($PublicReportPath)
+    Under $PublicReportPath (Join-Path $repo 'evidence\public\backend')
+    if ([IO.Path]::GetExtension($PublicReportPath) -ine '.json') { throw 'Public deployment report must be JSON.' }
+    Regular $PublicReportPath
+}
 foreach ($relative in @('worker\Palimpseste.Worker.exe','api\Palimpseste.Api.exe','doctor\ProviderDoctor.exe','visual-doctor\SpellVisualDoctor.exe','spec\prompts\05_VISUAL_CRITIC.md',
     'spec\assets\sourced-vfx\catalogue.json','spec\assets\sourced-vfx\references.json',
     'spec\assets\sourced-vfx\licenses\Kenney-Particle-Pack-CC0.txt','spec\assets\sourced-vfx\licenses\Kenney-Smoke-Particles-CC0.txt',
@@ -113,9 +121,13 @@ $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid(
 $logRoot = Join-Path $runtime ('evidence\pending\animation-sheet-install-' + $stamp)
 New-Item -ItemType Directory -Path $logRoot | Out-Null
 Protect $logRoot
-$record = [ordered]@{version='1.6.0'; delivery_name='D16 strict 3x7 animation sheet'; started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
+$record = [ordered]@{version='1.6.0'; backend_revision=$BackendRevision; delivery_name=($BackendRevision + ' backend / Player 1.6 animation sheet'); started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
     spell_generations=0; diagnostics_executed=$false; gameplay_tested=$false; visual_acceptance='pending_owner'; native_sha256=$originalNative}
-function Save-Record { [IO.File]::WriteAllText((Join-Path $logRoot 'installation.json'),($record | ConvertTo-Json -Depth 7),$utf8) }
+function Save-Record {
+    $json = $record | ConvertTo-Json -Depth 7
+    [IO.File]::WriteAllText((Join-Path $logRoot 'installation.json'),$json,$utf8)
+    if ($PublicReportPath) { [IO.File]::WriteAllText($PublicReportPath,$json,$utf8) }
+}
 Save-Record
 $render = Join-Path $runtime ('render-animation-sheet-' + $stamp)
 Install-Tree $player $render
@@ -201,7 +213,7 @@ try {
     & $powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File (Join-Path $launch 'start-owner-api.ps1') -RuntimeRoot $runtime
     if ($LASTEXITCODE -ne 0) { throw 'API startup failed.' }
     $record.phase='services_started'; $record.completed=$true; $record.completed_at=[DateTimeOffset]::UtcNow.ToString('o'); Save-Record
-    Write-Output "D16 / 1.6.0 installed. Owner gameplay trial pending. Record: $logRoot\installation.json"
+    Write-Output "$BackendRevision backend / Player 1.6.0 installed. Owner gameplay trial pending. Record: $logRoot\installation.json"
 } finally {
     foreach ($key in $previous.Keys) { [Environment]::SetEnvironmentVariable($key,$previous[$key],'Process') }
 }

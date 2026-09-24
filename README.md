@@ -2,9 +2,9 @@
 
 Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le parcours D16 est : **dessin libre → description → planche d’animation 3 × 7 → composition 3D/VFX contrôlée → sort jouable dans le laboratoire**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
-## Version courante — D16 / Player 1.6.0
+## Version courante — backend D17 / Player 1.6.0
 
-**D17 dans les sources :** la reconstruction de la planche doit examiner [cinq bibliothèques VFX obligatoires](docs/BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) avant de composer et d'itérer avec Dream-loop Pro. [Inventaire local](reference/vfx-libraries.inventory.json). Ce changement de recherche n'est pas encore déployé ; les nouveaux packages ne sont pas intégrés au Player.
+**D17 publié et déployé le 24 septembre à 21:59 Paris :** la reconstruction de la planche doit examiner [cinq bibliothèques VFX obligatoires](docs/BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) avant de composer et d'itérer avec Dream-loop Pro. Prompt B **2.5** et index de recherche sont installés ; API disponible et worker démarré. [Preuve d'installation](evidence/public/backend/vfx-libraries-d17-installation.json) · [Inventaire local](reference/vfx-libraries.inventory.json). Le Player 1.6.0 a été rouvert sans modification ; les nouveaux packages ne sont pas intégrés au Player. Aucun nouveau sort, test ou capture lancé par l'agent pour cette livraison.
 
 **Correctif backend D16.1 installé** : une critique finale au hash invalide avait bloqué « Foudre sous l’Enclume ». Le sort est récupéré depuis une version déjà évaluée, sans nouvel appel ni capture ; fidélité encore à améliorer. [Preuve et reprise](evidence/public/backend/visual-judge-fix-d16-1.json) · [Mécanisme général](docs/D16_JUDGE_RECOVERY.md).
 

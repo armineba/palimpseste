@@ -136,6 +136,9 @@ for ($attempt = 0; $attempt -lt 40; $attempt++) {
     $workerProcesses = @(Get-CimInstance Win32_Process -Filter "Name = 'Palimpseste.Worker.exe'")
     if ($workerProcesses.Count -ne 1) { continue }
     $item = $workerProcesses[0]
+    # CIM can see the new process before publishing its executable path.
+    # Wait within the existing deadline; never accept an unverified path.
+    if ([string]::IsNullOrWhiteSpace($item.ExecutablePath)) { continue }
     if (-not [string]::Equals($item.ExecutablePath, $worker,
             [StringComparison]::OrdinalIgnoreCase)) {
         throw 'Worker process path differs from reviewed executable.'

@@ -99,5 +99,10 @@ Consigne durable et catalogue de recherche mis à jour dans les sources.
 Les téléchargements précis sont consignés dans l'inventaire séparé.
 Les nouveaux packages ne sont pas encore embarqués dans le Player ; les
 16 textures Kenney et le bruit NoiseShader restent les ressources livrées.
-Le nouveau code de recherche doit être publié et déployé avant d'affecter
-les générations du service déjà installé. Aucun nouveau rendu n'est validé.
+Le backend D17 a été publié avec le code 0 et installé le 24 septembre 2026
+à 21:59 Paris. Le resolver, le prompt B 2.5 et l'index des cinq bibliothèques
+obligatoires sont actifs pour les nouvelles recherches. Le Player 1.6.0 reste
+inchangé ; API et worker ont redémarré et le jeu a été rouvert pour le créateur.
+Preuve : evidence/public/backend/vfx-libraries-d17-installation.json.
+Aucun test, appel modèle ou capture lancé pour cette livraison ; aucun
+nouveau rendu n'est validé.

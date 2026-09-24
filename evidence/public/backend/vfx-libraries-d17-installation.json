@@ -1,0 +1,22 @@
+{
+    "version":  "1.6.0",
+    "backend_revision":  "D17",
+    "delivery_name":  "D17 backend / Player 1.6 animation sheet",
+    "started_at":  "2026-09-24T19:59:46.8150721+00:00",
+    "phase":  "services_started",
+    "completed":  true,
+    "spell_generations":  0,
+    "diagnostics_executed":  false,
+    "gameplay_tested":  false,
+    "visual_acceptance":  "pending_owner",
+    "native_sha256":  "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "renderer_manifest_sha256":  "487175e3182a03995b30687c7738251ec32020cbdb265e2794155d3aee9f2bf0",
+    "renderer":  "E:\\PalimpsesteRuntime\\render-animation-sheet-20260924-195946-c7bfc956\\Palimpseste.exe",
+    "migration_010_prerequisite_present":  true,
+    "migration_011_applied":  true,
+    "migration_011_sha256":  "9ad00bf0d9af1e79da1d84b23b92ca308ae2f4eb4ea14328eae8cb09ee4f2195",
+    "worker_sha256":  "a886d4da6e550362a27b52c020835a67facb5694882f70c7654c84254b4b1c2b",
+    "api_sha256":  "c48d679adca65967258dee9fc6ba171eb6d7dc66fc25977715e819f454be8af3",
+    "launcher_directory":  "E:\\PalimpsesteRuntime\\evidence\\pending\\animation-sheet-install-20260924-195946-c7bfc956\\launch",
+    "completed_at":  "2026-09-24T19:59:55.5744323+00:00"
+}

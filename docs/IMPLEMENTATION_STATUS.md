@@ -1,12 +1,14 @@
 # État de réalisation et point de reprise
 
-## Sources courantes — D17, bibliothèques avant reconstruction
+## État courant — D17 déployé, bibliothèques avant reconstruction
 
 Les cinq sources imposées par le créateur sont documentées et deviennent obligatoires dans les nouveaux dossiers de recherche entre la planche et B. Le prompt B **2.5** utilise leurs techniques pertinentes pour reconstruire les phases de la planche, puis reprendre les corrections Dream-loop Pro. Les recherches persistées restent immuables. [Consigne](BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) · [Inventaire](../reference/vfx-libraries.inventory.json).
 
-Worker compilé en Release avec code 0, sans avertissement ni erreur : [journal](../deliverables/vfx-library-d17-build.log). **D17 non publié/non déployé ; packages non importés dans le Player ; aucun test ou appel modèle effectué.** Les quatre clones de consultation ne constituent pas une nouvelle version du jeu. Voir [la reprise](NEXT_ACTIONS.md) pour les étapes restantes et l'état réel des services.
+Worker compilé en Release avec code 0, sans avertissement ni erreur : [journal](../deliverables/vfx-library-d17-build.log). **Publication backend code 0 et installation achevée le 24 septembre à 21:59:55 Paris.** Prompt B **2.5**, resolver et index des cinq sources obligatoires sont installés. Worker PID **25352**, API PID **32092**, disponibilité HTTP **200** constatée à **22:00:32 Paris** ; Player 1.6.0 inchangé, rouvert PID **32492**. [Preuve d'installation](../evidence/public/backend/vfx-libraries-d17-installation.json).
 
-## État courant — correctif backend D16.1, Player 1.6.0 conservé
+**Packages non importés dans le Player ; aucun test, appel modèle ou capture effectué pour cette livraison.** Les quatre clones de consultation ne constituent pas de nouveaux assets exécutables. La suppression des six parchemins locaux demandée par le créateur a été rejetée par le contrôle automatique (`blocked by policy`, sans motif détaillé) ; ils restent présents, dont un dessin en attente sans job serveur associé. Aucune sauvegarde créée ni suppression serveur effectuée. Voir [la reprise](NEXT_ACTIONS.md) pour le travail restant et les limites observées.
+
+## Historique — correctif backend D16.1, Player 1.6.0 conservé
 
 Le dernier parcours joueur « Foudre sous l’Enclume » a produit sa description, sa planche 3 × 7, trois plans et deux verdicts admissibles. Le troisième J avait renvoyé un hash de plan erroné, bloquant la livraison. Le backend corrige cette cause par des empreintes imposées dans le schéma J, des diagnostics précis et une finalisation depuis le meilleur candidat déjà évalué en cas de J définitivement invalide.
 
