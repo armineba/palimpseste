@@ -1,5 +1,15 @@
 # Point de reprise immédiat
 
+## 24 septembre — D18 installé, plusieurs parchemins en parallèle
+
+**Publication code 0 et installation terminée à 22:52:32 Paris.** Le worker accepte plusieurs jobs asynchrones dans un même processus. `PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0` retire le plafond applicatif de jobs actifs, à la demande du créateur. Les captures Unity partagent un seul créneau GPU ; les autres étapes continuent en parallèle. [Fonctionnement](D18_CONCURRENT_JOBS.md) · [Installation réelle](../evidence/public/backend/parallel-jobs-d18-installation.json) · [Preuve de livraison](../evidence/public/backend/parallel-jobs-d18.json).
+
+Le déploiement a attendu la fin du travail déjà admis et suspendu temporairement les nouvelles prises de jobs par D17. La pause a été retirée avant de lancer D18 : `claims_paused=false`, `completed=true`, phase `services_started`. Les jobs en attente restent disponibles pour le nouveau worker. Aucun appel en cours annulé pour imposer la bascule. Player **1.6.0** conservé, sans build Unity ni fermeture de sa fenêtre.
+
+**Aucun test, appel modèle de diagnostic, sort de démonstration ou capture de validation lancé par l'agent.** Une commande supplémentaire de consultation de la file et de disponibilité a été refusée par le contrôle automatique (`blocked by policy`, sans motif détaillé) ; elle n'a pas été contournée. Le rapport d'installation atteste le démarrage des services ; la progression simultanée des jobs après installation n'a pas été observée. Ne pas la présenter comme un essai réussi.
+
+Suite : laisser le créateur utiliser plusieurs parchemins et recueillir son retour. Le nombre de jobs n'est plus borné par l'application ; les quotas réels du compte et la capacité de la machine restent applicables. Aucun achat ni recharge ajouté. La fidélité visuelle et la latence sous concurrence restent à apprécier. Les sections ci-dessous sont historiques, notamment les nombres de parchemins et PID alors observés.
+
 ## 24 septembre — D17, bibliothèques obligatoires dans la reconstruction
 
 Le créateur précise le point d'application : **planche d'animation générée → examen des cinq bibliothèques → construction B → critique et révisions Dream-loop Pro**. [Document texte demandé](BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) · [Inventaire des clones](../reference/vfx-libraries.inventory.json) · [Détails du fonctionnement](references-vfx-sources.md).

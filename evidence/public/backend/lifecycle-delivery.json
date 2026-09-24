@@ -1,15 +1,15 @@
 {
     "version":  "1.6.0",
-    "updated_at":  "2026-09-24T20:03:27.4506785+00:00",
+    "updated_at":  "2026-09-24T20:57:48.9914035+00:00",
     "build_exit":  0,
-    "binary_stage":  "deliverables/.stage-backend/9795134d91554c7ca3df7d9a1a3b2c5e",
+    "binary_stage":  "deliverables/.stage-backend/e129a7c838db4df6ac3ff784c50c07f0",
     "documentation_refreshed":  true,
     "zip":  "deliverables/Palimpseste-Backend-Windows-x64.zip",
-    "bytes":  247798939,
-    "sha256":  "206b8f9e77bee8121bc898a60d70e0c6ae8416e07baaca6647011057b38ce9b8",
-    "worker_sha256":  "a886d4da6e550362a27b52c020835a67facb5694882f70c7654c84254b4b1c2b",
-    "api_sha256":  "c48d679adca65967258dee9fc6ba171eb6d7dc66fc25977715e819f454be8af3",
+    "bytes":  247813700,
+    "sha256":  "d3dfff0e21b57c6be780a46177874499224476c707a92281b8e71df4adda04a4",
+    "worker_sha256":  "e5799b4c83cb5bc7418169dba0bc1d98fe174f095e9e8e0c0d2024c7c5a30b97",
+    "api_sha256":  "28c75de0e1d6221f3786301481a4fb3b35597221fc626a8e87d5a7a793170bf1",
     "tests_executed":  false,
     "gameplay_acceptance":  "pending_owner",
-    "evidence":  "evidence/public/backend/vfx-libraries-d17.json"
+    "evidence":  "evidence/public/backend/parallel-jobs-d18.json"
 }

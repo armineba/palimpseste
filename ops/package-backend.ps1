@@ -125,11 +125,16 @@ Set-ArchiveHashPin $archiveApiLauncher 'expectedApiSha256' $archiveApiHash
 Set-ArchiveHashPin $archiveApiLauncher 'expectedChildSha256' $archiveApiChildHash
 
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/IMPLEMENTATION_STATUS.md') -Destination (Join-Path $stage 'IMPLEMENTATION_STATUS.md')
+New-Item -ItemType Directory -Path (Join-Path $stage 'docs') -Force | Out-Null
+foreach ($name in @('D18_CONCURRENT_JOBS.md','NEXT_ACTIONS.md')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $name)) -Destination (Join-Path $stage ('docs/' + $name))
+}
 Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Destination (Join-Path $stage 'evidence') -Recurse
 
 @"
 Palimpseste backend Windows x64. API, worker et doctor sont des exécutables .NET autoportants.
-Backend D17 / Player 1.6.0. La chaîne privée est : dessin libre -> Sol high (description et cycle complet) -> atlas natif Codex 7x3 -> compositeur serveur fixe -> planche VFX 1536x1152 -> consultation des cinq bibliothèques obligatoires et d'une référence complémentaire -> Astra high (construction depuis la description, la planche et la recherche conservée, prompt B 2.5) -> compilateur contrôlé -> rendu Unity précompilé -> critique visuelle indépendante J -> ajustements bornés -> paquet Unity 1.6.
+Backend D18 / Player 1.6.0. La chaîne privée est : dessin libre -> Sol high (description et cycle complet) -> atlas natif Codex 7x3 -> compositeur serveur fixe -> planche VFX 1536x1152 -> consultation des cinq bibliothèques obligatoires et d'une référence complémentaire -> Astra high (construction depuis la description, la planche et la recherche conservée, prompt B 2.5) -> compilateur contrôlé -> rendu Unity précompilé -> critique visuelle indépendante J -> ajustements bornés -> paquet Unity 1.6.
+PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0 : aucun plafond applicatif de jobs en parallèle dans le worker. Les captures Unity partagent un seul créneau GPU. Les limites du compte et de la machine restent applicables. Voir docs/D18_CONCURRENT_JOBS.md et les preuves de déploiement ; aucun essai de concurrence n'est ajouté par le développement.
 La planche comporte APPARITION, STABLE, DISPARITION, sept cases numérotées 1 à 7 par ligne, titre et sous-titre VFX ANIMATION SHEET. L'atlas réellement produit par le fournisseur et la planche mise en page par le serveur ont des artefacts et SHA distincts ; la planche n'est pas présentée comme la sortie native du modèle. System.Drawing.Common 10.0.12 est gratuit sous MIT, Windows uniquement ; sa notice accompagne les programmes publiés. Aucune police n'est distribuée.
 Le worker utilise codex exec sous un compte Windows de service isolé. Il n'exécute ni C# issu d'un dessin, ni build Unity.
 L'archive contient les contrats, références, prompts A/G/B/J et migrations 001 à 011, mais aucun auth.json, jeton joueur, secret DB ou clé API. Les versions historiques A 2.3 et G 1.2 restent incluses pour les anciens parcours admis. spec/assets/sourced-vfx contient seulement les catalogues, licences et PNG contrôlés : aucun reference-code, plugin ni script d'import. Le binaire durci A/B/G/J et son attestation native sont décrits dans ops/codex-image-generation.md. Si codex/ est présent, son exécutable a été inclus avec un SHA vérifié et les notices amont ; sinon le construire à partir des correctifs fournis. Dans les deux cas, établir les preuves sur le compte de service avant activation.

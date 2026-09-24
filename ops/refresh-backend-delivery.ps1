@@ -28,8 +28,9 @@ foreach ($path in @($stage,$zip,$pending)) {
     }
 }
 $files = [ordered]@{}
+$files['README.txt'] = Join-Path $stage 'README.txt'
 $files['IMPLEMENTATION_STATUS.md'] = Join-Path $repo 'docs\IMPLEMENTATION_STATUS.md'
-foreach ($name in @('D15_BEHAVIOR_AND_RESEARCH.md','UNITY_BEHAVIORS_D15.md','UNITY_ANIMATION_SHEET_D16.md','references-vfx-sources.md','BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt','NEXT_ACTIONS.md','TESTER_MAINTENANT.md')) {
+foreach ($name in @('D15_BEHAVIOR_AND_RESEARCH.md','D18_CONCURRENT_JOBS.md','UNITY_BEHAVIORS_D15.md','UNITY_ANIMATION_SHEET_D16.md','references-vfx-sources.md','BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt','NEXT_ACTIONS.md','TESTER_MAINTENANT.md')) {
     $files['docs/' + $name] = Join-Path $repo ('docs\' + $name)
 }
 foreach ($file in Get-ChildItem -LiteralPath (Join-Path $repo 'docs') -Filter 'D16*.md' -File) {
@@ -46,7 +47,9 @@ foreach ($file in Get-ChildItem -LiteralPath $evidenceRoot -Recurse -File) {
 foreach ($entry in $files.GetEnumerator()) {
     $destination = Join-Path $stage $entry.Key
     New-Item -ItemType Directory -Path ([IO.Path]::GetDirectoryName($destination)) -Force | Out-Null
-    Copy-Item -LiteralPath $entry.Value -Destination $destination -Force
+    if ([IO.Path]::GetFullPath($entry.Value) -ine [IO.Path]::GetFullPath($destination)) {
+        Copy-Item -LiteralPath $entry.Value -Destination $destination -Force
+    }
 }
 # Recopying the source ops scripts must not restore the previous delivery's pins.
 # Bind the refreshed launchers to these already verified stage binaries and child scripts.

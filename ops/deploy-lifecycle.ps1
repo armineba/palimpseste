@@ -6,7 +6,10 @@
 param([Parameter(Mandatory)][string]$StageRoot,
     [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime',
     [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D16',
-    [string]$PublicReportPath = '')
+    [string]$PublicReportPath = '',
+    [ValidateRange(-1,2147483647)][int]$JobConcurrency = -1,
+    [ValidateRange(0,86400)][int]$WaitForIdleSeconds = 0,
+    [switch]$DrainExistingJobs)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -147,10 +150,59 @@ $env:PGHOST=$db.Host; $env:PGPORT=$db.Port; $env:PGUSER=$db.Username; $env:PGPAS
 $psql = 'C:\Program Files\PostgreSQL\17\bin\psql.exe'
 function Active-Jobs {
     $ErrorActionPreference='Continue'; $global:LASTEXITCODE=$null
-    $lines=@(& $psql -X -w -A -t -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM jobs WHERE state NOT IN ('ready','needs_operator');" 2> (Join-Path $logRoot 'postgres.stderr.txt'))
+    $query = if ($DrainExistingJobs) {
+        "SELECT count(*) FROM jobs j WHERE j.state NOT IN ('queued','waiting_retry','ready','needs_operator') OR EXISTS(SELECT 1 FROM provider_attempts a WHERE a.job_id=j.id AND a.status='running');"
+    } else { "SELECT count(*) FROM jobs WHERE state NOT IN ('ready','needs_operator');" }
+    $lines=@(& $psql -X -w -A -t -v ON_ERROR_STOP=1 -c $query 2> (Join-Path $logRoot 'postgres.stderr.txt'))
     $code=$global:LASTEXITCODE
     if ($code -ne 0 -or $null -eq $code -or $lines.Count -ne 1 -or $lines[0] -notmatch '^\d+$') { throw 'Could not read pending jobs.' }
     return [long]$lines[0]
+}
+function Set-ClaimPause([bool]$Enabled) {
+    # The legacy worker has no drain command. Its sole admission UPDATE increments
+    # fence_token; this temporary trigger skips only that UPDATE. Heartbeats,
+    # provider attempts, completed work and new HTTP submissions keep running.
+    $sql = if ($Enabled) { @'
+BEGIN;
+SET LOCAL statement_timeout = '5s';
+SET LOCAL lock_timeout = '5s';
+DO $$ BEGIN
+ IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgrelid='public.jobs'::regclass AND tgname='palimpseste_deployment_pause_claims')
+ OR to_regprocedure('public.palimpseste_deployment_pause_claims()') IS NOT NULL THEN
+  RAISE EXCEPTION 'An earlier claim pause requires operator inspection';
+ END IF;
+END $$;
+CREATE FUNCTION public.palimpseste_deployment_pause_claims() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NULL; END $$;
+CREATE TRIGGER palimpseste_deployment_pause_claims BEFORE UPDATE OF fence_token ON public.jobs
+ FOR EACH ROW WHEN (NEW.fence_token > OLD.fence_token) EXECUTE FUNCTION public.palimpseste_deployment_pause_claims();
+SELECT json_build_object('schema','public','table','jobs','name','palimpseste_deployment_pause_claims',
+ 'trigger_oid',oid,'function_oid',tgfoid) FROM pg_trigger
+ WHERE tgrelid='public.jobs'::regclass AND tgname='palimpseste_deployment_pause_claims';
+COMMIT;
+'@ } else { @'
+BEGIN;
+SET LOCAL statement_timeout = '5s';
+SET LOCAL lock_timeout = '5s';
+DO $$ BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgrelid='public.jobs'::regclass
+  AND tgname='palimpseste_deployment_pause_claims' AND oid=__TRIGGER_OID__ AND tgfoid=__FUNCTION_OID__)
+ OR to_regprocedure('public.palimpseste_deployment_pause_claims()')::oid IS DISTINCT FROM __FUNCTION_OID__::oid THEN
+  RAISE EXCEPTION 'Claim pause identity changed; refusing to remove it';
+ END IF;
+END $$;
+DROP TRIGGER palimpseste_deployment_pause_claims ON public.jobs;
+DROP FUNCTION public.palimpseste_deployment_pause_claims();
+COMMIT;
+'@ }
+    if (-not $Enabled) {
+        if ($null -eq $script:claimPauseIdentity) { throw 'Claim pause identity not recorded.' }
+        $sql=$sql.Replace('__TRIGGER_OID__',([uint32]$script:claimPauseIdentity.trigger_oid).ToString()).Replace('__FUNCTION_OID__',([uint32]$script:claimPauseIdentity.function_oid).ToString())
+    }
+    $savedPreference=$ErrorActionPreference; $ErrorActionPreference='Continue'; $global:LASTEXITCODE=$null
+    & $psql -X -w -q -A -t -v ON_ERROR_STOP=1 -c $sql 1> (Join-Path $logRoot 'claim-pause.stdout.txt') 2> (Join-Path $logRoot 'claim-pause.stderr.txt')
+    $code=$global:LASTEXITCODE; $ErrorActionPreference=$savedPreference
+    if ($code -ne 0 -or $null -eq $code) { throw 'Could not change the deployment claim pause; inspect private logs.' }
+    if ($Enabled) { $script:claimPauseIdentity=Get-Content -LiteralPath (Join-Path $logRoot 'claim-pause.stdout.txt') -Raw | ConvertFrom-Json }
 }
 function Assert-D15Schema {
     $ErrorActionPreference='Continue'; $global:LASTEXITCODE=$null
@@ -162,9 +214,26 @@ function Assert-D15Schema {
     }
     $record.migration_010_prerequisite_present=$true; Save-Record
 }
+$claimPauseInstalled=$false
+$script:claimPauseIdentity=$null
 try {
     Assert-D15Schema
-    if ((Active-Jobs) -ne 0) { throw 'Existing job active; deployment has not stopped services.' }
+    if ($DrainExistingJobs) {
+        Set-ClaimPause $true
+        $claimPauseInstalled=$true
+        $record.claims_paused=$true; $record.claim_pause_identity=$script:claimPauseIdentity; Save-Record
+    }
+    $idleDeadline = [DateTime]::UtcNow.AddSeconds($WaitForIdleSeconds)
+    $pendingJobs = Active-Jobs
+    while ($pendingJobs -ne 0) {
+        $record.phase='waiting_for_existing_jobs'; $record.pending_jobs=$pendingJobs; Save-Record
+        if ($WaitForIdleSeconds -eq 0 -or [DateTime]::UtcNow -ge $idleDeadline) {
+            throw 'Existing jobs are still active; services have not been stopped.'
+        }
+        Start-Sleep -Seconds 5
+        $pendingJobs = Active-Jobs
+    }
+    $record.pending_jobs=0; Save-Record
     Stop-ServiceExecutable (Join-Path $runtime 'api\Palimpseste.Api.exe')
     if ((Active-Jobs) -ne 0) { throw 'Job arrived during admission shutdown; worker left running.' }
     Stop-ServiceExecutable (Join-Path $runtime 'bin\Palimpseste.Worker.exe')
@@ -196,6 +265,13 @@ try {
     Pin (Join-Path $launch 'start-owner-api.ps1') 'expectedApiSha256' $apiHash
     Pin (Join-Path $launch 'start-owner-api.ps1') 'expectedChildSha256' (Digest (Join-Path $runtime 'bin\ApiService.Child.ps1'))
     $updates=@{PALIMPSESTE_VISUAL_RENDERER_EXE=$record.renderer; PALIMPSESTE_VISUAL_RENDERER_MANIFEST_SHA256=$record.renderer_manifest_sha256}
+    if ($JobConcurrency -ge 0) {
+        $updates.PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=$JobConcurrency.ToString([Globalization.CultureInfo]::InvariantCulture)
+        $updates.PALIMPSESTE_WORKER_DRAIN_FILE=Join-Path $runtime 'bin\worker-drain.request'
+        $record.max_concurrent_jobs=$JobConcurrency
+        $record.concurrency_policy=if ($JobConcurrency -eq 0) { 'no_application_job_count_ceiling' } else { 'operator_configured' }
+        $record.gpu_capture_slots=1
+    }
     $lines=[Collections.Generic.List[string]]::new(); $seen=@{}
     foreach ($line in Get-Content -LiteralPath $envFile -Encoding UTF8) {
         if ($line -match '^([A-Za-z_][A-Za-z0-9_]*)=' -and $updates.ContainsKey($Matches[1])) {
@@ -207,6 +283,11 @@ try {
     [IO.File]::WriteAllText($envFile,(($lines -join "`r`n")+"`r`n"),$utf8); Set-Acl -LiteralPath $envFile -AclObject $envAcl
     if ((Digest (Join-Path $runtime 'bin\codex-image.exe')) -cne $originalNative) { throw 'Native Codex unexpectedly changed.' }
     $record.worker_sha256=$workerHash; $record.api_sha256=$apiHash; $record.launcher_directory=$launch; $record.phase='installed'; Save-Record
+    if ($claimPauseInstalled) {
+        Set-ClaimPause $false
+        $claimPauseInstalled=$false
+        $record.claims_paused=$false; Save-Record
+    }
     $powershell='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
     & $powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File (Join-Path $launch 'start-owner-worker.ps1') -RuntimeRoot $runtime
     if ($LASTEXITCODE -ne 0) { throw 'Worker startup failed.' }
@@ -215,5 +296,9 @@ try {
     $record.phase='services_started'; $record.completed=$true; $record.completed_at=[DateTimeOffset]::UtcNow.ToString('o'); Save-Record
     Write-Output "$BackendRevision backend / Player 1.6.0 installed. Owner gameplay trial pending. Record: $logRoot\installation.json"
 } finally {
+    if ($claimPauseInstalled) {
+        try { Set-ClaimPause $false; $record.claims_paused=$false; Save-Record }
+        catch { Write-Warning 'Claim pause cleanup failed; inspect the recorded deployment before admitting new work.' }
+    }
     foreach ($key in $previous.Keys) { [Environment]::SetEnvironmentVariable($key,$previous[$key],'Process') }
 }

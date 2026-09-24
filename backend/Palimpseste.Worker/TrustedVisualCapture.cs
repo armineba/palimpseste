@@ -19,10 +19,21 @@ public sealed class VisualCaptureException(string reason, Exception inner) : Exc
 /// <summary>A fixed, prebuilt renderer. This is application code, never a model tool or a software build.</summary>
 public sealed class TrustedVisualCapture(CodexSettings settings)
 {
+    // Concurrent jobs share this worker's GPU. Capturing one at a time keeps
+    // another renderer from distorting the measured FPS and visual review.
+    private static readonly SemaphoreSlim RendererGate = new(1, 1);
+
     public async Task<VisualCaptureOutput> CaptureAsync(Guid jobId, byte[] packet, byte[] description,
         IReadOnlyDictionary<string, byte[]> artifacts, CancellationToken ct)
     {
-        try { return await CaptureCoreAsync(jobId, packet, description, artifacts, ct); }
+        var acquired = false;
+        try
+        {
+            // Queue time is cancellable and excluded from the renderer's own timeout.
+            await RendererGate.WaitAsync(ct);
+            acquired = true;
+            return await CaptureCoreAsync(jobId, packet, description, artifacts, ct);
+        }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
         catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException or InvalidOperationException or ArgumentException or
             KeyNotFoundException or JsonException or FormatException or OverflowException or System.ComponentModel.Win32Exception or OperationCanceledException)
@@ -33,6 +44,7 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
                 e is OperationCanceledException ? "visual_renderer_timeout" : "visual_capture_failed";
             throw new VisualCaptureException(reason, e);
         }
+        finally { if (acquired) RendererGate.Release(); }
     }
 
     private async Task<VisualCaptureOutput> CaptureCoreAsync(Guid jobId, byte[] packet, byte[] description,
@@ -77,7 +89,13 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
         timeout.CancelAfter(TimeSpan.FromSeconds(120));
         try { await process.WaitForExitAsync(timeout.Token); }
-        catch { if (!process.HasExited) process.Kill(entireProcessTree: true); throw; }
+        catch
+        {
+            if (!process.HasExited) process.Kill(entireProcessTree: true);
+            // Kill requests termination; wait for it before releasing the GPU gate.
+            await process.WaitForExitAsync(CancellationToken.None);
+            throw;
+        }
         await Task.WhenAll(stdout, stderr);
         if (process.ExitCode != 0) throw new IOException("visual_renderer_failed_" + process.ExitCode);
         var manifest = await ReadBoundedAsync(Path.Combine(directory, "output", "capture.json"), 64_000, ct);

@@ -144,7 +144,12 @@ Require-Value $config 'PALIMPSESTE_PLANNER_EFFORT' 'high'
 Require-Value $config 'PALIMPSESTE_INTERPRETER_MODEL' 'gpt-5.6-sol'
 Require-Value $config 'PALIMPSESTE_INTERPRETER_EFFORT' 'high'
 Require-Value $config 'PALIMPSESTE_INTERPRETER_VERIFIED' 'true'
-Require-Value $config 'PALIMPSESTE_MAX_PROVIDER_CONCURRENCY' '1'
+$jobConcurrency = -1
+if (-not $config.ContainsKey('PALIMPSESTE_MAX_PROVIDER_CONCURRENCY') -or
+    -not [int]::TryParse($config['PALIMPSESTE_MAX_PROVIDER_CONCURRENCY'], [ref]$jobConcurrency) -or
+    $jobConcurrency -lt 0) {
+    throw 'Owner lab job concurrency must be zero (no application ceiling) or a positive integer.'
+}
 Require-Value $config 'PALIMPSESTE_RUNTIME_FEATURES_VERIFIED' 'true'
 Require-Value $config 'PALIMPSESTE_EFFORT_VERIFIED' 'true'
 Require-Evidence $config 'PALIMPSESTE_RUNTIME_FEATURE_EVIDENCE'

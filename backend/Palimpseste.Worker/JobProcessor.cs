@@ -28,60 +28,6 @@ public sealed partial class JobProcessor
         this.settings = settings;
     }
 
-    public async Task RunAsync(CancellationToken shutdown)
-    {
-        while (!shutdown.IsCancellationRequested)
-        {
-            ClaimedJob? job = null;
-            try { job = await jobs.ClaimAsync(workerId, shutdown); }
-            catch (OperationCanceledException) when (shutdown.IsCancellationRequested) { break; }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine($"worker claim failed: {e.GetType().Name}");
-                await Task.Delay(TimeSpan.FromSeconds(5), shutdown);
-                continue;
-            }
-            if (job is null) { await Task.Delay(TimeSpan.FromSeconds(2), shutdown); continue; }
-            using var leaseLost = CancellationTokenSource.CreateLinkedTokenSource(shutdown);
-            var heartbeat = HeartbeatAsync(job, leaseLost);
-            try { await ProcessAsync(job, leaseLost.Token); }
-            catch (OperationCanceledException) when (shutdown.IsCancellationRequested) { }
-            catch (AnimationSheetException e)
-            {
-                Console.Error.WriteLine($"job {job.Id:N} animation sheet: {e.InnerException?.GetType().Name}");
-                try
-                {
-                    await jobs.SetStateAsync(job, "needs_operator", "animation_sheet_failed",
-                        "La mise en page de la planche a été interrompue. Les images sont conservées ; réessaie pour continuer.",
-                        false, CancellationToken.None);
-                }
-                catch (Exception) { /* A lost lease may already belong to another worker. */ }
-            }
-            catch (VisualCaptureException e)
-            {
-                Console.Error.WriteLine($"job {job.Id:N} visual capture: {e.Reason} ({e.InnerException?.GetType().Name})");
-                try
-                {
-                    await jobs.SetStateAsync(job, "needs_operator", "visual_capture_failed",
-                        "Finition visuelle interrompue ; image et construction conservées. Réessaie la finition.",
-                        false, CancellationToken.None);
-                }
-                catch (Exception) { /* A lost lease may already belong to another worker. */ }
-            }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine($"job {job.Id:N} incident: {e.GetType().Name}");
-                try { await jobs.SetStateAsync(job, "needs_operator", "worker_exception", "Incident technique à examiner", false, CancellationToken.None); }
-                catch (Exception) { /* A lost lease may already belong to another worker. */ }
-            }
-            finally
-            {
-                leaseLost.Cancel();
-                try { await heartbeat; } catch (OperationCanceledException) { }
-            }
-        }
-    }
-
     private async Task HeartbeatAsync(ClaimedJob job, CancellationTokenSource cancellation)
     {
         while (!cancellation.IsCancellationRequested)

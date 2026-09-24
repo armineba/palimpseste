@@ -2,7 +2,9 @@
 
 Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le parcours D16 est : **dessin libre → description → planche d’animation 3 × 7 → composition 3D/VFX contrôlée → sort jouable dans le laboratoire**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
-## Version courante — backend D17 / Player 1.6.0
+## Version courante — backend D18 / Player 1.6.0
+
+**D18 publié et installé le 24 septembre à 22:52 Paris :** plusieurs parchemins peuvent progresser en parallèle, sans plafond applicatif de jobs (`PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0`). Les captures Unity partagent le GPU à tour de rôle. [Fonctionnement](docs/D18_CONCURRENT_JOBS.md) · [Installation](evidence/public/backend/parallel-jobs-d18-installation.json). Aucun test ni génération de démonstration lancé ; l'essai simultané après installation reste au créateur.
 
 **D17 publié et déployé le 24 septembre à 21:59 Paris :** la reconstruction de la planche doit examiner [cinq bibliothèques VFX obligatoires](docs/BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) avant de composer et d'itérer avec Dream-loop Pro. Prompt B **2.5** et index de recherche sont installés ; API disponible et worker démarré. [Preuve d'installation](evidence/public/backend/vfx-libraries-d17-installation.json) · [Inventaire local](reference/vfx-libraries.inventory.json). Le Player 1.6.0 a été rouvert sans modification ; les nouveaux packages ne sont pas intégrés au Player. Aucun nouveau sort, test ou capture lancé par l'agent pour cette livraison.
 

@@ -1,6 +1,12 @@
 # État de réalisation et point de reprise
 
-## État courant — D17 déployé, bibliothèques avant reconstruction
+## État courant — D18 déployé, jobs sans plafond applicatif
+
+**Backend D18 publié et installé le 24 septembre à 22:52:32 Paris**, avec `PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0`. Un seul worker traite plusieurs jobs indépendants ; chacun garde son bail et ses checkpoints. Les captures Unity passent à tour de rôle sur le GPU, sans bloquer les autres étapes des autres parchemins. Le Player **1.6.0** reste celui déjà livré. [Architecture](D18_CONCURRENT_JOBS.md) · [Preuve](../evidence/public/backend/parallel-jobs-d18.json) · [Installation](../evidence/public/backend/parallel-jobs-d18-installation.json).
+
+Compilation Release : code **0**, **0 erreur / 0 avertissement**. Publication : code **0**. Installation : `completed=true`, `services_started`, pause temporaire de claims retirée. Aucun test ni génération indépendante exécuté. La consultation supplémentaire de la file a été refusée par le contrôle automatique, sans motif détaillé ; la concurrence effective des appels natifs reste à observer sur les essais du créateur. Le déploiement ne prouve ni gain de latence mesuré ni acceptation artistique. Voir [le point de reprise](NEXT_ACTIONS.md).
+
+## Historique — D17 déployé, bibliothèques avant reconstruction
 
 Les cinq sources imposées par le créateur sont documentées et deviennent obligatoires dans les nouveaux dossiers de recherche entre la planche et B. Le prompt B **2.5** utilise leurs techniques pertinentes pour reconstruire les phases de la planche, puis reprendre les corrections Dream-loop Pro. Les recherches persistées restent immuables. [Consigne](BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt) · [Inventaire](../reference/vfx-libraries.inventory.json).
 

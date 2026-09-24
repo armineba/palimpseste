@@ -1,0 +1,68 @@
+{
+    "change":  "D18",
+    "recorded_utc":  "2026-09-24T20:56:56.5017727+00:00",
+    "client_version":  "1.6.0",
+    "request":  "Remove the application ceiling on simultaneous parchment construction",
+    "compilation":  {
+                        "command":  "dotnet build backend/Palimpseste.Worker/Palimpseste.Worker.csproj -c Release --no-restore --nologo",
+                        "exit_code":  0,
+                        "errors":  0,
+                        "warnings":  0,
+                        "log":  "deliverables/parallel-jobs-d18-build.log"
+                    },
+    "backend":  {
+                    "publish_exit":  0,
+                    "publish_log":  "deliverables/parallel-jobs-d18-publish.log",
+                    "stage":  "deliverables/.stage-backend/e129a7c838db4df6ac3ff784c50c07f0",
+                    "worker_sha256":  "e5799b4c83cb5bc7418169dba0bc1d98fe174f095e9e8e0c0d2024c7c5a30b97",
+                    "api_sha256":  "28c75de0e1d6221f3786301481a4fb3b35597221fc626a8e87d5a7a793170bf1",
+                    "installed_at":  "2026-09-24T20:52:32.6582528+00:00",
+                    "installation_report":  "evidence/public/backend/parallel-jobs-d18-installation.json",
+                    "installation_completed":  true,
+                    "phase":  "services_started"
+                },
+    "concurrency":  {
+                        "max_concurrent_jobs":  0,
+                        "zero_means":  "no_application_job_count_ceiling",
+                        "worker_processes":  1,
+                        "gpu_capture_slots":  1,
+                        "independent_per_job_lease":  true,
+                        "application_limits_do_not_change_provider_quota":  true
+                    },
+    "deployment":  {
+                       "existing_jobs_drained":  true,
+                       "queued_jobs_preserved":  true,
+                       "claims_paused_after_installation":  false,
+                       "active_calls_cancelled_for_deployment":  false,
+                       "native_sha256":  "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+                       "renderer_manifest_sha256":  "487175e3182a03995b30687c7738251ec32020cbdb265e2794155d3aee9f2bf0"
+                   },
+    "supplementary_observation":  {
+                                      "executed":  false,
+                                      "result":  "automatic_execution_review_rejected",
+                                      "reason":  "blocked by policy; no detailed reason provided",
+                                      "action":  "Supplementary read-only queue and readiness observation after deployment",
+                                      "workaround_attempted":  false
+                                  },
+    "player":  {
+                   "version":  "1.6.0",
+                   "build_changed":  false,
+                   "relaunched_for_this_delivery":  false
+               },
+    "tests_executed":  false,
+    "diagnostic_model_calls_started":  false,
+    "demonstration_spells_started":  false,
+    "validation_captures_taken":  false,
+    "concurrent_native_calls_observed_after_installation":  false,
+    "gameplay_acceptance":  "pending_owner",
+    "visual_acceptance":  "pending_owner",
+    "digests":  {
+                    "backend/Palimpseste.Worker/JobProcessor.Dispatch.cs":  "5a46295c3644b5e3fa09f6efb33394c3f09361b9bcdb0e44d21ed92aec63f15b",
+                    "backend/Palimpseste.Worker/TrustedVisualCapture.cs":  "69e9435e7e97a26f70a630c2ebb5299684031705bc801952b1b84d322bea805f",
+                    "backend/Palimpseste.Provider/CodexSettings.cs":  "805431938c12745d51eff83a8a4cb9823d168ab3d497e6d5a5f062a2141f3e76",
+                    "ops/deploy-lifecycle.ps1":  "b19d8adaa8b58fc67a2262615f60b6722c4e0f350deda05c4eaa2482cf495f92",
+                    "ops/worker-service-child.ps1":  "b49eb020faf675d7c1f2966dc19ad706ffc6ab512a6f0d42840082d725cf3c49",
+                    "deliverables/parallel-jobs-d18-build.log":  "589395d4bd06bcfb085d4b3a9d811c8f2b23442f148a047ce7d9565efd998d6e",
+                    "deliverables/parallel-jobs-d18-publish.log":  "f9b5d153bcc51028b2a5c736dd0f7eef8ac052b962e13db5e4ff9f04c2979fca"
+                }
+}

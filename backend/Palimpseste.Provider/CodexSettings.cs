@@ -36,7 +36,8 @@ public sealed record CodexSettings(
     bool ImageGenerationCompatibilityVerified = false,
     string ImageGenerationEvidencePath = "",
     string ImageGenerationEvidenceSha256 = "",
-    string ImageGenerationExecutable = "")
+    string ImageGenerationExecutable = "",
+    int MaxConcurrentJobs = 1)
 {
     // These are the capabilities that must be observed false in the CLI
     // feature table before a runtime feature evidence file can be accepted.
@@ -82,7 +83,8 @@ public sealed record CodexSettings(
         ParseBool("PALIMPSESTE_IMAGE_GENERATION_VERIFIED"),
         Read("PALIMPSESTE_IMAGE_GENERATION_EVIDENCE_PATH"),
         Read("PALIMPSESTE_IMAGE_GENERATION_EVIDENCE_SHA256"),
-        Read("PALIMPSESTE_IMAGE_CODEX_EXE"));
+        Read("PALIMPSESTE_IMAGE_CODEX_EXE"),
+        ReadConcurrency());
 
     public string ExecutableForStage(string stage) => stage == "G" && !string.IsNullOrWhiteSpace(ImageGenerationExecutable)
         ? ImageGenerationExecutable : Executable;
@@ -167,6 +169,7 @@ public sealed record CodexSettings(
         }
         if (AttemptTimeout <= TimeSpan.Zero || AttemptTimeout > TimeSpan.FromHours(2)) issues.Add("invalid_timeout");
         if (MaxOutputBytes < 100_000 || MaxOutputBytes > 10_000_000) issues.Add("invalid_output_limit");
+        if (MaxConcurrentJobs < 0) issues.Add("invalid_job_concurrency");
 
         if (ParseBool("PALIMPSESTE_ALLOW_MODEL_FALLBACK")) issues.Add("model_fallback_enabled");
         if (ParseBool("PALIMPSESTE_ALLOW_REASONING_DOWNGRADE")) issues.Add("reasoning_downgrade_enabled");
@@ -939,6 +942,14 @@ public sealed record CodexSettings(
         var raw = Environment.GetEnvironmentVariable(name);
         if (string.IsNullOrWhiteSpace(raw) && alias is not null) raw = Environment.GetEnvironmentVariable(alias);
         return int.TryParse(raw, out var value) ? value : defaultValue;
+    }
+
+    // One provider call at most per running job. Zero removes the application's
+    // job-count ceiling; invalid configuration must not silently remove a ceiling.
+    private static int ReadConcurrency()
+    {
+        var raw = Read("PALIMPSESTE_MAX_PROVIDER_CONCURRENCY");
+        return raw.Length == 0 ? 0 : int.TryParse(raw, out var value) && value >= 0 ? value : -1;
     }
 
     private static void CheckDirectoryOrFile(string? path, bool file, string issue, ICollection<string> issues)
