@@ -9,6 +9,7 @@ using Palimpseste.Contracts;
 using Palimpseste.Core;
 
 var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
+Directory.CreateDirectory(Path.Combine(root, ".runtime"));
 var results = new List<string>();
 void Require(bool value, string name) { if (!value) throw new Exception(name); results.Add(name); }
 byte[] Json(object value) {

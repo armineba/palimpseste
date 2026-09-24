@@ -47,7 +47,7 @@ $fixtureRoot=Join-Path $runtime ('artifacts\v2-operator-fixture-'+$stamp)
 New-Item -ItemType Directory -Path $fixtureRoot|Out-Null
 $description=Join-Path $fixtureRoot 'description.json';$drawing=Join-Path $fixtureRoot 'drawing.png'
 Copy-Item -LiteralPath (Join-Path $repo 'examples\v2-validation\description.json') -Destination $description
-Copy-Item -LiteralPath (Join-Path $repo '.runtime\v2-fixture-drawing.png') -Destination $drawing
+Copy-Item -LiteralPath (Join-Path $repo 'examples\v2-validation\drawing.png') -Destination $drawing
 $doctor=Join-Path $installed 'doctor\BlueprintV2Doctor.exe';$doctorHash=Hash $doctor;$manifestHash=Hash $manifestPath
 $child=Join-Path $installed 'run.ps1'
 $childText=@'
