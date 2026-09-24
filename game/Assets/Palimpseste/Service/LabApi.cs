@@ -149,6 +149,7 @@ namespace Palimpseste.Game.Service
             if (body != null) req.uploadHandler = new UploadHandlerRaw(body);
             if (contentType != null) req.SetRequestHeader("Content-Type", contentType);
             req.SetRequestHeader("Authorization", "Bearer " + Token);
+            req.SetRequestHeader("X-Palimpseste-Client-Version", Application.version);
             if (!string.IsNullOrEmpty(key)) req.SetRequestHeader("Idempotency-Key", key);
             req.timeout = 30;
             return req;
@@ -221,6 +222,7 @@ namespace Palimpseste.Game.Service
             {
                 req.method = "PUT";
                 req.SetRequestHeader("Authorization", "Bearer " + Token);
+                req.SetRequestHeader("X-Palimpseste-Client-Version", Application.version);
                 req.SetRequestHeader("Idempotency-Key", record.capture_key);
                 req.timeout = 60;
                 yield return req.SendWebRequest();

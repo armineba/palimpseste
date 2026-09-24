@@ -1,0 +1,86 @@
+{
+  "schema_version": "sp.description/1.0",
+  "title": "V2 isolated meteor fixture",
+  "summary": "Deterministic developer fixture; never a player spell or model-generated result.",
+  "observations": [
+    {
+      "id": "o1",
+      "region": "full",
+      "visible_feature": "Marque rouge anguleuse dans le noyau.",
+      "interpretation": "Matière de braise et contact offensif."
+    }
+  ],
+  "clauses": [
+    {
+      "id": "c1",
+      "subject_id": "s0",
+      "kind": "mechanical",
+      "text": "A straight meteor hits the first hostile target for controlled fire damage.",
+      "observation_ids": [
+        "o1"
+      ],
+      "facts": [
+        {
+          "dimension": "carrier",
+          "value": "projectile"
+        },
+        {
+          "dimension": "effect",
+          "value": "damage"
+        },
+        {
+          "dimension": "target",
+          "value": "hostile"
+        },
+        {
+          "dimension": "motion",
+          "value": "straight"
+        },
+        {
+          "dimension": "event",
+          "value": "hit"
+        },
+        {
+          "dimension": "affinity",
+          "value": "fire"
+        },
+        {
+          "dimension": "pattern",
+          "value": "solid"
+        },
+        {
+          "dimension": "visual_form",
+          "value": "meteor"
+        },
+        {
+          "dimension": "palette",
+          "value": "ember"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "shape_requests": [],
+  "behaviors": [
+    {
+      "subject_id": "s0",
+      "origin": "muzzle",
+      "orientation": "cast_forward",
+      "attachment": "world",
+      "phenomenon": "static",
+      "axis": "y",
+      "sense": "counterclockwise",
+      "intensity": "brisk",
+      "travel": "straight"
+    }
+  ],
+  "lifecycle": [
+    {
+      "subject_id": "s0",
+      "appearance": "One core forms continuously.",
+      "active": "One meteor travels forward.",
+      "contact": "Compress on contact before dissolving.",
+      "expiration": "Fade the coherent remaining core."
+    }
+  ]
+}

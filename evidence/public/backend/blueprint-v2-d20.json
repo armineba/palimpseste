@@ -1,0 +1,29 @@
+{
+  "revision": "D20",
+  "client_version": "1.8.0",
+  "observed_utc": "2026-09-24T22:55:04.689055+00:00",
+  "backend": {
+    "publish_exit": 0,
+    "stage": "deliverables/.stage-backend/c961c7cf9bc6450a9f297cdf9a9d6090",
+    "worker_sha256": "6d1a5fb08aec24694811e869674b5486e30352d939ed98b3606be58803bbd44d",
+    "api_sha256": "31593b3907cf6f56a19bda395a623310bbb21c121557f6cca9b0593a323f03f5",
+    "doctor_sha256": "26fc77cd60dc65728dff9091938f7237d28cdde3f61c214afcfdc60a30a662a6",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f"
+  },
+  "unity": {
+    "build_exit": 0,
+    "version": "6000.3.24f1",
+    "pipeline": "URP",
+    "scripting_backend": "IL2CPP",
+    "shader_errors": 0,
+    "build_log_sha256": "664bf2d9dec40910b24da58b78a066bc40c27c42e051c693d6b588c1e1fffdd5",
+    "player_directory": "game/Build/WindowsBlueprintV2Playable",
+    "delivery_manifest_sha256": "a4d05dee826561ad9033e2aba36b5210b65de2d73712ceb798f2304aab6102b6"
+  },
+  "tests": "evidence/public/v2/results.json",
+  "deployed": false,
+  "deployment_status": "waiting_windows_elevation_confirmation",
+  "model_calls_executed_for_v2": 0,
+  "human_acceptance": "pending",
+  "fixture_artistic_acceptance": "rejected_by_independent_review"
+}

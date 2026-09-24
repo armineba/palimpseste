@@ -70,6 +70,7 @@ namespace Palimpseste.Game.Bootstrap
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void StartApp()
         {
+            if (SpellV2ValidationRunner.TryStartFromCommandLine()) return;
             if (SpellVisualCaptureRunner.TryStartFromCommandLine()) return;
             if (instance != null) return;
             var obj = new GameObject("Palimpseste App");
@@ -1358,6 +1359,17 @@ namespace Palimpseste.Game.Bootstrap
                 record.visual_reference_sha256 = downloadedVisual["sha256"]?.ToString();
                 if (!VisualReferenceCache.TryRead(record, store.DirectoryFor(record), out _))
                 { notice = "Image de référence invalide ; téléchargement à reprendre."; yield break; }
+            }
+            else if (packet["versions"]?["min_client"]?.ToString() == "1.8.0" && packet["binary_assets"] is JArray v2Assets)
+            {
+                foreach (var item in v2Assets)
+                {
+                    if (item["file_name"]?.ToString() != "v2-animation-sheet.png") continue;
+                    record.visual_reference_artifact_id = item["artifact_id"]?.ToString();
+                    record.visual_reference_sha256 = item["sha256"]?.ToString();
+                    if (!VisualReferenceCache.TryRead(record, store.DirectoryFor(record), out _))
+                    { notice = "Planche V2 invalide ; téléchargement à reprendre."; yield break; }
+                }
             }
             var spellPath = Path.Combine(store.DirectoryFor(record), "spell.json");
             try { ImageSpellPacketValidator.Validate(Encoding.UTF8.GetString(bytes), store.DirectoryFor(record)); }

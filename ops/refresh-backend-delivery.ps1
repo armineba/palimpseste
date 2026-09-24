@@ -31,7 +31,11 @@ $files = [ordered]@{}
 $files['README.txt'] = Join-Path $stage 'README.txt'
 $files['spec/assets/sourced-vfx/catalogue.json'] = Join-Path $repo 'assets\sourced-vfx\catalogue.json'
 $files['IMPLEMENTATION_STATUS.md'] = Join-Path $repo 'docs\IMPLEMENTATION_STATUS.md'
-foreach ($name in @('D15_BEHAVIOR_AND_RESEARCH.md','D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','UNITY_BEHAVIORS_D15.md','UNITY_ANIMATION_SHEET_D16.md','references-vfx-sources.md','BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt','NEXT_ACTIONS.md','TESTER_MAINTENANT.md')) {
+$files['docs/V2_FILES_CHANGED.md'] = Join-Path $repo 'docs\V2_FILES_CHANGED.md'
+foreach ($file in Get-ChildItem -LiteralPath (Join-Path $repo 'evidence\public\v2') -Recurse -File) {
+    $files['evidence/v2/' + $file.FullName.Substring((Join-Path $repo 'evidence\public\v2').Length+1).Replace('\','/')] = $file.FullName
+}
+foreach ($name in @('D15_BEHAVIOR_AND_RESEARCH.md','D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPELL_PIPELINE_V2.md','V2_BLUEPRINT_CONTRACT.md','V2_UNITY_STRUCTURAL_RENDERER.md','V2_VALIDATION_ENGINE.md','UNITY_BEHAVIORS_D15.md','UNITY_ANIMATION_SHEET_D16.md','references-vfx-sources.md','BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt','NEXT_ACTIONS.md','TESTER_MAINTENANT.md')) {
     $files['docs/' + $name] = Join-Path $repo ('docs\' + $name)
 }
 foreach ($file in Get-ChildItem -LiteralPath (Join-Path $repo 'docs') -Filter 'D16*.md' -File) {
@@ -91,6 +95,6 @@ $proof = [ordered]@{version=$deliveryProof.client_version; updated_at=[DateTimeO
     zip='deliverables/Palimpseste-Backend-Windows-x64.zip'; bytes=(Get-Item -LiteralPath $zip).Length; sha256=$hash;
     worker_sha256=(Get-FileHash -LiteralPath (Join-Path $stage 'worker\Palimpseste.Worker.exe')).Hash.ToLowerInvariant();
     api_sha256=(Get-FileHash -LiteralPath (Join-Path $stage 'api\Palimpseste.Api.exe')).Hash.ToLowerInvariant();
-    tests_executed=$false; gameplay_acceptance='pending_owner'; evidence=$proofFile.Substring($repo.Length+1).Replace('\','/')}
+    tests_executed_by_refresh=$false; gameplay_acceptance='pending_owner'; evidence=$proofFile.Substring($repo.Length+1).Replace('\','/')}
 [IO.File]::WriteAllText((Join-Path $evidenceRoot 'lifecycle-delivery.json'),($proof | ConvertTo-Json -Depth 4),[Text.UTF8Encoding]::new($false))
 Write-Output ('Refreshed backend ZIP: ' + $hash + ' (' + $proof.bytes + ' bytes)')

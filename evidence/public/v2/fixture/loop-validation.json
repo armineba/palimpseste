@@ -1,0 +1,3182 @@
+{
+  "schema_version": "sp.v2-validation/1.0",
+  "mode": "core",
+  "completed": true,
+  "spell_sha256": "986ab666b33baac5deadb0d1c01f70aff4379522dbf2fb49f5176003c35febba",
+  "blueprints_sha256": "45c6f3face7d7a05882e79288a25d08f2364e956d225862b790dc8f4c5398a7f",
+  "provider_calls": 0,
+  "user_library_touched": false,
+  "gameplay_executed": false,
+  "art_acceptance": "not_claimed",
+  "measured_fps": 126.94302162474374,
+  "measured_frames": 22,
+  "measurement_scope": "Explicit 512x512 URP GPU requests plus synchronous full-frame readback; excludes PNG encoding. Not gameplay FPS or isolated GPU duration",
+  "graphics_device": "NVIDIA GeForce RTX 3070",
+  "frames": [
+    {
+      "phase": "core_node_00",
+      "file": "core_node_00.png",
+      "sha256": "daf1ada5a56929ea0d34740650e0a2a1206bbaec7bab1dd336c130958411b236",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_gallery",
+      "file": "core_gallery.png",
+      "sha256": "38a702ae5bcdac2be9e774bbdb0fe608dd199ed75203161318f95d4d2c7bca12",
+      "width_px": 1536,
+      "height_px": 1536
+    },
+    {
+      "phase": "core_sheet_0_0",
+      "file": "core_sheet_0_0.png",
+      "sha256": "0d177f940296581ba5e09258e583f03f25c5c2dc102d9280dcde7553a159299e",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_0_1",
+      "file": "core_sheet_0_1.png",
+      "sha256": "de4dbbb53e6e632e752c6334ad1642ba9018714abfcd73f9039e33f246185326",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_0_2",
+      "file": "core_sheet_0_2.png",
+      "sha256": "3e7441cef25c6c73da6e45434b8a0ee8979930f762bfa8d3ee5a7bb1740abd4b",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_0_3",
+      "file": "core_sheet_0_3.png",
+      "sha256": "d0fbd94601351dfa2b18181668ede4a9f26dd2ff87818abfa6c850c80f11e3c2",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_0_4",
+      "file": "core_sheet_0_4.png",
+      "sha256": "b92a72b19bed654e316ed8054c0a578344647b6a999b1a2781aa817fba079004",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_0_5",
+      "file": "core_sheet_0_5.png",
+      "sha256": "51f606b0c0b17ce4793e06f2ac79510689f5b460ce5563555250da36642af7d9",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_0_6",
+      "file": "core_sheet_0_6.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_1_0",
+      "file": "core_sheet_1_0.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_1_1",
+      "file": "core_sheet_1_1.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_1_2",
+      "file": "core_sheet_1_2.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_1_3",
+      "file": "core_sheet_1_3.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_1_4",
+      "file": "core_sheet_1_4.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_1_5",
+      "file": "core_sheet_1_5.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_1_6",
+      "file": "core_sheet_1_6.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_2_0",
+      "file": "core_sheet_2_0.png",
+      "sha256": "b0d7b37347a0da08a26c2ab66cb68d933d3aa29f7740ab1bc9a83bdaaa974677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_2_1",
+      "file": "core_sheet_2_1.png",
+      "sha256": "32aa04912d13d030d4be883227856711b0011e5b7fc78c4bfe31b3e7d0fe1222",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_2_2",
+      "file": "core_sheet_2_2.png",
+      "sha256": "f8b002a6a2bc321e895398eff62cb0ad6ed479c0225b7236898267a644c7a38f",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_2_3",
+      "file": "core_sheet_2_3.png",
+      "sha256": "1b8fefb7bb7231fb12f223bc785f7b3565fcef08fe766a79ddd21ca06397caa8",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_2_4",
+      "file": "core_sheet_2_4.png",
+      "sha256": "c7b71ed92962f0c0e2d1b5e461304d6f19e9b0f355917371dea6ecace2a028bf",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_2_5",
+      "file": "core_sheet_2_5.png",
+      "sha256": "a2b4c9934dd0abc308bc21d25012362e65642a820d5dabce6c0f1526f13ccfcf",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet_2_6",
+      "file": "core_sheet_2_6.png",
+      "sha256": "0d177f940296581ba5e09258e583f03f25c5c2dc102d9280dcde7553a159299e",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "core_sheet",
+      "file": "core_sheet.png",
+      "sha256": "14033fb5525d9680c2fa9d97dd426be59e4b346b036fb9ac0902e3a101a725d5",
+      "width_px": 1536,
+      "height_px": 1152
+    }
+  ],
+  "phase_samples": [
+    {
+      "phase": "apparition",
+      "index": 0,
+      "normalized_milli": 0,
+      "composition_seconds": 0.0,
+      "file": "core_sheet_0_0.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.0,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 1,
+      "normalized_milli": 17,
+      "composition_seconds": 0.1,
+      "file": "core_sheet_0_1.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.0166666657,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 2,
+      "normalized_milli": 33,
+      "composition_seconds": 0.2,
+      "file": "core_sheet_0_2.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.03333333,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 3,
+      "normalized_milli": 50,
+      "composition_seconds": 0.3,
+      "file": "core_sheet_0_3.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.049999997,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 4,
+      "normalized_milli": 67,
+      "composition_seconds": 0.4,
+      "file": "core_sheet_0_4.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.06666666,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 5,
+      "normalized_milli": 83,
+      "composition_seconds": 0.5,
+      "file": "core_sheet_0_5.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.08333333,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 6,
+      "normalized_milli": 100,
+      "composition_seconds": 0.6,
+      "file": "core_sheet_0_6.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.099999994,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 0,
+      "normalized_milli": 100,
+      "composition_seconds": 0.6,
+      "file": "core_sheet_1_0.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.099999994,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 1,
+      "normalized_milli": 225,
+      "composition_seconds": 1.35,
+      "file": "core_sheet_1_1.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.224999979,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 2,
+      "normalized_milli": 350,
+      "composition_seconds": 2.1,
+      "file": "core_sheet_1_2.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.349999964,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 3,
+      "normalized_milli": 475,
+      "composition_seconds": 2.85,
+      "file": "core_sheet_1_3.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.474999934,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 4,
+      "normalized_milli": 600,
+      "composition_seconds": 3.59999967,
+      "file": "core_sheet_1_4.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.5999999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 5,
+      "normalized_milli": 725,
+      "composition_seconds": 4.35,
+      "file": "core_sheet_1_5.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.7249999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 6,
+      "normalized_milli": 850,
+      "composition_seconds": 5.1,
+      "file": "core_sheet_1_6.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.8499999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 0,
+      "normalized_milli": 850,
+      "composition_seconds": 5.1,
+      "file": "core_sheet_2_0.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.8499999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 1,
+      "normalized_milli": 875,
+      "composition_seconds": 5.25,
+      "file": "core_sheet_2_1.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.87499994,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 2,
+      "normalized_milli": 900,
+      "composition_seconds": 5.4,
+      "file": "core_sheet_2_2.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.8999999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 3,
+      "normalized_milli": 925,
+      "composition_seconds": 5.55,
+      "file": "core_sheet_2_3.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.924999952,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 4,
+      "normalized_milli": 950,
+      "composition_seconds": 5.70000029,
+      "file": "core_sheet_2_4.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.95,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 5,
+      "normalized_milli": 975,
+      "composition_seconds": 5.85000038,
+      "file": "core_sheet_2_5.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.974999964,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 6,
+      "normalized_milli": 1000,
+      "composition_seconds": 6.00000048,
+      "file": "core_sheet_2_6.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 1.0,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    }
+  ],
+  "topology_samples": [
+    {
+      "normalized_milli": 0,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 8,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.022626102,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 17,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0627194345,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 25,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0958344638,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 33,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.120290995,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 42,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.134250075,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 50,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.1374194,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 58,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.131794035,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 67,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.120778441,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 75,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.107105732,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 83,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.09085059,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 92,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.06887996,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 100,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0363149643,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 108,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 117,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 125,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 133,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 142,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 150,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 158,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 167,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 175,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 183,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 192,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 200,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 208,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 217,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 225,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 233,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 242,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 250,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 258,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 267,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 275,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 283,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 292,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 300,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 308,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 317,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 325,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 333,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 342,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 350,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 358,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 367,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 375,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 383,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 392,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 400,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 408,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 417,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 425,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 433,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 442,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 450,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 458,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 467,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 475,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 483,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 492,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 500,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 508,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 517,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144006014,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 525,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 533,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 542,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 550,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 558,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 567,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 575,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 583,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 592,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 600,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 608,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 617,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 625,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 633,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 642,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 650,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 658,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 667,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 675,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 683,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 692,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 700,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 708,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 717,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 725,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 733,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 742,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 750,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 758,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 767,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 775,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.01440084,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 783,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 792,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 2.40735631E-07,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 800,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 808,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 817,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.01440084,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 825,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008899927,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 833,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 2.384495E-07,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 842,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 850,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144004822,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 858,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.01440084,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 867,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 875,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 883,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 892,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144006014,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 900,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 908,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 917,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 2.384495E-07,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 925,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 933,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144004822,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 942,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 950,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 958,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 967,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 975,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 983,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 992,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 1000,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "root_active_loop",
+      "node": "p0",
+      "normalized_milli": 850,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 0,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 8,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.022626102,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 17,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0627194345,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 25,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0958344042,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 33,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.120291054,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 42,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.134250075,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 50,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.137419283,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 58,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.131794155,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 67,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.120778441,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 75,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.107105732,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 83,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.09085059,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 92,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.06887996,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 100,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0363149643,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 108,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 117,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 125,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 133,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 142,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 150,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 158,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 167,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 175,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 183,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 192,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 200,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 208,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 217,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 225,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 233,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 242,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 250,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 258,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 267,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 275,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 283,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 292,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 300,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 308,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 317,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 325,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 333,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 342,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 350,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 358,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 367,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 375,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 383,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 392,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 400,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 408,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 417,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 425,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 433,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 442,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 450,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 458,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 467,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 475,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 483,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 492,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 500,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 508,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 517,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144006014,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 525,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 533,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 542,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 550,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 558,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 567,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 575,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 583,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 592,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 600,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 608,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 617,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 625,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 633,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 642,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 650,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 658,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 667,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 675,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 683,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 692,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 700,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 708,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 717,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 725,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 733,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 742,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 750,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 758,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 767,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 775,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.01440084,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 783,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 792,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 800,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 808,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 817,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 825,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 833,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 2.384495E-07,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 842,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 850,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144004822,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 858,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.01440084,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 867,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 875,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 883,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 892,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144004822,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 900,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.014400959,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 908,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 917,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 2.384495E-07,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 925,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 933,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144004822,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 942,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 950,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900166,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 958,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 967,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900404,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 975,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 983,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0144007206,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 992,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.008900046,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_lifecycle",
+      "node": "p0",
+      "normalized_milli": 1000,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 2.384495E-07,
+      "displacement_bounded": true
+    },
+    {
+      "scope": "isolated_node_active_loop",
+      "node": "p0",
+      "normalized_milli": 850,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    }
+  ],
+  "impact_scenarios": [],
+  "realtime_samples": [],
+  "motion_sheet_samples": [],
+  "gates": [
+    {
+      "gate": "A_structure",
+      "status": "requires_visual_review",
+      "reason": "Solid core silhouette evidence; readability and blind semantic identity require independent review"
+    },
+    {
+      "gate": "B_continuity",
+      "status": "technical_pass",
+      "reason": "121 deterministic samples of the same mesh; finite vertices, bounded displacement, invariant topology. Visual temporal review remains required"
+    },
+    {
+      "gate": "semantic_blind",
+      "status": "requires_visual_review",
+      "reason": "Reviewer must receive core image without intent, title or drawing before comparison"
+    },
+    {
+      "gate": "performance",
+      "status": "technical_pass",
+      "reason": "Measured geometry, materials, peak particles and CPU sampling plus declared renderer-submission estimate meet known budgets. GPU cost, transparent overdraw and actual draw calls remain explicitly unmeasured"
+    }
+  ],
+  "core_gallery_nodes": [
+    {
+      "tile": "N1",
+      "node_id": "p0",
+      "parent_id": null,
+      "event_kind": "cast",
+      "local_normalized_time": 0.475,
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "file": "core_node_00.png",
+      "scope": "Standalone structural preview; no event occurrence or trigger time is invented"
+    }
+  ],
+  "active_loop_samples": [
+    {
+      "node_id": "p0",
+      "scope": "root_active_loop",
+      "start_normalized_milli": 100,
+      "end_normalized_milli": 850,
+      "period_seconds": 4.5,
+      "first_vertex_count": 2147,
+      "last_vertex_count": 2147,
+      "same_topology": true,
+      "maximum_seam_displacement_m": 0.0,
+      "tolerance_m": 0.001,
+      "passed": true,
+      "measurement_scope": "Local structural vertices at active-loop boundaries; excludes gameplay root travel. Surface/particle phase quality remains subject to visual review"
+    },
+    {
+      "node_id": "p0",
+      "scope": "isolated_node_active_loop",
+      "start_normalized_milli": 100,
+      "end_normalized_milli": 850,
+      "period_seconds": 4.5,
+      "first_vertex_count": 2147,
+      "last_vertex_count": 2147,
+      "same_topology": true,
+      "maximum_seam_displacement_m": 0.0,
+      "tolerance_m": 0.001,
+      "passed": true,
+      "measurement_scope": "Local structural vertices at active-loop boundaries; excludes gameplay root travel. Surface/particle phase quality remains subject to visual review"
+    }
+  ],
+  "canonical_sheet_scope": "Root nodes only, one shared elapsed clock with activation delays and individual lifespans; no invented timeline for event children. Event children are measured during real RuntimeEngine casts in F and D",
+  "canonical_duration_seconds": 6.00000048,
+  "impact_sheet_layout": "2x2: ground top-left, wall top-right, target bottom-left, oblique bottom-right. Each cell is an actual unchanged RuntimeEngine scenario",
+  "metrics": {
+    "per_visual": [
+      {
+        "particle_count": 0,
+        "vfx_systems": 0,
+        "mesh_vertices": 2147,
+        "mesh_triangles": 4160,
+        "estimated_draw_calls": 1,
+        "material_count": 3,
+        "transparent_layers": 0,
+        "decorative_colliders": 0,
+        "decorative_rigidbodies": 0,
+        "cpu_update_microseconds": 520,
+        "draw_calls_measurement": "renderer submission estimate; GPU batching not measured",
+        "transparent_overdraw": "unavailable: requires GPU pixel instrumentation",
+        "gpu_cost": "unavailable: per-spell GPU timestamps not exposed by this player"
+      }
+    ],
+    "canonical_sampling_cpu_ms": 21.810599999999983,
+    "actual_draw_calls": null,
+    "gpu_microseconds": null,
+    "transparent_overdraw": null,
+    "unavailable_reason": "Per-effect GPU timing, exact SRP draw calls and overdraw require a separate instrumented GPU profiler capture; no substitute estimated zeros",
+    "render_wall_ms": 173.3061
+  },
+  "pass_stamp": {
+    "mode": "core",
+    "spell_sha256": "986ab666b33baac5deadb0d1c01f70aff4379522dbf2fb49f5176003c35febba",
+    "blueprints_sha256": "45c6f3face7d7a05882e79288a25d08f2364e956d225862b790dc8f4c5398a7f",
+    "topology": [
+      {
+        "normalized_milli": 0,
+        "node": "p0",
+        "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+        "vertices": 2147,
+        "finite": true,
+        "topology_stable": true,
+        "maximum_vertex_displacement_m": 0.0,
+        "displacement_bounded": true
+      }
+    ],
+    "previous_pass_immutable": true
+  },
+  "elapsed_seconds": 0.644913,
+  "error": null
+}

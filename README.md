@@ -1,8 +1,14 @@
 # Palimpseste — dessin vers sort dans Unity
 
-Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. Le parcours D16 est : **dessin libre → description → planche d’animation 3 × 7 → composition 3D/VFX contrôlée → sort jouable dans le laboratoire**. Les sorts sont des données validées, jamais du code produit par le joueur.
+Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. La nouvelle pipeline V2 est : **dessin → intention → blueprint canonique → mouvement continu → contrôles structure/physique/rendu → planche échantillonnée et sort jouable**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
-## Version courante — backend D19 / Player 1.7.0
+## D20 / Player 1.8.0 — Pipeline V2 construite
+
+Refonte dédiée aux nouveaux sorts, huit représentations structurelles et gates A à F. Les anciens sorts conservent leurs données, assets et parcours V1. [Architecture et différences V1/V2](docs/D20_SPELL_PIPELINE_V2.md) · [État réel et limites](docs/IMPLEMENTATION_STATUS.md) · [Tests exécutés](evidence/public/v2/).
+
+Backend et Player construits et empaquetés ; **installation en attente de validation Windows UAC**. Les 27 contrôles V2 et la fixture Unity ont été exécutés, mais aucun nouveau parcours Codex V2 complet. La fixture n'est pas acceptée artistiquement. Le service D19 reste installé.
+
+## Historique — backend D19 / Player 1.7.0
 
 **D19 installé, jeu rouvert le 24 septembre à 23:20 Paris.** Le moteur exécute quatre nouveaux profils par partie, issus de TinyPlay et Keijiro : plasma, champ de force, matière toxique et flux spectral. Les calculs et les deux textures originales sont réellement livrés dans le Player ; le constructeur B **2.6** peut les sélectionner depuis la recherche liée à la planche. [Provenance et limites](docs/D19_SOURCED_SURFACES.md) · [Compilation et livraison](evidence/public/backend/sourced-surfaces-d19.json) · [Installation](evidence/public/backend/sourced-surfaces-d19-installation.json).
 

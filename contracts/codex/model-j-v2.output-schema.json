@@ -1,0 +1,158 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "sp.v2-review/1.0"
+      ]
+    },
+    "description_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "plan_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "visual_reference_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "blind",
+        "structure",
+        "full"
+      ]
+    },
+    "observed_subject": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1500
+    },
+    "semantic_match": {
+      "type": "boolean"
+    },
+    "score_milli": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "A_structure": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "B_continuity": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "C_rendering": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "D_impact": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "E_game_camera": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "F_motion": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "semantic_blind": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "performance": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        }
+      },
+      "required": [
+        "A_structure",
+        "B_continuity",
+        "C_rendering",
+        "D_impact",
+        "E_game_camera",
+        "F_motion",
+        "semantic_blind",
+        "performance"
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1200
+      }
+    },
+    "return_stage": {
+      "type": "string",
+      "enum": [
+        "structural_core",
+        "motion",
+        "physics",
+        "rendering",
+        "optimization",
+        "none"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "description_sha256",
+    "plan_sha256",
+    "visual_reference_sha256",
+    "mode",
+    "observed_subject",
+    "semantic_match",
+    "score_milli",
+    "gates",
+    "issues",
+    "return_stage"
+  ]
+}

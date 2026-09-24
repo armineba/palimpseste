@@ -21,13 +21,16 @@ namespace Palimpseste.Game.Editor
         [MenuItem("Palimpseste/Construire Windows x64 IL2CPP")]
         public static void BuildWindows()
         {
-            PrepareMaterials();
+            // V2 must not rewrite materials or volume profiles used by archived spells.
+            // Preparation remains an explicit editor command for a new installation.
+            foreach (var path in new[] { "Assets/Palimpseste/Resources/LabOpaque.mat", "Assets/Palimpseste/Resources/LabEmissive.mat", "Assets/Palimpseste/Resources/LabVfxVolume.asset" })
+                if (!File.Exists(path)) throw new FileNotFoundException("Ressource historique manquante", path);
             foreach (var scene in Scenes)
                 if (!File.Exists(scene)) throw new FileNotFoundException("Scène manquante", scene);
             EditorBuildSettings.scenes = Array.ConvertAll(Scenes, scene => new EditorBuildSettingsScene(scene, true));
             PlayerSettings.companyName = "Palimpseste";
             PlayerSettings.productName = "Palimpseste Spell Lab";
-            PlayerSettings.bundleVersion = "1.7.0";
+            PlayerSettings.bundleVersion = "1.8.0";
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.IL2CPP);
             PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
             var directory = Environment.GetEnvironmentVariable("PALIMPSESTE_BUILD_DIR");

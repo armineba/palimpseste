@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [switch]$UpdateDesktopShortcut,
-    [ValidateSet('1.6.0','1.7.0')][string]$ClientVersion = '1.7.0',
+    [ValidateSet('1.6.0','1.7.0','1.8.0')][string]$ClientVersion = '1.8.0',
+    [ValidatePattern('^Windows[A-Za-z0-9]+Playable$')][string]$PlayerFolder = 'WindowsAnimationSheetPlayable',
     [ValidateRange(1, 48)][int]$MaximumBuildAgeHours = 6
 )
 
@@ -9,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $buildRoot = Join-Path $repo 'game\Build'
 $source = Join-Path $buildRoot 'WindowsAnimationSheetRelease'
-$playable = Join-Path $buildRoot 'WindowsAnimationSheetPlayable'
+$playable = Join-Path $buildRoot $PlayerFolder
 $zipPath = Join-Path $repo 'deliverables\Palimpseste-Windows-x64-IL2CPP.zip'
 $proofPath = Join-Path $repo 'evidence\public\unity\lifecycle-delivery.json'
 $logPath = Join-Path $repo 'game\Logs\animation-sheet-build.log'

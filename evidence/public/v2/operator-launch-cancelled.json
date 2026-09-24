@@ -1,0 +1,10 @@
+{
+  "schema_version": "sp.v2-operator-launch-attempt/1.0",
+  "attempt_utc": "2026-09-24T22:40:19.8129661Z",
+  "result": "windows_elevation_cancelled",
+  "operator_process_started": false,
+  "model_calls_executed": 0,
+  "database_touched": false,
+  "player_library_touched": false,
+  "evidence": "Start-Process -Verb RunAs returned operation cancelled by user; no operator-launch.json produced. This was not a provider refusal."
+}

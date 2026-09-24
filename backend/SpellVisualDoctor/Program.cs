@@ -480,7 +480,7 @@ internal static class VisualDoctor
             new FileInfo(manifestPath).Length > 128_000 || CodexSettings.ComputeExecutableSha256(manifestPath) != hash)
             throw new ProbeFailure("renderer_manifest_mismatch");
         using var manifest = JsonDocument.Parse(File.ReadAllBytes(manifestPath));
-        if (manifest.RootElement.GetProperty("version").GetString() is not ("1.6.0" or "1.7.0")) throw new ProbeFailure("renderer_version_mismatch");
+        if (manifest.RootElement.GetProperty("version").GetString() is not ("1.6.0" or "1.7.0" or "1.8.0")) throw new ProbeFailure("renderer_version_mismatch");
         foreach (var entry in manifest.RootElement.GetProperty("files").EnumerateArray())
         {
             var file = Path.GetFullPath(Path.Combine(directory, entry.GetProperty("file").GetString()!));

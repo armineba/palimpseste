@@ -1,0 +1,20 @@
+# Contraintes croisées V2 exécutées par le compilateur
+
+Ce document complète le contrat JSON ; il n'accorde aucun outil au worker.
+
+- `motion.duration_ms = options.lifetime_ticks * 20`. `motion.trajectory = behavior.travel` ; aucune deuxième translation visuelle.
+- `motion.angular_speed_mdeg_s = physics.angular_speed_mdeg_s * (behavior.sense == "clockwise" ? -1 : 1)`. Un vortex a au moins 180000 millidegrés/s, avec une fréquence strictement positive ; respecter aussi le minimum de son intensité physique.
+- `identity.topology = "fixed"`, `identity.coordinate_system = "local_cm_y_up_z_forward"`, `identity.element_count = structural_core.entity_count`. Un élément sauf `controlled_swarm`. Les éléments d'un essaim visuel restent sous une seule collision racine ; plusieurs entités gameplay exigent plusieurs nœuds.
+- `structural_core.control_points` contient 2 à 32 objets `{ "position_cm": [0,0,0], "radius_cm": 20, "width_cm": 40 }`. Deux points consécutifs distincts, rayon positif, variations de rayon successives au maximum ×4. Branches seulement avec `branched_surface`, chaque parent désigne -1 (axe principal) ou une branche antérieure. Un portail `planar_field` conserve une ouverture `inner_radius_milli > 0`.
+- `physics.collision_owner = "root"`, `rigidbody_count = 0`, `decorative_physics = false`, `independent_entities = false` : le moteur gameplay précompilé possède déjà les collisions.
+- Colliders : projectile/pulse → `sphere`, beam → `capsule`, barrier → `plane`, field/trap → `box`. Réponse : projectile avec bounces → `bounce`, sinon pierces → `pierce`, sinon `stop`; barrier → `block`; autres → `overlap`.
+- `motion.impact_transition` : `stop` pour stop/block, `deflect` pour bounce, `continue` pour pierce/overlap. `impact.surviving_core_duration_ms >= impact.reaction_duration_ms`.
+- `rendering_layers.core_surface` est exactement `spectral`, `plasma`, `forcefield`, `toxic` ou `unlit`. Correspondance recherche : spectral → spectral_flow ; forcefield → force_field ; plasma/toxic gardent leur nom. Le `resource_id` choisi doit être identique dans appearance et rendering_layers.
+- Implémentation exacte : root `Spell_ROOT`, renderer `canonical_mesh`, déformation `canonical_motion_v2`, mouvement/lifetime `spell_runtime`, collision `root_only`, shader `Palimpseste/CanonicalSpellV2`, impact `canonical_impact_v2`, `vfx_graph_systems = 0`, `trails = "none"`.
+- `particle_systems` vaut (atmosphère active ? 1 : 0) + (impact.secondary_emission > 0 ? 1 : 0). `material_count` vaut 1 + (énergie secondaire active ? 1 : 0) + (au moins un système de particules ? 1 : 0). Le budget particules couvre atmosphère + émission de contact.
+- Aucun champ n'autorise un résultat de validation inventé : les huit gates sont obligatoires et leurs mesures sont produites après compilation.
+- Si `phases.active_loop = true`, conserve exactement les vitesses déclarées et choisis un nombre entier de cycles pendant la phase active : avec `span = active_end_milli - appearance_end_milli`, `angular_speed_mdeg_s * duration_ms * span` doit être divisible par `360000000000`. Pour une oscillation ou un essaim d'amplitude positive, `frequency_mhz * duration_ms * span` doit être divisible par `1000000000`. `deformation = expand` ne peut pas être une boucle active. Ne compte pas sur le renderer pour arrondir ou changer ces vitesses.
+
+Exemple d'implémentation pour un volume avec énergie secondaire et particules d'ambiance/contact :
+`{"root":"Spell_ROOT","core_renderer":"canonical_mesh","deformation_system":"canonical_motion_v2","motion_controller":"spell_runtime","collider_strategy":"root_only","vfx_graph_systems":0,"particle_systems":2,"shader":"Palimpseste/CanonicalSpellV2","material_count":3,"trails":"none","audio_hook":"carrier","impact_system":"canonical_impact_v2","lifetime_controller":"spell_runtime"}`.
+Cet exemple illustre des champs et des unités, pas un sujet ou une géométrie à recopier.

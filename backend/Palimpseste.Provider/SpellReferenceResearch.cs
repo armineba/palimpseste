@@ -61,6 +61,15 @@ public sealed record SpellReferenceResearch(string Json, string Sha256)
             : new HashSet<string?>(StringComparer.Ordinal);
         foreach (var node in candidate.RootElement.GetProperty("nodes").EnumerateArray())
         {
+            if (node.TryGetProperty("blueprint_v2", out var blueprint) && blueprint.ValueKind == JsonValueKind.Object)
+            {
+                var surface = blueprint.GetProperty("rendering_layers").GetProperty("core_surface").GetString();
+                var profile = surface switch { "plasma" => "plasma", "forcefield" => "force_field", "toxic" => "toxic", "spectral" => "spectral_flow", _ => null };
+                if (surface != "unlit" && (profile is null || !availableProfiles.Contains(profile)))
+                    return ["blueprint_v2.rendering_layers.core_surface: profil absent de la recherche figée"];
+                if (!ids.Contains(blueprint.GetProperty("rendering_layers").GetProperty("resource_id").GetString()))
+                    return ["blueprint_v2.rendering_layers.resource_id: ressource absente de la recherche figée"];
+            }
             if (!node.GetProperty("appearance").TryGetProperty("construction", out var construction) ||
                 construction.ValueKind == JsonValueKind.Null) continue;
             foreach (var part in construction.GetProperty("parts").EnumerateArray())

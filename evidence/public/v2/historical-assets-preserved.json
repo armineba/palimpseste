@@ -1,0 +1,1215 @@
+{
+  "baseline_commit": "b424e33",
+  "observed_utc": "2026-09-24T22:55:04.689055+00:00",
+  "scope": "tracked historical Unity assets, shaders, materials, scenes, animations and asset identities",
+  "checked": 172,
+  "all_unchanged": true,
+  "files": [
+    {
+      "path": "game/Assets/InputSystem_Actions.inputactions.meta",
+      "baseline_sha256": "3b4e424a80f5b4fa76b6abd774884a24285eaa61f22ff9bb20e5ad505fd8b569",
+      "current_sha256": "5e2e2329ab736a64146d747108bde43aff5f940da6a98dd48bc35dc7c0b87098",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste.meta",
+      "baseline_sha256": "033473921dffea024d2ff64db3b061575146cffbb170939a9921e5fd48c01a62",
+      "current_sha256": "afdefba51d3025f9a527ddc68d2de2091ef0b8fb4a6cddd14bb9536e6ae00ca8",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Art.meta",
+      "baseline_sha256": "2b940415cf592e2bac211bb9e8d2be6220c85fdee442c6021fb21ffc438e3546",
+      "current_sha256": "571b8432418b068ae90391addfaa29a1fe56f3b2753330c2b3b2c8dd5f931871",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Art/README.md.meta",
+      "baseline_sha256": "a66ffdb39fb5405edd4969c7cfc9dfae0d44ea4b8041462ddde8aadfe49441e9",
+      "current_sha256": "b98a6b7bafceb0ce77ea683d79689c1396d19a0361706840d571b99ff7b25716",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Bootstrap.meta",
+      "baseline_sha256": "8be28678a00934df75b217e4f5c1a5c3a9351505e617b8daa1f923523d100fd5",
+      "current_sha256": "d0bce026ad1799fc6981722015e52e15140fe4c99238b9d969f64fe60f548eac",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Bootstrap/PalimpsesteApp.cs.meta",
+      "baseline_sha256": "e4279b7f97556d922a983fd0f48828c6d5ac0d82d6bb53617b2a52072e009240",
+      "current_sha256": "39bcbae4002ad00a3e8e55fdca968ab8ec349b22b675c02a7bedc9ad86f7b6fa",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Bootstrap/SpellVisualCaptureRunner.cs.meta",
+      "baseline_sha256": "921417aabcbecbec1f34793cdf60c3677d7bde7af83432137d7b2beddecf5fda",
+      "current_sha256": "921417aabcbecbec1f34793cdf60c3677d7bde7af83432137d7b2beddecf5fda",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Drawing.meta",
+      "baseline_sha256": "30886a717efbccf0de1d370656a0aeb6dd06085e5959497221cc3933d73fe291",
+      "current_sha256": "e78a896fe03f635f351e379ffbb159b591f78ac04751cb955f08328114826d28",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Drawing/DrawingCanvas.cs.meta",
+      "baseline_sha256": "9fe4a7b1acfd1683129f0d844c38045ec123290adf768bd7084d6ba94b3a662b",
+      "current_sha256": "4ca952133c8532585c37344ef0b15e763ad03a26b293cc98602e594bd7e4f607",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Editor.meta",
+      "baseline_sha256": "3bf314928e61fffc78d01de816148699bef809dd872183c4dd7f26420b19c7ea",
+      "current_sha256": "3713159a6567fe5ff31e3d70845f212ae8c59ab7e1fc4263dc7819482cb27b88",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Editor/BuildPalimpseste.cs.meta",
+      "baseline_sha256": "799435c9964356ab6409f23e7267b8c4a1d6f951baac1a8c6a498017911d7fbc",
+      "current_sha256": "7a6e5175977f25b34ea7e26cf065d7ee26d7c9617e30abd3e893271b2f1d4617",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Editor/Palimpseste.Game.Editor.asmdef.meta",
+      "baseline_sha256": "d8aca1227e9f4efba462ce8c9f212d16b3088e001eccdeb5baea4017d4b446b0",
+      "current_sha256": "ae300380ec30a9ff277fa698dda0f5cb6888c757084f47473c7016ddb7123b95",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Library.meta",
+      "baseline_sha256": "819768ca241443b252e1d3868435ecff7768e9681c84efd8a5525a14e01d7b87",
+      "current_sha256": "a808d2a52d55cb74b36d54fd6c26d86b3dd46301ef550ff037c593bd576c656d",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Library/CachedSpellVerifier.cs.meta",
+      "baseline_sha256": "1af8ca50556b6510d00c82385741f84e41428a41d95d34c241aa84a809864585",
+      "current_sha256": "6d2e905809d7a1b4c36d1f098e9d6320415fe3badb9830a57b05f2f3a38a76f3",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Library/DescriptionCache.cs.meta",
+      "baseline_sha256": "39e849b48ac35175955d9f6e4270990964631161345e1d04b97f58882c7e8669",
+      "current_sha256": "eb90d4788eaa4983190ca01eb698b4ffdedd0ef593b2014ff1a1cdcaa602b867",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Library/ImageSpellPacketValidator.cs.meta",
+      "baseline_sha256": "417fad1f3fa4969a6642f133f7733c630737eca6008e9f5c0e62b649a7a02170",
+      "current_sha256": "f57ed33ccbfe4177e6a0130139c4ceaa9b82b191178ba0f36675db174d0f92e1",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Library/ParchmentStore.cs.meta",
+      "baseline_sha256": "7f0c783dda3eb7feb9a966d7985d653d445635482392375c215137a54ba07eeb",
+      "current_sha256": "6d0d98cc46334bd7ad7d104075600374da86d003cfe34bc11ec9a235aa4cc518",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Library/PlayerParchmentFilter.cs.meta",
+      "baseline_sha256": "5eb04408ff8798e0ccb84ca137c7b60c1711e368c0e4c673d9b954d442f02009",
+      "current_sha256": "642cb4c350a0ba200f8568dbccdcd050f1618c58e769a031bf605632a9c7b096",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Library/VisualReferenceCache.cs.meta",
+      "baseline_sha256": "22b0dd9efe397ff348d8eeda9d092d7efdd4ce01f9fd42d649c6491341e6ec50",
+      "current_sha256": "e6402f4fd6eea1bf7a25192bd00e2a9ca571a4b17342fb112e13b16dad81064b",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Palimpseste.Game.asmdef.meta",
+      "baseline_sha256": "787ae6ae98fcb24c0773cb1657c529c23bead52eca6808bff19383da2c6123b1",
+      "current_sha256": "8f95753fe25b5e86aad7f6110bb1a2602f93274984265c796a271bbf472139b8",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Presentation.meta",
+      "baseline_sha256": "a9164cc3d3c7d9277c3efe7d92f3ab2e63bcaddd689c0945394a53b3a80cf499",
+      "current_sha256": "fd51602ad0a94e17c07ed7de45b154c1244e9985e7e93290957094ba9f571a11",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Presentation/CarrierVisual.cs.meta",
+      "baseline_sha256": "96e6407fa98b6dd714b16acc209d105f6f54db1662fbd80a6c8936094a0b2012",
+      "current_sha256": "25c38413d684329c08f2343c7d56cc619ec0e1cbfbe0bdbf7b723e26ec1dd81f",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Presentation/ImageConstructedSpellVisual.cs.meta",
+      "baseline_sha256": "fea4a050094037392320f43b135ffe6e21acbe78066e9e2b752ea1b0f0c2bc51",
+      "current_sha256": "9d5ca5f8f3f8de03043b29d2bd988af8b5054a689ec2fedad16ceedfb00c6836",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Presentation/SemanticSpellVisual.cs.meta",
+      "baseline_sha256": "53dae815a32d62e8d78bb9549ddc8f170f4ec2c853f8b256dea317af0c7b3111",
+      "current_sha256": "bcd15ea99d98a99112ecc202b408362c5622a88e7303d89cbaee7a90393ec19a",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Presentation/SpectralWakeMotion.cs.meta",
+      "baseline_sha256": "81605e5132d0b7ece379869e4528e4c0cae75cc9ecea651b2957c1a6df031cc7",
+      "current_sha256": "6b62c97f7b9aab9d1509c76a150dfdca9f817986898b522751a0f535e0647e9f",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Presentation/SpellBehaviorMotion.cs.meta",
+      "baseline_sha256": "aa82d61a6a6a727097e2d2876f8771c332e1cc3f586ef8a4fbf4676b71d77c6f",
+      "current_sha256": "aa82d61a6a6a727097e2d2876f8771c332e1cc3f586ef8a4fbf4676b71d77c6f",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Presentation/SpellVfxComposition.cs.meta",
+      "baseline_sha256": "f8be92211f270fa985dd89e0016d74c853b5fb8e2dceb960ffd9315e2f41b2aa",
+      "current_sha256": "1db09e26434abab05d5999394a44e38c07e335d4f195d9d5ab328336e55ae88c",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources.meta",
+      "baseline_sha256": "4e4f361d2c8a9308c1e30bb3bea3aae15b679339a01e93c0b6f83e794c4fc87e",
+      "current_sha256": "406a97eac5222d7c94fb63b509d340dd64b02e229d44eb7f3cff50d815c78e63",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LabEmissive.mat",
+      "baseline_sha256": "7ad6fb569f075e9a15a43979d8a7abce2fd49d4897c539f6ad3d6c26b5d982f9",
+      "current_sha256": "7ad6fb569f075e9a15a43979d8a7abce2fd49d4897c539f6ad3d6c26b5d982f9",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LabEmissive.mat.meta",
+      "baseline_sha256": "391243d5e142f8cfc6b370975f2c8c54f8064430df2a54e3bb60ebbd6d6fe2ef",
+      "current_sha256": "ec43cc52d39ec2bd99e70766ba9948a4ae4fc7a7127e21f97c7aa1c2f068060e",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LabOpaque.mat",
+      "baseline_sha256": "cf290e9b317b1f7e84208014a6797ccaffdbac1ed2cf8acb5b933bd0e7369502",
+      "current_sha256": "cf290e9b317b1f7e84208014a6797ccaffdbac1ed2cf8acb5b933bd0e7369502",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LabOpaque.mat.meta",
+      "baseline_sha256": "5a287ae52a11a3d4155e30fba7ef27ec69f3b3d17566266a33dce0aa5782ba6d",
+      "current_sha256": "4a2eeb50146b6c9979c384deac3bcea4f9b7c89d6951d3764df46f0a4a452061",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LabUnlit.shader",
+      "baseline_sha256": "66391a661481f09fdfe6df42ea20ca9fef7eacf8e018fa79046b915b9c7345dd",
+      "current_sha256": "b0d5c0b6743f83dca321df9ac173ee6c82e007bcf18dd3ea1f7ce5c32d629c6a",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LabUnlit.shader.meta",
+      "baseline_sha256": "86982411610d73854e340576400efba06b81fc903c6daaf66c069383a92cd950",
+      "current_sha256": "c98bbc13db1b38158f8b9f24e34c41510b8f1ad38394d43851d3a27752df9fde",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LabVfxVolume.asset",
+      "baseline_sha256": "8e46a691a19a2b3cdc93c2f7dd004220f4c950485bee5df045d3c74f9aee9e36",
+      "current_sha256": "8e46a691a19a2b3cdc93c2f7dd004220f4c950485bee5df045d3c74f9aee9e36",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LabVfxVolume.asset.meta",
+      "baseline_sha256": "c389fe18e64e3d0f61f139bc24d338564a27f2ff8239eebe677b0846db1b8737",
+      "current_sha256": "365b8eac38b2fb14bd0b3c7c6c1a4c9cfd2aca1e8415dd60c26e316f516d432c",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LavaBeam.shader",
+      "baseline_sha256": "9c5a542eb058e49ad16387d1a4998e2e4e5e6a6aa78c9d4f90e1de1375eda962",
+      "current_sha256": "a8804e05ef9392a4f4c2f5dc588fe3ebb72153f68ec27ba4925c15a63366e09d",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LavaBeam.shader.meta",
+      "baseline_sha256": "16cef49d2c9d6a5d1473ad4b98f36f0b6baf8ed3fd05b112bc116fc599ff27fd",
+      "current_sha256": "419f19e80a42f6b307c42cb5d0b9a9c94d67f2b2cc8a3dc959ef5377d8b7af26",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LibraryBackdrop.png",
+      "baseline_sha256": "74a69ebc3872077870e171f111c3792ccd70c55ec1d2b5c19e42f7cfeb4db63b",
+      "current_sha256": "74a69ebc3872077870e171f111c3792ccd70c55ec1d2b5c19e42f7cfeb4db63b",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/LibraryBackdrop.png.meta",
+      "baseline_sha256": "6224c14d51f86c40f9e2a16e26ba3383233f6c2dde73c7907561b9050bea2b4a",
+      "current_sha256": "3f2a588bb54bfc16e736c1edc822811cb24925bfe556651cee83abe685933a80",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedNoise.meta",
+      "baseline_sha256": "965ac3aa2fb91a3c78fb1e02a92aa5d35d78e23ee78b7e44f0126b9ba935b210",
+      "current_sha256": "965ac3aa2fb91a3c78fb1e02a92aa5d35d78e23ee78b7e44f0126b9ba935b210",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedNoise/Common.hlsl",
+      "baseline_sha256": "f4d34c6fa5eaf4d1b9ec369de840232ba9798f6e099601176461221f2efa6e6d",
+      "current_sha256": "f4d34c6fa5eaf4d1b9ec369de840232ba9798f6e099601176461221f2efa6e6d",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedNoise/Common.hlsl.meta",
+      "baseline_sha256": "b15fd7171249c224064ee3be291b35f2faeecead8719bc2c07b7ddf24b720226",
+      "current_sha256": "b15fd7171249c224064ee3be291b35f2faeecead8719bc2c07b7ddf24b720226",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedNoise/LICENSE.txt.meta",
+      "baseline_sha256": "2a905eadd630f0bdde99360f32b85b49d9cae82a0ed5cd3cfbf9f48051da3a0a",
+      "current_sha256": "2a905eadd630f0bdde99360f32b85b49d9cae82a0ed5cd3cfbf9f48051da3a0a",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedNoise/SimplexNoise3D.hlsl",
+      "baseline_sha256": "5355b2914b6657db352a53aaabe4dd6d753546c77c3982331524e742c2ca5c18",
+      "current_sha256": "5355b2914b6657db352a53aaabe4dd6d753546c77c3982331524e742c2ca5c18",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedNoise/SimplexNoise3D.hlsl.meta",
+      "baseline_sha256": "5644f8bc37d6daee08d331123687e73dc7464dc6ff1bae0a01c3ba0c7de05e27",
+      "current_sha256": "5644f8bc37d6daee08d331123687e73dc7464dc6ff1bae0a01c3ba0c7de05e27",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedSurfaces.meta",
+      "baseline_sha256": "2ad2bc5ad15453fbe521e926b4851aa03f1eed88b665d1ce36d5865050a19c97",
+      "current_sha256": "2ad2bc5ad15453fbe521e926b4851aa03f1eed88b665d1ce36d5865050a19c97",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedSurfaces/KeijiroDivergenceFreeNoise.hlsl",
+      "baseline_sha256": "02014c4f7ef9687933f0209bb1ed4a9c2c249e2170a3437320b1ba3cbd306d98",
+      "current_sha256": "02014c4f7ef9687933f0209bb1ed4a9c2c249e2170a3437320b1ba3cbd306d98",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedSurfaces/KeijiroDivergenceFreeNoise.hlsl.meta",
+      "baseline_sha256": "7f0d61de563c4a4c8ca530967265bfffb2ae4bf5c77daecafc5c4fc8e8d80cd5",
+      "current_sha256": "7f0d61de563c4a4c8ca530967265bfffb2ae4bf5c77daecafc5c4fc8e8d80cd5",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx.meta",
+      "baseline_sha256": "b8d4fb5c2ed2905c3b2b18c58394145f33f8f094daed8892fc8ba2e643870139",
+      "current_sha256": "b8d4fb5c2ed2905c3b2b18c58394145f33f8f094daed8892fc8ba2e643870139",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/Keijiro-VfxGraphAssets-Unlicense.txt.meta",
+      "baseline_sha256": "713af8e8baae00a7afb3fc099b587f57e4c26556c9173537bdd3bd1dc2fb3a94",
+      "current_sha256": "713af8e8baae00a7afb3fc099b587f57e4c26556c9173537bdd3bd1dc2fb3a94",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/TinyPlay-URPShadersCollection-MIT.txt.meta",
+      "baseline_sha256": "1a0c8f22fc7ac4e0f39633346a0101d2d1785427b797c99caba4feb860e01bd7",
+      "current_sha256": "1a0c8f22fc7ac4e0f39633346a0101d2d1785427b797c99caba4feb860e01bd7",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_circle_01.png",
+      "baseline_sha256": "4b2d03683bf0fe4a946567adc3bd86b8ba045da84cee58dc2cf8aef63bbfaa06",
+      "current_sha256": "4b2d03683bf0fe4a946567adc3bd86b8ba045da84cee58dc2cf8aef63bbfaa06",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_circle_01.png.meta",
+      "baseline_sha256": "4ec0213041bf0ccf94cb1844674065e1e15ef4f2fc161ca4d386cfd6cf3d179d",
+      "current_sha256": "4ec0213041bf0ccf94cb1844674065e1e15ef4f2fc161ca4d386cfd6cf3d179d",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_circle_03.png",
+      "baseline_sha256": "ed6c6f082e666c16bcaca89f15aefb55df9bf69450090518bcae1d3d61f82936",
+      "current_sha256": "ed6c6f082e666c16bcaca89f15aefb55df9bf69450090518bcae1d3d61f82936",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_circle_03.png.meta",
+      "baseline_sha256": "eb12822679d9335b7219a500b2be3076b34147c72ddd41f9c088a44bb80e1652",
+      "current_sha256": "eb12822679d9335b7219a500b2be3076b34147c72ddd41f9c088a44bb80e1652",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_fire_01.png",
+      "baseline_sha256": "9727a9743ac6ab8dd4dd79f5fc5b0266290efae45f4d4452279eb5e4bcf3a978",
+      "current_sha256": "9727a9743ac6ab8dd4dd79f5fc5b0266290efae45f4d4452279eb5e4bcf3a978",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_fire_01.png.meta",
+      "baseline_sha256": "76f45db3a50fa8d1987743b3530c05512cd088a5bc7e61625a4a8980ec4da5d5",
+      "current_sha256": "76f45db3a50fa8d1987743b3530c05512cd088a5bc7e61625a4a8980ec4da5d5",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_flame_01.png",
+      "baseline_sha256": "92a70bcb90b1e21c57b2dae42843135703b2e988abee97433f84c3119723d144",
+      "current_sha256": "92a70bcb90b1e21c57b2dae42843135703b2e988abee97433f84c3119723d144",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_flame_01.png.meta",
+      "baseline_sha256": "ee7f1d71427c29cb41a3a89ff567552ed4d36c8e9a8f4884b48bbf5931616f79",
+      "current_sha256": "ee7f1d71427c29cb41a3a89ff567552ed4d36c8e9a8f4884b48bbf5931616f79",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_magic_01.png",
+      "baseline_sha256": "398479ea280c8161d0b6d509ca97eefb27e989c7832b404abcb65faae3e922ff",
+      "current_sha256": "398479ea280c8161d0b6d509ca97eefb27e989c7832b404abcb65faae3e922ff",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_magic_01.png.meta",
+      "baseline_sha256": "ff73563f5297b1444a27dc3d42f88a66837fc85b62d100403c9c4a25201dc1b2",
+      "current_sha256": "ff73563f5297b1444a27dc3d42f88a66837fc85b62d100403c9c4a25201dc1b2",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_slash_01.png",
+      "baseline_sha256": "cb4787978122bb863866a1681af22a7dec39a4566f08c400f233740eb1d3730c",
+      "current_sha256": "cb4787978122bb863866a1681af22a7dec39a4566f08c400f233740eb1d3730c",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_slash_01.png.meta",
+      "baseline_sha256": "2f06afd59c496d75e7b1bb71d3204495d803d3a44287b05254de9bdee6883696",
+      "current_sha256": "2f06afd59c496d75e7b1bb71d3204495d803d3a44287b05254de9bdee6883696",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_smoke_01.png",
+      "baseline_sha256": "e8724c219e8d35859167fc0a7e207e13c72ccf0c29704909b9bb3d3dc71c6cf7",
+      "current_sha256": "e8724c219e8d35859167fc0a7e207e13c72ccf0c29704909b9bb3d3dc71c6cf7",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_smoke_01.png.meta",
+      "baseline_sha256": "b3bd2da249db73b2a42d47c69878c6485f2c0f985f8c29936f2d03343092434e",
+      "current_sha256": "b3bd2da249db73b2a42d47c69878c6485f2c0f985f8c29936f2d03343092434e",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_spark_01.png",
+      "baseline_sha256": "5902da3a324cad0a4b5a88ce1e3c9cc18fee50922c358ce93d8c9f1ad7708f0a",
+      "current_sha256": "5902da3a324cad0a4b5a88ce1e3c9cc18fee50922c358ce93d8c9f1ad7708f0a",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_spark_01.png.meta",
+      "baseline_sha256": "43fa997d864a20da50ec1e6567d02848ff58f013adcc6e5ef19494144d7e3734",
+      "current_sha256": "43fa997d864a20da50ec1e6567d02848ff58f013adcc6e5ef19494144d7e3734",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_spark_05.png",
+      "baseline_sha256": "9624ea2017b8b2767a9d3b82e978b7fdf5154d83e6756cd919da51447bb97138",
+      "current_sha256": "9624ea2017b8b2767a9d3b82e978b7fdf5154d83e6756cd919da51447bb97138",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_spark_05.png.meta",
+      "baseline_sha256": "9fb902adb6ab4c846b757d8d081a03a9935337435bc36f53b0b282a53f971995",
+      "current_sha256": "9fb902adb6ab4c846b757d8d081a03a9935337435bc36f53b0b282a53f971995",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_star_01.png",
+      "baseline_sha256": "3ba3999c944a0767677449412d306c1f230daa1743b31f929533cf77a22ecf5d",
+      "current_sha256": "3ba3999c944a0767677449412d306c1f230daa1743b31f929533cf77a22ecf5d",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_star_01.png.meta",
+      "baseline_sha256": "ef8bb55bfaa23df2ec258cdfb19699e0a5c49298675d316e2a6dcae579de6f0f",
+      "current_sha256": "ef8bb55bfaa23df2ec258cdfb19699e0a5c49298675d316e2a6dcae579de6f0f",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_trace_01.png",
+      "baseline_sha256": "34de69bc3f665b23fe9bed15f388efd8e8e4dc1a99f2fc5db9ba8715c525711f",
+      "current_sha256": "34de69bc3f665b23fe9bed15f388efd8e8e4dc1a99f2fc5db9ba8715c525711f",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_trace_01.png.meta",
+      "baseline_sha256": "acb7f80b3b490721e13fcfd0ace48c5f90f3be5063953b52fd41519d933ba426",
+      "current_sha256": "acb7f80b3b490721e13fcfd0ace48c5f90f3be5063953b52fd41519d933ba426",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_twirl_01.png",
+      "baseline_sha256": "ba3f4996a5a91ea3cba6817a9b4770a385a82ef0b9350cbda5c0f140d182af7e",
+      "current_sha256": "ba3f4996a5a91ea3cba6817a9b4770a385a82ef0b9350cbda5c0f140d182af7e",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/kpp_twirl_01.png.meta",
+      "baseline_sha256": "69e86840984615a46b4508daabd30a8bda17403e5b1c5e1e2f8d855016072cd2",
+      "current_sha256": "69e86840984615a46b4508daabd30a8bda17403e5b1c5e1e2f8d855016072cd2",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/ksp_black_smoke_00.png",
+      "baseline_sha256": "5d9f2b522beaa41511ef0ad1ccf2457d90b9aba8f5cac7154e3a86f8be7cc05b",
+      "current_sha256": "5d9f2b522beaa41511ef0ad1ccf2457d90b9aba8f5cac7154e3a86f8be7cc05b",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/ksp_black_smoke_00.png.meta",
+      "baseline_sha256": "8830f103a65c58664ab823b9d4131bfcd5c6695907fdb9eea5f2210170ef7119",
+      "current_sha256": "8830f103a65c58664ab823b9d4131bfcd5c6695907fdb9eea5f2210170ef7119",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/ksp_explosion_00.png",
+      "baseline_sha256": "bfd931b030a6ac464fbdd439a5230933571f52da9b0b94d197fce18c1e081260",
+      "current_sha256": "bfd931b030a6ac464fbdd439a5230933571f52da9b0b94d197fce18c1e081260",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/ksp_explosion_00.png.meta",
+      "baseline_sha256": "35c1c1de2472281fdc2d4691004bdf96d6f7c183c73cfa44538c81eb3c9874cb",
+      "current_sha256": "35c1c1de2472281fdc2d4691004bdf96d6f7c183c73cfa44538c81eb3c9874cb",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/ksp_poison_puff_00.png",
+      "baseline_sha256": "46a16a153344a2709d5fda308ab9629e237fb8eda3fdd2bfae0b8cd7c7297b8f",
+      "current_sha256": "46a16a153344a2709d5fda308ab9629e237fb8eda3fdd2bfae0b8cd7c7297b8f",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/ksp_poison_puff_00.png.meta",
+      "baseline_sha256": "e7893a88d99f889cc0845db621e7437e9bf69f5236f130e0489537eeb959b77f",
+      "current_sha256": "e7893a88d99f889cc0845db621e7437e9bf69f5236f130e0489537eeb959b77f",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/ksp_white_puff_00.png",
+      "baseline_sha256": "33f894c2279bee9f77874dbfa3c0e9f071a0ee5e1a7065dcc40196029d699f58",
+      "current_sha256": "33f894c2279bee9f77874dbfa3c0e9f071a0ee5e1a7065dcc40196029d699f58",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/ksp_white_puff_00.png.meta",
+      "baseline_sha256": "4678265477ae73cc86a19f535de25c599aa28dfca67296a180e0340153b53616",
+      "current_sha256": "4678265477ae73cc86a19f535de25c599aa28dfca67296a180e0340153b53616",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_noise.png",
+      "baseline_sha256": "da338fcff419c98214a1723239a1f1234e9c4d57c795d1ac35e958e58cb3993e",
+      "current_sha256": "da338fcff419c98214a1723239a1f1234e9c4d57c795d1ac35e958e58cb3993e",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_noise.png.meta",
+      "baseline_sha256": "11cb3b310829873266e8fba1cbc186ce0c7960707f91a47ba13d333ea1d81acf",
+      "current_sha256": "b1a0da0b948ac642623aa10995d3b6e80263e89babef32667ddc0728f4e3f465",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_plasma.jpg",
+      "baseline_sha256": "e60137678e9caf011d113b42ae44aba05efb6393243005c1fa520c35d16554c5",
+      "current_sha256": "e60137678e9caf011d113b42ae44aba05efb6393243005c1fa520c35d16554c5",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SourcedVfx/tinyplay_plasma.jpg.meta",
+      "baseline_sha256": "9960418c38c43cbff84a8e0c8d6216653a3ef3969f27da214163acc1b2386836",
+      "current_sha256": "2142a1920833283c84b8256df19abeefa935496b4725299c950b25a84ac87292",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellComposition.shader",
+      "baseline_sha256": "b00fb86346920383ed85c1cb4c44e558a1bce105a802967f48b5b5df1818d5fe",
+      "current_sha256": "b951d84e58dde2b575630ff4c2643a8d8bf8a9656ae699afa2c1cb613e95ea07",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellComposition.shader.meta",
+      "baseline_sha256": "e0f5dc4374ce53ad5b8ffd960cc2e28551882337e6a28e5ed7d76d5923d050b3",
+      "current_sha256": "083a82023b971ae276426ae4eba96beac391b73435b3115f4bfa5192279a7698",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellEnergy.shader",
+      "baseline_sha256": "3258a98e938274504320f951b7788f948d85f08926e120ae033cad3a2cd43451",
+      "current_sha256": "6578b1057f3e04deaeea77322bd88e7ad51f733e5e018286fc5cf260ceec8a20",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellEnergy.shader.meta",
+      "baseline_sha256": "14db68afa73a9f0689a35286630acebe3fb94fd3014ffcc83c5e5698623cd323",
+      "current_sha256": "57880f5bd6318ecf8342acd2954e62e1956d3a60c1643cb220013650c9903c93",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader",
+      "baseline_sha256": "fc7624cf1e069038d64ccd5dde80b442f0316b0dc30fedb3088a8368160bb086",
+      "current_sha256": "a073894edbb341b653f86eb3c9aa952247499b6bdcf7c5452d942ee3a9446407",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellImageConstruction.shader.meta",
+      "baseline_sha256": "53e00330f931c2e54515c5ba705f30fdf4f32aacc17715405aae603fad4ef074",
+      "current_sha256": "24b61cb92671ad1116ad4c7220713fa034a0933f9585297a3fe39f60f95a4874",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellSpectralCloth.shader",
+      "baseline_sha256": "6625b0f3475577b2ad3e46daebf8790dc29e245818915f6e844562d9c34e48c5",
+      "current_sha256": "c8fcc1d0419e52eee7186f2bb90b2415d655730613b9fc0d114cad5b6f8ceaf2",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellSpectralCloth.shader.meta",
+      "baseline_sha256": "74f9f310344ba05fd75fa9ab7439a397690ff01d210db248d9cdd52394614063",
+      "current_sha256": "3a160c3cd74fa327e63515925c20fb63b7d153b59388af153e535249638ad0ad",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellSpectralMist.shader",
+      "baseline_sha256": "21f0e72f29283a7bd7ac0412a2056f35ec7f133cf7c4aa3084457b33693a51e8",
+      "current_sha256": "7cf159ab871dea246dd1abeb0f85ce8db5b3bd82fb7bfbdc9b63c64de2008554",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellSpectralMist.shader.meta",
+      "baseline_sha256": "4e5eeefaa569ff49ac79a9444a4c02a33451391f54fa8bc7cf34f6c1ae59750b",
+      "current_sha256": "8c3600c66ef3bc50c8087303dca4c8caf1712ab0d23ef3150986332e3dd17bdc",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellStylized.shader",
+      "baseline_sha256": "5ab03bfd33d4d4933f428612598bf3984e5faf8577015313c9eae26bd8a74365",
+      "current_sha256": "ba38ab99e0d5489c0202917b6131b591fe7ab4c464aab2be6c329ef7cd5ca506",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Resources/SpellStylized.shader.meta",
+      "baseline_sha256": "070a49268bb2a36f7a73f125fafcf69ecb8af58db3213136037036a3e156b0d0",
+      "current_sha256": "46d09e94e4e5369f87650d1a9c98955d3ce73569c34ead355aec1d0066cbfab5",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Scenes.meta",
+      "baseline_sha256": "8550ee836ded94b08bf9b8afe8bad264a0a188a0bfd36e60a26ed8b5de65f29d",
+      "current_sha256": "7988fef54d60611df9ff899177f45853b538f0221a1e3a5e67c3a314b3046cbb",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Scenes/Bootstrap.unity",
+      "baseline_sha256": "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca",
+      "current_sha256": "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Scenes/Bootstrap.unity.meta",
+      "baseline_sha256": "f36fb429e30b8fa31833ce265898a6f8096b6435653e0cb89bc3855b8d66dfc9",
+      "current_sha256": "9d79d5cfe0308b391d6e7e050e8169fefb8b8a2e8341b1679bdf4cb388e5ef66",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Scenes/SpellLab.unity",
+      "baseline_sha256": "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca",
+      "current_sha256": "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Scenes/SpellLab.unity.meta",
+      "baseline_sha256": "bc709730a4ff25559a799631eb62f5547896eae9586118c803885acec91cd327",
+      "current_sha256": "89ce5ee55570d77b34ad5df601e4e63391440516d291b2c6daecb3f3c4c4d25c",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Service.meta",
+      "baseline_sha256": "f418d8b453c79eb955bc56ac2986ccd53a042beaf0503e50d3fd91b1465f41cf",
+      "current_sha256": "68b7ca9f5f894a6bc56aeee63843bb1e498b601bd0004637a601da2b3edc8c39",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Service/LabApi.cs.meta",
+      "baseline_sha256": "94fd464d79634c464eed314e48b5f1ea8f390e7e7bff1a0755d9ea2228003779",
+      "current_sha256": "06a2e1f67a21a2085781612736f95435ea0a02c6a4e3ab5c0dac8cecd8d1d4ad",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Service/ServiceAccess.cs.meta",
+      "baseline_sha256": "9bece07f209069512769e4ce665ad623304d129dc56c65cf1de151b2a155fd19",
+      "current_sha256": "50af8137df1415d3a3db04f7b891f819cd8222a68d7f90efc5f89fa8fc5beb87",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Service/SpellDescriptionView.cs.meta",
+      "baseline_sha256": "0cb72d3a7639372547af3d3819a890224087b9c80e0398f8ddbe134b182e887d",
+      "current_sha256": "2fe504853bcc49d97d559bfe288a0328460223a88c4d144e672cf994b7ad3181",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Service/WindowsCredentialStore.cs.meta",
+      "baseline_sha256": "81cb8a998ce935f4a5a199a375f7ee3441c063dd85e75d1e19a92045a4c7db5b",
+      "current_sha256": "98dda5dbc91956aa8ce593b7ebb9366e23c1afe2a9cfb0a4d7faccac8da23a6f",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Service/WindowsInvitationPicker.cs.meta",
+      "baseline_sha256": "c8d24359af59d45a8409fd8611de1c915fa5d47e1e80ec13341cc53631ee159b",
+      "current_sha256": "d1e93708b8200495e66395ecd1eea68ee323373cfad0e97508656b405986aca3",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/SpellRuntime.meta",
+      "baseline_sha256": "5698aa22c35de6f7fac97d50523cd47129b4e015159e31f52cf92d14f4fb384f",
+      "current_sha256": "55826b28592836d207c8694e8c6151343103e9f9560c4f9ccee63e22038ebc7b",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/SpellRuntime/GeometryRuntime.cs.meta",
+      "baseline_sha256": "c8ef4dfbc8cfdafc533a8a661771d72251815d526646b607ca181f1a7a56ddb1",
+      "current_sha256": "8ed56c929ea9b7d92b891c82149d295c6a4cda876b71562b655ca74655878a03",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/SpellRuntime/LabPerformanceProbe.cs.meta",
+      "baseline_sha256": "3bcacf7d77808653399daa2d1952f6b427ddc27ea34d79772cf67b5560262475",
+      "current_sha256": "591f969d3c0eaa70579a5ffc9dd2a8302455abe7649ae1dd54cf0bd58e699e48",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/SpellRuntime/LabSetDressing.cs.meta",
+      "baseline_sha256": "cbd2b4454303f3b7e8f63a18ad31f03405644431089af526f00d85500c31dd16",
+      "current_sha256": "056ead72b4bf494fbfb1b736ab8374746da593fc9964706275f187b4eefdf570",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/SpellRuntime/RuntimeEngine.cs.meta",
+      "baseline_sha256": "893be00dffc4854ed7358664afcf01da8417e9dd1b90d8d9575521ffa6094216",
+      "current_sha256": "9c418c159151053b0cb365cbae0a3d981ddecfa738ece7e05320acd2b083a6c5",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/SpellRuntime/SpellLab.cs.meta",
+      "baseline_sha256": "6bb1a1890a5b4c24e10c014a2f0eb44cfafd4d73fe16da1040a1fabf556d1770",
+      "current_sha256": "3a2869abcd44395ccc6d34b522fc329fb8d04ae858db13eb45e756ffb29013d0",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests.meta",
+      "baseline_sha256": "35b29c522d5d3d92dcca4e9a3d3e5c8958fd3f0f29d56e841283bdf1171beb6f",
+      "current_sha256": "ba98d1cf1effe45517b05e005f5170936cea542951451d1965f80ec435e2e652",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/CachedSpellVerifierTests.cs.meta",
+      "baseline_sha256": "b941fe88e9c3ba9c9ffa563366e99b0057deb6698ef8e2a81ee874d3481e9eea",
+      "current_sha256": "a3cbb666e584c458120c2f7b906f94780ccf3d304b250b3fa5de45ba8d90b9e1",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/DescriptionCacheTests.cs.meta",
+      "baseline_sha256": "728e5a0479ea2bd10ce8604fe8faf67814f64377c42cccc09c33b46f45ce7e66",
+      "current_sha256": "472fd9c54cfe9080aac48f3367e5cdd3a4e7e0e3130d3373f72158039d7b8ca0",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/DrawingCanvasTests.cs.meta",
+      "baseline_sha256": "4c10e52798592f0e707712082c46307c032d9306e15f2d46c2affe0d26d04698",
+      "current_sha256": "5864ed3988d6fed5e01579f0304ac14577627fb17a8eff8f56736cbb5a0200cb",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/LabApiErrorTests.cs.meta",
+      "baseline_sha256": "a8eb474460d17e5a9579c0492ff1ed883e9403da2a90145b35e142fe4b8c3ce3",
+      "current_sha256": "c41c217ec402210378853240506aa11754b8cbf2c60836d049dfefb20e017e76",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/Palimpseste.Game.Tests.asmdef.meta",
+      "baseline_sha256": "56399b433b8d57b7705c89c2408b86586ecd7fa44248fb3de28f79c429cc0f4b",
+      "current_sha256": "c220bc6231be9edcbc3f8f0e9b616200886e724b183ea707a85c1ddf0364d6ab",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/ParchmentRecoveryTests.cs.meta",
+      "baseline_sha256": "7f7ca47a23bcc3b6fe798d1b9dc6a0366752a809ed34e7a9220b5e08284f0ebb",
+      "current_sha256": "f162cc09c92410932de51aee83a67ec68c85cd12de89fbebb911f2d058165ef1",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode.meta",
+      "baseline_sha256": "9c257768b55552666fd25263dab33d8689d235d39fc03618089c374a14cc322b",
+      "current_sha256": "5c2a516fa93378784cd822a384bc80f7add8dcbe264394568aa370d1bda0c948",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/BeamPathPlayModeTests.cs.meta",
+      "baseline_sha256": "f0dde071e6c55b95e4ef49a3c71a364d1bbeddec07db850809810f306e95650f",
+      "current_sha256": "cc285634580dd897d16fce678b1295a05f0c13174a9d2c8fb447b42dca661fea",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/CachedSpectrePresentationTests.cs.meta",
+      "baseline_sha256": "a8882bd8b075e92091d231d199c80fa6b75a8f5741950aef131eb0ea8c055b59",
+      "current_sha256": "951a1855fa747ae4e728ec3e44b3e2bb13176e5121b771c75e6f340f371914ee",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/EffectRuntimePlayModeTests.cs.meta",
+      "baseline_sha256": "23e35d319d64aecad05242d59efb76d0122b67aa1c92aea52dab0048500a5363",
+      "current_sha256": "2a8b024fec937655e30ab3b29bd4042fec51a8a9c2e84d3452e2fb773dac2e82",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/FocusInterruptionTests.cs.meta",
+      "baseline_sha256": "1b268cc5caa5581f6b72a9438fb1e7ce64aa2b1a4bc20983273a5be0bae064ea",
+      "current_sha256": "b1df8538f8121362cacaf0bb3ae7217006a9729bb82ca572b91464b1ee96de66",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/ImageConstructionPresentationTests.cs.meta",
+      "baseline_sha256": "dfda1040997694cca61e4cb7b153b953a8d84459ba6588dfdc31b97bb7b9fd45",
+      "current_sha256": "51d069239538f5774d666198d4a88d2344028e6e81e70e3e68b7ce23f81a2353",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/ImageSpellPacketValidatorTests.cs.meta",
+      "baseline_sha256": "8b81a80ff7d1758fc6bc92f887e40d8573ae5d9fb3b84c8559a4fb295e4b56bf",
+      "current_sha256": "00c7b825fd25bda59a1e8321081fa4c25754a744f60dfc70c7d5acc5e86b45ca",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/Palimpseste.Game.PlayModeTests.asmdef.meta",
+      "baseline_sha256": "9f6ddae861ddf9fe32eefede78e43e31824c90de12d2259209098df6e76fdc82",
+      "current_sha256": "c45b834f5d77d812c0e0274ff2b6c7674944f8357b674f29f7f9c91d1090403e",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/RealLunaPacketPlayModeTests.cs.meta",
+      "baseline_sha256": "a8628a9ba52bd9e4d9e28943ca9ef26ce357596f0dd58ce715243807b494c6cb",
+      "current_sha256": "3df866e1c55f2ce36f4bcc72b4b9c95cc18227c20b7feb71ada6b52a69ad958e",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/SemanticVisualPlayModeTests.cs.meta",
+      "baseline_sha256": "6ae165648519a2f730c620f6ed8357da65b1b117c330b63f4cd8421831bd69c1",
+      "current_sha256": "06814d5fc40c256b3ecef0e2d1b45bd1c937da1a1a06bb516b42503267052d4e",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/SemanticVisualPresentationTests.cs.meta",
+      "baseline_sha256": "1a5a427ec3420bc0c0019cb585f42e5801f9648755bf4e106a8325d471bcec01",
+      "current_sha256": "8cfc93ffe0bfdcbe5a47e7eff531be019b0a473d6ce20daf56d1168e07e2e0ba",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/SpellLabFixtureTests.cs.meta",
+      "baseline_sha256": "5da2c71aeba2f7c92c341dd6764459f4632365aab1917be807b8ddf845b6e9dc",
+      "current_sha256": "a07a744812e1718e08852a0029e613ea25378c4a01d480f802b7a145050a5323",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayMode/StylizedCompositionPresentationTests.cs.meta",
+      "baseline_sha256": "7d808059b14fd1ae7a1d4069ccd4f69c019188534972dd1103ed7083ba3e5119",
+      "current_sha256": "31c7cb4c253c590852dcd5608a5d65d98d0f13f8644befb47a670ccc6e228338",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/PlayerParchmentFilterTests.cs.meta",
+      "baseline_sha256": "4c3cd9119c31eb34bd0f165e5f2e65f9cb731292d3ee871c9601f9a1c5f6c518",
+      "current_sha256": "bdce63caa42b49556dce37aa0f49570488013e529eba8f01b4e00a0832f5708c",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/ServiceAccessTests.cs.meta",
+      "baseline_sha256": "efb0fbcae5d6efbcdeb69329c8bb12974c2feb0049ce0f633f3a59a1942c8b84",
+      "current_sha256": "4e5a613fa2d8888c13afc8b4fbc6f7c5af7282037bbcead7c09885a0e0a67770",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Palimpseste/Tests/WindowsCredentialStoreTests.cs.meta",
+      "baseline_sha256": "5a82ae148551984fa4edf8b81943671e9b12b1fa6e5015311a9f5c5d82ad3b80",
+      "current_sha256": "b4a6581ebf30096dfd8a8172e2c8057c4446b87929c6862384c90efdcd79ab94",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Readme.asset",
+      "baseline_sha256": "6d098604e909b6a0e64fe5910c2719704864d49678bcf5413bd47b67e5490107",
+      "current_sha256": "6d098604e909b6a0e64fe5910c2719704864d49678bcf5413bd47b67e5490107",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Readme.asset.meta",
+      "baseline_sha256": "46c6b89ac1d47bd0c0d1a8b141ae3e32cd95d3e74c49381f0d9f942488c254ce",
+      "current_sha256": "86b2e76e458e22228995ddddfaba9422b5dedcfe216ba9028208d3dd6f831ae7",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Resources.meta",
+      "baseline_sha256": "0464242e302d7f867fe549f2cdb57d6e86aea5c7c2bf5ec627c81523aa9eb6d6",
+      "current_sha256": "a693ea21e3096fc28e4820312626917e9b8ba0880bb65499849eb5356a32aaa9",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Scenes.meta",
+      "baseline_sha256": "dc3ac95238c331489025612f48d74cb2af4fb2f2f466c7f5c43c0e83f6d2ef99",
+      "current_sha256": "5f0b8d99577f85779996e16ef68314b08ba637b4016cc4ec2f68b10c1f5de120",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Scenes/SampleScene.unity",
+      "baseline_sha256": "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca",
+      "current_sha256": "07fce8b04804ddccb3026db5b43d8dc41ba138e49d50d36a5c24877081eacdca",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Scenes/SampleScene.unity.meta",
+      "baseline_sha256": "b5815a6b12afaf810577bc89041c4ce46516c7cd6609693f8db616f8e5584d80",
+      "current_sha256": "baf1a15df993d52223ce52daa6bf340fd183fb7e5c3c173ed76fd7f614d6e7f0",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings.meta",
+      "baseline_sha256": "73c8e19843240273facb0af6bdbf430d719e397aded705629594060ce25ce7ad",
+      "current_sha256": "fa4ade308d94f4213fe1712fbe10839379c26bc8b4ca3b4c43cf02ccc03a7687",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/DefaultVolumeProfile.asset",
+      "baseline_sha256": "463776c51ae49d4fef980e8fd268081b2f505610d79315003faae1acff8f4115",
+      "current_sha256": "463776c51ae49d4fef980e8fd268081b2f505610d79315003faae1acff8f4115",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/DefaultVolumeProfile.asset.meta",
+      "baseline_sha256": "efbcb026cee6b8e32fdf27018c06b0515296a6ccbb43969e792fea270310700a",
+      "current_sha256": "43e8f7bed8f99da631d74ee652953c230594e150ce305d313ec0844e312d574f",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/Mobile_RPAsset.asset",
+      "baseline_sha256": "077b30c366ee79c2b0906284297c3433c470b59a7bca563801901512d6cabf64",
+      "current_sha256": "077b30c366ee79c2b0906284297c3433c470b59a7bca563801901512d6cabf64",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/Mobile_RPAsset.asset.meta",
+      "baseline_sha256": "53ea46647712c615fd1a3f2e0dddfa8559eeedc649e9a1dbf93ff913de28544c",
+      "current_sha256": "4718cab1245b68049fc0c4e0acd26ac7c4a7e8eb7dcdb8f357159a129ca615ec",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/Mobile_Renderer.asset",
+      "baseline_sha256": "aa93274c9521fa941170becec9e87c5fa36b8587eefd5eeb5c0eed0d1d4b1dbe",
+      "current_sha256": "aa93274c9521fa941170becec9e87c5fa36b8587eefd5eeb5c0eed0d1d4b1dbe",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/Mobile_Renderer.asset.meta",
+      "baseline_sha256": "a148ee2b4987b05b8ff7ae5f9bf84916184f77aefddc821dceb551f5a69f8179",
+      "current_sha256": "da2404303c1d6f6af244a6bb7ac7d65cc8cbdd741c804cc913be8be861e65379",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/PC_RPAsset.asset",
+      "baseline_sha256": "86a7e0f07ac4ddc12496b9ca6bf03fff7be00f41fd170b7d1f9bf6b18f07aa47",
+      "current_sha256": "86a7e0f07ac4ddc12496b9ca6bf03fff7be00f41fd170b7d1f9bf6b18f07aa47",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/PC_RPAsset.asset.meta",
+      "baseline_sha256": "bb469b9b6f318e9e9bed29c3b2e73e79371c04743c6f95dd6603941f1cd3e53e",
+      "current_sha256": "dd77ab3eb523c6e234943bc07250360e2ae934ced15c075a56168f2f7a3b5ce4",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/PC_Renderer.asset",
+      "baseline_sha256": "3d0b01d8ded3327263b6690be128a3de58d17c514943ae42fe743a3e084a9c79",
+      "current_sha256": "3d0b01d8ded3327263b6690be128a3de58d17c514943ae42fe743a3e084a9c79",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/PC_Renderer.asset.meta",
+      "baseline_sha256": "b5df8ddb2708c6ed4c133a5ff9ee95a75cc20e4ee3ed6181366a61aedbaf31ec",
+      "current_sha256": "0f063b81db6817db7ec416712a575dd3e9960330e241de389115f02ed5b3ffbd",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/SampleSceneProfile.asset",
+      "baseline_sha256": "a8677d4bac051d24caa11cd622e39f968155ee277bfce132274f1de225692fe9",
+      "current_sha256": "a8677d4bac051d24caa11cd622e39f968155ee277bfce132274f1de225692fe9",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/SampleSceneProfile.asset.meta",
+      "baseline_sha256": "2e23abc214069f0adbf2b2207f1db54be7876629ec2a3681d0f4aa5b61622ef0",
+      "current_sha256": "0b8036af967c670deb9c96912e7efda0895418ad3b2eeb4612b016a4d76a25c8",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset",
+      "baseline_sha256": "ac1d98fdd295c59e0ff1bbed41724d1153bc4c4424fba20b46a6ff23dc01723e",
+      "current_sha256": "ac1d98fdd295c59e0ff1bbed41724d1153bc4c4424fba20b46a6ff23dc01723e",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta",
+      "baseline_sha256": "f61661d8bc8dbe531daf09f6211ef978c7ba145c9207c8e76524396ae0722d7c",
+      "current_sha256": "9f7756af7860ade1e88db1b5cffa7dff8cc535f6ac08819a4e26164bf4018717",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/StreamingAssets.meta",
+      "baseline_sha256": "d6f9f5931063c8f5306b3301b3930f360b34d190f833a9fa9af8125f37515991",
+      "current_sha256": "fa86a7129d0fe161488432b320c761cae3803c792449c7f10d446e607bfe4949",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/StreamingAssets/service.json.meta",
+      "baseline_sha256": "88d1b034b547d4959c7e766244dfa8eb7272a05e7cd8ae81920047ba7f1c320a",
+      "current_sha256": "64b9a0ba10e763efba22a335a4330810b4e2b4e082044d53386318fbf73c3f2d",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo.meta",
+      "baseline_sha256": "07f022e5932c833d026e020b27d73452ebd781993b616d76003494af1e140946",
+      "current_sha256": "79f6e715f0c28ed4214d96cd73a018a561fc7046e1def01a4b46c318a2536f90",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo/Icons.meta",
+      "baseline_sha256": "546e7d7af6b4d5e17d284c8f1188d05472e681911b8359905ee9b9e20769a106",
+      "current_sha256": "50014f60d3214b170318dd12a9201552b6257b8380fb49ecdba9f90c91a9670e",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo/Icons/URP.png",
+      "baseline_sha256": "1d17a9ff3537859abe2c008603d29d90cf43191ae77aa386167cc65e53ba03d9",
+      "current_sha256": "1d17a9ff3537859abe2c008603d29d90cf43191ae77aa386167cc65e53ba03d9",
+      "bytes_match_git_blob": true,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo/Icons/URP.png.meta",
+      "baseline_sha256": "b330f1fcfc4e6ceccc95fc34a38434141603469b135633e1c4e8a03c19f9fdbc",
+      "current_sha256": "03823ec2c2b908ccb33338f867f94977ed50895d4d692cd4146e15ada6ae8c8d",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo/Layout.wlt.meta",
+      "baseline_sha256": "b8745a251df078ffa75dbaac0c4c6debecb61ab306b5b119a490ce6c635a11d8",
+      "current_sha256": "436feb69902b5241ed43e01228b8ab54849270cdb6adcc0f35b83b7e5ce6522d",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo/Scripts.meta",
+      "baseline_sha256": "930d0c8276cea1559a3e315f8500ea6ca8b58d980eee3b44aaa1d461742c47e0",
+      "current_sha256": "c55b750860bb8aa13bdac48bb17dcf9abaacd884aedde1715957d208e9996a17",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo/Scripts/Editor.meta",
+      "baseline_sha256": "7036bdbc8af05799b5fd508484343b35c28a68b390198da4673d34357d7d667f",
+      "current_sha256": "95691357c049014315fcf6e6f690fcc51caa2a71ab2ecaef69fc41674224391b",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs.meta",
+      "baseline_sha256": "f59080b424c16fa13edd105bf006fdbad98c11fce0c921043e63c8877f144cd9",
+      "current_sha256": "6e8b1ed493b9120709c93fc0c1ca3b5a1f729ea3144ebfc1ce7073ec856f5712",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    },
+    {
+      "path": "game/Assets/TutorialInfo/Scripts/Readme.cs.meta",
+      "baseline_sha256": "80a3df9969fab6e656583ee9bbca884d0507e2b7de3417f6ea3118fba901cd60",
+      "current_sha256": "d5fd919374ef6579b847f253237c31e58e1d5d4302a1eba70b13c9af7eca7958",
+      "bytes_match_git_blob": false,
+      "unchanged_in_git": true
+    }
+  ],
+  "player_library_written": false,
+  "comparison": "Git normalized content: existing CRLF checkout differs from LF Git blobs; byte hashes recorded separately, no normalization performed on historical files."
+}

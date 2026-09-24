@@ -113,6 +113,10 @@ public static partial class ApiHandlers
             }
             // The files become durable before their DB rows are attached. Holding the
             // parchment row lock avoids writing orphan files on ordinary duplicate uploads.
+            // Version-gate only NEW generation: the existing/replay branches above preserve old jobs.
+            if (!GenerationAdmission.SupportsCurrentGeneration(context.Request))
+                return ApiProblem.Result(context, 426, "client_update_required",
+                    "Mettez le jeu à jour vers la version 1.8.0 ou ultérieure pour créer ce sort. Votre dessin est conservé.");
             var drawingArtifact = await store.PutAsync(drawing, "png", "image/png", ct);
             var inkArtifact = await store.PutAsync(ink, "png", "image/png", ct);
             var journalArtifact = await store.PutAsync(journal, "gz", "application/gzip", ct);

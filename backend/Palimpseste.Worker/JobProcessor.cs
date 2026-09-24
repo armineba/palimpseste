@@ -83,8 +83,8 @@ public sealed partial class JobProcessor
             ? Path.Combine(specRoot, "contracts", "legacy", "capability-catalog-pre-d15.json")
             : Path.Combine(specRoot, "contracts", "capability-catalog.json");
         var capabilities = await File.ReadAllTextAsync(capabilitiesPath, ct);
-        var interpretationPromptVersion = legacyInterpretation ? LunaCodexProvider.LegacyPromptAVersion : LunaCodexProvider.PromptAVersion;
-        var interpretationPromptHash = legacyInterpretation ? provider.LegacyPromptASha256 : provider.PromptASha256;
+        var interpretationPromptVersion = job.VisualPipelineVersion == 5 ? LunaCodexProvider.InterpreterV2PromptVersion : legacyInterpretation ? LunaCodexProvider.LegacyPromptAVersion : LunaCodexProvider.PromptAVersion;
+        var interpretationPromptHash = job.VisualPipelineVersion == 5 ? provider.InterpreterV2PromptSha256 : legacyInterpretation ? provider.LegacyPromptASha256 : provider.PromptASha256;
         var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + interpretationPromptHash + provider.EffectRecipesPromptSha256));
 
         var descriptionRecord = await jobs.GetDescriptionAsync(job, ct);
@@ -93,7 +93,10 @@ public sealed partial class JobProcessor
         {
             await jobs.SetStateAsync(job, "interpreting", null, "Interprétation du dessin", false, ct);
             var attempt = await jobs.BeginAttemptAsync(job, "A", settings.InterpreterModel, settings.InterpreterEffort, inputHash, ct);
-            var result = legacyInterpretation
+            var result = job.VisualPipelineVersion == 5
+                ? await provider.InterpretBlueprintV2Async(job.Id.ToString("N"), attempt.ToString("N"),
+                    files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, ct)
+                : legacyInterpretation
                 ? await provider.InterpretLegacyAsync(job.Id.ToString("N"), attempt.ToString("N"),
                     files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, ct)
                 : await provider.InterpretAsync(job.Id.ToString("N"), attempt.ToString("N"),
@@ -138,6 +141,13 @@ public sealed partial class JobProcessor
             description = result.Utf8;
         }
         else description = await ReadCheckedAsync(descriptionRecord.StorageKey, descriptionRecord.Sha256, ct);
+
+        // Admission is persisted. Historical jobs never enter Pipeline V2, even after deployment.
+        if (job.VisualPipelineVersion == 5)
+        {
+            await ProcessBlueprintV2Async(job, capture, description, capabilities, ct);
+            return;
+        }
 
         // D16 freezes the native atlas, then its composed animation sheet, before the planner.
         // Earlier admitted jobs retain their original versioned pipeline.

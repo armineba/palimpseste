@@ -23,6 +23,7 @@ public static partial class ApiHandlers
                 layout_version = "free_canvas_v2",
                 reference_artifact_id = PublicIds.Artifact(referenceId),
                 minimum_client_version = config.MinimumClientVersion,
+                minimum_generation_client_version = GenerationAdmission.MinimumGenerationClientVersion,
                 carriers,
                 inks = new[]
                 {
@@ -175,7 +176,7 @@ public static partial class ApiHandlers
                    j.created_at,j.updated_at,
                    greatest(0,floor(extract(epoch from ((CASE WHEN j.state IN ('ready','needs_operator') THEN j.updated_at ELSE clock_timestamp() END)-j.created_at))*1000))::bigint,
                    (SELECT max(pa.started_at) FROM provider_attempts pa WHERE pa.job_id=j.id AND pa.status='running'),
-                   va.id,va.sha256,
+                   coalesce(v2sheet.id,va.id),coalesce(v2sheet.sha256,va.sha256),
                    EXISTS(SELECT 1 FROM visual_atlases atlas
                        JOIN artifacts native ON native.id=atlas.artifact_id AND native.owner_id=j.owner_id
                            AND native.kind='visual_atlas' AND native.content_type='image/png'
@@ -198,6 +199,12 @@ public static partial class ApiHandlers
             LEFT JOIN visual_references vr ON vr.job_id=j.id
             LEFT JOIN artifacts va ON va.id=vr.artifact_id AND va.owner_id=j.owner_id
                 AND va.kind='visual_reference' AND va.content_type='image/png'
+            LEFT JOIN LATERAL (
+                SELECT a.id,a.sha256 FROM spell_v2_passes p JOIN artifacts a ON a.id=p.artifact_id
+                WHERE p.job_id=j.id AND j.visual_pipeline_version=5 AND p.pass='sheet' AND p.accepted
+                  AND a.owner_id=j.owner_id AND a.kind='v2_sheet' AND a.content_type='image/png'
+                ORDER BY p.revision DESC LIMIT 1
+            ) v2sheet ON true
             WHERE j.id=@id AND j.owner_id=@owner
             """, connection);
         command.Parameters.AddWithValue("id", jobId);

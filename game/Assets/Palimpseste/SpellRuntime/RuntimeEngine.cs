@@ -51,6 +51,10 @@ namespace Palimpseste.Game.SpellRuntime
         public int Statuses { get; private set; }
         public int StructuresBroken { get; private set; }
         public int ActiveCount => active.Count;
+        // Read-only V2 contact telemetry used by the real-physics gate runner.
+        public int V2ContactCount { get; private set; }
+        public Vector3 V2LastContactNormal { get; private set; }
+        public Vector3 V2LastContactPosition { get; private set; }
 
         public RuntimeEngine(CompiledSpell spell, Dictionary<string, GeometryAsset> assets, Dictionary<string, Texture2D> masks, Transform caster, List<LabReceiver> targets)
         {
@@ -121,7 +125,15 @@ namespace Palimpseste.Game.SpellRuntime
                     if (visual != null)
                     {
                         var constructed = visual.GetComponent<ImageConstructedSpellVisual>();
-                        if (constructed != null && constructed.HasLifecycle)
+                        var canonical = visual.GetComponent<CanonicalSpellVisualV2>();
+                        if (canonical != null)
+                        {
+                            foreach (var collider in visual.GetComponentsInChildren<Collider>()) collider.enabled = false;
+                            var duration = canonical.RetireForCause(active[i].endedByContact);
+                            UnityEngine.Object.Destroy(visual,duration + .03f);
+                            retiredVisuals.Add(visual);
+                        }
+                        else if (constructed != null && constructed.HasLifecycle)
                         {
                             // Collisions end on this tick. Only bounded artwork
                             // survives, using the actual reason for retirement.
@@ -170,6 +182,7 @@ namespace Palimpseste.Game.SpellRuntime
             retiredVisuals.Clear();
             active.Clear(); scheduled.Clear(); activationCounts.Clear();
             Hits = Impulses = Statuses = StructuresBroken = 0; DamageMilli = HealMilli = 0;
+            V2ContactCount = 0; V2LastContactNormal = V2LastContactPosition = Vector3.zero;
         }
 
         private static int Option(int? value, int fallback) => value ?? fallback;
@@ -292,7 +305,8 @@ namespace Palimpseste.Game.SpellRuntime
                 state.path = geometry.Path(node);
                 state.visual = CarrierVisual.Create(state, geometry.Mask(node), geometry.SignatureMask(node));
                 active.Add(state);
-                Play(state.position, birthClip, .17f);
+                if (node.blueprint_v2 == null || node.blueprint_v2.unity_implementation.audio_hook != "none")
+                    Play(state.position, birthClip, .17f);
                 Emit(state, "spawn", null, state.position, Vector3.up);
                 if (node.carrier == "beam") EvaluateBeam(state);
             }
@@ -302,8 +316,16 @@ namespace Palimpseste.Game.SpellRuntime
             Vector3? effectForward = null)
         {
             if (state.expired && kind != "expire") return;
+            if (state.node.blueprint_v2 != null && (kind == "hit" || kind == "block" || kind == "trigger"))
+            {
+                V2ContactCount++; V2LastContactPosition = position; V2LastContactNormal = normal;
+                state.surfaceNormal = normal;
+                state.visual?.GetComponent<CanonicalSpellVisualV2>()?.NotifyContact(normal);
+            }
             if (receiver != null) Hits++;
-            if (kind == "hit" || kind == "block" || kind == "trigger") Play(position, impactClip, .22f);
+            if ((kind == "hit" || kind == "block" || kind == "trigger") &&
+                (state.node.blueprint_v2 == null || state.node.blueprint_v2.unity_implementation.audio_hook != "none"))
+                Play(position, impactClip, .22f);
             if (kind == "hit" && receiver != null)
             {
                 var contactVisual = CarrierVisual.ProjectileHit(state,position);
@@ -407,7 +429,8 @@ namespace Palimpseste.Game.SpellRuntime
             Emit(state, "expire", null, state.position, Vector3.up);
             state.expired = true;
             state.endedByContact = contact;
-            Play(state.position, expireClip, .1f);
+            if (state.node.blueprint_v2 == null || state.node.blueprint_v2.unity_implementation.audio_hook != "none")
+                Play(state.position, expireClip, .1f);
             if (state.node.carrier == "barrier" && state.visual != null)
                 foreach (var collider in state.visual.GetComponentsInChildren<Collider>()) collider.enabled = false;
         }
@@ -432,12 +455,17 @@ namespace Palimpseste.Game.SpellRuntime
         {
             var opts = state.node.options;
             var speed = Option(opts.speed_cm_s, 100) / 100f;
+            if (state.node.blueprint_v2 != null)
+                speed = Mathf.Max(0, speed + state.node.blueprint_v2.motion.acceleration_cm_s2 * .01f *
+                    Mathf.Max(0,(TickCount-state.born-.5f)*.02f));
             var length = speed * .02f;
             var old = state.position;
             var ballistic = SpellBehaviorMotion.Enabled(state.node) && opts.motion == "ballistic";
             if (ballistic)
             {
                 var acceleration = Vector3.down * Mathf.Clamp(state.node.physics.gravity_cm_s2,0,4000) / 100f;
+                if (state.node.blueprint_v2 != null)
+                    acceleration += state.direction * (state.node.blueprint_v2.motion.acceleration_cm_s2 * .01f);
                 state.position += state.velocity * .02f + acceleration * .0002f;
                 state.velocity += acceleration * .02f;
                 if (state.velocity.sqrMagnitude > .0001f) state.direction = state.velocity.normalized;
@@ -517,6 +545,8 @@ namespace Palimpseste.Game.SpellRuntime
                     // A filtered actor is still a physical obstacle. A wall may bounce.
                     if (receiver == null && SpellBehaviorMotion.Enabled(state.node))
                         Emit(state,"hit",null,hit.point,hit.normal);
+                    else if (state.node.blueprint_v2 != null && receiver != null)
+                        Emit(state,"hit",null,hit.point,hit.normal);
                     if (state.bouncesLeft-- > 0 && receiver == null)
                     {
                         state.direction = Vector3.Reflect(state.direction, hit.normal).normalized;
@@ -570,6 +600,9 @@ namespace Palimpseste.Game.SpellRuntime
                         Emit(state, "hit", target, state.position, direction);
             LabReceiver chosen = null;
             var hitDirection = direction;
+            var v2ContactNormal = -direction;
+            var v2ContactPoint = Vector3.zero;
+            var v2HasContact = false;
             for (var i = 1; i < trace.Count; i++)
             {
                 var delta = trace[i] - from;
@@ -590,6 +623,10 @@ namespace Palimpseste.Game.SpellRuntime
                     // at the same swept distance used by the physics query.
                     segments.Add(from + delta.normalized * firstHit.distance);
                     hitDirection = delta.normalized;
+                    if (state.node.blueprint_v2 != null)
+                    {
+                        v2HasContact = true; v2ContactNormal = firstHit.normal; v2ContactPoint = firstHit.point;
+                    }
                     break;
                 }
                 segments.Add(trace[i]);
@@ -597,12 +634,14 @@ namespace Palimpseste.Game.SpellRuntime
             }
             if (chosen == null || !Matches(opts.chain_filter, chosen))
             {
+                if (state.node.blueprint_v2 != null && v2HasContact)
+                    Emit(state,"hit",null,v2ContactPoint,v2ContactNormal);
                 CarrierVisual.BeamSegments(state, segments);
                 return;
             }
             visited.Add(chosen.StableId);
             var position = chosen.transform.position;
-            Emit(state, "hit", chosen, position, hitDirection, hitDirection);
+            Emit(state, "hit", chosen, position, state.node.blueprint_v2 != null ? v2ContactNormal : hitDirection, hitDirection);
             direction = hitDirection;
             from = position + direction * .08f;
             for (var hop = 1; hop <= Option(opts.chain_hops, 0); hop++)

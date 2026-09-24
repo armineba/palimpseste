@@ -18,3 +18,5 @@ Les téléchargements, imports et modifications de code appartiennent au dévelo
 ## Livraison
 
 Le créateur teste lui-même : ne pas lancer de tests, de génération de démonstration ni de capture de validation depuis l'agent. Distinguer recherche, téléchargement, compilation, déploiement et acceptation visuelle. Maintenir `docs/NEXT_ACTIONS.md` avec les opérations réellement réalisées et ce qui reste à faire.
+
+Exception explicite du 25 septembre 2026 : la demande « Spell Pipeline V2 » autorise les tests et captures nécessaires à cette refonte et impose un sort de test V2 séparé. Aucun sort historique, prefab, material, animation ou référence de scène historique ne doit être modifié. Le verdict humain sur la qualité reste distinct des contrôles automatiques.

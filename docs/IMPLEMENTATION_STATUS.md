@@ -1,6 +1,16 @@
 # État de réalisation et point de reprise
 
-## État courant — D19 / Player 1.7.0 installé et ouvert
+## D20 — Pipeline V2 construite, installation en attente
+
+**Backend D20 et Player 1.8.0 compilés et empaquetés**, Unity 6.3 / URP / IL2CPP, sorties 0, sans erreur de shader. [Livraison](../evidence/public/backend/blueprint-v2-d20.json) · [Architecture, diagramme, types et gates](D20_SPELL_PIPELINE_V2.md) · [Fichiers](V2_FILES_CHANGED.md).
+
+**27 contrôles V2 réussis**, compatibilité V1 vérifiée (141 recettes / 705 paires), 172 assets historiques inchangés dans Git. Fixture séparée réellement exécutée : continuité, quatre contacts, vraie caméra et vrai lancer ; boucle 4,5 s refermée avec écart 0 m. Le banc de capture magenta est corrigé. [Résultats](../evidence/public/v2/results.json) · [Vidéo](../evidence/public/v2/fixture/motion-real-time.mp4).
+
+**Qualité artistique de la fixture refusée par la critique indépendante**, acceptation humaine absente. Les mesures GPU et d'overdraw sont inconnues.
+
+**D20 non installé et nouveau parcours Codex non exécuté** : Windows a annulé la première élévation opérateur. Une question demandant d'accepter la prochaine fenêtre UAC est en attente. L'ancien service D19, son Player et la bibliothèque restent conservés. Nouveau Player séparé dans `game/Build/WindowsBlueprintV2Playable`. Voir la reprise détaillée D20 pour le diagnostic isolé puis le déploiement 012 ; ne pas prétendre que le jeu ouvert utilise déjà V2.
+
+## Historique — D19 / Player 1.7.0 installé et ouvert
 
 **Backend et Player compilés, empaquetés et installés ; jeu rouvert le 24 septembre à 23:20:41 Paris**, PID **33920**. Quatre profils par partie sont exécutés dans le shader : plasma, force_field, toxic et spectral_flow. Ils portent des calculs TinyPlay MIT et Keijiro Unlicense, avec deux textures TinyPlay originales échantillonnées en RGB. B **2.6** reçoit leurs capacités dans les nouveaux dossiers de recherche ; les paquets les utilisant exigent le client 1.7.0. [Provenance](D19_SOURCED_SURFACES.md) · [Preuves](../evidence/public/backend/sourced-surfaces-d19.json) · [Installation](../evidence/public/backend/sourced-surfaces-d19-installation.json).
 

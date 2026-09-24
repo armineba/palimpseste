@@ -496,11 +496,19 @@ public sealed partial class JobRepository
         if (job.ParchmentId is null) throw new InvalidOperationException("authoring_cannot_publish_player_spell");
         await using var conn = await source.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
+        // Serialize V2 publication against SavePlanAsync: its latest accepted revision cannot change mid-publish.
+        if (job.VisualPipelineVersion == 5) await LockUnpublishedJobAsync(conn, tx, job, ct);
         await InsertArtifactAsync(conn, tx, job, artifact, "compiled_spell", ct);
         await using (var cmd = new NpgsqlCommand("""
             INSERT INTO spells(id,owner_id,parchment_id,job_id,payload_artifact_id,payload_sha256,rules_profile,catalog_version)
             SELECT $1,j.owner_id,j.parchment_id,j.id,$2,$3,'lab_v1','sp.capabilities/1.0'
             FROM jobs j WHERE j.id=$4 AND j.fence_token=$5 AND j.kind='production'
+              AND (j.visual_pipeline_version<>5 OR EXISTS (
+                SELECT 1 FROM spell_v2_passes v
+                JOIN spell_plans p ON p.job_id=v.job_id AND p.revision=v.revision AND p.plan_sha256=v.input_sha256
+                JOIN artifacts pa ON pa.id=p.plan_artifact_id AND pa.owner_id=j.owner_id AND pa.kind='plan' AND pa.sha256=p.plan_sha256
+                WHERE v.job_id=j.id AND v.pass='validation' AND v.accepted=true AND p.validation_errors IS NULL
+                  AND p.revision=(SELECT MAX(latest.revision) FROM spell_plans latest WHERE latest.job_id=j.id)))
             """, conn, tx))
         {
             cmd.Parameters.AddWithValue(spellId); cmd.Parameters.AddWithValue(artifact.Id);

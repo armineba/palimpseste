@@ -1,0 +1,959 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "sp.blueprint/2.0"
+    },
+    "intent": {
+      "type": "object",
+      "properties": {
+        "semantic_subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "primary_action": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "target_behavior": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "perceived_material": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "motion_character": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "silhouette_priority": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "visual_keywords": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "gameplay_role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "impact_intent": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "disappearance_intent": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "figurative": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "semantic_subject",
+        "primary_action",
+        "target_behavior",
+        "perceived_material",
+        "motion_character",
+        "silhouette_priority",
+        "visual_keywords",
+        "gameplay_role",
+        "impact_intent",
+        "disappearance_intent",
+        "figurative"
+      ],
+      "additionalProperties": false
+    },
+    "archetype": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "creature",
+          "projectile",
+          "beam",
+          "ribbon",
+          "orbital",
+          "area",
+          "explosion",
+          "summon",
+          "shield",
+          "portal",
+          "environmental",
+          "multi_projectile",
+          "abstract"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 4
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "hard_invariants": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "minItems": 3,
+          "maxItems": 16
+        },
+        "soft_invariants": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "free_parameters": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "emission",
+              "atmosphere_density",
+              "surface_flow",
+              "secondary_intensity"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 4
+        },
+        "topology": {
+          "const": "fixed"
+        },
+        "coordinate_system": {
+          "const": "local_cm_y_up_z_forward"
+        },
+        "element_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "forward_axis": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 1
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "palette_rgb": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "minItems": 1,
+          "maxItems": 6
+        },
+        "landmarks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 48
+              },
+              "branch_index": {
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 11
+              },
+              "t_milli": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              }
+            },
+            "required": [
+              "id",
+              "branch_index",
+              "t_milli"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 24
+        }
+      },
+      "required": [
+        "hard_invariants",
+        "soft_invariants",
+        "free_parameters",
+        "topology",
+        "coordinate_system",
+        "element_count",
+        "forward_axis",
+        "palette_rgb",
+        "landmarks"
+      ],
+      "additionalProperties": false
+    },
+    "structural_core": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "swept_tube",
+            "ribbon",
+            "beam",
+            "radial_volume",
+            "vortex_surface",
+            "planar_field",
+            "controlled_swarm",
+            "branched_surface"
+          ]
+        },
+        "selection_reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "size_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "control_points": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/v2_control_point"
+          },
+          "minItems": 2,
+          "maxItems": 32
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 48
+              },
+              "parent_index": {
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 10
+              },
+              "parent_t_milli": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "control_points": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/v2_control_point"
+                },
+                "minItems": 2,
+                "maxItems": 16
+              }
+            },
+            "required": [
+              "id",
+              "parent_index",
+              "parent_t_milli",
+              "control_points"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0,
+          "maxItems": 12
+        },
+        "longitudinal_segments": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 128
+        },
+        "radial_segments": {
+          "type": "integer",
+          "minimum": 6,
+          "maximum": 48
+        },
+        "entity_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "inner_radius_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 950
+        },
+        "color_rgb": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      },
+      "required": [
+        "kind",
+        "selection_reason",
+        "size_cm",
+        "control_points",
+        "branches",
+        "longitudinal_segments",
+        "radial_segments",
+        "entity_count",
+        "inner_radius_milli",
+        "color_rgb"
+      ],
+      "additionalProperties": false
+    },
+    "motion": {
+      "type": "object",
+      "properties": {
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 30000
+        },
+        "trajectory": {
+          "type": "string",
+          "enum": [
+            "stationary",
+            "straight",
+            "curve",
+            "ballistic",
+            "homing"
+          ]
+        },
+        "path_cm": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": -3000,
+              "maximum": 3000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "minItems": 2,
+          "maxItems": 32
+        },
+        "deformation": {
+          "type": "string",
+          "enum": [
+            "none",
+            "undulate",
+            "twist",
+            "pulse",
+            "expand",
+            "vortex",
+            "flutter"
+          ]
+        },
+        "amplitude_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
+        },
+        "frequency_mhz": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "angular_speed_mdeg_s": {
+          "type": "integer",
+          "minimum": -2880000,
+          "maximum": 2880000
+        },
+        "acceleration_cm_s2": {
+          "type": "integer",
+          "minimum": -4000,
+          "maximum": 4000
+        },
+        "anticipation_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
+        },
+        "follow_through_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "secondary_motion_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "impact_transition": {
+          "type": "string",
+          "enum": [
+            "stop",
+            "continue",
+            "deflect"
+          ]
+        },
+        "dissipation": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "dissolve",
+            "contract",
+            "disperse"
+          ]
+        }
+      },
+      "required": [
+        "duration_ms",
+        "trajectory",
+        "path_cm",
+        "deformation",
+        "amplitude_cm",
+        "frequency_mhz",
+        "angular_speed_mdeg_s",
+        "acceleration_cm_s2",
+        "anticipation_milli",
+        "follow_through_milli",
+        "secondary_motion_milli",
+        "impact_transition",
+        "dissipation"
+      ],
+      "additionalProperties": false
+    },
+    "phases": {
+      "type": "object",
+      "properties": {
+        "appearance_end_milli": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 450
+        },
+        "active_end_milli": {
+          "type": "integer",
+          "minimum": 451,
+          "maximum": 999
+        },
+        "active_loop": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "appearance_end_milli",
+        "active_end_milli",
+        "active_loop"
+      ],
+      "additionalProperties": false
+    },
+    "rendering_layers": {
+      "type": "object",
+      "properties": {
+        "core_surface": {
+          "type": "string",
+          "enum": [
+            "spectral",
+            "plasma",
+            "forcefield",
+            "toxic",
+            "unlit"
+          ]
+        },
+        "core_opacity_milli": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 1000
+        },
+        "core_emission_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6000
+        },
+        "secondary_kind": {
+          "type": "string",
+          "enum": [
+            "none",
+            "filaments",
+            "flow",
+            "pulse"
+          ]
+        },
+        "secondary_intensity_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "atmosphere_kind": {
+          "type": "string",
+          "enum": [
+            "none",
+            "sparks",
+            "smoke",
+            "motes",
+            "debris"
+          ]
+        },
+        "atmosphere_particles": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 512
+        },
+        "resource_id": {
+          "type": "string",
+          "enum": [
+            "kpp_circle_01",
+            "kpp_circle_03",
+            "kpp_fire_01",
+            "kpp_flame_01",
+            "kpp_magic_01",
+            "kpp_slash_01",
+            "kpp_smoke_01",
+            "kpp_spark_01",
+            "kpp_spark_05",
+            "kpp_star_01",
+            "kpp_trace_01",
+            "kpp_twirl_01",
+            "ksp_black_smoke_00",
+            "ksp_explosion_00",
+            "ksp_poison_puff_00",
+            "ksp_white_puff_00",
+            null
+          ]
+        }
+      },
+      "required": [
+        "core_surface",
+        "core_opacity_milli",
+        "core_emission_milli",
+        "secondary_kind",
+        "secondary_intensity_milli",
+        "atmosphere_kind",
+        "atmosphere_particles",
+        "resource_id"
+      ],
+      "additionalProperties": false
+    },
+    "physics": {
+      "type": "object",
+      "properties": {
+        "collider": {
+          "type": "string",
+          "enum": [
+            "sphere",
+            "capsule",
+            "box",
+            "plane"
+          ]
+        },
+        "collision_owner": {
+          "const": "root"
+        },
+        "collision_response": {
+          "type": "string",
+          "enum": [
+            "stop",
+            "pierce",
+            "bounce",
+            "overlap",
+            "block"
+          ]
+        },
+        "visual_response": {
+          "type": "string",
+          "enum": [
+            "impact",
+            "deform",
+            "dissolve",
+            "persist"
+          ]
+        },
+        "affected_components": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "core",
+              "secondary",
+              "atmosphere"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "lifetime_behavior": {
+          "type": "string",
+          "enum": [
+            "until_contact",
+            "until_duration",
+            "until_contact_or_duration"
+          ]
+        },
+        "rigidbody_count": {
+          "const": 0
+        },
+        "decorative_physics": {
+          "const": false
+        },
+        "independent_entities": {
+          "const": false
+        }
+      },
+      "required": [
+        "collider",
+        "collision_owner",
+        "collision_response",
+        "visual_response",
+        "affected_components",
+        "lifetime_behavior",
+        "rigidbody_count",
+        "decorative_physics",
+        "independent_entities"
+      ],
+      "additionalProperties": false
+    },
+    "impact": {
+      "type": "object",
+      "properties": {
+        "contact_pose": {
+          "type": "string",
+          "enum": [
+            "preserve",
+            "align_normal",
+            "flatten"
+          ]
+        },
+        "hit_flash_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "deformation": {
+          "type": "string",
+          "enum": [
+            "none",
+            "compress",
+            "ripple",
+            "expand"
+          ]
+        },
+        "reaction_duration_ms": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 3000
+        },
+        "secondary_emission": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        },
+        "dissipation_direction": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "forward",
+            "radial",
+            "upward"
+          ]
+        },
+        "surviving_core_duration_ms": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 3000
+        },
+        "destruction_mode": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "dissolve",
+            "contract",
+            "persist"
+          ]
+        }
+      },
+      "required": [
+        "contact_pose",
+        "hit_flash_milli",
+        "deformation",
+        "reaction_duration_ms",
+        "secondary_emission",
+        "dissipation_direction",
+        "surviving_core_duration_ms",
+        "destruction_mode"
+      ],
+      "additionalProperties": false
+    },
+    "disappearance": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "fade",
+            "dissolve",
+            "contract",
+            "disperse"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "longitudinal",
+            "radial",
+            "uniform",
+            "upward"
+          ]
+        },
+        "residual_duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        }
+      },
+      "required": [
+        "mode",
+        "direction",
+        "residual_duration_ms"
+      ],
+      "additionalProperties": false
+    },
+    "unity_implementation": {
+      "type": "object",
+      "properties": {
+        "root": {
+          "const": "Spell_ROOT"
+        },
+        "core_renderer": {
+          "const": "canonical_mesh"
+        },
+        "deformation_system": {
+          "const": "canonical_motion_v2"
+        },
+        "motion_controller": {
+          "const": "spell_runtime"
+        },
+        "collider_strategy": {
+          "const": "root_only"
+        },
+        "vfx_graph_systems": {
+          "const": 0
+        },
+        "particle_systems": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "shader": {
+          "const": "Palimpseste/CanonicalSpellV2"
+        },
+        "material_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "trails": {
+          "const": "none"
+        },
+        "audio_hook": {
+          "type": "string",
+          "enum": [
+            "carrier",
+            "none"
+          ]
+        },
+        "impact_system": {
+          "const": "canonical_impact_v2"
+        },
+        "lifetime_controller": {
+          "const": "spell_runtime"
+        }
+      },
+      "required": [
+        "root",
+        "core_renderer",
+        "deformation_system",
+        "motion_controller",
+        "collider_strategy",
+        "vfx_graph_systems",
+        "particle_systems",
+        "shader",
+        "material_count",
+        "trails",
+        "audio_hook",
+        "impact_system",
+        "lifetime_controller"
+      ],
+      "additionalProperties": false
+    },
+    "validation_rules": {
+      "type": "object",
+      "properties": {
+        "required_gates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "A_structure",
+              "B_continuity",
+              "C_rendering",
+              "D_impact",
+              "E_game_camera",
+              "F_motion",
+              "semantic_blind",
+              "performance"
+            ]
+          },
+          "minItems": 8,
+          "maxItems": 8
+        },
+        "blind_semantic_check": {
+          "const": true
+        },
+        "reject_visible_primitives": {
+          "const": true
+        },
+        "require_fixed_topology": {
+          "const": true
+        },
+        "maximum_vertices": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 131072
+        },
+        "maximum_particles": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 512
+        },
+        "maximum_draw_calls": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "maximum_materials": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "maximum_cpu_microseconds": {
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 20000
+        },
+        "maximum_gpu_microseconds": {
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 20000
+        },
+        "maximum_transparent_layers": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        }
+      },
+      "required": [
+        "required_gates",
+        "blind_semantic_check",
+        "reject_visible_primitives",
+        "require_fixed_topology",
+        "maximum_vertices",
+        "maximum_particles",
+        "maximum_draw_calls",
+        "maximum_materials",
+        "maximum_cpu_microseconds",
+        "maximum_gpu_microseconds",
+        "maximum_transparent_layers"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "intent",
+    "archetype",
+    "identity",
+    "structural_core",
+    "motion",
+    "phases",
+    "rendering_layers",
+    "physics",
+    "impact",
+    "disappearance",
+    "unity_implementation",
+    "validation_rules"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://palimpseste.invalid/contracts/spell-blueprint-v2.schema.json",
+  "$defs": {
+    "v2_control_point": {
+      "type": "object",
+      "properties": {
+        "position_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -2000,
+            "maximum": 2000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "radius_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "width_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "position_cm",
+        "radius_cm",
+        "width_cm"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

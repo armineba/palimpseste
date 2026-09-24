@@ -1,0 +1,3706 @@
+{
+  "schema_version": "sp.v2-validation/1.0",
+  "mode": "full",
+  "completed": true,
+  "spell_sha256": "733a2e5a496f592d39cca1c9ad0fdef15d1211a7cb3e3660694fea3ba461a443",
+  "blueprints_sha256": "48f0972929c7eb9b44b6ae8e1c129b2e47e8154a4777e1b99704785e8c25a14e",
+  "provider_calls": 0,
+  "user_library_touched": false,
+  "gameplay_executed": true,
+  "art_acceptance": "not_claimed",
+  "measured_fps": 68.402866536126965,
+  "measured_frames": 108,
+  "measurement_scope": "Explicit 512x512 URP GPU requests plus synchronous full-frame readback; excludes PNG encoding. Not gameplay FPS or isolated GPU duration",
+  "graphics_device": "NVIDIA GeForce RTX 3070",
+  "frames": [
+    {
+      "phase": "normal_sheet_0_0",
+      "file": "normal_sheet_0_0.png",
+      "sha256": "f60fe0490b530a135f5be23245d87e14e42785c90869d3231980f38f284ea3d9",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_0_1",
+      "file": "normal_sheet_0_1.png",
+      "sha256": "0862979e4f8d613efebf40459894c9fa203e0e8da59856c9e0154f158f6e1775",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_0_2",
+      "file": "normal_sheet_0_2.png",
+      "sha256": "be0cc11643c585409bbfbc22bdb4ef4758a1ef539b91e35835302504ddcebd97",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_0_3",
+      "file": "normal_sheet_0_3.png",
+      "sha256": "77961efffc5ebf406bbd23b069c4f7e3ac32ca0ec0a6cf9be44e93675bd0138e",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_0_4",
+      "file": "normal_sheet_0_4.png",
+      "sha256": "5d0f55c2a2c31ad72e9cfe59da18ff34ef443e08f65bbc0dc03b400a2651fa67",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_0_5",
+      "file": "normal_sheet_0_5.png",
+      "sha256": "f7378c610b49dec5af243caadd523e7c8f01b54746c69b2ed5286d954ab0582f",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_0_6",
+      "file": "normal_sheet_0_6.png",
+      "sha256": "eb0bbc36c0adf114f32013ad0e53865a1b5dc1d03bae18a10f170a259b03b15b",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_1_0",
+      "file": "normal_sheet_1_0.png",
+      "sha256": "eb0bbc36c0adf114f32013ad0e53865a1b5dc1d03bae18a10f170a259b03b15b",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_1_1",
+      "file": "normal_sheet_1_1.png",
+      "sha256": "3954e37abf649e1a95664fb512ed1b387bcd988b870de87bc69d4b24f3d0b168",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_1_2",
+      "file": "normal_sheet_1_2.png",
+      "sha256": "62ec5887ecad3382f1190ac2a4b692d52c3b0da52a437ad8d1fd2ad3407389f1",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_1_3",
+      "file": "normal_sheet_1_3.png",
+      "sha256": "7df196bc2fedc884b61520ee05f135f1260844cb7989dfe0ccc264a4327e34ed",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_1_4",
+      "file": "normal_sheet_1_4.png",
+      "sha256": "809b141d1fae8940dd43232aa1b40a7e2fb2bfdd8b43964fd42b9d45ae9e619c",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_1_5",
+      "file": "normal_sheet_1_5.png",
+      "sha256": "5bffea633460cd036fadc398c82962a5681db9ce0ce1476f0bce494c13822677",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_1_6",
+      "file": "normal_sheet_1_6.png",
+      "sha256": "daffd9b79425b938f5a3034cefe9aef79537c545f8daa43211358f40364319bc",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_2_0",
+      "file": "normal_sheet_2_0.png",
+      "sha256": "daffd9b79425b938f5a3034cefe9aef79537c545f8daa43211358f40364319bc",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_2_1",
+      "file": "normal_sheet_2_1.png",
+      "sha256": "d2e9a165c0e44df4a0bc1e3f4e9658cefa8abf9abcd535d2af0096827a63af51",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_2_2",
+      "file": "normal_sheet_2_2.png",
+      "sha256": "9bddd8f52aaeb452612216a4f0049585019c4367fdebb176d5223e07f48286e1",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_2_3",
+      "file": "normal_sheet_2_3.png",
+      "sha256": "721db0efd2769a178016aca1091b9e789ae94aa896c72c44a009e1e0a0a1c35c",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_2_4",
+      "file": "normal_sheet_2_4.png",
+      "sha256": "b55eb5f1e78ea53975b89bac1d83ccd5e62b626caadc09995e88db6c91cfc802",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_2_5",
+      "file": "normal_sheet_2_5.png",
+      "sha256": "5c3a924d396709475aeab72efea707af754195f9a1d62cadb9fd6867bf38171c",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet_2_6",
+      "file": "normal_sheet_2_6.png",
+      "sha256": "f60fe0490b530a135f5be23245d87e14e42785c90869d3231980f38f284ea3d9",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "normal_sheet",
+      "file": "normal_sheet.png",
+      "sha256": "813ff249b8f49b906ce10226dd2384feb87a8d7864481331892794ad99932907",
+      "width_px": 1536,
+      "height_px": 1152
+    },
+    {
+      "phase": "motion_000",
+      "file": "motion_000.png",
+      "sha256": "0a8a9c6be9a1524c290fdece179d458b0e5d51608a325e43be47ad03cd163ba0",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_001",
+      "file": "motion_001.png",
+      "sha256": "0e0dfa40e5bbe4936c459f8d39886bd271a69b77656daa1f35e50635837de54c",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_002",
+      "file": "motion_002.png",
+      "sha256": "25dda2cdf1e537cda87530f0ae13f2d89fa792168f981c4760f9edaf2099cf37",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_003",
+      "file": "motion_003.png",
+      "sha256": "9635aefd084af3b7777cb90476b3cae907dc3534b007d3e802103a664a568bd4",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_004",
+      "file": "motion_004.png",
+      "sha256": "e72a17e15930f1b200daee50607c538ac3fbd68b4be8d5dff4d651e1118a855f",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_005",
+      "file": "motion_005.png",
+      "sha256": "316bb30ac56517d64546634d1bdb2bff76cf025120b5830e2fd74428ba9c54d0",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_006",
+      "file": "motion_006.png",
+      "sha256": "ccc34ba6ca0f406501346ba6b0095097f936660fdf67dcc59a3463889bb6f5d4",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_007",
+      "file": "motion_007.png",
+      "sha256": "00f34420f272ab2c0a839868323f0e6c4b8ba31ab842921995306dccf73dd139",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_008",
+      "file": "motion_008.png",
+      "sha256": "ea4ac6e9b99fc622bc1765294b5d46761ac4901cd4e6bad55320f7398ff62338",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_009",
+      "file": "motion_009.png",
+      "sha256": "9665d6bd9eb062b3c0136eaa55be2b156da253f7ce6d264701097ca141e6d863",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_010",
+      "file": "motion_010.png",
+      "sha256": "b635582bdb12ad8750fd5446ba15f082503bf359d6d88a850431464909878bfa",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_011",
+      "file": "motion_011.png",
+      "sha256": "79c17b3db9a75bf0340c6c4a133eb36ffbc618c982e656246cbb9ce98c3b6625",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_012",
+      "file": "motion_012.png",
+      "sha256": "0cbfc4039b9a773bd8daf3acaab9dccf55fd85e3c62b3a28d49b90d1d481e19d",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_013",
+      "file": "motion_013.png",
+      "sha256": "98e8c7d8be18c745c156339ace5961f879f8bf916fe451c30e6b345bb003e0ba",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_014",
+      "file": "motion_014.png",
+      "sha256": "c6dd9563858192107fed55013aeaf80b69feaf1b8fe5cf58f8efca674dfeb8ab",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_015",
+      "file": "motion_015.png",
+      "sha256": "fe84b9346eb24553b0947646ffcd2181c4854cf2b1aa32fb7a567e0dc79c2f85",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_016",
+      "file": "motion_016.png",
+      "sha256": "6d02755c80a9ed3556f8da9a406e1721f1483a4aa94e0f0b64b3f88c10bc4f29",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_017",
+      "file": "motion_017.png",
+      "sha256": "16cfba8d6d06333961e57bf0f9616c0a06c7a23b1b5eba547b5f99a46468d67a",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_018",
+      "file": "motion_018.png",
+      "sha256": "b4555c61183bfee38a36a1ea3fa8f00adec4fde0254e042cef15293855fb8ec4",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_019",
+      "file": "motion_019.png",
+      "sha256": "e8c60dc8ef2599163faea460a2fbf5b170d3980b85bdb24ded6df4889087fc90",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_020",
+      "file": "motion_020.png",
+      "sha256": "becb65d1d206e517f3b89b3642a05ce7fe3b153c05a23987c4005687f231277d",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_021",
+      "file": "motion_021.png",
+      "sha256": "734a5d72c4807117c73da6e4fe542e899954f013fe27ae43db4a0123a02d2a5e",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_022",
+      "file": "motion_022.png",
+      "sha256": "650301249f4c6728711c959634b5097a6ba946bbb38f58534bb3541da475c235",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_023",
+      "file": "motion_023.png",
+      "sha256": "dbf93b3cf5455b6da81c7f9d8eaabb3fb8dfd36268574cf3b51644c2d69987a1",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_024",
+      "file": "motion_024.png",
+      "sha256": "b73e146130c67f974b60ed53254c70ab5e4acbe4514b956b3bb691acee6a96b1",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_025",
+      "file": "motion_025.png",
+      "sha256": "bc3e8ecb01c6222dc18c2c8682ad04efccf8f841841c81e61b82abf4c0cdac86",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_026",
+      "file": "motion_026.png",
+      "sha256": "ae68270d97a6897d9785427a46e94986bcc2bb64683f0cdf08e592894e96b8f0",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_027",
+      "file": "motion_027.png",
+      "sha256": "dd74ddf46e98b01a8e66d98c763f0a035b1b6009e827dabf97822f5d81c828c5",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_028",
+      "file": "motion_028.png",
+      "sha256": "bf56b076431d41f9e6d3e81d02925c09037302690ef9a7536c9fc9c317e94a2e",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_029",
+      "file": "motion_029.png",
+      "sha256": "99c2be8a2aa549d2727e2ad9d9d3155ffb4d16f2944909639f9eb1765ab20861",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_030",
+      "file": "motion_030.png",
+      "sha256": "999bf2c0f99da9110b3af74762cbb7748bb51e8cdad076e910d5f2f87416fc27",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_031",
+      "file": "motion_031.png",
+      "sha256": "9dc5f8deaebcb62122ed53a02fb0062da1fb059b2b40e256597f426c41dd20f6",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_032",
+      "file": "motion_032.png",
+      "sha256": "34c60ddc9243afd2169a9517c2662bc511ebc70a9b40d7ac7ab5df596bfe1bbd",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_033",
+      "file": "motion_033.png",
+      "sha256": "e694e8c1edcc887ac7650197bedbf625d3ce93ba3e76c12192d20d8a72fd6c1b",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_034",
+      "file": "motion_034.png",
+      "sha256": "19bd1f240340af2fbe94934339a2422c235e28663a659c5b4795a9f7a78cefde",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_035",
+      "file": "motion_035.png",
+      "sha256": "ed8d5609ba600f9958814a3e5cf2fa434352087d026c689868fe8f99ef2d00c7",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_036",
+      "file": "motion_036.png",
+      "sha256": "060ff4aaacc15ab8d5d379abc3a8b69508a063d575afbb0c98d015aa83f6f2f0",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_037",
+      "file": "motion_037.png",
+      "sha256": "06dc1b60fd2954051c74b3669b2639096956e1b93e64df1062e47f86725a2d4d",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_038",
+      "file": "motion_038.png",
+      "sha256": "90de82b98d5b3a63e66379ca14d6902c31f4ab2613104a386902e146c2b4849f",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_039",
+      "file": "motion_039.png",
+      "sha256": "f103603283e1448625712e6473f1e1933ee9d14f25109e2e5fa6ca66a2543bdb",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_040",
+      "file": "motion_040.png",
+      "sha256": "2e63adc288897df585d4b73adf9c2422b53ed19e3c28cd5eb4c03724ff5e90b2",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_041",
+      "file": "motion_041.png",
+      "sha256": "73d8dd57e07553e0d0f73fd295924ffd104438a4e20e7779e6f612bafd775220",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_042",
+      "file": "motion_042.png",
+      "sha256": "799960d6b83cdc8142abbb58f4d63ff2ffe0aae2e0f2fe460435f56559ee58af",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_043",
+      "file": "motion_043.png",
+      "sha256": "9afdb95733ed3973e6c0c63715654ea0a44cbada2bf5239c8e1ff54ccfb551e0",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_044",
+      "file": "motion_044.png",
+      "sha256": "503bd6096fc7d315c41db3a0fbf0504eccd1a8b1b8110e17400c45751b84e7f3",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_045",
+      "file": "motion_045.png",
+      "sha256": "54b83be30384ed6f148fd72b6a8c473e71092c5bd8c21e58adb37eea759ae513",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_046",
+      "file": "motion_046.png",
+      "sha256": "7d75a3ea845ce397c3c5cf765692afba8c2165e378417c281f1d22ea1210411b",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_047",
+      "file": "motion_047.png",
+      "sha256": "9073fb4f732fc1bca945955e92f29b07720d37d72263cd7097f0a9304208c73e",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_048",
+      "file": "motion_048.png",
+      "sha256": "78b64995bd58758b5208da2d94b1d3a149ff1d6a17e20e86e6d00b50bf5c6915",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_049",
+      "file": "motion_049.png",
+      "sha256": "f32e2b47c9c67badde41cccd8796f95236f4695d656b04665efba8cb1bb82ccc",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_050",
+      "file": "motion_050.png",
+      "sha256": "946af5debb6805378b9248f6852c3662e764c42582fab0ee0d513a4d42c170a1",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_051",
+      "file": "motion_051.png",
+      "sha256": "94427bf4a0e77f171bf36d4cd2222540d8fb53afab82d39f624d9f0c7032e519",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_052",
+      "file": "motion_052.png",
+      "sha256": "119cf516c0333f503702be31c6f6ef74881b7e4355bb09b8bf0d2ab51407ece0",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_053",
+      "file": "motion_053.png",
+      "sha256": "68485bb5980ad88b982bab36e8a8702641c57fc56397652aaa8e525fd160c717",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_054",
+      "file": "motion_054.png",
+      "sha256": "4d6d7307be7785aee6946b6696a1b4e3962c8e5f3fe8843290004e53ab5cd822",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_055",
+      "file": "motion_055.png",
+      "sha256": "4949c0d33c78eb20a0f0aaaf62d0d9fee072a0e16cb3b35e71c1efef6e898b14",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_056",
+      "file": "motion_056.png",
+      "sha256": "e90c24fe272e9560e3ca20b4ce54da7f3bc2d1a223cb18d5b8378ef88224bbe0",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_057",
+      "file": "motion_057.png",
+      "sha256": "ecc9510fc7200b2b7a3c61915035eca93fc29d1767d5f1939266ce90528bfe74",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_058",
+      "file": "motion_058.png",
+      "sha256": "8eb11830b34d127995ed6625537c20ee4ac7c992cf383161519bd30fbb373af3",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_059",
+      "file": "motion_059.png",
+      "sha256": "f0f16bfed7a30e7d14d6d5f5b1019f0283d586f6a9ebcabad3422c7c3e886b5f",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_060",
+      "file": "motion_060.png",
+      "sha256": "22920426549f48cad08a7c1b0a3d1022bdf208615bebab083a7621f57464a174",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_061",
+      "file": "motion_061.png",
+      "sha256": "1a419563cf13307adc98487dfba2753f8eb6d0f446916246c77a256b9fa6f93d",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_062",
+      "file": "motion_062.png",
+      "sha256": "52a750b95b2ebc035ecafb4e70b6aea0a288d15c4c91d3f12adef2ec8eee617c",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_063",
+      "file": "motion_063.png",
+      "sha256": "73bfe478dbc19304e8afffb44925089174c20925884f38bb5b500d63c778bc0c",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_064",
+      "file": "motion_064.png",
+      "sha256": "65ddf21b3db583a05153d377ec03f82321cc5a23766592bc4bfd9f0d18087835",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_065",
+      "file": "motion_065.png",
+      "sha256": "8c0cdb8771c125b6a7caea749d398b59c5861764e1e496560a67ae2c444fe681",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_066",
+      "file": "motion_066.png",
+      "sha256": "ba2f3b796a66d0a60a86ba25d07fc69c09bd04421b5342292e75616de904c004",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_067",
+      "file": "motion_067.png",
+      "sha256": "822f0d9b4664851d684875230632a2d33353bc45c71d610acb37dc9d9c7f350c",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_068",
+      "file": "motion_068.png",
+      "sha256": "fa489824b57d0102a14091125b67b279abfe46ef84aa4ee2b1c2d731ea6a14d3",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_069",
+      "file": "motion_069.png",
+      "sha256": "1953036bf547bef614b3af2f3698e5f41b1aea91a04f8cd5cf0d2664c126218b",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_070",
+      "file": "motion_070.png",
+      "sha256": "08d37697c46290f3fb5dee6ef076874c00d2b9e5cdb91023091f057b79337426",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_071",
+      "file": "motion_071.png",
+      "sha256": "31e836e703084c5e8c7cb3e92d3b5ef1f18f37c4a410825069ef70f82e83263d",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_072",
+      "file": "motion_072.png",
+      "sha256": "bc803714ef9348cf74805e752a2b3264e64171b65346c182af9fa1d7c318f477",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_073",
+      "file": "motion_073.png",
+      "sha256": "b9be2d9db7e6f44a804ac3cca9f86018a7d56ac411f54f2df4427da0b3ffec41",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_074",
+      "file": "motion_074.png",
+      "sha256": "aa9e925190ad43377caced78035350ee852078417f42c23ff131c404ca0c1c58",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_075",
+      "file": "motion_075.png",
+      "sha256": "f4f03380f76bc973cdab129fe0815607a55932cf04b3463846ac4ac7e2a94188",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_076",
+      "file": "motion_076.png",
+      "sha256": "73513839ba3ee23407931abdc766d11fea4483db1f614d2600b90d821ab0f623",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_077",
+      "file": "motion_077.png",
+      "sha256": "4d9a59629126160b26ed06d586c97dbabf8093d2a98507caf643b6516830dfb9",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_078",
+      "file": "motion_078.png",
+      "sha256": "e1c6753f551ebd592d42e90d548615a4bc89e589ed74d1441f3d51e21b950262",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_079",
+      "file": "motion_079.png",
+      "sha256": "597902584c6572e8e7485c709e97a39743feb90f19037731f5f1261a1ffc5870",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_080",
+      "file": "motion_080.png",
+      "sha256": "1778c3d39c6aeac8a098519cc617d59ef6e21c72f6ea61b8ea8e72beb673c080",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_081",
+      "file": "motion_081.png",
+      "sha256": "c476fd8e540768831710a8161ea6b23de7af3738c97f3b388c8ba7125feb3988",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "motion_sheet",
+      "file": "motion_sheet.png",
+      "sha256": "fe3f381dc368902764da72f21649020e24231e99a94de973197460895a58cc7e",
+      "width_px": 1536,
+      "height_px": 1152
+    },
+    {
+      "phase": "impact_ground",
+      "file": "impact_ground.png",
+      "sha256": "72aa3ab96cf6c858a3b6e71bf18c0897ed5482483cf93711fe9935eae94a17a8",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "impact_wall",
+      "file": "impact_wall.png",
+      "sha256": "52eedb01616666a20ff29ac7b3cbde2c83d13b05f7224951b3ebd5d051117022",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "impact_target",
+      "file": "impact_target.png",
+      "sha256": "b2dd3517cd18997a6adf499d154f0fbc36d5bd9f4095020c24be8c7f1f09398b",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "impact_oblique",
+      "file": "impact_oblique.png",
+      "sha256": "fe04ab6d8377192166b3ee9facf4d8e2fd4e42009827082db9254ee5c11bf900",
+      "width_px": 512,
+      "height_px": 512
+    },
+    {
+      "phase": "impact_sheet",
+      "file": "impact_sheet.png",
+      "sha256": "a07c81235204774d95200b7cbe5f6da8fe99bf5591e052f44597c99447611762",
+      "width_px": 1024,
+      "height_px": 1024
+    },
+    {
+      "phase": "game_camera",
+      "file": "game_camera.png",
+      "sha256": "dd59ad06f789820ddc3c50293d6313e3efb5eea79abeaf98e2eb0d4a26567aa4",
+      "width_px": 512,
+      "height_px": 512
+    }
+  ],
+  "phase_samples": [
+    {
+      "phase": "apparition",
+      "index": 0,
+      "normalized_milli": 0,
+      "composition_seconds": 0.0,
+      "file": "normal_sheet_0_0.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.0,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 1,
+      "normalized_milli": 17,
+      "composition_seconds": 0.1,
+      "file": "normal_sheet_0_1.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.0166666657,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 2,
+      "normalized_milli": 33,
+      "composition_seconds": 0.2,
+      "file": "normal_sheet_0_2.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.03333333,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 3,
+      "normalized_milli": 50,
+      "composition_seconds": 0.3,
+      "file": "normal_sheet_0_3.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.049999997,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 4,
+      "normalized_milli": 67,
+      "composition_seconds": 0.4,
+      "file": "normal_sheet_0_4.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.06666666,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 5,
+      "normalized_milli": 83,
+      "composition_seconds": 0.5,
+      "file": "normal_sheet_0_5.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.08333333,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "apparition",
+      "index": 6,
+      "normalized_milli": 100,
+      "composition_seconds": 0.6,
+      "file": "normal_sheet_0_6.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.099999994,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 0,
+      "normalized_milli": 100,
+      "composition_seconds": 0.6,
+      "file": "normal_sheet_1_0.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.099999994,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 1,
+      "normalized_milli": 225,
+      "composition_seconds": 1.35,
+      "file": "normal_sheet_1_1.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.224999979,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 2,
+      "normalized_milli": 350,
+      "composition_seconds": 2.1,
+      "file": "normal_sheet_1_2.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.349999964,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 3,
+      "normalized_milli": 475,
+      "composition_seconds": 2.85,
+      "file": "normal_sheet_1_3.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.474999934,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 4,
+      "normalized_milli": 600,
+      "composition_seconds": 3.59999967,
+      "file": "normal_sheet_1_4.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.5999999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 5,
+      "normalized_milli": 725,
+      "composition_seconds": 4.35,
+      "file": "normal_sheet_1_5.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.7249999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "stable",
+      "index": 6,
+      "normalized_milli": 850,
+      "composition_seconds": 5.1,
+      "file": "normal_sheet_1_6.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.8499999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 0,
+      "normalized_milli": 850,
+      "composition_seconds": 5.1,
+      "file": "normal_sheet_2_0.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.8499999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 1,
+      "normalized_milli": 875,
+      "composition_seconds": 5.25,
+      "file": "normal_sheet_2_1.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.87499994,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 2,
+      "normalized_milli": 900,
+      "composition_seconds": 5.4,
+      "file": "normal_sheet_2_2.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.8999999,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 3,
+      "normalized_milli": 925,
+      "composition_seconds": 5.55,
+      "file": "normal_sheet_2_3.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.924999952,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 4,
+      "normalized_milli": 950,
+      "composition_seconds": 5.70000029,
+      "file": "normal_sheet_2_4.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.95,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 5,
+      "normalized_milli": 975,
+      "composition_seconds": 5.85000038,
+      "file": "normal_sheet_2_5.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 0.974999964,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    },
+    {
+      "phase": "disparition",
+      "index": 6,
+      "normalized_milli": 1000,
+      "composition_seconds": 6.00000048,
+      "file": "normal_sheet_2_6.png",
+      "nodes": [
+        {
+          "node_id": "p0",
+          "local_normalized_time": 1.0,
+          "exists": true,
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ]
+    }
+  ],
+  "topology_samples": [
+    {
+      "normalized_milli": 0,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 8,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0226251185,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 17,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0621925,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 25,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0942134857,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 33,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.11849606,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 42,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.134847164,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 50,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.143096626,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 58,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.143117666,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 67,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.134845614,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 75,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.1182847,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 83,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0935124159,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 92,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0606749058,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 100,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.01997161,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 108,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0032607317,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 117,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003813982,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 125,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004232168,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 133,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00450027,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 142,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004609108,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 150,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00455451,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 158,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0043387413,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 167,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0039690733,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 175,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00345897675,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 183,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00282645226,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 192,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00209343433,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 200,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00128674507,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 208,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0004339218,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 217,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0004339218,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 225,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00128674507,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 233,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00209343433,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 242,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00282645226,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 250,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00345897675,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 258,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0039690733,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 267,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0043387413,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 275,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00455451,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 283,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004609108,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 292,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004500389,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 300,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004232049,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 308,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003813982,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 317,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0032607317,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 325,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00259184837,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 333,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00183153152,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 342,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.001005888,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 350,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.000144839287,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 358,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0007213354,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 367,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00156211853,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 375,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00234746933,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 383,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00304937363,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 392,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003643632,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 400,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004108906,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 408,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00442826748,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 417,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00459074974,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 425,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004590988,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 433,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00442814827,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 442,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00410866737,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 450,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00364375114,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 458,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00304949284,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 467,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00234746933,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 475,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00156199932,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 483,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0007214546,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 492,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0001449585,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 500,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.001005888,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 508,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00183141232,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 517,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00259208679,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 525,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00326061249,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 533,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003813982,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 542,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00423193,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 550,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004500389,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 558,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00460898876,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 567,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00455451,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 575,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0043387413,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 583,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0039691925,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 592,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003459096,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 600,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00282621384,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 608,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00209355354,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 617,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00128650665,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 625,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.000434041023,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 633,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.000434041023,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 642,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00128650665,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 650,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00209355354,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 658,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00282645226,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 667,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00345885754,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 675,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0039691925,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 683,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0043387413,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 692,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00455451,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 700,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004609108,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 708,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00450027,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 717,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004232168,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 725,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0038138628,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 733,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003260851,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 742,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00259184837,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 750,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00183141232,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 758,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.001005888,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 767,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0001449585,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 775,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0007214546,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 783,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00156211853,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 792,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.002347231,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 800,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003049612,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 808,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003643632,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 817,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00410866737,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 825,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00442814827,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 833,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004590988,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 842,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004590988,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 850,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004428029,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 858,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004108906,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 867,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003643632,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 875,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003049612,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 883,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00234735012,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 892,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00156211853,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 900,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0007213354,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 908,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.000144839287,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 917,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.001005888,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 925,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00183153152,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 933,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00259184837,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 942,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0032607317,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 950,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.003813982,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 958,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004232168,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 967,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00450027,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 975,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.004609108,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 983,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.00455451,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 992,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0043387413,
+      "displacement_bounded": true
+    },
+    {
+      "normalized_milli": 1000,
+      "node": "p0",
+      "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+      "vertices": 2147,
+      "finite": true,
+      "topology_stable": true,
+      "maximum_vertex_displacement_m": 0.0039690733,
+      "displacement_bounded": true
+    }
+  ],
+  "impact_scenarios": [
+    {
+      "scenario": "ground",
+      "cast": true,
+      "contact_count": 1,
+      "ticks": 14,
+      "contact_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "contact_position": [
+        0.0,
+        0.099999994,
+        -0.5
+      ],
+      "expected_response": "root_contact",
+      "test_apparatus": "Original compiled spell unchanged",
+      "expected_response_observed": true,
+      "gameplay_hits": 0,
+      "root_physics_only": true,
+      "core_topology_preserved": true,
+      "spawned_visuals": 1,
+      "simulated_physics": "RuntimeEngine.Tick (20 ms) paced by real wall clock; real Unity SphereCast/Raycast/Overlap against scenario colliders; no force on visual children",
+      "visual_review": "required"
+    },
+    {
+      "scenario": "wall",
+      "cast": true,
+      "contact_count": 1,
+      "ticks": 9,
+      "contact_normal": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "contact_position": [
+        0.0,
+        1.0,
+        -0.099999994
+      ],
+      "expected_response": "root_contact",
+      "test_apparatus": "Original compiled spell unchanged",
+      "expected_response_observed": true,
+      "gameplay_hits": 0,
+      "root_physics_only": true,
+      "core_topology_preserved": true,
+      "spawned_visuals": 1,
+      "simulated_physics": "RuntimeEngine.Tick (20 ms) paced by real wall clock; real Unity SphereCast/Raycast/Overlap against scenario colliders; no force on visual children",
+      "visual_review": "required"
+    },
+    {
+      "scenario": "target",
+      "cast": true,
+      "contact_count": 1,
+      "ticks": 7,
+      "contact_normal": [
+        7.89492E-15,
+        0.0,
+        -1.0
+      ],
+      "contact_position": [
+        -3.157968E-15,
+        1.0,
+        -0.5
+      ],
+      "expected_response": "root_contact",
+      "test_apparatus": "Original compiled spell unchanged",
+      "expected_response_observed": true,
+      "gameplay_hits": 1,
+      "root_physics_only": true,
+      "core_topology_preserved": true,
+      "spawned_visuals": 1,
+      "simulated_physics": "RuntimeEngine.Tick (20 ms) paced by real wall clock; real Unity SphereCast/Raycast/Overlap against scenario colliders; no force on visual children",
+      "visual_review": "required"
+    },
+    {
+      "scenario": "oblique",
+      "cast": true,
+      "contact_count": 1,
+      "ticks": 8,
+      "contact_normal": [
+        -0.5735764,
+        0.0,
+        -0.819152
+      ],
+      "contact_position": [
+        0.229430556,
+        1.0,
+        -0.2827264
+      ],
+      "expected_response": "root_contact",
+      "test_apparatus": "Original compiled spell unchanged",
+      "expected_response_observed": true,
+      "gameplay_hits": 0,
+      "root_physics_only": true,
+      "core_topology_preserved": true,
+      "spawned_visuals": 1,
+      "simulated_physics": "RuntimeEngine.Tick (20 ms) paced by real wall clock; real Unity SphereCast/Raycast/Overlap against scenario colliders; no force on visual children",
+      "visual_review": "required"
+    }
+  ],
+  "realtime_samples": [
+    {
+      "index": 0,
+      "elapsed_seconds": 0.0015378,
+      "normalized_time": 0.000232999984,
+      "runtime_ticks": 1,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            -3.99999976
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_000.png"
+    },
+    {
+      "index": 1,
+      "elapsed_seconds": 0.13485439999999999,
+      "normalized_time": 0.0204324834,
+      "runtime_ticks": 7,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            -2.79999948
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_001.png"
+    },
+    {
+      "index": 2,
+      "elapsed_seconds": 0.2220741,
+      "normalized_time": 0.03364759,
+      "runtime_ticks": 12,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            -1.79999924
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_002.png"
+    },
+    {
+      "index": 3,
+      "elapsed_seconds": 0.31016309999999997,
+      "normalized_time": 0.0469944067,
+      "runtime_ticks": 16,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            -0.9999991
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_003.png"
+    },
+    {
+      "index": 4,
+      "elapsed_seconds": 0.3835325,
+      "normalized_time": 0.0581109822,
+      "runtime_ticks": 20,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            -0.199999154
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_004.png"
+    },
+    {
+      "index": 5,
+      "elapsed_seconds": 0.47063829999999995,
+      "normalized_time": 0.07130883,
+      "runtime_ticks": 24,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            0.6000008
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_005.png"
+    },
+    {
+      "index": 6,
+      "elapsed_seconds": 0.5570894,
+      "normalized_time": 0.08440748,
+      "runtime_ticks": 28,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            1.40000081
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_006.png"
+    },
+    {
+      "index": 7,
+      "elapsed_seconds": 0.64553569999999993,
+      "normalized_time": 0.0978084356,
+      "runtime_ticks": 33,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            2.400001
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_007.png"
+    },
+    {
+      "index": 8,
+      "elapsed_seconds": 0.73293679999999994,
+      "normalized_time": 0.111051023,
+      "runtime_ticks": 37,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            3.20000124
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_008.png"
+    },
+    {
+      "index": 9,
+      "elapsed_seconds": 0.82059739999999992,
+      "normalized_time": 0.124332935,
+      "runtime_ticks": 42,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            4.20000124
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_009.png"
+    },
+    {
+      "index": 10,
+      "elapsed_seconds": 0.9070283,
+      "normalized_time": 0.137428522,
+      "runtime_ticks": 46,
+      "active_carriers": 1,
+      "hits": 0,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            0.0,
+            1.1,
+            5.00000048
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_010.png"
+    },
+    {
+      "index": 11,
+      "elapsed_seconds": 0.9831496,
+      "normalized_time": 0.148962051,
+      "runtime_ticks": 50,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_011.png"
+    },
+    {
+      "index": 12,
+      "elapsed_seconds": 1.0701817,
+      "normalized_time": 0.162148729,
+      "runtime_ticks": 54,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_012.png"
+    },
+    {
+      "index": 13,
+      "elapsed_seconds": 1.1577294999999999,
+      "normalized_time": 0.175413549,
+      "runtime_ticks": 58,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_013.png"
+    },
+    {
+      "index": 14,
+      "elapsed_seconds": 1.244929,
+      "normalized_time": 0.188625589,
+      "runtime_ticks": 63,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_014.png"
+    },
+    {
+      "index": 15,
+      "elapsed_seconds": 1.3321185,
+      "normalized_time": 0.201836124,
+      "runtime_ticks": 67,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_015.png"
+    },
+    {
+      "index": 16,
+      "elapsed_seconds": 1.4190702,
+      "normalized_time": 0.215010628,
+      "runtime_ticks": 71,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_016.png"
+    },
+    {
+      "index": 17,
+      "elapsed_seconds": 1.5065321,
+      "normalized_time": 0.228262424,
+      "runtime_ticks": 76,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_017.png"
+    },
+    {
+      "index": 18,
+      "elapsed_seconds": 1.5935721999999999,
+      "normalized_time": 0.241450325,
+      "runtime_ticks": 80,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_018.png"
+    },
+    {
+      "index": 19,
+      "elapsed_seconds": 1.6819035,
+      "normalized_time": 0.254833847,
+      "runtime_ticks": 85,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_019.png"
+    },
+    {
+      "index": 20,
+      "elapsed_seconds": 1.7698973,
+      "normalized_time": 0.268166244,
+      "runtime_ticks": 89,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_020.png"
+    },
+    {
+      "index": 21,
+      "elapsed_seconds": 1.8596641999999999,
+      "normalized_time": 0.281767279,
+      "runtime_ticks": 93,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_021.png"
+    },
+    {
+      "index": 22,
+      "elapsed_seconds": 1.9474209999999998,
+      "normalized_time": 0.295063764,
+      "runtime_ticks": 98,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_022.png"
+    },
+    {
+      "index": 23,
+      "elapsed_seconds": 2.0357613999999997,
+      "normalized_time": 0.308448672,
+      "runtime_ticks": 102,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [
+        {
+          "node_id": "p0",
+          "world_position": [
+            -5.298195E-09,
+            1.1,
+            5.5
+          ],
+          "topology": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1"
+        }
+      ],
+      "file": "motion_023.png"
+    },
+    {
+      "index": 24,
+      "elapsed_seconds": 2.1248758999999997,
+      "normalized_time": 0.321950883,
+      "runtime_ticks": 107,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_024.png"
+    },
+    {
+      "index": 25,
+      "elapsed_seconds": 2.2141002,
+      "normalized_time": 0.335469723,
+      "runtime_ticks": 111,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_025.png"
+    },
+    {
+      "index": 26,
+      "elapsed_seconds": 2.3018369,
+      "normalized_time": 0.348763138,
+      "runtime_ticks": 116,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_026.png"
+    },
+    {
+      "index": 27,
+      "elapsed_seconds": 2.3916912,
+      "normalized_time": 0.362377435,
+      "runtime_ticks": 120,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_027.png"
+    },
+    {
+      "index": 28,
+      "elapsed_seconds": 2.4797927,
+      "normalized_time": 0.375726134,
+      "runtime_ticks": 124,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_028.png"
+    },
+    {
+      "index": 29,
+      "elapsed_seconds": 2.5678034999999997,
+      "normalized_time": 0.389061123,
+      "runtime_ticks": 129,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_029.png"
+    },
+    {
+      "index": 30,
+      "elapsed_seconds": 2.6426662999999997,
+      "normalized_time": 0.400403976,
+      "runtime_ticks": 133,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_030.png"
+    },
+    {
+      "index": 31,
+      "elapsed_seconds": 2.7315498,
+      "normalized_time": 0.413871169,
+      "runtime_ticks": 137,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_031.png"
+    },
+    {
+      "index": 32,
+      "elapsed_seconds": 2.8192074,
+      "normalized_time": 0.4271526,
+      "runtime_ticks": 141,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_032.png"
+    },
+    {
+      "index": 33,
+      "elapsed_seconds": 2.8926724,
+      "normalized_time": 0.438283682,
+      "runtime_ticks": 145,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_033.png"
+    },
+    {
+      "index": 34,
+      "elapsed_seconds": 2.9812881,
+      "normalized_time": 0.451710284,
+      "runtime_ticks": 150,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_034.png"
+    },
+    {
+      "index": 35,
+      "elapsed_seconds": 3.0696393,
+      "normalized_time": 0.465096831,
+      "runtime_ticks": 154,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_035.png"
+    },
+    {
+      "index": 36,
+      "elapsed_seconds": 3.1592710999999998,
+      "normalized_time": 0.478677422,
+      "runtime_ticks": 158,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_036.png"
+    },
+    {
+      "index": 37,
+      "elapsed_seconds": 3.2479147,
+      "normalized_time": 0.492108256,
+      "runtime_ticks": 163,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_037.png"
+    },
+    {
+      "index": 38,
+      "elapsed_seconds": 3.337685,
+      "normalized_time": 0.5057098,
+      "runtime_ticks": 167,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_038.png"
+    },
+    {
+      "index": 39,
+      "elapsed_seconds": 3.4150201,
+      "normalized_time": 0.517427266,
+      "runtime_ticks": 171,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_039.png"
+    },
+    {
+      "index": 40,
+      "elapsed_seconds": 3.5037387,
+      "normalized_time": 0.5308695,
+      "runtime_ticks": 176,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_040.png"
+    },
+    {
+      "index": 41,
+      "elapsed_seconds": 3.5845811999999997,
+      "normalized_time": 0.543118358,
+      "runtime_ticks": 180,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_041.png"
+    },
+    {
+      "index": 42,
+      "elapsed_seconds": 3.6623078999999996,
+      "normalized_time": 0.5548951,
+      "runtime_ticks": 184,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_042.png"
+    },
+    {
+      "index": 43,
+      "elapsed_seconds": 3.7395012,
+      "normalized_time": 0.5665911,
+      "runtime_ticks": 187,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_043.png"
+    },
+    {
+      "index": 44,
+      "elapsed_seconds": 3.8286236999999996,
+      "normalized_time": 0.580094457,
+      "runtime_ticks": 192,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_044.png"
+    },
+    {
+      "index": 45,
+      "elapsed_seconds": 3.9030791999999996,
+      "normalized_time": 0.5913756,
+      "runtime_ticks": 196,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_045.png"
+    },
+    {
+      "index": 46,
+      "elapsed_seconds": 3.9775134999999997,
+      "normalized_time": 0.6026535,
+      "runtime_ticks": 199,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_046.png"
+    },
+    {
+      "index": 47,
+      "elapsed_seconds": 4.0534463,
+      "normalized_time": 0.6141585,
+      "runtime_ticks": 203,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_047.png"
+    },
+    {
+      "index": 48,
+      "elapsed_seconds": 4.1315506,
+      "normalized_time": 0.6259925,
+      "runtime_ticks": 207,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_048.png"
+    },
+    {
+      "index": 49,
+      "elapsed_seconds": 4.220698,
+      "normalized_time": 0.639499664,
+      "runtime_ticks": 212,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_049.png"
+    },
+    {
+      "index": 50,
+      "elapsed_seconds": 4.2945383999999995,
+      "normalized_time": 0.6506876,
+      "runtime_ticks": 215,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_050.png"
+    },
+    {
+      "index": 51,
+      "elapsed_seconds": 4.3704070999999995,
+      "normalized_time": 0.662182868,
+      "runtime_ticks": 219,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_051.png"
+    },
+    {
+      "index": 52,
+      "elapsed_seconds": 4.4445602,
+      "normalized_time": 0.673418164,
+      "runtime_ticks": 223,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_052.png"
+    },
+    {
+      "index": 53,
+      "elapsed_seconds": 4.5204207,
+      "normalized_time": 0.6849122,
+      "runtime_ticks": 227,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_053.png"
+    },
+    {
+      "index": 54,
+      "elapsed_seconds": 4.5949811999999994,
+      "normalized_time": 0.696209252,
+      "runtime_ticks": 230,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_054.png"
+    },
+    {
+      "index": 55,
+      "elapsed_seconds": 4.6695136,
+      "normalized_time": 0.707502,
+      "runtime_ticks": 234,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_055.png"
+    },
+    {
+      "index": 56,
+      "elapsed_seconds": 4.7440495,
+      "normalized_time": 0.718795359,
+      "runtime_ticks": 238,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_056.png"
+    },
+    {
+      "index": 57,
+      "elapsed_seconds": 4.8195229,
+      "normalized_time": 0.7302307,
+      "runtime_ticks": 241,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_057.png"
+    },
+    {
+      "index": 58,
+      "elapsed_seconds": 4.8941127,
+      "normalized_time": 0.7415322,
+      "runtime_ticks": 245,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_058.png"
+    },
+    {
+      "index": 59,
+      "elapsed_seconds": 4.9701556999999994,
+      "normalized_time": 0.753053844,
+      "runtime_ticks": 249,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_059.png"
+    },
+    {
+      "index": 60,
+      "elapsed_seconds": 5.0439552,
+      "normalized_time": 0.7642356,
+      "runtime_ticks": 253,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_060.png"
+    },
+    {
+      "index": 61,
+      "elapsed_seconds": 5.1196763,
+      "normalized_time": 0.7757085,
+      "runtime_ticks": 256,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_061.png"
+    },
+    {
+      "index": 62,
+      "elapsed_seconds": 5.1944265,
+      "normalized_time": 0.7870343,
+      "runtime_ticks": 260,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_062.png"
+    },
+    {
+      "index": 63,
+      "elapsed_seconds": 5.2696024999999995,
+      "normalized_time": 0.7984246,
+      "runtime_ticks": 264,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_063.png"
+    },
+    {
+      "index": 64,
+      "elapsed_seconds": 5.3440867999999995,
+      "normalized_time": 0.8097101,
+      "runtime_ticks": 268,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_064.png"
+    },
+    {
+      "index": 65,
+      "elapsed_seconds": 5.4194357,
+      "normalized_time": 0.8211266,
+      "runtime_ticks": 271,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_065.png"
+    },
+    {
+      "index": 66,
+      "elapsed_seconds": 5.4984274,
+      "normalized_time": 0.833095,
+      "runtime_ticks": 275,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_066.png"
+    },
+    {
+      "index": 67,
+      "elapsed_seconds": 5.5873272,
+      "normalized_time": 0.846564651,
+      "runtime_ticks": 280,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_067.png"
+    },
+    {
+      "index": 68,
+      "elapsed_seconds": 5.660849,
+      "normalized_time": 0.857704341,
+      "runtime_ticks": 284,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_068.png"
+    },
+    {
+      "index": 69,
+      "elapsed_seconds": 5.7368207999999994,
+      "normalized_time": 0.86921525,
+      "runtime_ticks": 287,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_069.png"
+    },
+    {
+      "index": 70,
+      "elapsed_seconds": 5.8110972,
+      "normalized_time": 0.8804692,
+      "runtime_ticks": 291,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_070.png"
+    },
+    {
+      "index": 71,
+      "elapsed_seconds": 5.8869684,
+      "normalized_time": 0.891964853,
+      "runtime_ticks": 295,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_071.png"
+    },
+    {
+      "index": 72,
+      "elapsed_seconds": 5.9608840999999995,
+      "normalized_time": 0.9031642,
+      "runtime_ticks": 299,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_072.png"
+    },
+    {
+      "index": 73,
+      "elapsed_seconds": 6.0380924999999994,
+      "normalized_time": 0.914862454,
+      "runtime_ticks": 302,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_073.png"
+    },
+    {
+      "index": 74,
+      "elapsed_seconds": 6.1269768,
+      "normalized_time": 0.928329766,
+      "runtime_ticks": 307,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_074.png"
+    },
+    {
+      "index": 75,
+      "elapsed_seconds": 6.2026204,
+      "normalized_time": 0.9397909,
+      "runtime_ticks": 311,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_075.png"
+    },
+    {
+      "index": 76,
+      "elapsed_seconds": 6.2778694,
+      "normalized_time": 0.95119226,
+      "runtime_ticks": 314,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_076.png"
+    },
+    {
+      "index": 77,
+      "elapsed_seconds": 6.3530166,
+      "normalized_time": 0.962578237,
+      "runtime_ticks": 318,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_077.png"
+    },
+    {
+      "index": 78,
+      "elapsed_seconds": 6.4276307999999993,
+      "normalized_time": 0.9738834,
+      "runtime_ticks": 322,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_078.png"
+    },
+    {
+      "index": 79,
+      "elapsed_seconds": 6.5034298,
+      "normalized_time": 0.9853681,
+      "runtime_ticks": 326,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_079.png"
+    },
+    {
+      "index": 80,
+      "elapsed_seconds": 6.5777287,
+      "normalized_time": 0.9966255,
+      "runtime_ticks": 329,
+      "active_carriers": 0,
+      "hits": 1,
+      "actors": [],
+      "file": "motion_080.png"
+    },
+    {
+      "index": 81,
+      "elapsed_seconds": 6.6265602999999995,
+      "normalized_time": 1.0,
+      "runtime_ticks": 329,
+      "active_carriers": 0,
+      "hits": 1,
+      "file": "motion_081.png"
+    }
+  ],
+  "motion_sheet_samples": [
+    {
+      "row": 0,
+      "column": 0,
+      "frame_index": 0,
+      "elapsed_seconds": 0.0015378
+    },
+    {
+      "row": 0,
+      "column": 1,
+      "frame_index": 1,
+      "elapsed_seconds": 0.13485439999999999
+    },
+    {
+      "row": 0,
+      "column": 2,
+      "frame_index": 2,
+      "elapsed_seconds": 0.2220741
+    },
+    {
+      "row": 0,
+      "column": 3,
+      "frame_index": 4,
+      "elapsed_seconds": 0.3835325
+    },
+    {
+      "row": 0,
+      "column": 4,
+      "frame_index": 5,
+      "elapsed_seconds": 0.47063829999999995
+    },
+    {
+      "row": 0,
+      "column": 5,
+      "frame_index": 6,
+      "elapsed_seconds": 0.5570894
+    },
+    {
+      "row": 0,
+      "column": 6,
+      "frame_index": 7,
+      "elapsed_seconds": 0.64553569999999993
+    },
+    {
+      "row": 1,
+      "column": 0,
+      "frame_index": 8,
+      "elapsed_seconds": 0.73293679999999994
+    },
+    {
+      "row": 1,
+      "column": 1,
+      "frame_index": 10,
+      "elapsed_seconds": 0.9070283
+    },
+    {
+      "row": 1,
+      "column": 2,
+      "frame_index": 11,
+      "elapsed_seconds": 0.9831496
+    },
+    {
+      "row": 1,
+      "column": 3,
+      "frame_index": 12,
+      "elapsed_seconds": 1.0701817
+    },
+    {
+      "row": 1,
+      "column": 4,
+      "frame_index": 13,
+      "elapsed_seconds": 1.1577294999999999
+    },
+    {
+      "row": 1,
+      "column": 5,
+      "frame_index": 14,
+      "elapsed_seconds": 1.244929
+    },
+    {
+      "row": 1,
+      "column": 6,
+      "frame_index": 16,
+      "elapsed_seconds": 1.4190702
+    },
+    {
+      "row": 2,
+      "column": 0,
+      "frame_index": 17,
+      "elapsed_seconds": 1.5065321
+    },
+    {
+      "row": 2,
+      "column": 1,
+      "frame_index": 18,
+      "elapsed_seconds": 1.5935721999999999
+    },
+    {
+      "row": 2,
+      "column": 2,
+      "frame_index": 19,
+      "elapsed_seconds": 1.6819035
+    },
+    {
+      "row": 2,
+      "column": 3,
+      "frame_index": 20,
+      "elapsed_seconds": 1.7698973
+    },
+    {
+      "row": 2,
+      "column": 4,
+      "frame_index": 22,
+      "elapsed_seconds": 1.9474209999999998
+    },
+    {
+      "row": 2,
+      "column": 5,
+      "frame_index": 23,
+      "elapsed_seconds": 2.0357613999999997
+    },
+    {
+      "row": 2,
+      "column": 6,
+      "frame_index": 24,
+      "elapsed_seconds": 2.1248758999999997
+    }
+  ],
+  "gates": [
+    {
+      "gate": "A_structure",
+      "status": "requires_visual_review",
+      "reason": "Solid core silhouette evidence; readability and blind semantic identity require independent review"
+    },
+    {
+      "gate": "B_continuity",
+      "status": "technical_pass",
+      "reason": "121 deterministic samples of the same mesh; finite vertices, bounded displacement, invariant topology. Visual temporal review remains required"
+    },
+    {
+      "gate": "C_rendering",
+      "status": "requires_visual_review",
+      "reason": "Compare normal_sheet against approved core_sheet; particles must not define the silhouette"
+    },
+    {
+      "gate": "D_impact",
+      "status": "technical_pass",
+      "reason": "Four unmodified RuntimeEngine casts with real Unity colliders; contact and decorative-physics ownership recorded separately per scenario; contact artistry still reviewed"
+    },
+    {
+      "gate": "E_game_camera",
+      "status": "requires_visual_review",
+      "reason": "game_camera comes from actual SpellLab.BuildScene camera, default gameplay distance and viewport"
+    },
+    {
+      "gate": "F_motion",
+      "status": "requires_visual_review",
+      "reason": "Real SpellLab cast with RuntimeEngine ticks paced at 50 Hz; actual trajectories, contacts and event children; timestamped consecutive frames over declared lifetime and terminal survival, no time compression"
+    },
+    {
+      "gate": "semantic_blind",
+      "status": "requires_visual_review",
+      "reason": "Reviewer must receive core image without intent, title or drawing before comparison"
+    },
+    {
+      "gate": "performance",
+      "status": "technical_pass",
+      "reason": "Measured geometry, materials, peak particles and CPU sampling plus declared renderer-submission estimate meet known budgets. GPU cost, transparent overdraw and actual draw calls remain explicitly unmeasured"
+    }
+  ],
+  "core_gallery_nodes": [],
+  "active_loop_samples": [],
+  "canonical_sheet_scope": "Root nodes only, one shared elapsed clock with activation delays and individual lifespans; no invented timeline for event children. Event children are measured during real RuntimeEngine casts in F and D",
+  "canonical_duration_seconds": 6.00000048,
+  "impact_sheet_layout": "2x2: ground top-left, wall top-right, target bottom-left, oblique bottom-right. Each cell is an actual unchanged RuntimeEngine scenario",
+  "metrics": {
+    "per_visual": [
+      {
+        "particle_count": 48,
+        "vfx_systems": 0,
+        "mesh_vertices": 2147,
+        "mesh_triangles": 4160,
+        "estimated_draw_calls": 4,
+        "material_count": 3,
+        "transparent_layers": 4,
+        "decorative_colliders": 0,
+        "decorative_rigidbodies": 0,
+        "cpu_update_microseconds": 480,
+        "draw_calls_measurement": "renderer submission estimate; GPU batching not measured",
+        "transparent_overdraw": "unavailable: requires GPU pixel instrumentation",
+        "gpu_cost": "unavailable: per-spell GPU timestamps not exposed by this player"
+      }
+    ],
+    "canonical_sampling_cpu_ms": 21.291200000000007,
+    "actual_draw_calls": null,
+    "gpu_microseconds": null,
+    "transparent_overdraw": null,
+    "unavailable_reason": "Per-effect GPU timing, exact SRP draw calls and overdraw require a separate instrumented GPU profiler capture; no substitute estimated zeros",
+    "render_wall_ms": 1578.8812
+  },
+  "pass_stamp": {
+    "mode": "full",
+    "spell_sha256": "733a2e5a496f592d39cca1c9ad0fdef15d1211a7cb3e3660694fea3ba461a443",
+    "blueprints_sha256": "48f0972929c7eb9b44b6ae8e1c129b2e47e8154a4777e1b99704785e8c25a14e",
+    "topology": [
+      {
+        "normalized_milli": 0,
+        "node": "p0",
+        "topology_sha256": "0d4886490912c4c633be69d37487d947ef7b15bf09de69e613e93da7d67fc2b1",
+        "vertices": 2147,
+        "finite": true,
+        "topology_stable": true,
+        "maximum_vertex_displacement_m": 0.0,
+        "displacement_bounded": true
+      }
+    ],
+    "previous_pass_immutable": true
+  },
+  "elapsed_seconds": 9.190424,
+  "error": null
+}

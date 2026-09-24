@@ -51,6 +51,11 @@ namespace Palimpseste.Game.Library
             var imageHash = plan?["visual_reference_sha256"];
             var citesImage = imageHash != null && imageHash.Type != JTokenType.Null;
             var minimumClient = packet["versions"]?["min_client"]?.Value<string>();
+            if (nodes != null && nodes.Any(n => n?["blueprint_v2"] is JObject))
+            {
+                ValidateBlueprintV2Packet(packet, plan, nodes, minimumClient);
+                return;
+            }
             var newClient = Version.TryParse(minimumClient,out var minimumVersion) && minimumVersion >= new Version(1,3,0);
             if (!hasReference && !hasConstruction && !citesImage && !newClient) return;
 
@@ -250,6 +255,43 @@ namespace Palimpseste.Game.Library
                 MissingMemberHandling = MissingMemberHandling.Error, MaxDepth = 64
             }));
         }
+        private static void ValidateBlueprintV2Packet(JObject packet, JObject plan, JArray nodes, string minimumClient)
+        {
+            Require(minimumClient == "1.8.0" && packet["schema_version"]?.Value<string>() == "sp.compiled/1.0" &&
+                plan?["schema_version"]?.Value<string>() == "sp.plan/1.0", "Unsupported V2 packet");
+            Require(nodes.Count >= 1 && nodes.Count <= MaximumNodes, "V2 node budget");
+            Require(Digest(Text(packet,"description_sha256")) && Text(packet,"description_sha256") == Text(plan,"description_sha256") &&
+                Digest(Text(plan,"reference_research_sha256")), "V2 provenance");
+            Require(packet["visual_reference"] == null || packet["visual_reference"].Type == JTokenType.Null, "V2 has no invented image source");
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None,
+                MetadataPropertyHandling = MetadataPropertyHandling.Ignore, MissingMemberHandling = MissingMemberHandling.Error, MaxDepth = 64 });
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            long instances = 0, vertices = 0, particles = 0;
+            foreach (var raw in nodes)
+            {
+                Require(raw is JObject, "Missing V2 node");
+                var node = (JObject)raw;
+                Require(node["blueprint_v2"] is JObject && Text(node,"geometry_id") == "canonical.v2", "Mixed V1/V2 packet");
+                Require(!string.IsNullOrEmpty(Text(node,"node_id")) && ids.Add(Text(node,"node_id")), "Duplicate V2 node");
+                Require(node["appearance"] is JObject && node["activation"] is JObject, "V2 appearance/activation missing");
+                var appearance = (JObject)node["appearance"];
+                Require(appearance["construction"] == null || appearance["construction"].Type == JTokenType.Null, "V2 legacy primitive construction");
+                var blueprint = node["blueprint_v2"].ToObject<SpellBlueprintV2>(serializer);
+                Require(SpellBlueprintV2Safety.Validate(blueprint).Count == 0, "Invalid bounded V2 blueprint");
+                var copies = Integer((JObject)node["activation"],"copies",1,8);
+                var activations = Integer((JObject)node["activation"],"max_activations",1,16);
+                instances += copies * activations;
+                vertices += (long)blueprint.validation_rules.maximum_vertices * copies * activations;
+                particles += (long)blueprint.rendering_layers.atmosphere_particles * copies * activations;
+                Require(instances <= 128 && vertices <= 4000000 && particles <= 32768, "V2 expanded resource budget");
+                Integer(node,"scale_cm",1,2000);
+                ValidateBehavior(node,appearance);
+                node.ToObject<SpellNode>(serializer);
+            }
+            Require(packet["resource_bounds"] is JObject, "Missing V2 bounds");
+            Require(Integer((JObject)packet["resource_bounds"],"max_instances",1,128) == instances, "V2 instance bound mismatch");
+        }
+
         private static bool IsLowerHex(char value) => value >= '0' && value <= '9' || value >= 'a' && value <= 'f';
         private static bool Digest(string value) => value != null && value.Length == 64 && value.All(IsLowerHex);
         private static int PngInteger(byte[] bytes, int offset) => bytes[offset] << 24 | bytes[offset+1] << 16 | bytes[offset+2] << 8 | bytes[offset+3];

@@ -1,5 +1,15 @@
 # Point de reprise immédiat
 
+## D20 — Pipeline V2 construite, installation en attente
+
+**Backend D20 et Player 1.8.0 compilés et empaquetés**, Unity 6.3 / URP / IL2CPP, sorties 0, sans erreur de shader. [Livraison](../evidence/public/backend/blueprint-v2-d20.json) · [Architecture, diagramme, types et gates](D20_SPELL_PIPELINE_V2.md) · [Fichiers](V2_FILES_CHANGED.md).
+
+**27 contrôles V2 réussis**, compatibilité V1 vérifiée (141 recettes / 705 paires), 172 assets historiques inchangés dans Git. Fixture séparée réellement exécutée : continuité, quatre contacts, vraie caméra et vrai lancer ; boucle 4,5 s refermée avec écart 0 m. Le banc de capture magenta est corrigé. [Résultats](../evidence/public/v2/results.json) · [Vidéo](../evidence/public/v2/fixture/motion-real-time.mp4).
+
+**Qualité artistique de la fixture refusée par la critique indépendante**, acceptation humaine absente. Les mesures GPU et d'overdraw sont inconnues.
+
+**D20 non installé et nouveau parcours Codex non exécuté** : Windows a annulé la première élévation opérateur. Une question demandant d'accepter la prochaine fenêtre UAC est en attente. L'ancien service D19, son Player et la bibliothèque restent conservés. Nouveau Player séparé dans `game/Build/WindowsBlueprintV2Playable`. Voir la reprise détaillée D20 pour le diagnostic isolé puis le déploiement 012 ; ne pas prétendre que le jeu ouvert utilise déjà V2.
+
 ## D19 installé et jeu rouvert — laisser le créateur essayer
 
 Le créateur rejette encore le rendu et demande si les bibliothèques ont réellement servi. D17 ne livrait que leur recherche, sans nouveau programme de surface dans Unity. La correction D19 ajoute des profils par partie issus des graphes TinyPlay MIT et de l'opérateur de flux Keijiro Unlicense : `plasma`, `force_field`, `toxic`, `spectral_flow`. Leur choix doit être présent dans la recherche figée du job et le paquet doit exiger le Player 1.7.0. Les textures sources doivent être échantillonnées en couleur/luminance, pas seulement comme masque alpha.

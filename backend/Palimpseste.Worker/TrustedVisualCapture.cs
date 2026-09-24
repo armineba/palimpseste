@@ -17,7 +17,7 @@ public sealed class VisualCaptureException(string reason, Exception inner) : Exc
 }
 
 /// <summary>A fixed, prebuilt renderer. This is application code, never a model tool or a software build.</summary>
-public sealed class TrustedVisualCapture(CodexSettings settings)
+public sealed partial class TrustedVisualCapture(CodexSettings settings)
 {
     // Concurrent jobs share this worker's GPU. Capturing one at a time keeps
     // another renderer from distorting the measured FPS and visual review.
@@ -303,7 +303,7 @@ public sealed class TrustedVisualCapture(CodexSettings settings)
         }
         using var manifest = JsonDocument.Parse(bytes);
         var rendererVersion = manifest.RootElement.GetProperty("version").GetString();
-        if (rendererVersion is not ("1.6.0" or "1.7.0") ||
+        if (rendererVersion is not ("1.6.0" or "1.7.0" or "1.8.0") ||
             !System.Version.TryParse(minimumClient, out var requiredVersion) ||
             System.Version.Parse(rendererVersion) < requiredVersion)
             throw new InvalidDataException("visual_renderer_version");

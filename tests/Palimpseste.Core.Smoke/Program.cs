@@ -969,6 +969,8 @@ foreach (var phase in new[] { "intro", "active", "contact", "expiration" })
 }
 var oldSemanticToken = JObject.FromObject(semanticTyped);
 oldSemanticToken.Property("lifecycle")?.Remove();
+// Both optional fields have been omitted by the production semantic digest since D15.
+oldSemanticToken.Property("behaviors")?.Remove();
 Require(GeometryResolver.SemanticDescriptionSha256(semanticTyped) == SpellCompiler.Sha256(JsonBytes(oldSemanticToken)),
     "Null lifecycle changed the normalized description hash of existing semantic geometry");
 var nullableLifecycleDescription = (JObject)wholeDescription.DeepClone();

@@ -97,6 +97,12 @@ namespace Palimpseste.Game.SpellRuntime
             root.transform.position = state.position;
             root.transform.rotation = state.rotation;
             var tint = ColorFor(node.appearance?.palette, node.appearance?.affinity);
+            if (CanonicalSpellVisualV2.Supports(node))
+            {
+                root.AddComponent<CanonicalSpellVisualV2>().Initialize(node);
+                if (node.carrier == "barrier") V2Barrier(root, state);
+                return root;
+            }
             if (ImageConstructedSpellVisual.Supports(node))
             {
                 ImageConstructedSpellVisual.ValidateConstruction(node.appearance.construction);
@@ -299,6 +305,9 @@ namespace Palimpseste.Game.SpellRuntime
         public static GameObject ProjectileHit(CarrierState state, Vector3 point)
         {
             if (state.node.carrier != "projectile") return null;
+            if (CanonicalSpellVisualV2.Supports(state.node))
+                return state.piercesLeft > 0 ? CanonicalSpellVisualV2.SpawnContactVisual(state.node,
+                    point, state.direction, state.surfaceNormal) : null;
             if (ImageConstructedSpellVisual.Supports(state.node))
             {
                 if (state.node.appearance.lifecycle != null)
@@ -496,6 +505,8 @@ namespace Palimpseste.Game.SpellRuntime
         public static void BeamSegments(CarrierState state, System.Collections.Generic.List<Vector3> points)
         {
             if (state.visual == null || points.Count < 2) return;
+            var v2 = state.visual.GetComponent<CanonicalSpellVisualV2>();
+            if (v2 != null) { v2.SetBeamPath(points); return; }
             var construction = state.visual.GetComponent<ImageConstructedSpellVisual>();
             if (construction != null)
             {
@@ -605,6 +616,8 @@ namespace Palimpseste.Game.SpellRuntime
 
         public static void PulseRadius(CarrierState state, float outerRadius)
         {
+            var v2 = state.visual?.GetComponent<CanonicalSpellVisualV2>();
+            if (v2 != null) { v2.SetPulseRadius(outerRadius); return; }
             state.visual?.GetComponent<ImageConstructedSpellVisual>()?.SetPulseRadius(outerRadius);
             var semantic = state.visual?.GetComponent<SemanticSpellVisual>();
             if (semantic != null)
@@ -658,6 +671,8 @@ namespace Palimpseste.Game.SpellRuntime
 
         public static void TrapArmed(CarrierState state)
         {
+            var v2 = state.visual?.GetComponent<CanonicalSpellVisualV2>();
+            if (v2 != null) { v2.Arm(); return; }
             if (state.visual?.GetComponent<ImageConstructedSpellVisual>() is ImageConstructedSpellVisual construction)
             {
                 construction.Arm();
@@ -673,6 +688,21 @@ namespace Palimpseste.Game.SpellRuntime
             state.visual?.GetComponent<SpellVfxComposition>()?.Arm();
             var renderer = state.visual?.GetComponentInChildren<Renderer>();
             if (renderer != null) renderer.material.color = new Color(1f, .82f, .4f, .75f);
+        }
+
+        private static void V2Barrier(GameObject root, CarrierState state)
+        {
+            var receiver = root.AddComponent<BarrierReceiver>();
+            receiver.StructureMilli = state.node.options.structure_milli ?? 100000;
+            receiver.BlocksLeft = state.node.options.block_limit ?? 1; receiver.InstanceId = state.id;
+            // One gameplay-owned box. The canonical mesh and decorative layers
+            // never receive physical components or hidden primitive renderers.
+            var gameplay = root.transform.Find("Gameplay");
+            var collider = gameplay.gameObject.AddComponent<BoxCollider>();
+            var size = state.node.blueprint_v2.structural_core.size_cm;
+            collider.size = new Vector3(Mathf.Max(.01f,size[0]*.01f),
+                Mathf.Max(.01f,size[1]*.01f),Mathf.Max(.01f,size[2]*.01f));
+            collider.center = root.GetComponent<CanonicalSpellVisualV2>().CoreBounds.center;
         }
     }
 }

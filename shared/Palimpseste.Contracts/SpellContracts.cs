@@ -96,6 +96,8 @@ namespace Palimpseste.Contracts
         public SpellOptions options;
         public SpellBehaviorIntent behavior;
         public SpellPhysicsProfile physics;
+        // Null for every archived V1 packet. New pipeline V2 has one canonical source of geometry and motion.
+        public SpellBlueprintV2 blueprint_v2;
     }
 
     public sealed class SpellActivation

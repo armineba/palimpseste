@@ -11,6 +11,9 @@
     <EmbeddedResource Include="../../contracts/spell-plan.schema.json" LogicalName="Palimpseste.Core.Schemas.spell-plan.schema.json" />
     <EmbeddedResource Include="../../contracts/geometry.schema.json" LogicalName="Palimpseste.Core.Schemas.geometry.schema.json" />
     <EmbeddedResource Include="../../contracts/compiled-spell.schema.json" LogicalName="Palimpseste.Core.Schemas.compiled-spell.schema.json" />
+    <EmbeddedResource Include="../../contracts/spell-blueprint-v2.schema.json" LogicalName="Palimpseste.Core.Schemas.spell-blueprint-v2.schema.json" />
+    <EmbeddedResource Include="../../contracts/spell-plan-v2.schema.json" LogicalName="Palimpseste.Core.Schemas.spell-plan-v2.schema.json" />
+    <EmbeddedResource Include="../../contracts/compiled-spell-v2.schema.json" LogicalName="Palimpseste.Core.Schemas.compiled-spell-v2.schema.json" />
     <EmbeddedResource Include="../../contracts/effect-recipes.json" LogicalName="Palimpseste.Core.Data.effect-recipes.json" />
   </ItemGroup>
 </Project>

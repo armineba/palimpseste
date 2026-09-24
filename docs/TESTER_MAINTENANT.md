@@ -1,5 +1,18 @@
 # Tester le lecteur actuel
 
+## Pipeline V2 — après installation D20 / Player 1.8.0
+
+Consulter [l'état réel](NEXT_ACTIONS.md) avant l'essai : le service D20 n'est pas encore installé.
+
+1. Ouvrir **Palimpseste Spell Lab** après la bascule du service.
+2. Dessiner un **nouveau parchemin**, puis cliquer **Dessin terminé**.
+3. Lire l'interprétation. Le système construit la forme et le mouvement, contrôle la silhouette sans décorations, puis les impacts et le rendu.
+4. Ouvrir le sort disponible dans le laboratoire et le lancer. Comparer sujet, mouvement, contact et disparition au texte et à la planche.
+
+La planche 3 × 7 échantillonne le même sort continu. Les anciens parchemins restent en V1. Un candidat refusé n'est pas publié comme terminé ; dessin et étapes restent conservés. La fixture de développement est séparée de votre bibliothèque. Les tests techniques ne remplacent pas votre verdict.
+
+## Historique des essais précédents
+
 ## D19 / 1.7.0 — profils issus des bibliothèques
 
 Une fois [l'installation D19](../evidence/public/backend/sourced-surfaces-d19-installation.json) terminée, ouvrir le raccourci Bureau et créer **un nouveau parchemin**. Le constructeur peut choisir pour chaque partie les surfaces plasma, champ de force, matière toxique et flux spectral livrées dans le moteur. La sélection dépend de la description et de la planche ; il ne faut pas ajouter les quatre à tous les sorts.

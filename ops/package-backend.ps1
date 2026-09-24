@@ -22,12 +22,13 @@ Publish-App 'backend/Palimpseste.Api/Palimpseste.Api.csproj' 'api'
 Publish-App 'backend/Palimpseste.Worker/Palimpseste.Worker.csproj' 'worker'
 Publish-App 'backend/ProviderDoctor/ProviderDoctor.csproj' 'doctor'
 Publish-App 'backend/SpellVisualDoctor/SpellVisualDoctor.csproj' 'visual-doctor'
+Publish-App 'backend/BlueprintV2Doctor/BlueprintV2Doctor.csproj' 'blueprint-doctor'
 Get-ChildItem -LiteralPath $stage -Filter '*.pdb' -File -Recurse | Remove-Item -Force
 
 # Keep the compositor's MIT notice alongside every published application that
 # carries its managed dependency, including with single-file publication.
 $drawingNotice = Join-Path $projectRoot 'backend\Palimpseste.Provider\ThirdPartyNotices\System.Drawing.Common-MIT.txt'
-foreach ($application in @('api', 'worker', 'doctor', 'visual-doctor')) {
+foreach ($application in @('api', 'worker', 'doctor', 'visual-doctor', 'blueprint-doctor')) {
     $noticeFolder = Join-Path (Join-Path $stage $application) 'ThirdPartyNotices'
     New-Item -ItemType Directory -Path $noticeFolder -Force | Out-Null
     $noticeTarget = Join-Path $noticeFolder 'System.Drawing.Common-MIT.txt'
@@ -65,7 +66,7 @@ foreach ($folder in @('licenses', 'textures')) {
 }
 $runtimePrompts = Join-Path $spec 'prompts'
 New-Item -ItemType Directory -Force -Path $runtimePrompts | Out-Null
-foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_REPARATION_TECHNIQUE.md', '04_IMAGE_REFERENCE.md', '05_VISUAL_CRITIC.md')) {
+foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_REPARATION_TECHNIQUE.md', '04_IMAGE_REFERENCE.md', '05_VISUAL_CRITIC.md', '06_BLUEPRINT_V2.md', '07_V2_CRITIC.md', '08_V2_INTERPRETATION.md', '09_V2_NUMERIC_RULES.md')) {
     Copy-Item -LiteralPath (Join-Path (Join-Path $projectRoot 'prompts') $name) -Destination (Join-Path $runtimePrompts $name)
 }
 $runtimePromptHistory = Join-Path $runtimePrompts 'history'
@@ -126,29 +127,32 @@ Set-ArchiveHashPin $archiveApiLauncher 'expectedChildSha256' $archiveApiChildHas
 
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/IMPLEMENTATION_STATUS.md') -Destination (Join-Path $stage 'IMPLEMENTATION_STATUS.md')
 New-Item -ItemType Directory -Path (Join-Path $stage 'docs') -Force | Out-Null
-foreach ($name in @('D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','NEXT_ACTIONS.md')) {
+foreach ($name in @('D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPELL_PIPELINE_V2.md','V2_BLUEPRINT_CONTRACT.md','V2_UNITY_STRUCTURAL_RENDERER.md','V2_VALIDATION_ENGINE.md','NEXT_ACTIONS.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $name)) -Destination (Join-Path $stage ('docs/' + $name))
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Destination (Join-Path $stage 'evidence') -Recurse
 
 @"
-Palimpseste backend Windows x64. API, worker et doctor sont des exécutables .NET autoportants.
-Backend D19 / Player 1.7.0. La chaîne privée est : dessin libre -> Sol high (description et cycle complet) -> atlas natif Codex 7x3 -> compositeur serveur fixe -> planche VFX 1536x1152 -> consultation des cinq bibliothèques obligatoires et d'une référence complémentaire -> Astra high (construction depuis la description, la planche et la recherche conservée, prompt B 2.6) -> compilateur contrôlé -> rendu Unity précompilé -> critique visuelle indépendante J -> ajustements bornés -> paquet Unity.
-Les profils plasma, force_field, toxic et spectral_flow sont choisis par partie. Le Player 1.7 porte des programmes et textures issus de TinyPlay MIT et Keijiro VfxGraphAssets Unlicense. Les recherches nouvelles décrivent ces ressources réellement livrées ; un ancien dossier de recherche sans ces profils conserve ses capacités d'origine. Les paquets qui les utilisent exigent le client 1.7.0.
-PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0 : aucun plafond applicatif de jobs en parallèle dans le worker. Les captures Unity partagent un seul créneau GPU. Les limites du compte et de la machine restent applicables. Voir docs/D18_CONCURRENT_JOBS.md et les preuves de déploiement ; aucun essai de concurrence n'est ajouté par le développement.
-La planche comporte APPARITION, STABLE, DISPARITION, sept cases numérotées 1 à 7 par ligne, titre et sous-titre VFX ANIMATION SHEET. L'atlas réellement produit par le fournisseur et la planche mise en page par le serveur ont des artefacts et SHA distincts ; la planche n'est pas présentée comme la sortie native du modèle. System.Drawing.Common 10.0.12 est gratuit sous MIT, Windows uniquement ; sa notice accompagne les programmes publiés. Aucune police n'est distribuée.
-Le worker utilise codex exec sous un compte Windows de service isolé. Il n'exécute ni C# issu d'un dessin, ni build Unity.
-L'archive contient les contrats, références, prompts A/G/B/J et migrations 001 à 011, mais aucun auth.json, jeton joueur, secret DB ou clé API. Les versions historiques A 2.3 et G 1.2 restent incluses pour les anciens parcours admis. spec/assets/sourced-vfx contient seulement les catalogues, licences et PNG contrôlés : aucun reference-code, plugin ni script d'import. Le binaire durci A/B/G/J et son attestation native sont décrits dans ops/codex-image-generation.md. Si codex/ est présent, son exécutable a été inclus avec un SHA vérifié et les notices amont ; sinon le construire à partir des correctifs fournis. Dans les deux cas, établir les preuves sur le compte de service avant activation.
-Lire IMPLEMENTATION_STATUS.md puis ops/provision-runtime.ps1 avant toute installation.
-Extraire l'archive dans un dossier opérateur inaccessible au compte worker : elle contient des scripts ops d'administration.
-Copier api, worker et doctor publiés vers leurs emplacements de service avec ACL minimales ; ne pas lancer le worker depuis le dossier extrait.
-L'API attend DATABASE_URL, ARTIFACT_ROOT et PALIMPSESTE_SPEC_ROOT pointant vers la copie runtime de spec.
-Le worker attend en plus le compte Windows dédié, CODEX_HOME isolé et la preuve du doctor actif. D16 conserve le binaire natif D13 et ses preuves ; les nouveaux prompts, le compositeur et le rendu D16 restent à essayer par le propriétaire.
-Le rendu de critique demande PALIMPSESTE_VISUAL_RENDERER_EXE et PALIMPSESTE_VISUAL_RENDERER_MANIFEST_SHA256. Installer une copie du Player 1.7.0 livré, avec manifeste SHA de tous les fichiers, hors sources et dossiers modifiables du worker. ops/deploy-lifecycle.ps1 met à jour le PC existant : migration 010 et sa table spell_reference_research doivent déjà être présentes, seule migration 011 est appliquée. Ne pas rejouer 009 ou 010 sur des jobs plus récents : elles restreignent l'ancienne contrainte de version. Pour une base neuve, appliquer toutes les migrations 001 à 011 dans l'ordre avant de lancer les services. Ne pas exposer les scripts ops au worker.
-La recherche par job examine TinyPlay URPShadersCollection, xtaja VFX-Shader, Unity VisualEffectGraph-Samples, Keijiro VfxGraphAssets et la fiche locale de disponibilité/licence Magic Effects FREE. Les bibliothèques complètes ne sont pas embarquées : les portages TinyPlay/Keijiro sont identifiés dans surface_profiles, indépendamment des 16 textures CC0 sélectionnables. Les autres références gardent leur disponibilité explicite. La recherche ne donne aucun droit de téléchargement libre ou d'installation de code au joueur. Conserver les notices des ressources dans la distribution du Player.
-Le programme visual-doctor est un diagnostic manuel facultatif, non exécuté pour cette livraison. Les captures automatiques de la génération joueur servent à la critique visuelle ; elles ne prouvent pas le gameplay ni une fidélité visuelle parfaite.
-La génération reste bloquée tant que le compte de service Codex et le doctor actif ne sont pas validés.
-Le service local actuel emploie 127.0.0.1 ; cette archive ne configure pas une URL HTTPS publique ni les identités des joueurs.
+Palimpseste backend Windows x64 — D20 / Player 1.8.0
+
+Les exécutables API, worker et diagnostics sont autoportants. Nouveaux sorts : dessin -> description -> cinq bibliothèques -> SpellBlueprintV2 -> structure canonique et mouvement continu -> CORE_ONLY et critique aveugle -> VFX -> impacts réels et caméra gameplay -> verdict -> planche 3x7 et paquet Unity. Aucun candidat refusé par les gates obligatoires n'est publié. Quatre candidats maximum par admission ; étapes conservées et corrections ciblées.
+
+Les admissions historiques 0..4 restent en V1. L'admission 5 utilise V2, client 1.8.0 requis. Aucun sort historique régénéré ni asset historique modifié. La planche échantillonne le même modèle temporel que le Player ; huit représentations structurelles sont disponibles.
+
+Le worker utilise codex exec sous PalRuntimeSvc et conserve les protections du binaire natif épinglé. A/B/J ne peuvent ni télécharger, ni exécuter du code, ni lire les secrets, ni modifier Unity. Les blueprints sont des données bornées exécutées par le renderer précompilé protégé. Les scripts ops sont réservés à l'opérateur et ne doivent jamais être exposés au worker.
+
+PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0 conserve l'absence de plafond applicatif de jobs ; le GPU de capture est partagé. Les quotas du compte et la capacité de la machine restent applicables. Aucun achat, recharge ou clé API ajouté.
+
+Ressources intégrées : textures CC0 sélectionnées, portages TinyPlay MIT / Keijiro Unlicense. Les cinq bibliothèques sont consultées ; xtaja sans licence, Magic Effects non acquis et exemples Unity HDRP/LFS restent des références à disponibilité explicite. Toutes les bibliothèques ne sont pas embarquées. Conserver les notices du Player.
+
+Installation : lire IMPLEMENTATION_STATUS.md et docs/D20_SPELL_PIPELINE_V2.md. Sur D19, deploy-lifecycle.ps1 applique uniquement migration012 après drainage et vérification de011. Ne pas rejouer les anciennes migrations sur une base plus récente. Pour une base neuve, appliquer001..012 dans l'ordre. L'archive ne contient aucun auth.json, jeton joueur, secret DB ou clé API. Installer un renderer Player1.8 protégé avec manifeste SHA complet.
+
+L'API exige DATABASE_URL, ARTIFACT_ROOT et PALIMPSESTE_SPEC_ROOT. Le worker exige son compte dédié, CODEX_HOME isolé, les preuves natives et les pins du renderer. Le binaire et l'identité Codex existants sont conservés. Le service local est127.0.0.1 ; cette archive ne configure ni HTTPS public ni identités distantes.
+
+Les tests de contrat et la fixture Unity séparée sont documentés dans les preuves V2. Le rendu de la fixture n'est pas accepté artistiquement. completed=true signifie fin de capture, pas acceptation du sort. GPU/overdraw non mesurés restent inconnus. Le nouveau parcours Codex réel et l'installation D20 restent en attente de l'élévation Windows ; aucune réussite n'est présumée.
+
+blueprint-doctor est un outil opérateur pour vrais appels B/J isolés, sans écriture DB ni bibliothèque joueur. Seul son rapport atteste les appels réellement exécutés. Consulter le point de reprise pour finaliser.
+
 "@ | Set-Content -LiteralPath (Join-Path $stage 'README.txt') -Encoding UTF8
 
 $zip = Join-Path $deliverables 'Palimpseste-Backend-Windows-x64.zip'

@@ -1,0 +1,343 @@
+{
+  "schema_version": "sp.plan/1.0",
+  "description_sha256": "ed733a684d37a597591c36fa13ad730870fbb043c56dc3c76421fd8713446a9a",
+  "reference_research_sha256": "33442c878048c65fa872fbb5f6a77e5fc6873a8d825f733dc7b57b56d8a268aa",
+  "catalog_version": "sp.capabilities/1.0",
+  "rules_profile": "lab_v1",
+  "nodes": [
+    {
+      "node_id": "p0",
+      "subject_id": "s0",
+      "clause_ids": [
+        "c1"
+      ],
+      "carrier": "projectile",
+      "activation": {
+        "event": "cast",
+        "delay_ticks": 0,
+        "max_activations": 1,
+        "copies": 1,
+        "spread_mdeg": 0,
+        "parent_id": null
+      },
+      "anchor": "caster",
+      "geometry_id": "canonical.v2",
+      "scale_cm": 100,
+      "rotation_mdeg": 0,
+      "appearance": {
+        "affinity": "fire",
+        "pattern": "solid",
+        "palette": "ember",
+        "form": "meteor",
+        "resource_id": "kpp_spark_01"
+      },
+      "effects": [
+        {
+          "id": "e0",
+          "clause_ids": [
+            "c1"
+          ],
+          "event": "hit",
+          "kind": "damage",
+          "target_filter": "hostile",
+          "amount": 12000,
+          "duration_ticks": 0,
+          "direction": "none"
+        }
+      ],
+      "options": {
+        "lifetime_ticks": 300,
+        "range_cm": 2000,
+        "speed_cm_s": 1000,
+        "radius_cm": 40,
+        "turn_mdeg_s": 0,
+        "bounces": 0,
+        "pierces": 0,
+        "motion": "straight",
+        "contact_filter": "hostile"
+      },
+      "behavior": {
+        "subject_id": "s0",
+        "origin": "muzzle",
+        "orientation": "cast_forward",
+        "attachment": "world",
+        "phenomenon": "static",
+        "axis": "y",
+        "sense": "counterclockwise",
+        "intensity": "brisk",
+        "travel": "straight"
+      },
+      "physics": {
+        "cast_range_cm": 0,
+        "offset_cm": [
+          0,
+          0,
+          0
+        ],
+        "angular_speed_mdeg_s": 0,
+        "axial_speed_cm_s": 0,
+        "radial_speed_cm_s": 0,
+        "radius_cm": 0,
+        "turbulence_cm": 0,
+        "frequency_mhz": 0,
+        "gravity_cm_s2": 0,
+        "launch_pitch_mdeg": 0
+      },
+      "blueprint_v2": {
+        "schema_version": "sp.blueprint/2.0",
+        "intent": {
+          "semantic_subject": "meteor",
+          "primary_action": "straight charge",
+          "target_behavior": "strike first hostile or environment contact",
+          "perceived_material": "incandescent rock",
+          "motion_character": "heavy continuous travel",
+          "silhouette_priority": "single pointed meteor mass",
+          "visual_keywords": [
+            "ember",
+            "continuous",
+            "single body"
+          ],
+          "gameplay_role": "projectile",
+          "impact_intent": "compress then dissolve",
+          "disappearance_intent": "coherent radial fade",
+          "figurative": true
+        },
+        "archetype": [
+          "projectile"
+        ],
+        "identity": {
+          "hard_invariants": [
+            "one core",
+            "fixed topology",
+            "orange directional silhouette"
+          ],
+          "soft_invariants": [
+            "surface brightness"
+          ],
+          "free_parameters": [
+            "emission"
+          ],
+          "topology": "fixed",
+          "coordinate_system": "local_cm_y_up_z_forward",
+          "element_count": 1,
+          "forward_axis": [
+            0,
+            0,
+            1
+          ],
+          "palette_rgb": [
+            [
+              255,
+              125,
+              40
+            ]
+          ],
+          "landmarks": [
+            {
+              "id": "tail",
+              "branch_index": -1,
+              "t_milli": 0
+            },
+            {
+              "id": "front",
+              "branch_index": -1,
+              "t_milli": 1000
+            }
+          ]
+        },
+        "structural_core": {
+          "kind": "radial_volume",
+          "selection_reason": "A meteor is one closed directional mass rather than separate flames",
+          "size_cm": [
+            100,
+            100,
+            250
+          ],
+          "control_points": [
+            {
+              "position_cm": [
+                0,
+                0,
+                -150
+              ],
+              "radius_cm": 4,
+              "width_cm": 8
+            },
+            {
+              "position_cm": [
+                0,
+                0,
+                -100
+              ],
+              "radius_cm": 9,
+              "width_cm": 18
+            },
+            {
+              "position_cm": [
+                0,
+                0,
+                -50
+              ],
+              "radius_cm": 18,
+              "width_cm": 36
+            },
+            {
+              "position_cm": [
+                0,
+                0,
+                0
+              ],
+              "radius_cm": 36,
+              "width_cm": 72
+            },
+            {
+              "position_cm": [
+                0,
+                0,
+                40
+              ],
+              "radius_cm": 46,
+              "width_cm": 92
+            },
+            {
+              "position_cm": [
+                0,
+                0,
+                70
+              ],
+              "radius_cm": 32,
+              "width_cm": 64
+            },
+            {
+              "position_cm": [
+                0,
+                0,
+                95
+              ],
+              "radius_cm": 10,
+              "width_cm": 20
+            }
+          ],
+          "branches": [],
+          "longitudinal_segments": 64,
+          "radial_segments": 32,
+          "entity_count": 1,
+          "inner_radius_milli": 0,
+          "color_rgb": [
+            255,
+            125,
+            40
+          ]
+        },
+        "motion": {
+          "duration_ms": 6000,
+          "trajectory": "straight",
+          "path_cm": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              2500
+            ]
+          ],
+          "deformation": "pulse",
+          "amplitude_cm": 2,
+          "frequency_mhz": 600,
+          "angular_speed_mdeg_s": 0,
+          "acceleration_cm_s2": 0,
+          "anticipation_milli": 0,
+          "follow_through_milli": 200,
+          "secondary_motion_milli": 100,
+          "impact_transition": "stop",
+          "dissipation": "dissolve"
+        },
+        "phases": {
+          "appearance_end_milli": 100,
+          "active_end_milli": 850,
+          "active_loop": false
+        },
+        "rendering_layers": {
+          "core_surface": "plasma",
+          "core_opacity_milli": 850,
+          "core_emission_milli": 1000,
+          "secondary_kind": "flow",
+          "secondary_intensity_milli": 300,
+          "atmosphere_kind": "sparks",
+          "atmosphere_particles": 24,
+          "resource_id": "kpp_spark_01"
+        },
+        "physics": {
+          "collider": "sphere",
+          "collision_owner": "root",
+          "collision_response": "stop",
+          "visual_response": "impact",
+          "affected_components": [
+            "core",
+            "secondary",
+            "atmosphere"
+          ],
+          "lifetime_behavior": "until_contact_or_duration",
+          "rigidbody_count": 0,
+          "decorative_physics": false,
+          "independent_entities": false
+        },
+        "impact": {
+          "contact_pose": "align_normal",
+          "hit_flash_milli": 600,
+          "deformation": "compress",
+          "reaction_duration_ms": 300,
+          "secondary_emission": 24,
+          "dissipation_direction": "normal",
+          "surviving_core_duration_ms": 600,
+          "destruction_mode": "dissolve"
+        },
+        "disappearance": {
+          "mode": "dissolve",
+          "direction": "radial",
+          "residual_duration_ms": 500
+        },
+        "unity_implementation": {
+          "root": "Spell_ROOT",
+          "core_renderer": "canonical_mesh",
+          "deformation_system": "canonical_motion_v2",
+          "motion_controller": "spell_runtime",
+          "collider_strategy": "root_only",
+          "vfx_graph_systems": 0,
+          "particle_systems": 2,
+          "shader": "Palimpseste/CanonicalSpellV2",
+          "material_count": 3,
+          "trails": "none",
+          "audio_hook": "carrier",
+          "impact_system": "canonical_impact_v2",
+          "lifetime_controller": "spell_runtime"
+        },
+        "validation_rules": {
+          "required_gates": [
+            "A_structure",
+            "B_continuity",
+            "C_rendering",
+            "D_impact",
+            "E_game_camera",
+            "F_motion",
+            "semantic_blind",
+            "performance"
+          ],
+          "blind_semantic_check": true,
+          "reject_visible_primitives": true,
+          "require_fixed_topology": true,
+          "maximum_vertices": 65536,
+          "maximum_particles": 96,
+          "maximum_draw_calls": 8,
+          "maximum_materials": 4,
+          "maximum_cpu_microseconds": 10000,
+          "maximum_gpu_microseconds": 10000,
+          "maximum_transparent_layers": 16
+        }
+      }
+    }
+  ]
+}

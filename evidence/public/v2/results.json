@@ -1,0 +1,187 @@
+{
+  "observed_utc": "2026-09-24T22:53:37.813499+00:00",
+  "fixture_only": true,
+  "player_library_touched": false,
+  "model_calls": 0,
+  "unity_build_exit": 0,
+  "compiler_checks": 27,
+  "full_capture_completed": true,
+  "measured_render_request_fps": 68.40286653612696,
+  "fps_scope": "URP render requests, not game FPS",
+  "full_gates": [
+    {
+      "gate": "A_structure",
+      "status": "requires_visual_review",
+      "reason": "Solid core silhouette evidence; readability and blind semantic identity require independent review"
+    },
+    {
+      "gate": "B_continuity",
+      "status": "technical_pass",
+      "reason": "121 deterministic samples of the same mesh; finite vertices, bounded displacement, invariant topology. Visual temporal review remains required"
+    },
+    {
+      "gate": "C_rendering",
+      "status": "requires_visual_review",
+      "reason": "Compare normal_sheet against approved core_sheet; particles must not define the silhouette"
+    },
+    {
+      "gate": "D_impact",
+      "status": "technical_pass",
+      "reason": "Four unmodified RuntimeEngine casts with real Unity colliders; contact and decorative-physics ownership recorded separately per scenario; contact artistry still reviewed"
+    },
+    {
+      "gate": "E_game_camera",
+      "status": "requires_visual_review",
+      "reason": "game_camera comes from actual SpellLab.BuildScene camera, default gameplay distance and viewport"
+    },
+    {
+      "gate": "F_motion",
+      "status": "requires_visual_review",
+      "reason": "Real SpellLab cast with RuntimeEngine ticks paced at 50 Hz; actual trajectories, contacts and event children; timestamped consecutive frames over declared lifetime and terminal survival, no time compression"
+    },
+    {
+      "gate": "semantic_blind",
+      "status": "requires_visual_review",
+      "reason": "Reviewer must receive core image without intent, title or drawing before comparison"
+    },
+    {
+      "gate": "performance",
+      "status": "technical_pass",
+      "reason": "Measured geometry, materials, peak particles and CPU sampling plus declared renderer-submission estimate meet known budgets. GPU cost, transparent overdraw and actual draw calls remain explicitly unmeasured"
+    }
+  ],
+  "contacts": [
+    {
+      "scenario": "ground",
+      "cast": true,
+      "contact_count": 1,
+      "ticks": 14,
+      "contact_normal": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "contact_position": [
+        0.0,
+        0.099999994,
+        -0.5
+      ],
+      "expected_response": "root_contact",
+      "test_apparatus": "Original compiled spell unchanged",
+      "expected_response_observed": true,
+      "gameplay_hits": 0,
+      "root_physics_only": true,
+      "core_topology_preserved": true,
+      "spawned_visuals": 1,
+      "simulated_physics": "RuntimeEngine.Tick (20 ms) paced by real wall clock; real Unity SphereCast/Raycast/Overlap against scenario colliders; no force on visual children",
+      "visual_review": "required"
+    },
+    {
+      "scenario": "wall",
+      "cast": true,
+      "contact_count": 1,
+      "ticks": 9,
+      "contact_normal": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "contact_position": [
+        0.0,
+        1.0,
+        -0.099999994
+      ],
+      "expected_response": "root_contact",
+      "test_apparatus": "Original compiled spell unchanged",
+      "expected_response_observed": true,
+      "gameplay_hits": 0,
+      "root_physics_only": true,
+      "core_topology_preserved": true,
+      "spawned_visuals": 1,
+      "simulated_physics": "RuntimeEngine.Tick (20 ms) paced by real wall clock; real Unity SphereCast/Raycast/Overlap against scenario colliders; no force on visual children",
+      "visual_review": "required"
+    },
+    {
+      "scenario": "target",
+      "cast": true,
+      "contact_count": 1,
+      "ticks": 7,
+      "contact_normal": [
+        7.89492e-15,
+        0.0,
+        -1.0
+      ],
+      "contact_position": [
+        -3.157968e-15,
+        1.0,
+        -0.5
+      ],
+      "expected_response": "root_contact",
+      "test_apparatus": "Original compiled spell unchanged",
+      "expected_response_observed": true,
+      "gameplay_hits": 1,
+      "root_physics_only": true,
+      "core_topology_preserved": true,
+      "spawned_visuals": 1,
+      "simulated_physics": "RuntimeEngine.Tick (20 ms) paced by real wall clock; real Unity SphereCast/Raycast/Overlap against scenario colliders; no force on visual children",
+      "visual_review": "required"
+    },
+    {
+      "scenario": "oblique",
+      "cast": true,
+      "contact_count": 1,
+      "ticks": 8,
+      "contact_normal": [
+        -0.5735764,
+        0.0,
+        -0.819152
+      ],
+      "contact_position": [
+        0.229430556,
+        1.0,
+        -0.2827264
+      ],
+      "expected_response": "root_contact",
+      "test_apparatus": "Original compiled spell unchanged",
+      "expected_response_observed": true,
+      "gameplay_hits": 0,
+      "root_physics_only": true,
+      "core_topology_preserved": true,
+      "spawned_visuals": 1,
+      "simulated_physics": "RuntimeEngine.Tick (20 ms) paced by real wall clock; real Unity SphereCast/Raycast/Overlap against scenario colliders; no force on visual children",
+      "visual_review": "required"
+    }
+  ],
+  "artistic_acceptance": "rejected_by_independent_review",
+  "human_acceptance": "not_requested_for_fixture",
+  "loop_seam": [
+    {
+      "node_id": "p0",
+      "scope": "root_active_loop",
+      "start_normalized_milli": 100,
+      "end_normalized_milli": 850,
+      "period_seconds": 4.5,
+      "first_vertex_count": 2147,
+      "last_vertex_count": 2147,
+      "same_topology": true,
+      "maximum_seam_displacement_m": 0.0,
+      "tolerance_m": 0.001,
+      "passed": true,
+      "measurement_scope": "Local structural vertices at active-loop boundaries; excludes gameplay root travel. Surface/particle phase quality remains subject to visual review"
+    },
+    {
+      "node_id": "p0",
+      "scope": "isolated_node_active_loop",
+      "start_normalized_milli": 100,
+      "end_normalized_milli": 850,
+      "period_seconds": 4.5,
+      "first_vertex_count": 2147,
+      "last_vertex_count": 2147,
+      "same_topology": true,
+      "maximum_seam_displacement_m": 0.0,
+      "tolerance_m": 0.001,
+      "passed": true,
+      "measurement_scope": "Local structural vertices at active-loop boundaries; excludes gameplay root travel. Surface/particle phase quality remains subject to visual review"
+    }
+  ]
+}

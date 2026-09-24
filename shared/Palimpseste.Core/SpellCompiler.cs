@@ -27,6 +27,8 @@ namespace Palimpseste.Core
         public SpellProvenance Provenance;
         public SpellVisualReference VisualReference;
         public string ReferenceResearchSha256;
+        // Optional only after V2 canonical sampling/validation. Never defines the blueprint itself.
+        public BinaryAssetEntry BlueprintAnimationSheet;
     }
 
     public sealed class CompilationResult
@@ -85,12 +87,20 @@ namespace Palimpseste.Core
             if (plan.description_sha256 != Sha256(input.DescriptionJson))
                 Add(issues, "description_hash", "$.description_sha256", "Plan is not tied to the frozen description bytes");
             CheckDescription(description, issues);
-            var geometry = LoadGeometry(input, issues);
-            CheckSemanticGeometry(description, geometry, input, issues);
+            var geometry = LoadGeometry(input, issues, IsV2(plan));
+            if (!IsV2(plan)) CheckSemanticGeometry(description, geometry, input, issues);
             CheckPlan(description, plan, geometry, issues);
             CheckVisualReference(input.DescriptionJson, plan, input.VisualReference, issues);
             CheckVisualConstruction(plan, issues);
             CheckReferenceResearch(description, plan, input.ReferenceResearchSha256, issues);
+            CheckBlueprints(plan, input, issues);
+            if (input.BlueprintAnimationSheet != null && (!IsV2(plan) ||
+                input.BlueprintAnimationSheet.file_name != "v2-animation-sheet.png" ||
+                input.BlueprintAnimationSheet.media_type != "image/png" ||
+                !ValidArtifactId(input.BlueprintAnimationSheet.artifact_id) ||
+                !HexDigest(input.BlueprintAnimationSheet.sha256) ||
+                input.BlueprintAnimationSheet.size_bytes < 24 || input.BlueprintAnimationSheet.size_bytes > 16777216))
+                Add(issues, "v2_animation_artifact", "$.binary_assets", "Canonical sheet requires a persisted, bounded, hashed PNG artifact on a V2 packet");
             if (input.GeometryJson == null || input.MaskPng == null) return new CompilationResult { Issues = issues };
             if (issues.Count != 0) return new CompilationResult { Issues = issues };
             var bounds = ComputeBounds(plan, geometry, input, issues);
@@ -99,7 +109,9 @@ namespace Palimpseste.Core
 
             var minimumClient = input.MinimumClientVersion;
             if (!System.Version.TryParse(minimumClient, out var parsedClient)) parsedClient = new System.Version(0, 0, 0);
-            if (plan.nodes.Any(node => node.appearance.construction?.parts.Any(part =>
+            if (IsV2(plan) && parsedClient < new System.Version(1, 8, 0))
+                minimumClient = SpellBlueprintV2Limits.MinimumClient;
+            else if (plan.nodes.Any(node => node.appearance.construction?.parts.Any(part =>
                     SpellVisualConstructionLimits.SourcedMaterials.Contains(part.material)) == true) &&
                 parsedClient < new System.Version(1, 7, 0))
                 minimumClient = "1.7.0";
@@ -134,6 +146,7 @@ namespace Palimpseste.Core
                 resource_bounds = bounds,
                 display = RulesPresenter.Describe(description, plan)
             };
+            if (input.BlueprintAnimationSheet != null) spell.binary_assets.Add(input.BlueprintAnimationSheet);
             var payload = Serialize(spell);
             var schemaIssues = ContractJson.Validate(ContractJson.ParseStrict(payload), "compiled-spell");
             if (schemaIssues.Count != 0) return new CompilationResult { Issues = schemaIssues };
@@ -162,6 +175,7 @@ namespace Palimpseste.Core
             {
                 if (node["behavior"]?.Type == JTokenType.Null) ((JObject)node).Property("behavior")?.Remove();
                 if (node["physics"]?.Type == JTokenType.Null) ((JObject)node).Property("physics")?.Remove();
+                if (node["blueprint_v2"]?.Type == JTokenType.Null) ((JObject)node).Property("blueprint_v2")?.Remove();
                 var options = (JObject)node["options"];
                 foreach (var property in options.Properties().ToList())
                     if (property.Value.Type == JTokenType.Null) property.Remove();
@@ -195,13 +209,13 @@ namespace Palimpseste.Core
             Issues = new[] { new ValidationIssue(code, "$", message) }
         };
 
-        private static Dictionary<string, GeometryAsset> LoadGeometry(CompilationInput input, List<ValidationIssue> issues)
+        private static Dictionary<string, GeometryAsset> LoadGeometry(CompilationInput input, List<ValidationIssue> issues, bool canonicalV2 = false)
         {
             var result = new Dictionary<string, GeometryAsset>(StringComparer.Ordinal);
             if (input.GeometryJson == null || input.MaskPng == null) {
                 Add(issues, "geometry_missing", "$.geometry", "Geometry and mask inputs are required"); return result;
             }
-            if (input.GeometryJson.Count < 1 || input.GeometryJson.Count > 32 || input.MaskPng.Count > 32)
+            if ((!canonicalV2 && input.GeometryJson.Count < 1) || input.GeometryJson.Count > 32 || input.MaskPng.Count > 32)
                 Add(issues, "geometry_count", "$.geometry", "Artifact count outside profile");
             foreach (var pair in input.GeometryJson)
             {
@@ -338,12 +352,13 @@ namespace Palimpseste.Core
                 if (plan.description_sha256 != Sha256(descriptionJson))
                     Add(issues, "description_hash", "$.description_sha256", "Plan is not tied to frozen description bytes");
                 var input = new CompilationInput { GeometryJson = geometryJson, MaskPng = maskPng };
-                var geometry = LoadGeometry(input, issues);
-                CheckSemanticGeometry(description, geometry, input, issues);
+                var geometry = LoadGeometry(input, issues, IsV2(plan));
+                if (!IsV2(plan)) CheckSemanticGeometry(description, geometry, input, issues);
                 CheckPlan(description, plan, geometry, issues);
                 CheckVisualReference(descriptionJson, plan, visualReference, issues);
                 CheckVisualConstruction(plan, issues);
                 CheckReferenceResearch(description, plan, referenceResearchSha256, issues);
+                CheckBlueprints(plan, input, issues);
                 if (geometryJson != null && maskPng != null && issues.Count == 0)
                     ComputeBounds(plan, geometry, input, issues);
                 return issues;
@@ -354,6 +369,11 @@ namespace Palimpseste.Core
         private static void CheckVisualReference(byte[] description, SpellPlan plan,
             SpellVisualReference reference, List<ValidationIssue> issues)
         {
+            if (IsV2(plan)) {
+                if (reference != null || plan.visual_reference_sha256 != null)
+                    Add(issues, "v2_independent_reference", "$.visual_reference", "V2 sheets are sampled from the canonical blueprint after structural validation; an independently generated image cannot define the core");
+                return;
+            }
             var hasConstruction = plan.nodes.Any(node => node.appearance.construction != null);
             if (reference == null)
             {
@@ -570,7 +590,7 @@ namespace Palimpseste.Core
         {
             var usesSourcedMaterial = plan.nodes.Any(node => node.appearance.construction?.parts?.Any(part =>
                 part != null && SpellVisualConstructionLimits.SourcedMaterials.Contains(part.material)) == true);
-            if (description.behaviors == null && plan.reference_research_sha256 == null && !usesSourcedMaterial) return;
+            if (!IsV2(plan) && description.behaviors == null && plan.reference_research_sha256 == null && !usesSourcedMaterial) return;
             if (!HexDigest(expectedHash) || plan.reference_research_sha256 != expectedHash)
                 Add(issues, "reference_research_hash", "$.reference_research_sha256",
                     "Plan must cite the exact frozen research context supplied by the server");
@@ -672,7 +692,7 @@ namespace Palimpseste.Core
                 Add(issues, "behavior_travel", path, "Projectile options.motion differs from interpreted travel");
             if (node.appearance.resource_id == null || !SpellVfxResources.All.Contains(node.appearance.resource_id))
                 Add(issues, "visual_resource_required", node.node_id + ".appearance.resource_id", "Select one shipped texture resource");
-            if (node.appearance.construction == null || node.appearance.lifecycle == null)
+            if (node.blueprint_v2 == null && (node.appearance.construction == null || node.appearance.lifecycle == null))
                 Add(issues, "behavior_visual_construction", path, "Physical behavior requires explicit image construction and lifecycle");
             var physics = node.physics;
             var numericPath = node.node_id + ".physics";
@@ -803,7 +823,7 @@ namespace Palimpseste.Core
             foreach (var node in plan.nodes)
             {
                 var p = node.node_id;
-                CheckLifecyclePlan(d, node, issues);
+                if (node.blueprint_v2 == null) CheckLifecyclePlan(d, node, issues);
                 CheckBehaviorPlan(d, node, issues);
                 if (!Emitted.ContainsKey(node.carrier)) { Add(issues, "carrier", p, "Unknown carrier"); continue; }
                 var allSubjectClauses = d.clauses.Where(c => c.subject_id == node.subject_id).ToArray();
@@ -923,6 +943,7 @@ namespace Palimpseste.Core
                     Add(issues, "motion_fact", p, "Expanding fact requires pulse");
                 if (new[] { "straight", "curve", "homing", "ballistic" }.Contains(motion) && node.carrier != "projectile")
                     Add(issues, "motion_fact", p, "Travel motion requires projectile");
+                if (node.blueprint_v2 == null) {
                 var request = d.shape_requests?.FirstOrDefault(s => s.subject_id == node.subject_id);
                 if (!geometry.TryGetValue(node.geometry_id, out var main))
                     Add(issues, "geometry_reference", p, "Unknown main geometry");
@@ -942,6 +963,7 @@ namespace Palimpseste.Core
                     Add(issues, "path_required", p, "This carrier requires a drawn path");
                 if ((node.carrier == "field" || node.carrier == "trap") && main?.kind != "footprint")
                     Add(issues, "footprint_required", p, "This carrier requires a footprint");
+                }
                 if (node.activation.parent_id == null)
                 {
                     if (node.activation.@event != "cast" || node.activation.max_activations != 1 || node.anchor == "parent_event")
@@ -1076,7 +1098,8 @@ namespace Palimpseste.Core
                     long statusTicks = PeriodicEffects.Contains(effect.kind) ? effect.duration_ticks / 50 : 0;
                     applications += count * contacts * (1 + statusTicks);
                 }
-                if (node.carrier == "barrier" && geometry.TryGetValue(node.geometry_id, out var g))
+                if (node.blueprint_v2 != null) colliders += count;
+                else if (node.carrier == "barrier" && geometry.TryGetValue(node.geometry_id, out var g))
                     colliders += count * Math.Min(64, Math.Max(0, g.points.Count - 1));
             }
             foreach (var pair in input.GeometryJson) geometryBytes += pair.Value?.Length ?? 0;
@@ -1107,6 +1130,19 @@ namespace Palimpseste.Core
         }
 
         private static int Clamp(long number) => number > int.MaxValue ? int.MaxValue : (int)number;
+        private static bool IsV2(SpellPlan plan) => plan.nodes.Any(node => node.blueprint_v2 != null);
+
+        private static void CheckBlueprints(SpellPlan plan, CompilationInput input, List<ValidationIssue> issues)
+        {
+            if (!IsV2(plan)) return;
+            if (plan.nodes.Any(node => node.blueprint_v2 == null))
+                Add(issues, "v2_mixed_pipeline", "$.nodes", "A V2 plan cannot contain an archived V1 node");
+            if (input.GeometryJson?.Count != 0 || input.MaskPng?.Count != 0)
+                Add(issues, "v2_traced_geometry", "$.geometry", "V2 has a canonical core and cannot consume traced drawing geometry or masks");
+            foreach (var node in plan.nodes.Where(node => node.blueprint_v2 != null))
+                foreach (var issue in SpellBlueprintV2Validator.ValidateNode(node))
+                    Add(issues, issue.Code, node.node_id + issue.Path.TrimStart('$'), issue.Message);
+        }
         private static string RecipeSignature(string kind, int amount, int duration, string direction,
             string target, string @event) => kind + "|" + amount.ToString(CultureInfo.InvariantCulture) + "|" +
             duration.ToString(CultureInfo.InvariantCulture) + "|" + direction + "|" + target + "|" + @event;

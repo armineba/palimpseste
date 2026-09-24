@@ -1,12 +1,12 @@
 <# Operator installation only. Does not generate a spell, run a diagnostic, or build software.
    Reuses the existing native Codex identity and observed D13 binary evidence unchanged.
    Gameplay and artistic acceptance remain pending the owner's own trial.
-   Updates an existing D15 database with migration011 only; migration010 is a prerequisite. #>
+   D20 applies migration012 only; migration011 is a prerequisite. Older Player updates apply011. #>
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$StageRoot,
     [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime',
-    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D16',
-    [ValidateSet('1.6.0','1.7.0')][string]$ClientVersion = '1.7.0',
+    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D20',
+    [ValidateSet('1.6.0','1.7.0','1.8.0')][string]$ClientVersion = '1.8.0',
     [string]$PublicReportPath = '',
     [ValidateRange(-1,2147483647)][int]$JobConcurrency = -1,
     [ValidateRange(0,86400)][int]$WaitForIdleSeconds = 0,
@@ -99,6 +99,16 @@ foreach ($relative in @('worker\Palimpseste.Worker.exe','api\Palimpseste.Api.exe
     if (-not (Test-Path -LiteralPath (Join-Path $stage $relative) -PathType Leaf)) { throw 'D16 stage incomplete.' }
 }
 $stageVfx = Join-Path $stage 'spec\assets\sourced-vfx'
+if ($ClientVersion -eq '1.8.0') {
+    foreach ($relative in @('migrations\012_blueprint_v2.sql',
+        'spec\prompts\06_BLUEPRINT_V2.md','spec\prompts\07_V2_CRITIC.md',
+        'spec\prompts\08_V2_INTERPRETATION.md','spec\prompts\09_V2_NUMERIC_RULES.md',
+        'spec\contracts\spell-blueprint-v2.schema.json','spec\contracts\spell-plan-v2.schema.json',
+        'spec\contracts\compiled-spell-v2.schema.json','spec\contracts\codex\model-b-v2.output-schema.json',
+        'spec\contracts\codex\model-j-v2.output-schema.json','blueprint-doctor\BlueprintV2Doctor.exe')) {
+        if (-not (Test-Path -LiteralPath (Join-Path $stage $relative) -PathType Leaf)) { throw "D20 stage incomplete: $relative" }
+    }
+}
 foreach ($file in Get-ChildItem -LiteralPath $stageVfx -Recurse -File) {
     Regular $file.FullName
     $relative = $file.FullName.Substring($stageVfx.Length + 1).Replace('\','/')
@@ -219,6 +229,11 @@ $claimPauseInstalled=$false
 $script:claimPauseIdentity=$null
 try {
     Assert-D15Schema
+    if ($ClientVersion -eq '1.8.0') {
+        $prerequisite = @(& $psql -X -w -A -t -v ON_ERROR_STOP=1 -c "SELECT CASE WHEN to_regclass('public.visual_atlases') IS NOT NULL THEN 1 ELSE 0 END;" 2> (Join-Path $logRoot 'v2-prerequisite.stderr.txt'))
+        if ($LASTEXITCODE -ne 0 -or ($prerequisite -join '').Trim() -ne '1') { throw 'Pipeline V2 requires migration011 already applied; services have not been stopped.' }
+        $record.migration_011_prerequisite_present=$true; Save-Record
+    }
     if ($DrainExistingJobs) {
         Set-ClaimPause $true
         $claimPauseInstalled=$true
@@ -241,11 +256,12 @@ try {
     $record.phase='services_stopped'; Save-Record
     $savedPreference=$ErrorActionPreference; $ErrorActionPreference='Continue'; $global:LASTEXITCODE=$null
     # Never replay009 or010 here: their older constraints reject newer visual pipeline versions.
-    $migration = Join-Path $stage 'migrations\011_animation_sheet.sql'
+    $migrationName = if ($ClientVersion -eq '1.8.0') { '012_blueprint_v2.sql' } else { '011_animation_sheet.sql' }
+    $migration = Join-Path $stage ('migrations\' + $migrationName)
     & $psql -X -w -v ON_ERROR_STOP=1 -f $migration 1> (Join-Path $logRoot 'migration.stdout.txt') 2> (Join-Path $logRoot 'migration.stderr.txt')
     $code=$global:LASTEXITCODE; $ErrorActionPreference=$savedPreference
-    if ($code -ne 0 -or $null -eq $code) { throw 'Migration011 failed; see private installation logs.' }
-    $record.migration_011_applied=$true; $record.migration_011_sha256=Digest $migration; $record.phase='migration_complete'; Save-Record
+    if ($code -ne 0 -or $null -eq $code) { throw 'Migration failed; see private installation logs.' }
+    $record.migration_applied=$migrationName; $record.migration_sha256=Digest $migration; $record.phase='migration_complete'; Save-Record
     Install-File (Join-Path $stage 'worker\Palimpseste.Worker.exe') (Join-Path $runtime 'bin\Palimpseste.Worker.exe')
     Install-File (Join-Path $stage 'doctor\ProviderDoctor.exe') (Join-Path $runtime 'bin\ProviderDoctor.exe')
     Install-File (Join-Path $stage 'visual-doctor\SpellVisualDoctor.exe') (Join-Path $runtime 'bin\SpellVisualDoctor.exe')

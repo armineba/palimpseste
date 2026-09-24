@@ -29,7 +29,8 @@ namespace Palimpseste.Core
         public const int MaxDocumentBytes = 8 * 1024 * 1024;
         public const int MaxDepth = 64;
         private static readonly string[] KnownSchemas = {
-            "spell-description", "spell-plan", "geometry", "compiled-spell"
+            "spell-description", "spell-plan", "geometry", "compiled-spell",
+            "spell-blueprint-v2", "spell-plan-v2", "compiled-spell-v2"
         };
 
         public static JObject ParseStrict(byte[] utf8, int maxBytes = MaxDocumentBytes)
@@ -85,6 +86,9 @@ namespace Palimpseste.Core
 
         public static IReadOnlyList<ValidationIssue> Validate(JToken token, string schemaName)
         {
+            // Route before validation; archived schemas stay frozen and cannot accept V2 fields.
+            if (schemaName == "spell-plan" && HasV2Blueprint(token)) schemaName = "spell-plan-v2";
+            if (schemaName == "compiled-spell" && HasV2Blueprint(token?["plan"])) schemaName = "compiled-spell-v2";
             if (!KnownSchemas.Contains(schemaName, StringComparer.Ordinal))
                 throw new ArgumentException("Unknown schema", nameof(schemaName));
             var assembly = typeof(ContractJson).GetTypeInfo().Assembly;
@@ -98,6 +102,9 @@ namespace Palimpseste.Core
                 return issues;
             }
         }
+
+        private static bool HasV2Blueprint(JToken plan) => plan?["nodes"] is JArray nodes &&
+            nodes.Any(node => node?["blueprint_v2"] != null && node["blueprint_v2"].Type != JTokenType.Null);
 
         private static void ValidateToken(JToken token, JObject rule, JObject root, string path,
             List<ValidationIssue> issues, int depth)
