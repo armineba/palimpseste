@@ -1,0 +1,29 @@
+{
+  "job_id": "5e763870284e41679c6b850b9b02ceff",
+  "provider_attempt_id": "953cf5e6fa4e4aa2b8e889916b6a9ba6",
+  "outcome": "Success",
+  "native_error_code": null,
+  "schema_sha256": "5f82b8b167429ab3e2c6a7dff0630d2c62849715cb4116ba15b06797952209b9",
+  "output_sha256": "76fb5d8712f42920214fdaa60e3cbbb20893dfaaed0300fddc3e09717b989210",
+  "ended_at": "2026-09-25T09:10:33.4622031+00:00",
+  "elapsed_ms": 174774,
+  "metadata_sha256": "616b0e7d0c5b7ff7e270ed8224426a86b17e57b7747e061e59090a47afc2d61c",
+  "provider_schema_accepted": true,
+  "construction_feedback": {
+    "stage": "structural_core",
+    "failure_kind": "construction_contract",
+    "issues": [
+      "v2_core_aperture n0.structural_core.inner_radius_milli: Only a planar field supports an aperture"
+    ],
+    "locked_stage_changed": false,
+    "methods_invalid": false,
+    "method_issues": null,
+    "provider_outcome": "Success",
+    "provider_error": null
+  },
+  "next_attempt_id": "65961c9d19a14306b39b94c84c6e3f11",
+  "next_attempt_status": "running",
+  "observed_at": "2026-09-25T11:11:45.769562+02:00",
+  "spell_published": false,
+  "original_failure_passes_retained": 4
+}

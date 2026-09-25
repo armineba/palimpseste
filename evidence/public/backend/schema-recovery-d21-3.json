@@ -25,7 +25,7 @@
   "unity_rebuilt": false,
   "deployed": true,
   "parchment_resumed": true,
-  "provider_acceptance_observed": false,
+  "provider_acceptance_observed": true,
   "gameplay_tested": false,
   "provider_diagnostic_calls": 0,
   "human_acceptance": "pending",
@@ -38,14 +38,17 @@
   "installed_at": "2026-09-25T09:07:19.6479994+00:00",
   "status_observed": {
     "state": "planning",
-    "attempt_count": 7,
+    "attempt_count": 8,
     "error_code": null,
-    "stage_started_at": "2026-09-25T09:07:38.625678Z"
+    "correction_stage": "structural_core",
+    "provider_response_received": true,
+    "spell_published": false
   },
   "installation_initial_attempt": {
     "completed": false,
     "last_phase": "migration_complete",
     "failure_reason_unrecorded": true,
     "retry_completed": true
-  }
+  },
+  "acceptance_evidence": "evidence/public/backend/schema-recovery-d21-3-provider-accepted.json"
 }
