@@ -1,12 +1,22 @@
 # État de réalisation et point de reprise
 
-## D22.1 — compilé ; installation autorisée, attend la génération active
+## D22.3 — installé ; reprise réelle du parchemin après timeout
+
+**Installation terminée le 25 septembre à 12:18:18 Paris**, Player 1.8.0 conservé, API et worker démarrés, pause retirée. Backend publié avec code 0. [Installation](../evidence/public/backend/construction-repair-d22-3-installation.json) · [Compilation et état](../evidence/public/backend/construction-repair-d22-3.json).
+
+Le runner observe désormais ensemble l’envoi du prompt, ses lecteurs et la sortie de Codex. Un lecteur en erreur n’attend plus la sortie d’un processus potentiellement bloqué ; les diagnostics restent privés et bornés. La terminaison non confirmée reste incertaine, les refus et violations restent protégés. [Détail et limites](D22_CONSTRUCTION_REPAIR.md).
+
+**Reprise via l’API exécutée, HTTP 202**, même job `5e763870284e41679c6b850b9b02ceff`, puis appel B n°14 observé à 12:19:07 Paris. Base 4..7, politique, compteurs et anciennes passes conservés. La reprise fonctionne pour l’identité `player` du propriétaire ; aucun rôle ni droit de compte changé. [Reprise réelle](../evidence/public/backend/construction-repair-d22-3-resume.json).
+
+**Résultat complet encore attendu.** Le précédent appel a réellement expiré après 1800 secondes ; le défaut de lecture trouvé dans le code n’est pas présenté comme sa cause prouvée. Aucun dessin de démonstration, diagnostic modèle ou test de gameplay supplémentaire lancé. Les prochaines captures et critiques appartiennent au parchemin repris. Ne pas annoncer ce sort prêt avant sa publication réelle ; l’acceptation artistique appartient au créateur.
+
+## D22.1 — installé ; appel du parchemin expiré
 
 Backend publié avec code 0 ; Player 1.8.0 conservé. Le complément restaure les mesures lors d’une reprise et documente les huit géométries exécutables. Les futures descriptions A 1.1 et leurs réparations reçoivent les mêmes capacités que le constructeur, pour éviter de demander une forme absente du moteur. [Preuve de compilation](../evidence/public/backend/construction-repair-d22-1.json) · [Détail](D22_CONSTRUCTION_REPAIR.md).
 
-Windows a annulé la première demande administrateur. Le créateur a explicitement demandé de la réafficher et accepté la suivante. Installation lancée le 25 septembre à 11:50:25 Paris ; elle attend le job `5e763870284e41679c6b850b9b02ceff`, sans annuler son appel en cours. Les nouvelles prises de jobs sont temporairement suspendues pendant cette installation. [État du déploiement](../evidence/public/backend/construction-repair-d22-1-installation.json).
+Windows a annulé la première demande administrateur. Le créateur a explicitement demandé de la réafficher et accepté la suivante. Installation terminée le 25 septembre à 12:06:37 Paris, API et worker redémarrés, pause retirée. Elle a attendu la fin du job actif. [État du déploiement](../evidence/public/backend/construction-repair-d22-1-installation.json).
 
-Le second job `c05961d1e0a74377a8567664f37f64c6` a réellement échoué sur sa structure : trois copies entières ne construisent pas un serpent unique en trois tronçons. Il n’est ni relancé ni annoncé jouable. Les deux descriptions existantes restent intactes. Aucun essai de jeu, diagnostic fournisseur ou génération de démonstration ajouté. Suivre le résultat du job actif et la fin du déploiement avant d’annoncer la livraison prête.
+Le second job `c05961d1e0a74377a8567664f37f64c6` a réellement échoué sur sa structure : trois copies entières ne construisent pas un serpent unique en trois tronçons. Il n’est ni relancé ni annoncé jouable. Les deux descriptions existantes restent intactes. Aucun essai de jeu, diagnostic fournisseur ou génération de démonstration ajouté. L’appel B réel de Tarière des strates a expiré à 12:06:27 après 1800 secondes, sans nouveau candidat. Aucun sort prêt n’est revendiqué. Voir [la preuve](../evidence/public/backend/construction-repair-d22-timeout.json). La surveillance des processus et la reprise explicite sont livrées dans D22.3, décrite en tête.
 
 ## D22 — installé ; même parchemin repris, résultat du rendu attendu
 

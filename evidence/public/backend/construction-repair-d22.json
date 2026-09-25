@@ -28,5 +28,7 @@
   "spell_published": false,
   "human_acceptance": "pending",
   "installed_at": "2026-09-25T09:36:03.9927431+00:00",
-  "status": "awaiting_real_construction_and_rendering"
+  "status": "real_B_attempt_timed_out_before_new_candidate",
+  "last_error": "attempt_timeout",
+  "timeout_evidence": "construction-repair-d22-timeout.json"
 }

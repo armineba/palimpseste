@@ -2,9 +2,9 @@
 
 Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. La nouvelle pipeline V2 est : **dessin → intention → blueprint canonique → mouvement continu → contrôles structure/physique/rendu → planche échantillonnée et sort jouable**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
-## D22 / D22.1 — boucle de correction du constructeur
+## D22.3 — construction et reprise corrigées
 
-Conserve les propositions refusées et la critique, transmet les capacités géométriques exactes et corrige une incompatibilité artificielle `area/ribbon`. D22.1 restaure les mesures lors des reprises et fournit les huit représentations exécutables aux futures descriptions A. Backend publié ; installation et reprise du parchemin à suivre dans [l’état actuel](docs/NEXT_ACTIONS.md). Aucune réussite de rendu encore revendiquée.
+Conserve les propositions refusées et la critique, transmet les capacités géométriques exactes et corrige une incompatibilité artificielle `area/ribbon`. D22.1 restaure les mesures lors des reprises et fournit les huit représentations exécutables aux futures descriptions A. D22.3 surveille les erreurs des flux Codex et permet au propriétaire de reprendre un appel B expiré dont l’arrêt est confirmé. Backend publié ; installation et reprise du parchemin à suivre dans [l’état actuel](docs/NEXT_ACTIONS.md). Aucune réussite de rendu encore revendiquée.
 
 ## D21.3 — interruption du constructeur corrigée
 

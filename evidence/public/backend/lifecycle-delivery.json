@@ -1,15 +1,15 @@
 {
     "version":  "1.8.0",
-    "updated_at":  "2026-09-25T09:51:35.6209244+00:00",
+    "updated_at":  "2026-09-25T10:20:04.2543064+00:00",
     "build_exit":  0,
-    "binary_stage":  "deliverables/.stage-backend/83270da7980f43558f0d8ba50b76a22e",
+    "binary_stage":  "deliverables/.stage-backend/3cbb134c0d364ea7b7e27fa3fbdf0159",
     "documentation_refreshed":  true,
     "zip":  "deliverables/Palimpseste-Backend-Windows-x64.zip",
-    "bytes":  282620668,
-    "sha256":  "b32defad1f625c390409715426a3d89ffababf5b1ff5707839bd2c8b59d56e9a",
-    "worker_sha256":  "7e1757bfa6d3b90b2c77dc7ddb87ef4b06d04042e337449afc3630b29b05ee56",
-    "api_sha256":  "5142d672c696a86cb784442ab84cfef333f774c6f582090acc28d8e06c77512e",
+    "bytes":  282648746,
+    "sha256":  "e47b949a56dad7a6b8ac2a5ba46bcc87fa2d1ec34691049621d62e42c6b5d486",
+    "worker_sha256":  "a6bafd757ea46b1bd682f8021e7caf0ab3eb2a191567401821c2074ef6340296",
+    "api_sha256":  "9a9cabc4eaac9f033ccf0ac867f6729c00d92b57b6a57b800533a8f2f006072c",
     "tests_executed_by_refresh":  false,
     "gameplay_acceptance":  "pending_owner",
-    "evidence":  "evidence/public/backend/construction-repair-d22-1.json"
+    "evidence":  "evidence/public/backend/construction-repair-d22-3.json"
 }

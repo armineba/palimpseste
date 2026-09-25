@@ -5,7 +5,7 @@
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$StageRoot,
     [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime',
-    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D22.1',
+    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D22.3',
     [ValidateSet('1.6.0','1.7.0','1.8.0')][string]$ClientVersion = '1.8.0',
     [string]$PublicReportPath = '',
     [ValidateRange(-1,2147483647)][int]$JobConcurrency = -1,

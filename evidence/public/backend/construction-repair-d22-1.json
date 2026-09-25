@@ -14,8 +14,8 @@
   "unity_rebuilt": false,
   "independent_provider_calls": 0,
   "gameplay_tests_executed": false,
-  "deployed": false,
-  "status": "waiting_for_existing_generation_before_installation",
+  "deployed": true,
+  "status": "installed",
   "first_windows_elevation_cancelled": true,
   "second_windows_elevation_authorized_by_owner": true,
   "human_acceptance": "pending",
@@ -27,5 +27,6 @@
     "api_sha256": "5142d672c696a86cb784442ab84cfef333f774c6f582090acc28d8e06c77512e",
     "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
     "publish_log": "deliverables/construction-repair-d22-1-publish.log"
-  }
+  },
+  "installed_at": "2026-09-25T10:06:37.5547912+00:00"
 }

@@ -153,7 +153,7 @@ foreach ($name in @('D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPEL
 Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Destination (Join-Path $stage 'evidence') -Recurse
 
 @"
-Palimpseste backend Windows x64 — D22.1 UNITY GOD / Player 1.8.0 inchangé
+Palimpseste backend Windows x64 — D22.3 UNITY GOD / Player 1.8.0 inchangé
 
 Les exécutables API, worker et diagnostics sont autoportants. Nouveaux sorts : dessin -> description -> cinq bibliothèques -> SpellBlueprintV2 -> structure canonique et mouvement continu -> CORE_ONLY et critique aveugle -> VFX -> impacts réels et caméra gameplay -> verdict -> planche 3x7 et paquet Unity. Aucun candidat refusé par les gates obligatoires n'est publié. Quatre candidats maximum par admission ; étapes conservées et corrections ciblées.
 

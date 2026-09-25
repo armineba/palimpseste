@@ -1,0 +1,28 @@
+{
+  "revision": "D22.3",
+  "client_version": "1.8.0",
+  "recorded_at": "2026-09-25T10:18:42.121362+00:00",
+  "backend": {
+    "publish_exit": 0,
+    "stage": "deliverables/.stage-backend/3cbb134c0d364ea7b7e27fa3fbdf0159",
+    "worker_sha256": "a6bafd757ea46b1bd682f8021e7caf0ab3eb2a191567401821c2074ef6340296",
+    "api_sha256": "9a9cabc4eaac9f033ccf0ac867f6729c00d92b57b6a57b800533a8f2f006072c",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "publish_log": "deliverables/construction-repair-d22-3-publish.log"
+  },
+  "backend_compiled": true,
+  "unity_rebuilt": false,
+  "independent_provider_calls": 0,
+  "gameplay_tests_executed": false,
+  "deployed": true,
+  "status": "real_construction_resumed_attempt_14",
+  "owner_role_change": false,
+  "timeout_resume_limited_to_authenticated_job_owner": true,
+  "read_only_database_eligibility_result": true,
+  "historical_attempt_json_modified": false,
+  "native_binary_changed": false,
+  "parchment_resumed": true,
+  "spell_published": false,
+  "human_acceptance": "pending",
+  "installed_at": "2026-09-25T10:18:18.5007285+00:00"
+}

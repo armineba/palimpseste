@@ -11,6 +11,7 @@ namespace Palimpseste.Provider;
 // This class only transports trusted application prompts and artifacts. It accepts no client arguments.
 public sealed class CodexProcessRunner
 {
+    private const int DiagnosticCharacterLimit = 16_384;
     private static readonly byte[] PngMagic = [137, 80, 78, 71, 13, 10, 26, 10];
     private static readonly string[] DisabledFeatures =
     [
@@ -239,13 +240,63 @@ public sealed class CodexProcessRunner
         const bool processStarted = true;
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(settings.AttemptTimeout);
-        var stdout = ReadBoundedAsync(process.StandardOutput, settings.MaxOutputBytes, timeout.Token);
-        var stderr = ReadBoundedAsync(process.StandardError, 128_000, timeout.Token);
+        var stdoutCapture = new StreamDiagnosticCapture();
+        var stderrCapture = new StreamDiagnosticCapture();
+        var stdout = ReadBoundedAsync(process.StandardOutput, settings.MaxOutputBytes, stdoutCapture, timeout.Token);
+        var stderr = ReadBoundedAsync(process.StandardError, 128_000, stderrCapture, timeout.Token);
+        Task? inputTask = null;
+        Task? exited = null;
+
+        async Task<CodexResult> FailAfterLaunchAsync(ProviderOutcome outcome, string code, string category)
+        {
+            // Cancellation stops the remaining pipe operations; process termination
+            // is independent of the caller's already-cancelled token. Never await a
+            // live child indefinitely when a read has stopped draining its pipe.
+            timeout.Cancel();
+            var stopped = await StopProcessAsync(process);
+            await ObserveStoppedTasksAsync(stdout, stderr, inputTask, exited);
+            var stdoutDiagnostic = stdoutCapture.Snapshot();
+            var stderrDiagnostic = stderrCapture.Snapshot();
+            var partialEvents = ReadDiagnosticEvents(stdoutDiagnostic);
+            var eventDiagnostic = SnapshotDiagnostic(partialEvents.Error);
+            // A timeout or pipe failure does not erase an already observed
+            // protected failure. Missing completion in an ordinary prefix is
+            // not an attestation violation; ParseEvents only declares one when
+            // an invalid/duplicate/order event or a completed turn proves it.
+            if (partialEvents.AttestationError is { } attestationError)
+            {
+                outcome = ProviderOutcome.IsolationViolation;
+                code = attestationError;
+                category += "_protected_attestation";
+            }
+            else if (partialEvents.Error is { } nativeError && Classify(nativeError) == ProviderOutcome.Refusal)
+            {
+                outcome = ProviderOutcome.Refusal;
+                code = "provider_refusal";
+                category += "_protected_refusal";
+            }
+            var failure = Failure(stopped.Exited ? outcome : ProviderOutcome.TransportUncertain,
+                code, started, stopped.ExitCode, partialEvents.SessionId, partialEvents.UsageJson,
+                directory, partialEvents.ReportedModel, partialEvents.ReportedEffort,
+                processStarted: processStarted, diagnosticStderr: stderrDiagnostic?.Text,
+                diagnosticStdoutSha256: stdoutDiagnostic?.Sha256,
+                diagnosticStdoutLength: stdoutDiagnostic?.Length,
+                diagnosticStdoutTruncated: stdoutDiagnostic?.Truncated ?? false,
+                diagnosticEventErrorSha256: eventDiagnostic?.Sha256,
+                diagnosticEventErrorLength: eventDiagnostic?.Length,
+                diagnosticEventErrorTruncated: eventDiagnostic?.Truncated ?? false,
+                diagnosticCategory: stopped.Exited ? category : category + "_termination_unconfirmed");
+            return await PersistFailureAsync(failure, stdoutDiagnostic?.Text, eventDiagnostic?.Text);
+        }
+
         try
         {
-            await process.StandardInput.WriteAsync(attempt.Prompt.AsMemory(), timeout.Token);
-            process.StandardInput.Close();
-            await process.WaitForExitAsync(timeout.Token);
+            exited = process.WaitForExitAsync(timeout.Token);
+            inputTask = WritePromptAsync(process.StandardInput, attempt.Prompt, timeout.Token);
+            // A reader may reach its limit or fail while the child is still alive.
+            // Observe every completion as it happens instead of waiting for exit
+            // first, which can deadlock against a full, no-longer-drained pipe.
+            await ObserveProcessTasksAsync(inputTask, stdout, stderr, exited);
             var outText = await stdout;
             var errText = await stderr;
             var diagnosticStderr = BoundDiagnostic(errText);
@@ -320,30 +371,27 @@ public sealed class CodexProcessRunner
             var result = new CodexResult(ProviderOutcome.Success, json, process.ExitCode, events.SessionId, null, started,
                 DateTimeOffset.UtcNow, GetCliVersion(executable), requestedModel, requestedEffort, events.ReportedModel, events.ReportedEffort,
                 events.UsageJson, directory, processStarted, diagnosticStderr, GeneratedImage: generatedImage);
-            await TryWriteAttemptOutcomeAsync(directory, result, attempt.Stage == "G" ? SnapshotDiagnostic(outText)?.Text : null, null, cancellationToken);
+            await TryWriteAttemptOutcomeAsync(directory, result, attempt.Stage == "G" ? SnapshotDiagnostic(outText)?.Text : null, null, CancellationToken.None);
             return result;
         }
         catch (OperationCanceledException)
         {
-            try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            try { await process.WaitForExitAsync(CancellationToken.None); } catch (InvalidOperationException) { }
-            return Failure(cancellationToken.IsCancellationRequested ? ProviderOutcome.TransportUncertain : ProviderOutcome.Timeout,
-                cancellationToken.IsCancellationRequested ? "cancelled_after_launch" : "attempt_timeout", started, directory: directory, processStarted: processStarted);
+            return await FailAfterLaunchAsync(cancellationToken.IsCancellationRequested ? ProviderOutcome.TransportUncertain : ProviderOutcome.Timeout,
+                cancellationToken.IsCancellationRequested ? "cancelled_after_launch" : "attempt_timeout",
+                cancellationToken.IsCancellationRequested ? "cancelled" : "timeout");
         }
         catch (InvalidDataException)
         {
-            try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            return Failure(ProviderOutcome.Incomplete, "event_stream_too_large", started, directory: directory, processStarted: processStarted);
+            return await FailAfterLaunchAsync(ProviderOutcome.Incomplete, "event_stream_too_large",
+                stdoutCapture.LimitExceeded ? "stdout_limit" : stderrCapture.LimitExceeded ? "stderr_limit" : "stream_limit");
         }
         catch (IOException)
         {
-            try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            return Failure(ProviderOutcome.ProcessFailure, "provider_io_failed", started, directory: directory, processStarted: processStarted);
+            return await FailAfterLaunchAsync(ProviderOutcome.ProcessFailure, "provider_io_failed", "io");
         }
         catch (UnauthorizedAccessException)
         {
-            try { process.Kill(entireProcessTree: true); } catch (InvalidOperationException) { }
-            return Failure(ProviderOutcome.IsolationViolation, "provider_access_denied", started, directory: directory, processStarted: processStarted);
+            return await FailAfterLaunchAsync(ProviderOutcome.IsolationViolation, "provider_access_denied", "permission");
         }
     }
 
@@ -387,7 +435,7 @@ public sealed class CodexProcessRunner
     private static DiagnosticSnapshot? SnapshotDiagnostic(string? raw)
     {
         if (string.IsNullOrWhiteSpace(raw)) return null;
-        const int limit = 16_384;
+        const int limit = DiagnosticCharacterLimit;
         var truncated = raw.Length > limit;
         var text = truncated ? raw[..limit] + "\n[diagnostic truncated]" : raw;
         return new(text, Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text))), text.Length, truncated);
@@ -396,7 +444,7 @@ public sealed class CodexProcessRunner
     private static string? BoundDiagnostic(string raw)
     {
         if (string.IsNullOrWhiteSpace(raw)) return null;
-        const int limit = 16_384;
+        const int limit = DiagnosticCharacterLimit;
         return raw.Length <= limit ? raw : raw[..limit] + "\n[stderr truncated]";
     }
 
@@ -424,12 +472,25 @@ public sealed class CodexProcessRunner
             var path = Path.Combine(directory, "attempt.json");
             if (!CodexSettings.IsPathInside(path, directory, allowEqual: false) ||
                 CodexSettings.HasReparsePoint(directory) || !File.Exists(path) || CodexSettings.HasReparsePoint(path)) return;
+            bool? stdoutPersisted = null;
             if (diagnosticStdout is not null)
             {
+                stdoutPersisted = false;
                 var stdoutPath = Path.Combine(directory, "stdout.jsonl");
-                if (CodexSettings.IsPathInside(stdoutPath, directory, allowEqual: false) &&
-                    !CodexSettings.HasReparsePoint(stdoutPath))
-                    await File.WriteAllTextAsync(stdoutPath, diagnosticStdout, new UTF8Encoding(false), cancellationToken);
+                try
+                {
+                    if (CodexSettings.IsPathInside(stdoutPath, directory, allowEqual: false) &&
+                        !CodexSettings.HasReparsePoint(stdoutPath))
+                    {
+                        await File.WriteAllTextAsync(stdoutPath, diagnosticStdout, new UTF8Encoding(false), cancellationToken);
+                        stdoutPersisted = true;
+                    }
+                }
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+                {
+                    // A diagnostic-file failure must not prevent writing the
+                    // primary attempt outcome when attempt.json remains writable.
+                }
             }
             var source = await File.ReadAllTextAsync(path, Encoding.UTF8, cancellationToken);
             using var doc = JsonDocument.Parse(source);
@@ -451,6 +512,7 @@ public sealed class CodexProcessRunner
             values["stdout_jsonl_sha256"] = result.DiagnosticStdoutSha256;
             values["stdout_jsonl_length"] = result.DiagnosticStdoutLength;
             values["stdout_jsonl_truncated"] = result.DiagnosticStdoutTruncated;
+            values["stdout_jsonl_persisted"] = stdoutPersisted;
             values["event_error"] = diagnosticEventError;
             values["event_error_sha256"] = result.DiagnosticEventErrorSha256;
             values["event_error_length"] = result.DiagnosticEventErrorLength;
@@ -467,7 +529,106 @@ public sealed class CodexProcessRunner
         }
     }
 
-    private static async Task<string> ReadBoundedAsync(StreamReader reader, int limit, CancellationToken ct)
+    private static async Task WritePromptAsync(StreamWriter writer, string prompt, CancellationToken ct)
+    {
+        await writer.WriteAsync(prompt.AsMemory(), ct);
+        await writer.FlushAsync(ct);
+        writer.Close();
+    }
+
+    private static async Task ObserveProcessTasksAsync(params Task[] tasks)
+    {
+        var pending = tasks.ToList();
+        while (pending.Count != 0)
+        {
+            var completed = await Task.WhenAny(pending);
+            // Propagate a pipe fault immediately even when the process is alive.
+            await completed;
+            pending.Remove(completed);
+        }
+    }
+
+    private static async Task<(bool Exited, int? ExitCode)> StopProcessAsync(Process process)
+    {
+        try { if (!process.HasExited) process.Kill(entireProcessTree: true); }
+        catch (Exception e) when (e is InvalidOperationException or System.ComponentModel.Win32Exception or
+            UnauthorizedAccessException or NotSupportedException) { }
+        // Killing can fail (for example if permissions changed). Do not turn a
+        // known pipe failure into another indefinite wait, or claim completion.
+        using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        try
+        {
+            await process.WaitForExitAsync(cleanup.Token);
+            return (true, process.ExitCode);
+        }
+        catch (Exception e) when (e is OperationCanceledException or InvalidOperationException or
+            System.ComponentModel.Win32Exception or UnauthorizedAccessException)
+        { return (false, null); }
+    }
+
+    private static async Task ObserveStoppedTasksAsync(params Task?[] tasks)
+    {
+        var completion = Task.WhenAll(tasks.OfType<Task>());
+        try { await completion.WaitAsync(TimeSpan.FromSeconds(5)); }
+        catch (Exception e) when (e is OperationCanceledException or InvalidDataException or IOException or UnauthorizedAccessException or
+            InvalidOperationException or TimeoutException or System.ComponentModel.Win32Exception)
+        {
+            // All faults are observed even if an OS pipe does not promptly honor
+            // cancellation. These tasks cannot authorize another provider call.
+            if (!completion.IsCompleted)
+                _ = completion.ContinueWith(done => { _ = done.Exception; }, CancellationToken.None,
+                    TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        }
+    }
+
+    private sealed class StreamDiagnosticCapture
+    {
+        private readonly object gate = new();
+        private readonly StringBuilder prefix = new();
+        private bool limitExceeded;
+        public bool LimitExceeded { get { lock (gate) return limitExceeded; } }
+
+        public void Append(char[] buffer, int count, bool exceedsLimit)
+        {
+            lock (gate)
+            {
+                limitExceeded |= exceedsLimit;
+                // One extra character lets SnapshotDiagnostic preserve the
+                // truncation flag without retaining the rest of a large stream.
+                var keep = Math.Min(count, DiagnosticCharacterLimit + 1 - prefix.Length);
+                if (keep > 0) prefix.Append(buffer, 0, keep);
+            }
+        }
+
+        public DiagnosticSnapshot? Snapshot()
+        {
+            lock (gate) return SnapshotDiagnostic(prefix.ToString());
+        }
+    }
+
+    private static (string? Error, string? SessionId, string? UsageJson, string? ReportedModel, string? ReportedEffort,
+        string? AttestationError)
+        ReadDiagnosticEvents(DiagnosticSnapshot? snapshot)
+    {
+        if (snapshot is null) return default;
+        var jsonl = snapshot.Truncated ? snapshot.Text[..DiagnosticCharacterLimit] : snapshot.Text;
+        // Retain complete events from a prefix; a cut JSONL line is not a native
+        // provider error and must not replace an earlier error event.
+        var lastNewline = jsonl.LastIndexOf('\n');
+        if (lastNewline >= 0) jsonl = jsonl[..(lastNewline + 1)];
+        else if (snapshot.Truncated) return default;
+        try
+        {
+            var events = ParseEvents(jsonl);
+            return (events.Error, events.SessionId, events.UsageJson, events.ReportedModel, events.ReportedEffort,
+                events.AttestationError);
+        }
+        catch (Exception e) when (e is JsonException or InvalidOperationException)
+        { return default; }
+    }
+
+    private static async Task<string> ReadBoundedAsync(StreamReader reader, int limit,
+        StreamDiagnosticCapture diagnostic, CancellationToken ct)
     {
         var buffer = new char[4096];
         var result = new StringBuilder();
@@ -475,7 +636,9 @@ public sealed class CodexProcessRunner
         {
             var read = await reader.ReadAsync(buffer.AsMemory(), ct);
             if (read == 0) return result.ToString();
-            if (result.Length + read > limit) throw new InvalidDataException("stream limit");
+            var exceedsLimit = result.Length + read > limit;
+            diagnostic.Append(buffer, read, exceedsLimit);
+            if (exceedsLimit) throw new InvalidDataException("stream limit");
             result.Append(buffer, 0, read);
         }
     }

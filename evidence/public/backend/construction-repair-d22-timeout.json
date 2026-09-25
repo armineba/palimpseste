@@ -1,0 +1,29 @@
+{
+  "observed_at": "2026-09-25T12:07:36.83783+02:00",
+  "job_id": "5e763870-284e-4167-9c6b-850b9b02ceff",
+  "attempt": {
+    "id": "89f18b6b-d687-4121-b5c9-56db8d5f4440",
+    "job_id": "5e763870-284e-4167-9c6b-850b9b02ceff",
+    "stage": "B",
+    "status": "invalid",
+    "error_code": "attempt_timeout",
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "high",
+    "started_at": "2026-09-25T11:36:26.698735+02:00",
+    "finished_at": "2026-09-25T12:06:27.043535+02:00",
+    "input_sha256": "69147808c112e7ddc5505e02e8b274edda29c7aeac6602336bf689b69b97d0c9",
+    "output_sha256": null
+  },
+  "timeout_seconds": 1800,
+  "process_observed_before_deadline": {
+    "pid": 21980,
+    "started_at": "2026-09-25T09:36:27.038Z",
+    "observed_at": "2026-09-25T10:05:09Z"
+  },
+  "process_absent_after_deadline_observed_at": "2026-09-25T10:06:50Z",
+  "pipeline_state": "needs_operator",
+  "error_code": "attempt_timeout",
+  "historical_attempt_json_incomplete": true,
+  "pipe_overflow_cause_confirmed": false,
+  "spell_published": false
+}

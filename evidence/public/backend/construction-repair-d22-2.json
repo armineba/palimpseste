@@ -1,0 +1,32 @@
+{
+  "revision": "D22.2",
+  "client_version": "1.8.0",
+  "recorded_at": "2026-09-25T10:16:46.554175+00:00",
+  "backend": {
+    "publish_exit": 0,
+    "stage": "deliverables/.stage-backend/63c27ecae4d5476cb0cb7514c4520d8c",
+    "worker_sha256": "a6bafd757ea46b1bd682f8021e7caf0ab3eb2a191567401821c2074ef6340296",
+    "api_sha256": "12dd49e844b6a3e19397e1af8e8fb8c60420c0188fde118522762a51c66dd8c1",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "publish_log": "deliverables/construction-repair-d22-2-publish.log",
+    "first_compile_exit": 1,
+    "first_compile_error": "CS0136 local input name conflict, renamed inputTask before successful publication",
+    "first_compile_log": "deliverables/construction-repair-d22-2-first-publish-failed.log"
+  },
+  "backend_compiled": true,
+  "unity_rebuilt": false,
+  "independent_provider_calls": 0,
+  "gameplay_tests_executed": false,
+  "deployed": true,
+  "installed_at": "2026-09-25T10:13:20.8385748+00:00",
+  "first_windows_elevation_cancelled": true,
+  "second_windows_elevation_authorized_by_owner": true,
+  "human_acceptance": "pending",
+  "parchment_resumed": false,
+  "spell_published": false,
+  "status": "installed_timeout_resume_role_mismatch_found",
+  "owner_role_observed": "player",
+  "D22_3_owner_eligibility_read_only_result": true,
+  "historical_attempt_json_modified": false,
+  "native_binary_changed": false
+}
