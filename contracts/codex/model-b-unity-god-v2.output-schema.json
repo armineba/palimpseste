@@ -1,0 +1,3727 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://palimpseste.invalid/contracts/codex/model-b-unity-god-v2.output-schema.json",
+  "title": "UNITY GOD V2 build envelope",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "sp.unity-god-build/1.0"
+    },
+    "plan": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "sp.plan/1.0"
+        },
+        "description_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "catalog_version": {
+          "const": "sp.capabilities/1.0"
+        },
+        "rules_profile": {
+          "const": "lab_v1"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/node_projectile"
+              },
+              {
+                "$ref": "#/$defs/node_beam"
+              },
+              {
+                "$ref": "#/$defs/node_field"
+              },
+              {
+                "$ref": "#/$defs/node_pulse"
+              },
+              {
+                "$ref": "#/$defs/node_barrier"
+              },
+              {
+                "$ref": "#/$defs/node_trap"
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "visual_reference_sha256": {
+          "type": "null"
+        },
+        "reference_research_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "schema_version",
+        "description_sha256",
+        "catalog_version",
+        "rules_profile",
+        "nodes",
+        "visual_reference_sha256",
+        "reference_research_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "method_design": {
+      "type": "object",
+      "properties": {
+        "skill_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "skill_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "method_catalog_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_review": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "enum": [
+                  "tinyplay_urp_shaders_collection",
+                  "xtaja_vfx_shader",
+                  "hovl_magic_effects_free",
+                  "unity_visual_effect_graph_samples",
+                  "keijiro_vfx_graph_assets"
+                ]
+              },
+              "disposition": {
+                "type": "string",
+                "enum": [
+                  "used",
+                  "reference_only",
+                  "unavailable",
+                  "not_applicable"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 900
+              }
+            },
+            "required": [
+              "source_id",
+              "disposition",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "node_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "choices": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "method_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "application": {
+                      "type": "string",
+                      "enum": [
+                        "reuse",
+                        "adapt",
+                        "combine"
+                      ]
+                    },
+                    "adaptation": {
+                      "type": "string",
+                      "minLength": 20,
+                      "maxLength": 1800
+                    },
+                    "bindings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 160
+                          },
+                          "value": {
+                            "type": "string",
+                            "maxLength": 500
+                          }
+                        },
+                        "required": [
+                          "path",
+                          "value"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 1,
+                      "maxItems": 16
+                    }
+                  },
+                  "required": [
+                    "method_id",
+                    "application",
+                    "adaptation",
+                    "bindings"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 4
+              },
+              "innovation": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 1200
+              },
+              "expected_visual_result": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 1200
+              }
+            },
+            "required": [
+              "node_id",
+              "choices",
+              "innovation",
+              "expected_visual_result"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "skill_version",
+        "skill_sha256",
+        "method_catalog_sha256",
+        "source_review",
+        "nodes"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "plan",
+    "method_design"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "activation": {
+      "type": "object",
+      "properties": {
+        "parent_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 64
+        },
+        "event": {
+          "type": "string",
+          "enum": [
+            "cast",
+            "hit",
+            "expire",
+            "trigger",
+            "tick",
+            "block",
+            "enter"
+          ]
+        },
+        "delay_ticks": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 250
+        },
+        "max_activations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "copies": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "spread_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 180000
+        }
+      },
+      "required": [
+        "parent_id",
+        "event",
+        "delay_ticks",
+        "max_activations",
+        "copies",
+        "spread_mdeg"
+      ],
+      "additionalProperties": false
+    },
+    "effect": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "event": {
+          "type": "string",
+          "enum": [
+            "spawn",
+            "hit",
+            "enter",
+            "tick",
+            "trigger",
+            "block",
+            "expire"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "damage",
+            "heal",
+            "impulse",
+            "burn",
+            "wet",
+            "slow",
+            "bleed",
+            "poison",
+            "freeze_damage",
+            "regen",
+            "barrier_health",
+            "vulnerability",
+            "weakness",
+            "haste",
+            "armor_break",
+            "damage_reduction",
+            "healing_reduction",
+            "root",
+            "stun",
+            "cleanse",
+            "dispel",
+            "life_steal",
+            "execute",
+            "shatter"
+          ]
+        },
+        "target_filter": {
+          "type": "string",
+          "enum": [
+            "hostile",
+            "ally",
+            "self",
+            "all_actors",
+            "environment"
+          ]
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500000
+        },
+        "duration_ticks": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "none",
+            "outward",
+            "inward",
+            "forward",
+            "up"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "clause_ids",
+        "event",
+        "kind",
+        "target_filter",
+        "amount",
+        "duration_ticks",
+        "direction"
+      ],
+      "additionalProperties": false
+    },
+    "node_projectile": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "projectile"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "const": "canonical.v2"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "palette": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light",
+                null
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "null"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
+            },
+            "vfx": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "enum": [
+                    "arcane",
+                    "fire",
+                    "frost",
+                    "lightning",
+                    "earth",
+                    "poison",
+                    "holy",
+                    "shadow",
+                    "nature",
+                    "water"
+                  ]
+                },
+                "motif": {
+                  "type": "string",
+                  "enum": [
+                    "runic",
+                    "orbital",
+                    "vortex",
+                    "fracture",
+                    "storm",
+                    "petal"
+                  ]
+                },
+                "density": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "aura_cm": {
+                  "type": "integer",
+                  "minimum": 80,
+                  "maximum": 400
+                },
+                "charge_ms": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 800
+                },
+                "impact": {
+                  "type": "string",
+                  "enum": [
+                    "nova",
+                    "shatter",
+                    "ripple",
+                    "pillar"
+                  ]
+                }
+              },
+              "required": [
+                "style",
+                "motif",
+                "density",
+                "aura_cm",
+                "charge_ms",
+                "impact"
+              ],
+              "additionalProperties": false
+            },
+            "construction": {
+              "type": "null"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "palette",
+            "signature_geometry_id",
+            "form",
+            "vfx",
+            "construction",
+            "lifecycle",
+            "resource_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "range_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3000
+            },
+            "speed_cm_s": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 6000
+            },
+            "radius_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "motion": {
+              "type": "string",
+              "enum": [
+                "straight",
+                "curve",
+                "homing",
+                "ballistic"
+              ]
+            },
+            "turn_mdeg_s": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 360000
+            },
+            "contact_filter": {
+              "type": "string",
+              "enum": [
+                "hostile",
+                "ally",
+                "self",
+                "all_actors",
+                "environment"
+              ]
+            },
+            "bounces": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "pierces": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "range_cm",
+            "speed_cm_s",
+            "radius_cm",
+            "motion",
+            "turn_mdeg_s",
+            "contact_filter",
+            "bounces",
+            "pierces"
+          ],
+          "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
+        },
+        "blueprint_v2": {
+          "$ref": "#/$defs/v2_blueprint"
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options",
+        "behavior",
+        "physics",
+        "blueprint_v2"
+      ],
+      "additionalProperties": false
+    },
+    "node_beam": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "beam"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "const": "canonical.v2"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "palette": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light",
+                null
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "null"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
+            },
+            "vfx": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "enum": [
+                    "arcane",
+                    "fire",
+                    "frost",
+                    "lightning",
+                    "earth",
+                    "poison",
+                    "holy",
+                    "shadow",
+                    "nature",
+                    "water"
+                  ]
+                },
+                "motif": {
+                  "type": "string",
+                  "enum": [
+                    "runic",
+                    "orbital",
+                    "vortex",
+                    "fracture",
+                    "storm",
+                    "petal"
+                  ]
+                },
+                "density": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "aura_cm": {
+                  "type": "integer",
+                  "minimum": 80,
+                  "maximum": 400
+                },
+                "charge_ms": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 800
+                },
+                "impact": {
+                  "type": "string",
+                  "enum": [
+                    "nova",
+                    "shatter",
+                    "ripple",
+                    "pillar"
+                  ]
+                }
+              },
+              "required": [
+                "style",
+                "motif",
+                "density",
+                "aura_cm",
+                "charge_ms",
+                "impact"
+              ],
+              "additionalProperties": false
+            },
+            "construction": {
+              "type": "null"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "palette",
+            "signature_geometry_id",
+            "form",
+            "vfx",
+            "construction",
+            "lifecycle",
+            "resource_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "range_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3000
+            },
+            "width_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "tick_interval": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "chain_hops": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "chain_radius_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 600
+            },
+            "chain_filter": {
+              "type": "string",
+              "enum": [
+                "hostile",
+                "ally",
+                "self",
+                "all_actors",
+                "environment"
+              ]
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "range_cm",
+            "width_cm",
+            "tick_interval",
+            "chain_hops",
+            "chain_radius_cm",
+            "chain_filter"
+          ],
+          "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
+        },
+        "blueprint_v2": {
+          "$ref": "#/$defs/v2_blueprint"
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options",
+        "behavior",
+        "physics",
+        "blueprint_v2"
+      ],
+      "additionalProperties": false
+    },
+    "node_field": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "field"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "const": "canonical.v2"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "palette": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light",
+                null
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "null"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
+            },
+            "vfx": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "enum": [
+                    "arcane",
+                    "fire",
+                    "frost",
+                    "lightning",
+                    "earth",
+                    "poison",
+                    "holy",
+                    "shadow",
+                    "nature",
+                    "water"
+                  ]
+                },
+                "motif": {
+                  "type": "string",
+                  "enum": [
+                    "runic",
+                    "orbital",
+                    "vortex",
+                    "fracture",
+                    "storm",
+                    "petal"
+                  ]
+                },
+                "density": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "aura_cm": {
+                  "type": "integer",
+                  "minimum": 80,
+                  "maximum": 400
+                },
+                "charge_ms": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 800
+                },
+                "impact": {
+                  "type": "string",
+                  "enum": [
+                    "nova",
+                    "shatter",
+                    "ripple",
+                    "pillar"
+                  ]
+                }
+              },
+              "required": [
+                "style",
+                "motif",
+                "density",
+                "aura_cm",
+                "charge_ms",
+                "impact"
+              ],
+              "additionalProperties": false
+            },
+            "construction": {
+              "type": "null"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "palette",
+            "signature_geometry_id",
+            "form",
+            "vfx",
+            "construction",
+            "lifecycle",
+            "resource_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "height_cm": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 300
+            },
+            "tick_interval": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 50
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "height_cm",
+            "tick_interval"
+          ],
+          "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
+        },
+        "blueprint_v2": {
+          "$ref": "#/$defs/v2_blueprint"
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options",
+        "behavior",
+        "physics",
+        "blueprint_v2"
+      ],
+      "additionalProperties": false
+    },
+    "node_pulse": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "pulse"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "const": "canonical.v2"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "palette": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light",
+                null
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "null"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
+            },
+            "vfx": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "enum": [
+                    "arcane",
+                    "fire",
+                    "frost",
+                    "lightning",
+                    "earth",
+                    "poison",
+                    "holy",
+                    "shadow",
+                    "nature",
+                    "water"
+                  ]
+                },
+                "motif": {
+                  "type": "string",
+                  "enum": [
+                    "runic",
+                    "orbital",
+                    "vortex",
+                    "fracture",
+                    "storm",
+                    "petal"
+                  ]
+                },
+                "density": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "aura_cm": {
+                  "type": "integer",
+                  "minimum": 80,
+                  "maximum": 400
+                },
+                "charge_ms": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 800
+                },
+                "impact": {
+                  "type": "string",
+                  "enum": [
+                    "nova",
+                    "shatter",
+                    "ripple",
+                    "pillar"
+                  ]
+                }
+              },
+              "required": [
+                "style",
+                "motif",
+                "density",
+                "aura_cm",
+                "charge_ms",
+                "impact"
+              ],
+              "additionalProperties": false
+            },
+            "construction": {
+              "type": "null"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "palette",
+            "signature_geometry_id",
+            "form",
+            "vfx",
+            "construction",
+            "lifecycle",
+            "resource_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 250
+            },
+            "radius_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1200
+            },
+            "front_width_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "radius_cm",
+            "front_width_cm"
+          ],
+          "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
+        },
+        "blueprint_v2": {
+          "$ref": "#/$defs/v2_blueprint"
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options",
+        "behavior",
+        "physics",
+        "blueprint_v2"
+      ],
+      "additionalProperties": false
+    },
+    "node_barrier": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "barrier"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "const": "canonical.v2"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "palette": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light",
+                null
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "null"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
+            },
+            "vfx": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "enum": [
+                    "arcane",
+                    "fire",
+                    "frost",
+                    "lightning",
+                    "earth",
+                    "poison",
+                    "holy",
+                    "shadow",
+                    "nature",
+                    "water"
+                  ]
+                },
+                "motif": {
+                  "type": "string",
+                  "enum": [
+                    "runic",
+                    "orbital",
+                    "vortex",
+                    "fracture",
+                    "storm",
+                    "petal"
+                  ]
+                },
+                "density": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "aura_cm": {
+                  "type": "integer",
+                  "minimum": 80,
+                  "maximum": 400
+                },
+                "charge_ms": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 800
+                },
+                "impact": {
+                  "type": "string",
+                  "enum": [
+                    "nova",
+                    "shatter",
+                    "ripple",
+                    "pillar"
+                  ]
+                }
+              },
+              "required": [
+                "style",
+                "motif",
+                "density",
+                "aura_cm",
+                "charge_ms",
+                "impact"
+              ],
+              "additionalProperties": false
+            },
+            "construction": {
+              "type": "null"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "palette",
+            "signature_geometry_id",
+            "form",
+            "vfx",
+            "construction",
+            "lifecycle",
+            "resource_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "height_cm": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 400
+            },
+            "thickness_cm": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "structure_milli": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500000
+            },
+            "block_limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "height_cm",
+            "thickness_cm",
+            "structure_milli",
+            "block_limit"
+          ],
+          "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
+        },
+        "blueprint_v2": {
+          "$ref": "#/$defs/v2_blueprint"
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options",
+        "behavior",
+        "physics",
+        "blueprint_v2"
+      ],
+      "additionalProperties": false
+    },
+    "node_trap": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "clause_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "carrier": {
+          "const": "trap"
+        },
+        "activation": {
+          "$ref": "#/$defs/activation"
+        },
+        "anchor": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "aim_point",
+            "parent_event"
+          ]
+        },
+        "geometry_id": {
+          "const": "canonical.v2"
+        },
+        "scale_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1200
+        },
+        "rotation_mdeg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 359999
+        },
+        "appearance": {
+          "type": "object",
+          "properties": {
+            "affinity": {
+              "type": "string",
+              "enum": [
+                "fire",
+                "water",
+                "stone",
+                "air"
+              ]
+            },
+            "pattern": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "double",
+                "dotted",
+                "irregular"
+              ]
+            },
+            "palette": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "ember",
+                "lava",
+                "ice",
+                "water",
+                "moss",
+                "stone",
+                "storm",
+                "arcane",
+                "shadow",
+                "light",
+                null
+              ]
+            },
+            "signature_geometry_id": {
+              "type": "null"
+            },
+            "form": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "boulder",
+                "meteor",
+                "crystal",
+                "blade",
+                "spear",
+                "hammer",
+                "orb",
+                "fireball",
+                "lightning",
+                "wave",
+                "vortex",
+                "chain",
+                "vine",
+                "tentacle",
+                "shield",
+                "skull",
+                "spirit",
+                "wolf",
+                "bird",
+                "serpent",
+                "golem",
+                null
+              ]
+            },
+            "vfx": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "enum": [
+                    "arcane",
+                    "fire",
+                    "frost",
+                    "lightning",
+                    "earth",
+                    "poison",
+                    "holy",
+                    "shadow",
+                    "nature",
+                    "water"
+                  ]
+                },
+                "motif": {
+                  "type": "string",
+                  "enum": [
+                    "runic",
+                    "orbital",
+                    "vortex",
+                    "fracture",
+                    "storm",
+                    "petal"
+                  ]
+                },
+                "density": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "aura_cm": {
+                  "type": "integer",
+                  "minimum": 80,
+                  "maximum": 400
+                },
+                "charge_ms": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 800
+                },
+                "impact": {
+                  "type": "string",
+                  "enum": [
+                    "nova",
+                    "shatter",
+                    "ripple",
+                    "pillar"
+                  ]
+                }
+              },
+              "required": [
+                "style",
+                "motif",
+                "density",
+                "aura_cm",
+                "charge_ms",
+                "impact"
+              ],
+              "additionalProperties": false
+            },
+            "construction": {
+              "type": "null"
+            },
+            "lifecycle": {
+              "$ref": "#/$defs/visual_lifecycle"
+            },
+            "resource_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
+            }
+          },
+          "required": [
+            "affinity",
+            "pattern",
+            "palette",
+            "signature_geometry_id",
+            "form",
+            "vfx",
+            "construction",
+            "lifecycle",
+            "resource_id"
+          ],
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 0,
+          "maxItems": 8
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "lifetime_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "arm_ticks": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 250
+            },
+            "trigger_limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            },
+            "rearm_ticks": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 250
+            },
+            "trigger_filter": {
+              "type": "string",
+              "enum": [
+                "hostile",
+                "ally",
+                "self",
+                "all_actors",
+                "environment"
+              ]
+            },
+            "height_cm": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 300
+            }
+          },
+          "required": [
+            "lifetime_ticks",
+            "arm_ticks",
+            "trigger_limit",
+            "rearm_ticks",
+            "trigger_filter",
+            "height_cm"
+          ],
+          "additionalProperties": false
+        },
+        "behavior": {
+          "$ref": "#/$defs/behavior_intent"
+        },
+        "physics": {
+          "$ref": "#/$defs/physics_profile"
+        },
+        "blueprint_v2": {
+          "$ref": "#/$defs/v2_blueprint"
+        }
+      },
+      "required": [
+        "node_id",
+        "subject_id",
+        "clause_ids",
+        "carrier",
+        "activation",
+        "anchor",
+        "geometry_id",
+        "scale_cm",
+        "rotation_mdeg",
+        "appearance",
+        "effects",
+        "options",
+        "behavior",
+        "physics",
+        "blueprint_v2"
+      ],
+      "additionalProperties": false
+    },
+    "visual_part": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "ellipsoid",
+            "shard",
+            "feather",
+            "ribbon",
+            "ring",
+            "arc"
+          ]
+        },
+        "material": {
+          "type": "string",
+          "enum": [
+            "glass",
+            "energy",
+            "mist",
+            "stone",
+            "metal",
+            "plasma",
+            "force_field",
+            "toxic",
+            "spectral_flow"
+          ]
+        },
+        "position_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -1000,
+            "maximum": 1000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "scale_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "rotation_mdeg": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -360000,
+            "maximum": 360000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "color_rgb": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "opacity_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "emission_milli": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6000
+        },
+        "points_cm": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": -1000,
+              "maximum": 1000
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "minItems": 0,
+          "maxItems": 16
+        },
+        "motion": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "still",
+                "flutter",
+                "orbit",
+                "drift"
+              ]
+            },
+            "amplitude_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 150
+            },
+            "frequency_mhz": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6000
+            },
+            "phase_mdeg": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 360000
+            }
+          },
+          "required": [
+            "kind",
+            "amplitude_cm",
+            "frequency_mhz",
+            "phase_mdeg"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "kind",
+        "material",
+        "position_cm",
+        "scale_cm",
+        "rotation_mdeg",
+        "color_rgb",
+        "opacity_milli",
+        "emission_milli",
+        "points_cm",
+        "motion"
+      ],
+      "additionalProperties": false
+    },
+    "visual_construction": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/visual_part"
+          },
+          "minItems": 1,
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "parts"
+      ],
+      "additionalProperties": false
+    },
+    "visual_lifecycle": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "intro": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "grow",
+                "assemble",
+                "ignite",
+                "draw",
+                "emerge"
+              ]
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 3000
+            },
+            "scale_start_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "opacity_start_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "emission_start_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6000
+            }
+          },
+          "required": [
+            "kind",
+            "duration_ms",
+            "scale_start_milli",
+            "opacity_start_milli",
+            "emission_start_milli"
+          ],
+          "additionalProperties": false
+        },
+        "active": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "steady",
+                "pulse",
+                "breathe",
+                "swirl",
+                "surge"
+              ]
+            },
+            "period_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 6000
+            },
+            "amplitude_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 500
+            }
+          },
+          "required": [
+            "kind",
+            "period_ms",
+            "amplitude_milli"
+          ],
+          "additionalProperties": false
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "burst",
+                "shatter",
+                "dissolve",
+                "collapse",
+                "ripple"
+              ]
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 3000
+            },
+            "spread_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 600
+            },
+            "scale_end_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3000
+            }
+          },
+          "required": [
+            "kind",
+            "duration_ms",
+            "spread_cm",
+            "scale_end_milli"
+          ],
+          "additionalProperties": false
+        },
+        "expiration": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "burst",
+                "shatter",
+                "dissolve",
+                "collapse",
+                "ripple"
+              ]
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 3000
+            },
+            "spread_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 600
+            },
+            "scale_end_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3000
+            }
+          },
+          "required": [
+            "kind",
+            "duration_ms",
+            "spread_cm",
+            "scale_end_milli"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "intro",
+        "active",
+        "contact",
+        "expiration"
+      ],
+      "additionalProperties": false
+    },
+    "behavior_intent": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "subject_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "caster",
+            "muzzle",
+            "aim_point",
+            "caster_ground",
+            "aim_ground",
+            "parent_event",
+            "parent_ground"
+          ]
+        },
+        "orientation": {
+          "type": "string",
+          "enum": [
+            "cast_forward",
+            "world_up",
+            "surface_normal"
+          ]
+        },
+        "attachment": {
+          "type": "string",
+          "enum": [
+            "world",
+            "caster"
+          ]
+        },
+        "phenomenon": {
+          "type": "string",
+          "enum": [
+            "static",
+            "spin",
+            "vortex",
+            "orbit",
+            "flow",
+            "flutter",
+            "turbulence"
+          ]
+        },
+        "axis": {
+          "type": "string",
+          "enum": [
+            "x",
+            "y",
+            "z"
+          ]
+        },
+        "sense": {
+          "type": "string",
+          "enum": [
+            "clockwise",
+            "counterclockwise"
+          ]
+        },
+        "intensity": {
+          "type": "string",
+          "enum": [
+            "gentle",
+            "brisk",
+            "violent"
+          ]
+        },
+        "travel": {
+          "type": "string",
+          "enum": [
+            "stationary",
+            "straight",
+            "curve",
+            "homing",
+            "ballistic"
+          ]
+        }
+      },
+      "required": [
+        "subject_id",
+        "origin",
+        "orientation",
+        "attachment",
+        "phenomenon",
+        "axis",
+        "sense",
+        "intensity",
+        "travel"
+      ],
+      "additionalProperties": false
+    },
+    "physics_profile": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "cast_range_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        },
+        "offset_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -500,
+            "maximum": 500
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "angular_speed_mdeg_s": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2880000
+        },
+        "axial_speed_cm_s": {
+          "type": "integer",
+          "minimum": -3000,
+          "maximum": 3000
+        },
+        "radial_speed_cm_s": {
+          "type": "integer",
+          "minimum": -3000,
+          "maximum": 3000
+        },
+        "radius_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "turbulence_cm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 300
+        },
+        "frequency_mhz": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6000
+        },
+        "gravity_cm_s2": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4000
+        },
+        "launch_pitch_mdeg": {
+          "type": "integer",
+          "minimum": -80000,
+          "maximum": 80000
+        }
+      },
+      "required": [
+        "cast_range_cm",
+        "offset_cm",
+        "angular_speed_mdeg_s",
+        "axial_speed_cm_s",
+        "radial_speed_cm_s",
+        "radius_cm",
+        "turbulence_cm",
+        "frequency_mhz",
+        "gravity_cm_s2",
+        "launch_pitch_mdeg"
+      ],
+      "additionalProperties": false
+    },
+    "v2_blueprint": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "sp.blueprint/2.0"
+        },
+        "intent": {
+          "type": "object",
+          "properties": {
+            "semantic_subject": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "primary_action": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "target_behavior": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "perceived_material": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "motion_character": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "silhouette_priority": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "visual_keywords": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "minItems": 1,
+              "maxItems": 16
+            },
+            "gameplay_role": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            },
+            "impact_intent": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "disappearance_intent": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "figurative": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "semantic_subject",
+            "primary_action",
+            "target_behavior",
+            "perceived_material",
+            "motion_character",
+            "silhouette_priority",
+            "visual_keywords",
+            "gameplay_role",
+            "impact_intent",
+            "disappearance_intent",
+            "figurative"
+          ],
+          "additionalProperties": false
+        },
+        "archetype": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "creature",
+              "projectile",
+              "beam",
+              "ribbon",
+              "orbital",
+              "area",
+              "explosion",
+              "summon",
+              "shield",
+              "portal",
+              "environmental",
+              "multi_projectile",
+              "abstract"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 4
+        },
+        "identity": {
+          "type": "object",
+          "properties": {
+            "hard_invariants": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "minItems": 3,
+              "maxItems": 16
+            },
+            "soft_invariants": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240
+              },
+              "minItems": 0,
+              "maxItems": 16
+            },
+            "free_parameters": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "emission",
+                  "atmosphere_density",
+                  "surface_flow",
+                  "secondary_intensity"
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 4
+            },
+            "topology": {
+              "const": "fixed"
+            },
+            "coordinate_system": {
+              "const": "local_cm_y_up_z_forward"
+            },
+            "element_count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16
+            },
+            "forward_axis": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 1
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "palette_rgb": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 255
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "minItems": 1,
+              "maxItems": 6
+            },
+            "landmarks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48
+                  },
+                  "branch_index": {
+                    "type": "integer",
+                    "minimum": -1,
+                    "maximum": 11
+                  },
+                  "t_milli": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  }
+                },
+                "required": [
+                  "id",
+                  "branch_index",
+                  "t_milli"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 2,
+              "maxItems": 24
+            }
+          },
+          "required": [
+            "hard_invariants",
+            "soft_invariants",
+            "free_parameters",
+            "topology",
+            "coordinate_system",
+            "element_count",
+            "forward_axis",
+            "palette_rgb",
+            "landmarks"
+          ],
+          "additionalProperties": false
+        },
+        "structural_core": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "swept_tube",
+                "ribbon",
+                "beam",
+                "radial_volume",
+                "vortex_surface",
+                "planar_field",
+                "controlled_swarm",
+                "branched_surface"
+              ]
+            },
+            "selection_reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "size_cm": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2000
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "control_points": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/v2_control_point"
+              },
+              "minItems": 2,
+              "maxItems": 32
+            },
+            "branches": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48
+                  },
+                  "parent_index": {
+                    "type": "integer",
+                    "minimum": -1,
+                    "maximum": 10
+                  },
+                  "parent_t_milli": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "control_points": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/v2_control_point"
+                    },
+                    "minItems": 2,
+                    "maxItems": 16
+                  }
+                },
+                "required": [
+                  "id",
+                  "parent_index",
+                  "parent_t_milli",
+                  "control_points"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0,
+              "maxItems": 12
+            },
+            "longitudinal_segments": {
+              "type": "integer",
+              "minimum": 8,
+              "maximum": 128
+            },
+            "radial_segments": {
+              "type": "integer",
+              "minimum": 6,
+              "maximum": 48
+            },
+            "entity_count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16
+            },
+            "inner_radius_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 950
+            },
+            "color_rgb": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "kind",
+            "selection_reason",
+            "size_cm",
+            "control_points",
+            "branches",
+            "longitudinal_segments",
+            "radial_segments",
+            "entity_count",
+            "inner_radius_milli",
+            "color_rgb"
+          ],
+          "additionalProperties": false
+        },
+        "motion": {
+          "type": "object",
+          "properties": {
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 30000
+            },
+            "trajectory": {
+              "type": "string",
+              "enum": [
+                "stationary",
+                "straight",
+                "curve",
+                "ballistic",
+                "homing"
+              ]
+            },
+            "path_cm": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": -3000,
+                  "maximum": 3000
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "minItems": 2,
+              "maxItems": 32
+            },
+            "deformation": {
+              "type": "string",
+              "enum": [
+                "none",
+                "undulate",
+                "twist",
+                "pulse",
+                "expand",
+                "vortex",
+                "flutter"
+              ]
+            },
+            "amplitude_cm": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 500
+            },
+            "frequency_mhz": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "angular_speed_mdeg_s": {
+              "type": "integer",
+              "minimum": -2880000,
+              "maximum": 2880000
+            },
+            "acceleration_cm_s2": {
+              "type": "integer",
+              "minimum": -4000,
+              "maximum": 4000
+            },
+            "anticipation_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 500
+            },
+            "follow_through_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "secondary_motion_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "impact_transition": {
+              "type": "string",
+              "enum": [
+                "stop",
+                "continue",
+                "deflect"
+              ]
+            },
+            "dissipation": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "dissolve",
+                "contract",
+                "disperse"
+              ]
+            }
+          },
+          "required": [
+            "duration_ms",
+            "trajectory",
+            "path_cm",
+            "deformation",
+            "amplitude_cm",
+            "frequency_mhz",
+            "angular_speed_mdeg_s",
+            "acceleration_cm_s2",
+            "anticipation_milli",
+            "follow_through_milli",
+            "secondary_motion_milli",
+            "impact_transition",
+            "dissipation"
+          ],
+          "additionalProperties": false
+        },
+        "phases": {
+          "type": "object",
+          "properties": {
+            "appearance_end_milli": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 450
+            },
+            "active_end_milli": {
+              "type": "integer",
+              "minimum": 451,
+              "maximum": 999
+            },
+            "active_loop": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "appearance_end_milli",
+            "active_end_milli",
+            "active_loop"
+          ],
+          "additionalProperties": false
+        },
+        "rendering_layers": {
+          "type": "object",
+          "properties": {
+            "core_surface": {
+              "type": "string",
+              "enum": [
+                "spectral",
+                "plasma",
+                "forcefield",
+                "toxic",
+                "unlit"
+              ]
+            },
+            "core_opacity_milli": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 1000
+            },
+            "core_emission_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6000
+            },
+            "secondary_kind": {
+              "type": "string",
+              "enum": [
+                "none",
+                "filaments",
+                "flow",
+                "pulse"
+              ]
+            },
+            "secondary_intensity_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "atmosphere_kind": {
+              "type": "string",
+              "enum": [
+                "none",
+                "sparks",
+                "smoke",
+                "motes",
+                "debris"
+              ]
+            },
+            "atmosphere_particles": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 512
+            },
+            "resource_id": {
+              "type": "string",
+              "enum": [
+                "kpp_circle_01",
+                "kpp_circle_03",
+                "kpp_fire_01",
+                "kpp_flame_01",
+                "kpp_magic_01",
+                "kpp_slash_01",
+                "kpp_smoke_01",
+                "kpp_spark_01",
+                "kpp_spark_05",
+                "kpp_star_01",
+                "kpp_trace_01",
+                "kpp_twirl_01",
+                "ksp_black_smoke_00",
+                "ksp_explosion_00",
+                "ksp_poison_puff_00",
+                "ksp_white_puff_00",
+                null
+              ]
+            }
+          },
+          "required": [
+            "core_surface",
+            "core_opacity_milli",
+            "core_emission_milli",
+            "secondary_kind",
+            "secondary_intensity_milli",
+            "atmosphere_kind",
+            "atmosphere_particles",
+            "resource_id"
+          ],
+          "additionalProperties": false
+        },
+        "physics": {
+          "type": "object",
+          "properties": {
+            "collider": {
+              "type": "string",
+              "enum": [
+                "sphere",
+                "capsule",
+                "box",
+                "plane"
+              ]
+            },
+            "collision_owner": {
+              "const": "root"
+            },
+            "collision_response": {
+              "type": "string",
+              "enum": [
+                "stop",
+                "pierce",
+                "bounce",
+                "overlap",
+                "block"
+              ]
+            },
+            "visual_response": {
+              "type": "string",
+              "enum": [
+                "impact",
+                "deform",
+                "dissolve",
+                "persist"
+              ]
+            },
+            "affected_components": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "core",
+                  "secondary",
+                  "atmosphere"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 3
+            },
+            "lifetime_behavior": {
+              "type": "string",
+              "enum": [
+                "until_contact",
+                "until_duration",
+                "until_contact_or_duration"
+              ]
+            },
+            "rigidbody_count": {
+              "const": 0
+            },
+            "decorative_physics": {
+              "const": false
+            },
+            "independent_entities": {
+              "const": false
+            }
+          },
+          "required": [
+            "collider",
+            "collision_owner",
+            "collision_response",
+            "visual_response",
+            "affected_components",
+            "lifetime_behavior",
+            "rigidbody_count",
+            "decorative_physics",
+            "independent_entities"
+          ],
+          "additionalProperties": false
+        },
+        "impact": {
+          "type": "object",
+          "properties": {
+            "contact_pose": {
+              "type": "string",
+              "enum": [
+                "preserve",
+                "align_normal",
+                "flatten"
+              ]
+            },
+            "hit_flash_milli": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "deformation": {
+              "type": "string",
+              "enum": [
+                "none",
+                "compress",
+                "ripple",
+                "expand"
+              ]
+            },
+            "reaction_duration_ms": {
+              "type": "integer",
+              "minimum": 20,
+              "maximum": 3000
+            },
+            "secondary_emission": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 128
+            },
+            "dissipation_direction": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "forward",
+                "radial",
+                "upward"
+              ]
+            },
+            "surviving_core_duration_ms": {
+              "type": "integer",
+              "minimum": 20,
+              "maximum": 3000
+            },
+            "destruction_mode": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "dissolve",
+                "contract",
+                "persist"
+              ]
+            }
+          },
+          "required": [
+            "contact_pose",
+            "hit_flash_milli",
+            "deformation",
+            "reaction_duration_ms",
+            "secondary_emission",
+            "dissipation_direction",
+            "surviving_core_duration_ms",
+            "destruction_mode"
+          ],
+          "additionalProperties": false
+        },
+        "disappearance": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "fade",
+                "dissolve",
+                "contract",
+                "disperse"
+              ]
+            },
+            "direction": {
+              "type": "string",
+              "enum": [
+                "longitudinal",
+                "radial",
+                "uniform",
+                "upward"
+              ]
+            },
+            "residual_duration_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3000
+            }
+          },
+          "required": [
+            "mode",
+            "direction",
+            "residual_duration_ms"
+          ],
+          "additionalProperties": false
+        },
+        "unity_implementation": {
+          "type": "object",
+          "properties": {
+            "root": {
+              "const": "Spell_ROOT"
+            },
+            "core_renderer": {
+              "const": "canonical_mesh"
+            },
+            "deformation_system": {
+              "const": "canonical_motion_v2"
+            },
+            "motion_controller": {
+              "const": "spell_runtime"
+            },
+            "collider_strategy": {
+              "const": "root_only"
+            },
+            "vfx_graph_systems": {
+              "const": 0
+            },
+            "particle_systems": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "shader": {
+              "const": "Palimpseste/CanonicalSpellV2"
+            },
+            "material_count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3
+            },
+            "trails": {
+              "const": "none"
+            },
+            "audio_hook": {
+              "type": "string",
+              "enum": [
+                "carrier",
+                "none"
+              ]
+            },
+            "impact_system": {
+              "const": "canonical_impact_v2"
+            },
+            "lifetime_controller": {
+              "const": "spell_runtime"
+            }
+          },
+          "required": [
+            "root",
+            "core_renderer",
+            "deformation_system",
+            "motion_controller",
+            "collider_strategy",
+            "vfx_graph_systems",
+            "particle_systems",
+            "shader",
+            "material_count",
+            "trails",
+            "audio_hook",
+            "impact_system",
+            "lifetime_controller"
+          ],
+          "additionalProperties": false
+        },
+        "validation_rules": {
+          "type": "object",
+          "properties": {
+            "required_gates": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "A_structure",
+                  "B_continuity",
+                  "C_rendering",
+                  "D_impact",
+                  "E_game_camera",
+                  "F_motion",
+                  "semantic_blind",
+                  "performance"
+                ]
+              },
+              "minItems": 8,
+              "maxItems": 8
+            },
+            "blind_semantic_check": {
+              "const": true
+            },
+            "reject_visible_primitives": {
+              "const": true
+            },
+            "require_fixed_topology": {
+              "const": true
+            },
+            "maximum_vertices": {
+              "type": "integer",
+              "minimum": 256,
+              "maximum": 131072
+            },
+            "maximum_particles": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 512
+            },
+            "maximum_draw_calls": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 16
+            },
+            "maximum_materials": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8
+            },
+            "maximum_cpu_microseconds": {
+              "type": "integer",
+              "minimum": 50,
+              "maximum": 20000
+            },
+            "maximum_gpu_microseconds": {
+              "type": "integer",
+              "minimum": 50,
+              "maximum": 20000
+            },
+            "maximum_transparent_layers": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32
+            }
+          },
+          "required": [
+            "required_gates",
+            "blind_semantic_check",
+            "reject_visible_primitives",
+            "require_fixed_topology",
+            "maximum_vertices",
+            "maximum_particles",
+            "maximum_draw_calls",
+            "maximum_materials",
+            "maximum_cpu_microseconds",
+            "maximum_gpu_microseconds",
+            "maximum_transparent_layers"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "intent",
+        "archetype",
+        "identity",
+        "structural_core",
+        "motion",
+        "phases",
+        "rendering_layers",
+        "physics",
+        "impact",
+        "disappearance",
+        "unity_implementation",
+        "validation_rules"
+      ],
+      "additionalProperties": false
+    },
+    "v2_control_point": {
+      "type": "object",
+      "properties": {
+        "position_cm": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -2000,
+            "maximum": 2000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "radius_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "width_cm": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000
+        }
+      },
+      "required": [
+        "position_cm",
+        "radius_cm",
+        "width_cm"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

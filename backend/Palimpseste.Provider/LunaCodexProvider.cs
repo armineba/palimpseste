@@ -46,7 +46,8 @@ public sealed record RepairAttempt(
     SpellReferenceResearch? Research = null,
     bool LegacyInterpretation = false);
 
-public sealed record ProviderDocument(CodexResult Transport, byte[]? Utf8, string? Sha256);
+public sealed record ProviderDocument(CodexResult Transport, byte[]? Utf8, string? Sha256,
+    byte[]? UnityGodReceipt = null, IReadOnlyList<string>? UnityGodIssues = null);
 
 public sealed partial class LunaCodexProvider : IMultimodalInterpreter, IDescriptionPlanner, ITechnicalRepairProvider, IVisualReferenceGenerator
 {

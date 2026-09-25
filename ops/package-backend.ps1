@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [string]$Configuration = 'Release',
     [string]$CodexExecutable = '',
@@ -66,13 +66,29 @@ foreach ($folder in @('licenses', 'textures')) {
 }
 $runtimePrompts = Join-Path $spec 'prompts'
 New-Item -ItemType Directory -Force -Path $runtimePrompts | Out-Null
-foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_REPARATION_TECHNIQUE.md', '04_IMAGE_REFERENCE.md', '05_VISUAL_CRITIC.md', '06_BLUEPRINT_V2.md', '07_V2_CRITIC.md', '08_V2_INTERPRETATION.md', '09_V2_NUMERIC_RULES.md')) {
+foreach ($name in @('01_MODEL_A_INTERPRETE.md', '02_MODEL_B_TRADUCTEUR.md', '03_REPARATION_TECHNIQUE.md', '04_IMAGE_REFERENCE.md', '05_VISUAL_CRITIC.md', '06_BLUEPRINT_V2.md', '07_V2_CRITIC.md', '08_V2_INTERPRETATION.md', '09_V2_NUMERIC_RULES.md', '10_UNITY_GOD_RUNTIME.md')) {
     Copy-Item -LiteralPath (Join-Path (Join-Path $projectRoot 'prompts') $name) -Destination (Join-Path $runtimePrompts $name)
 }
 $runtimePromptHistory = Join-Path $runtimePrompts 'history'
 New-Item -ItemType Directory -Force -Path $runtimePromptHistory | Out-Null
 foreach ($name in @('01_MODEL_A_INTERPRETE_2_3.md', '04_IMAGE_REFERENCE_1_2.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('prompts/history/' + $name)) -Destination (Join-Path $runtimePromptHistory $name)
+}
+# The generation worker consumes only this reviewed knowledge snapshot. Never
+# copy authoring scripts, import helpers or arbitrary skill attachments into spec.
+foreach ($relative in @('SKILL.md', 'references/runtime.md', 'references/methods.json')) {
+    $source = Join-Path $projectRoot ('skills/unity-god/' + $relative)
+    for ($cursor = [IO.Path]::GetFullPath($source); $cursor; $cursor = [IO.Path]::GetDirectoryName($cursor)) {
+        if ((Test-Path -LiteralPath $cursor) -and ((Get-Item -LiteralPath $cursor -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            throw 'UNITY GOD source links are not distributable.'
+        }
+    }
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "UNITY GOD data missing: $relative" }
+    $destination = Join-Path $spec ('skills/unity-god/' + $relative)
+    New-Item -ItemType Directory -Path ([IO.Path]::GetDirectoryName($destination)) -Force | Out-Null
+    Copy-Item -LiteralPath $source -Destination $destination
+    if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -cne
+        (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash) { throw 'UNITY GOD runtime data copy differs.' }
 }
 New-Item -ItemType Directory -Force -Path (Join-Path $stage 'migrations') | Out-Null
 Get-ChildItem -LiteralPath (Join-Path $projectRoot 'backend/migrations') -Filter '*.sql' -File |
@@ -127,17 +143,19 @@ Set-ArchiveHashPin $archiveApiLauncher 'expectedChildSha256' $archiveApiChildHas
 
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/IMPLEMENTATION_STATUS.md') -Destination (Join-Path $stage 'IMPLEMENTATION_STATUS.md')
 New-Item -ItemType Directory -Path (Join-Path $stage 'docs') -Force | Out-Null
-foreach ($name in @('D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPELL_PIPELINE_V2.md','V2_BLUEPRINT_CONTRACT.md','V2_UNITY_STRUCTURAL_RENDERER.md','V2_VALIDATION_ENGINE.md','NEXT_ACTIONS.md')) {
+foreach ($name in @('D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPELL_PIPELINE_V2.md','D21_UNITY_GOD.md','V2_BLUEPRINT_CONTRACT.md','V2_UNITY_STRUCTURAL_RENDERER.md','V2_VALIDATION_ENGINE.md','NEXT_ACTIONS.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $name)) -Destination (Join-Path $stage ('docs/' + $name))
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Destination (Join-Path $stage 'evidence') -Recurse
 
 @"
-Palimpseste backend Windows x64 — D20 / Player 1.8.0
+Palimpseste backend Windows x64 — D21 UNITY GOD / Player 1.8.0 inchangé
 
 Les exécutables API, worker et diagnostics sont autoportants. Nouveaux sorts : dessin -> description -> cinq bibliothèques -> SpellBlueprintV2 -> structure canonique et mouvement continu -> CORE_ONLY et critique aveugle -> VFX -> impacts réels et caméra gameplay -> verdict -> planche 3x7 et paquet Unity. Aucun candidat refusé par les gates obligatoires n'est publié. Quatre candidats maximum par admission ; étapes conservées et corrections ciblées.
 
 Les admissions historiques 0..4 restent en V1. L'admission 5 utilise V2, client 1.8.0 requis. Aucun sort historique régénéré ni asset historique modifié. La planche échantillonne le même modèle temporel que le Player ; huit représentations structurelles sont disponibles.
+
+D21 ajoute UNITY GOD aux nouvelles recherches V2 : fiches de construction issues des bibliothèques, sélection des méthodes pertinentes, réutilisation/adaptation/combinaison et bindings contrôlés contre les vrais paramètres du blueprint. Le reçu des méthodes est privé, lié par hash au plan et sauvegardé atomiquement avec sa révision. Les critiques non aveugles reçoivent ces méthodes ; le contrôle aveugle reste aveugle. Le Player et le contrat des sorts restent inchangés. Les anciens dossiers de recherche figés gardent leur parcours. Le skill constitue une base de connaissances consultée, pas un nouvel entraînement des poids du modèle.
 
 Le worker utilise codex exec sous PalRuntimeSvc et conserve les protections du binaire natif épinglé. A/B/J ne peuvent ni télécharger, ni exécuter du code, ni lire les secrets, ni modifier Unity. Les blueprints sont des données bornées exécutées par le renderer précompilé protégé. Les scripts ops sont réservés à l'opérateur et ne doivent jamais être exposés au worker.
 
@@ -145,11 +163,11 @@ PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0 conserve l'absence de plafond applicatif 
 
 Ressources intégrées : textures CC0 sélectionnées, portages TinyPlay MIT / Keijiro Unlicense. Les cinq bibliothèques sont consultées ; xtaja sans licence, Magic Effects non acquis et exemples Unity HDRP/LFS restent des références à disponibilité explicite. Toutes les bibliothèques ne sont pas embarquées. Conserver les notices du Player.
 
-Installation : lire IMPLEMENTATION_STATUS.md et docs/D20_SPELL_PIPELINE_V2.md. Sur D19, deploy-lifecycle.ps1 applique uniquement migration012 après drainage et vérification de011. Ne pas rejouer les anciennes migrations sur une base plus récente. Pour une base neuve, appliquer001..012 dans l'ordre. L'archive ne contient aucun auth.json, jeton joueur, secret DB ou clé API. Installer un renderer Player1.8 protégé avec manifeste SHA complet.
+Installation : lire IMPLEMENTATION_STATUS.md, docs/D20_SPELL_PIPELINE_V2.md et docs/D21_UNITY_GOD.md. Pour ce paquet Player 1.8, deploy-lifecycle.ps1 vérifie les données UNITY GOD et les migrations avant l'arrêt des services, puis applique 012 et 013 dans cet ordre après drainage et vérification de 011. Les mises à jour 1.6/1.7 conservent leur chemin 011. Ne pas rejouer 009 ou 010 sur une base plus récente. Pour une base neuve, appliquer 001..013 dans l'ordre. Chaque migration exécutée et son SHA sont consignés. L'archive ne contient aucun auth.json, jeton joueur, secret DB ou clé API. Installer un renderer Player 1.8 protégé avec manifeste SHA complet.
 
-L'API exige DATABASE_URL, ARTIFACT_ROOT et PALIMPSESTE_SPEC_ROOT. Le worker exige son compte dédié, CODEX_HOME isolé, les preuves natives et les pins du renderer. Le binaire et l'identité Codex existants sont conservés. Le service local est127.0.0.1 ; cette archive ne configure ni HTTPS public ni identités distantes.
+L'API exige DATABASE_URL, ARTIFACT_ROOT et PALIMPSESTE_SPEC_ROOT. Le worker exige son compte dédié, CODEX_HOME isolé, les preuves natives et les pins du renderer. Le binaire et l'identité Codex existants sont conservés. Le service local est 127.0.0.1 ; cette archive ne configure ni HTTPS public ni identités distantes.
 
-Les tests de contrat et la fixture Unity séparée sont documentés dans les preuves V2. Le rendu de la fixture n'est pas accepté artistiquement. completed=true signifie fin de capture, pas acceptation du sort. GPU/overdraw non mesurés restent inconnus. Le nouveau parcours Codex réel et l'installation D20 restent en attente de l'élévation Windows ; aucune réussite n'est présumée.
+Les tests de contrat et la fixture Unity séparée sont documentés dans les preuves V2. Le rendu de la fixture n'est pas accepté artistiquement. completed=true signifie fin de capture, pas acceptation du sort. GPU/overdraw non mesurés restent inconnus. Consulter les preuves et le point de reprise pour l'état des appels Codex réels et de l'installation D21 : aucune compilation de paquet ne vaut déploiement ni acceptation visuelle.
 
 blueprint-doctor est un outil opérateur pour vrais appels B/J isolés, sans écriture DB ni bibliothèque joueur. Seul son rapport atteste les appels réellement exécutés. Consulter le point de reprise pour finaliser.
 

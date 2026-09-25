@@ -2,6 +2,28 @@ PALIMPSESTE — BIBLIOTHÈQUES VFX OBLIGATOIRES
 Décision du créateur : 24 septembre 2026
 Cible : Unity 6.3 LTS, Universal Render Pipeline (URP).
 
+EXTENSION D21 — UNITY GOD / PIPELINE V2
+
+Utiliser skills/unity-god/SKILL.md. Partir des mécanismes réellement observés
+dans les sources, pas seulement de leurs images ou noms. Le catalogue
+skills/unity-god/references/methods.json indique fichiers, commits, SHA,
+méthodes de construction et adaptations disponibles. En développement,
+ouvrir les sources pertinentes avant tout nouveau portage. En génération
+joueur, le dossier figé fournit ces méthodes sans donner d'outils au worker.
+
+Ordre V2 : intention, étude des méthodes, core et mouvement continus,
+paramètres contrôlés, silhouette seule, couches secondaires, impacts,
+critique indépendante et planche échantillonnée depuis ce même sort.
+L'ancien ordre image d'abord ci-dessous concerne le parcours historique V1.
+B 2.1 doit fournir son dossier de méthodes ; la boucle vérifie chaque liaison
+au blueprint et transmet ce dossier au critique non aveugle.
+
+20 méthodes décrites, sept adaptations exécutables dans le Player V2 actuel.
+Une fiche étudiée ne rend pas sa technique automatiquement disponible.
+Le catalogue n'est pas une liste exhaustive des contrôles du blueprint.
+Installation du skill local attestée ; déploiement backend D21 en attente
+Windows UAC. Aucun nouveau rendu accepté. Voir docs/D21_UNITY_GOD.md.
+
 RÈGLE POUR CHAQUE FUTUR SORT ET CHAQUE AMÉLIORATION VFX
 
 Explorer les cinq sources ci-dessous avant de construire. Partir des éléments

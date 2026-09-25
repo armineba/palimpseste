@@ -1,11 +1,11 @@
 <# Operator installation only. Does not generate a spell, run a diagnostic, or build software.
    Reuses the existing native Codex identity and observed D13 binary evidence unchanged.
    Gameplay and artistic acceptance remain pending the owner's own trial.
-   D20 applies migration012 only; migration011 is a prerequisite. Older Player updates apply011. #>
+   D21 applies migrations012 then013; migration011 is a prerequisite. Older Player updates apply011. #>
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$StageRoot,
     [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime',
-    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D20',
+    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D21',
     [ValidateSet('1.6.0','1.7.0','1.8.0')][string]$ClientVersion = '1.8.0',
     [string]$PublicReportPath = '',
     [ValidateRange(-1,2147483647)][int]$JobConcurrency = -1,
@@ -100,15 +100,32 @@ foreach ($relative in @('worker\Palimpseste.Worker.exe','api\Palimpseste.Api.exe
 }
 $stageVfx = Join-Path $stage 'spec\assets\sourced-vfx'
 if ($ClientVersion -eq '1.8.0') {
-    foreach ($relative in @('migrations\012_blueprint_v2.sql',
+    foreach ($relative in @('migrations\012_blueprint_v2.sql','migrations\013_unity_god_methods.sql',
         'spec\prompts\06_BLUEPRINT_V2.md','spec\prompts\07_V2_CRITIC.md',
-        'spec\prompts\08_V2_INTERPRETATION.md','spec\prompts\09_V2_NUMERIC_RULES.md',
+        'spec\prompts\08_V2_INTERPRETATION.md','spec\prompts\09_V2_NUMERIC_RULES.md','spec\prompts\10_UNITY_GOD_RUNTIME.md',
         'spec\contracts\spell-blueprint-v2.schema.json','spec\contracts\spell-plan-v2.schema.json',
         'spec\contracts\compiled-spell-v2.schema.json','spec\contracts\codex\model-b-v2.output-schema.json',
-        'spec\contracts\codex\model-j-v2.output-schema.json','blueprint-doctor\BlueprintV2Doctor.exe')) {
-        if (-not (Test-Path -LiteralPath (Join-Path $stage $relative) -PathType Leaf)) { throw "D20 stage incomplete: $relative" }
+        'spec\contracts\codex\model-j-v2.output-schema.json','spec\contracts\codex\model-b-unity-god-v2.output-schema.json',
+        'spec\skills\unity-god\SKILL.md','spec\skills\unity-god\references\runtime.md',
+        'spec\skills\unity-god\references\methods.json','blueprint-doctor\BlueprintV2Doctor.exe')) {
+        $requiredFile = Join-Path $stage $relative
+        Regular $requiredFile
+        if (-not (Test-Path -LiteralPath $requiredFile -PathType Leaf)) { throw "D21 stage incomplete: $relative" }
+    }
+    $stageUnityGod = Join-Path $stage 'spec\skills\unity-god'
+    foreach ($file in Get-ChildItem -LiteralPath $stageUnityGod -Recurse -File) {
+        Regular $file.FullName
+        $relative = $file.FullName.Substring($stageUnityGod.Length + 1).Replace('\','/')
+        if ($relative -cnotin @('SKILL.md','references/runtime.md','references/methods.json')) {
+            throw 'UNITY GOD runtime package contains files outside the reviewed knowledge snapshot.'
+        }
     }
 }
+$migrationNames = if ($ClientVersion -eq '1.8.0') { @('012_blueprint_v2.sql','013_unity_god_methods.sql') } else { @('011_animation_sheet.sql') }
+$migrationInputs = @($migrationNames | ForEach-Object {
+    $source = Join-Path $stage ('migrations\' + $_); Regular $source
+    [ordered]@{file=$_;sha256=Digest $source}
+})
 foreach ($file in Get-ChildItem -LiteralPath $stageVfx -Recurse -File) {
     Regular $file.FullName
     $relative = $file.FullName.Substring($stageVfx.Length + 1).Replace('\','/')
@@ -136,7 +153,8 @@ $logRoot = Join-Path $runtime ('evidence\pending\animation-sheet-install-' + $st
 New-Item -ItemType Directory -Path $logRoot | Out-Null
 Protect $logRoot
 $record = [ordered]@{version=$ClientVersion; backend_revision=$BackendRevision; delivery_name=($BackendRevision + ' backend / Player ' + $ClientVersion); started_at=[DateTimeOffset]::UtcNow.ToString('o'); phase='staging'; completed=$false;
-    spell_generations=0; diagnostics_executed=$false; gameplay_tested=$false; visual_acceptance='pending_owner'; native_sha256=$originalNative}
+    spell_generations=0; diagnostics_executed=$false; gameplay_tested=$false; visual_acceptance='pending_owner'; native_sha256=$originalNative;
+    migrations_planned=$migrationInputs; migrations_applied=@()}
 function Save-Record {
     $json = $record | ConvertTo-Json -Depth 7
     [IO.File]::WriteAllText((Join-Path $logRoot 'installation.json'),$json,$utf8)
@@ -221,7 +239,7 @@ function Assert-D15Schema {
     $lines=@(& $psql -X -w -A -t -v ON_ERROR_STOP=1 -c $sql 2> (Join-Path $logRoot 'schema-prerequisite.stderr.txt'))
     $code=$global:LASTEXITCODE
     if ($code -ne 0 -or $null -eq $code -or $lines.Count -ne 1 -or $lines[0] -ne '1') {
-        throw 'D15 schema prerequisite missing. Fresh installations must apply migrations001 through011 in order; this updater applies011 only.'
+        throw 'D15 schema prerequisite missing. Fresh installations must apply the prerequisite migrations in order before this updater.'
     }
     $record.migration_010_prerequisite_present=$true; Save-Record
 }
@@ -250,18 +268,27 @@ try {
         $pendingJobs = Active-Jobs
     }
     $record.pending_jobs=0; Save-Record
+    foreach ($entry in $migrationInputs) {
+        if ((Digest (Join-Path $stage ('migrations\' + $entry.file))) -cne $entry.sha256) {
+            throw 'Migration changed after preflight; services have not been stopped.'
+        }
+    }
     Stop-ServiceExecutable (Join-Path $runtime 'api\Palimpseste.Api.exe')
     if ((Active-Jobs) -ne 0) { throw 'Job arrived during admission shutdown; worker left running.' }
     Stop-ServiceExecutable (Join-Path $runtime 'bin\Palimpseste.Worker.exe')
     $record.phase='services_stopped'; Save-Record
-    $savedPreference=$ErrorActionPreference; $ErrorActionPreference='Continue'; $global:LASTEXITCODE=$null
     # Never replay009 or010 here: their older constraints reject newer visual pipeline versions.
-    $migrationName = if ($ClientVersion -eq '1.8.0') { '012_blueprint_v2.sql' } else { '011_animation_sheet.sql' }
-    $migration = Join-Path $stage ('migrations\' + $migrationName)
-    & $psql -X -w -v ON_ERROR_STOP=1 -f $migration 1> (Join-Path $logRoot 'migration.stdout.txt') 2> (Join-Path $logRoot 'migration.stderr.txt')
-    $code=$global:LASTEXITCODE; $ErrorActionPreference=$savedPreference
-    if ($code -ne 0 -or $null -eq $code) { throw 'Migration failed; see private installation logs.' }
-    $record.migration_applied=$migrationName; $record.migration_sha256=Digest $migration; $record.phase='migration_complete'; Save-Record
+    foreach ($entry in $migrationInputs) {
+        $migration = Join-Path $stage ('migrations\' + $entry.file)
+        if ((Digest $migration) -cne $entry.sha256) { throw 'Migration differs from its preflight hash.' }
+        $savedPreference=$ErrorActionPreference; $ErrorActionPreference='Continue'; $global:LASTEXITCODE=$null
+        & $psql -X -w -v ON_ERROR_STOP=1 -f $migration 1> (Join-Path $logRoot ($entry.file + '.stdout.txt')) 2> (Join-Path $logRoot ($entry.file + '.stderr.txt'))
+        $code=$global:LASTEXITCODE; $ErrorActionPreference=$savedPreference
+        if ($code -ne 0 -or $null -eq $code) { throw 'Migration failed; see private installation logs.' }
+        $record.migrations_applied += [ordered]@{file=$entry.file;sha256=$entry.sha256;applied_at=[DateTimeOffset]::UtcNow.ToString('o')}
+        $record.migration_applied=$entry.file; $record.migration_sha256=$entry.sha256; $record.phase='migration_applied'; Save-Record
+    }
+    $record.phase='migration_complete'; Save-Record
     Install-File (Join-Path $stage 'worker\Palimpseste.Worker.exe') (Join-Path $runtime 'bin\Palimpseste.Worker.exe')
     Install-File (Join-Path $stage 'doctor\ProviderDoctor.exe') (Join-Path $runtime 'bin\ProviderDoctor.exe')
     Install-File (Join-Path $stage 'visual-doctor\SpellVisualDoctor.exe') (Join-Path $runtime 'bin\SpellVisualDoctor.exe')

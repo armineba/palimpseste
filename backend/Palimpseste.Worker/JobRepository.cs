@@ -463,10 +463,14 @@ public sealed partial class JobRepository
     }
 
     public async Task SavePlanAsync(ClaimedJob job, Guid attemptId, StoredArtifact artifact,
-        string planJson, string promptVersion, CodexResult transport, CancellationToken ct, int revision = 0)
+        string planJson, string promptVersion, CodexResult transport, CancellationToken ct, int revision = 0,
+        StoredArtifact? methodsArtifact = null)
     {
         if (revision < 0 || revision > 3 || revision > 0 && (job.VisualPipelineVersion < 2 || job.Kind != "production"))
             throw new ArgumentOutOfRangeException(nameof(revision));
+        var methodsRequired = promptVersion == LunaCodexProvider.UnityGodV2PromptVersion;
+        if (methodsRequired != (methodsArtifact is not null) || methodsRequired && job.VisualPipelineVersion != 5)
+            throw new InvalidOperationException("v2_methods_receipt_required");
         await using var conn = await source.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
         await LockUnpublishedJobAsync(conn, tx, job, ct);
@@ -483,6 +487,21 @@ public sealed partial class JobRepository
             cmd.Parameters.AddWithValue(promptVersion);
             cmd.Parameters.AddWithValue(revision);
             if (await cmd.ExecuteNonQueryAsync(ct) != 1) throw new InvalidOperationException("plan_already_frozen");
+        }
+        // Freeze plan and its verified method receipt atomically. A restart must never
+        // find a method-aware plan without the matching evidence for that revision.
+        if (methodsArtifact is not null)
+        {
+            await InsertArtifactAsync(conn, tx, job, methodsArtifact, "v2_methods", ct);
+            await using var methods = new NpgsqlCommand("""
+                INSERT INTO spell_v2_passes(job_id,revision,pass,artifact_id,input_sha256,accepted,provider_attempt_id)
+                SELECT j.id,$3,'methods',$4,$5,true,$6 FROM jobs j
+                WHERE j.id=$1 AND j.fence_token=$2 AND j.visual_pipeline_version=5
+                """, conn, tx);
+            methods.Parameters.AddWithValue(job.Id); methods.Parameters.AddWithValue(job.Fence);
+            methods.Parameters.AddWithValue(revision); methods.Parameters.AddWithValue(methodsArtifact.Id);
+            methods.Parameters.AddWithValue(artifact.Sha256); methods.Parameters.AddWithValue(attemptId);
+            if (await methods.ExecuteNonQueryAsync(ct) != 1) throw new InvalidOperationException("v2_methods_fence_lost");
         }
         await CompleteSuccessfulAttemptInTransactionAsync(conn, tx, job, attemptId, artifact.Sha256, transport, ct);
         await MoveInTransactionAsync(conn, tx, job,
@@ -508,6 +527,11 @@ public sealed partial class JobRepository
                 JOIN spell_plans p ON p.job_id=v.job_id AND p.revision=v.revision AND p.plan_sha256=v.input_sha256
                 JOIN artifacts pa ON pa.id=p.plan_artifact_id AND pa.owner_id=j.owner_id AND pa.kind='plan' AND pa.sha256=p.plan_sha256
                 WHERE v.job_id=j.id AND v.pass='validation' AND v.accepted=true AND p.validation_errors IS NULL
+                  AND (p.prompt_version<>'sp.prompt.blueprint/2.1' OR EXISTS (
+                    SELECT 1 FROM spell_v2_passes m JOIN artifacts ma ON ma.id=m.artifact_id
+                    WHERE m.job_id=p.job_id AND m.revision=p.revision AND m.pass='methods' AND m.accepted=true
+                      AND m.input_sha256=p.plan_sha256 AND m.provider_attempt_id=p.provider_attempt_id
+                      AND ma.owner_id=j.owner_id AND ma.kind='v2_methods'))
                   AND p.revision=(SELECT MAX(latest.revision) FROM spell_plans latest WHERE latest.job_id=j.id)))
             """, conn, tx))
         {

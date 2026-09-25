@@ -1,0 +1,25 @@
+{
+  "observed_utc": "2026-09-25T07:41:24.0418171+00:00",
+  "passed": 14,
+  "failed": 0,
+  "checks": [
+    "valid sourced adaptation binds actual plan",
+    "server receipt roundtrip binds plan and frozen methods",
+    "reject different skill version bytes",
+    "reject claimed technique absent from actual field",
+    "reject unimplemented upstream depth method",
+    "reject invented method",
+    "require examination of all five sources",
+    "reject paths outside blueprint data",
+    "scalar array coordinates can prove an adaptation",
+    "unlicensed source cannot be claimed as reused implementation",
+    "generic concept may use independently implemented dissolution",
+    "receipt cannot authorize another plan",
+    "reject forged source-method snapshot",
+    "historical research does not silently acquire methods"
+  ],
+  "provider_calls": 0,
+  "unity_tests": 0,
+  "database_tests": 0,
+  "scope": "deterministic method design and receipt validation; not a model output or visual acceptance"
+}

@@ -1,0 +1,30 @@
+{
+    "observed_utc":  "2026-09-25T07:48:57.8901296+00:00",
+    "installed_directory":  "C:\\Users\\Utilisateur\\.codex\\skills\\unity-god",
+    "skill_version":  "1.0",
+    "structure_validation_exit":  0,
+    "files":  [
+                  {
+                      "path":  "SKILL.md",
+                      "sha256":  "518ff842b48af3786a073aca0365e9a52b1a671044d48ada77b8643cd7b02463"
+                  },
+                  {
+                      "path":  "agents/openai.yaml",
+                      "sha256":  "2450cb49847f710c5778283aba6c13407d72d7d6b2d587a7e767ba732df7aa22"
+                  },
+                  {
+                      "path":  "references/construction.md",
+                      "sha256":  "5f5d9b4e72cd5f6103c071562f6c6914633413b9941a6ccf048ed46d68d1518b"
+                  },
+                  {
+                      "path":  "references/methods.json",
+                      "sha256":  "359f79e7bc91ebb341acb66c889cbfacdb474b8a052ffb64fad5f6e778f6ae3a"
+                  },
+                  {
+                      "path":  "references/runtime.md",
+                      "sha256":  "ef71e11cc024f94b6d968bb8fb8f7b220fe4eda4948c36c79881f7fece4c9670"
+                  }
+              ],
+    "model_training_performed":  false,
+    "backend_deployment_performed":  false
+}

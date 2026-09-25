@@ -4,6 +4,8 @@
 
 Lire `docs/BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt` avant toute construction ou modification du rendu d'un sort. Le créateur impose l'exploration des cinq bibliothèques listées, puis la réutilisation des ressources et techniques pertinentes comme point de départ.
 
+Appliquer également `skills/unity-god/SKILL.md` : ouvrir les sources pertinentes et comprendre comment l'effet est construit avant de l'adapter. Le catalogue distingue techniques étudiées, capacités partielles et méthodes réellement sélectionnables. Dans la boucle V2, le backend injecte le contexte runtime figé, exige le dossier de méthodes lié au blueprint et le transmet à la critique non aveugle. Une simple mention des bibliothèques ne remplace pas cette étape.
+
 - Explorer les cinq sources et leurs exemples ; utiliser le cache local et l'inventaire épinglé pour éviter de tout télécharger à chaque passage.
 - Choisir selon la description complète, la planche APPARITION / STABLE / DISPARITION et le mouvement physique attendu. Consulter toutes les sources ne signifie pas superposer tous leurs effets.
 - Partir des shaders, textures, graphes, prefabs ou techniques adaptés et autorisés. Documenter les chemins amont, commits, licences, adaptations URP et éléments retenus dans le travail de développement.

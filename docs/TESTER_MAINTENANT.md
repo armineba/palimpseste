@@ -1,12 +1,12 @@
 # Tester le lecteur actuel
 
-## Pipeline V2 — après installation D20 / Player 1.8.0
+## Pipeline V2 — après installation D21 / Player 1.8.0
 
-Consulter [l'état réel](NEXT_ACTIONS.md) avant l'essai : le service D20 n'est pas encore installé.
+Consulter [l'état réel](NEXT_ACTIONS.md) avant l'essai : le backend D21 avec UNITY GOD est compilé mais pas encore installé. La réponse à la demande Windows UAC reste attendue ; le service attesté est D19. L'installation locale du skill ne suffit pas à mettre à jour le jeu.
 
 1. Ouvrir **Palimpseste Spell Lab** après la bascule du service.
 2. Dessiner un **nouveau parchemin**, puis cliquer **Dessin terminé**.
-3. Lire l'interprétation. Le système construit la forme et le mouvement, contrôle la silhouette sans décorations, puis les impacts et le rendu.
+3. Lire l'interprétation. Le système sélectionne et adapte les méthodes des bibliothèques, construit la forme et le mouvement, contrôle la silhouette sans décorations, puis les impacts et le rendu.
 4. Ouvrir le sort disponible dans le laboratoire et le lancer. Comparer sujet, mouvement, contact et disparition au texte et à la planche.
 
 La planche 3 × 7 échantillonne le même sort continu. Les anciens parchemins restent en V1. Un candidat refusé n'est pas publié comme terminé ; dessin et étapes restent conservés. La fixture de développement est séparée de votre bibliothèque. Les tests techniques ne remplacent pas votre verdict.

@@ -1,0 +1,48 @@
+{
+    "revision":  "D21",
+    "client_version":  "1.8.0",
+    "observed_utc":  "2026-09-25T07:52:41.6165971+00:00",
+    "backend":  {
+                    "publish_exit":  0,
+                    "stage":  "deliverables/.stage-backend/3e8e8a20d685494f834f3fbef14a75b2",
+                    "worker_sha256":  "bca99af4bd9f843e8c639778df943e2bcbd9b0ebc59bd7e31621d85aff2e6f79",
+                    "api_sha256":  "410b1be5e578b122dfc3be7977f0c615f00d3d271e2beef3971171af1cfaa236",
+                    "blueprint_doctor_sha256":  "e5d7dfd4d4446fb55a036e3d7cc6ff02725e4e66b0dbcf3098a1b562bbf75f4f",
+                    "native_sha256":  "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+                    "publish_log":  "deliverables/unity-god-d21-publish.log",
+                    "publish_log_sha256":  "6da576ba7edfde3649b2950349ca7539bee1162017a897eb85bfb9fd0211c514"
+                },
+    "unity":  {
+                  "rebuilt":  false,
+                  "reused_client_version":  "1.8.0",
+                  "previous_delivery":  "evidence/public/backend/blueprint-v2-d20.json",
+                  "player_directory":  "game/Build/WindowsBlueprintV2Playable"
+              },
+    "skill":  {
+                  "version":  "1.0",
+                  "installed":  true,
+                  "installation_proof":  "evidence/public/unity-god/skill-installation.json",
+                  "method_catalog_sha256":  "359f79e7bc91ebb341acb66c889cbfacdb474b8a052ffb64fad5f6e778f6ae3a",
+                  "methods":  20,
+                  "runtime_selectable":  7,
+                  "sources_considered":  5,
+                  "source_files_verified":  22,
+                  "model_weights_retrained":  false
+              },
+    "contracts":  {
+                      "builder_prompt":  "sp.prompt.blueprint/2.1",
+                      "build_envelope":  "sp.unity-god-build/1.0",
+                      "method_receipt":  "sp.unity-god-receipt/1.0",
+                      "migration":  "013_unity_god_methods.sql",
+                      "migration_sha256":  "53937d6a98c6f84f846724e3dcfd207eeb4772100b6b66191b4a49a5c35a50f0"
+                  },
+    "tests":  "evidence/public/unity-god/contract-tests.json",
+    "independent_document_review":  "evidence/public/unity-god/independent-skill-review.md",
+    "deployed":  false,
+    "deployment_status":  "waiting_windows_elevation_confirmation",
+    "model_calls_executed":  0,
+    "gameplay_tests_executed":  0,
+    "database_migrations_executed":  0,
+    "human_acceptance":  "pending",
+    "new_visual_result_claimed":  false
+}

@@ -2,6 +2,12 @@
 
 Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. La nouvelle pipeline V2 est : **dessin → intention → blueprint canonique → mouvement continu → contrôles structure/physique/rendu → planche échantillonnée et sort jouable**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
+## D21 — UNITY GOD, construire depuis les méthodes sources
+
+[UNITY GOD](skills/unity-god/SKILL.md) étudie la construction réelle des bibliothèques, puis impose une adaptation liée aux paramètres du sort : **20 méthodes documentées, sept disponibles dans le Player actuel**. La boucle V2 vérifie leur emploi et fournit le dossier à la critique visuelle. [Intégration et limites](docs/D21_UNITY_GOD.md) · [Preuves](evidence/public/unity-god/).
+
+Skill installé localement et backend D21 compilé/empaqueté ; **à déployer après la validation Windows en attente**. Player 1.8.0 réutilisé. Les anciens sorts restent inchangés ; aucun rendu nouveau n'est présenté comme accepté.
+
 ## D20 / Player 1.8.0 — Pipeline V2 construite
 
 Refonte dédiée aux nouveaux sorts, huit représentations structurelles et gates A à F. Les anciens sorts conservent leurs données, assets et parcours V1. [Architecture et différences V1/V2](docs/D20_SPELL_PIPELINE_V2.md) · [État réel et limites](docs/IMPLEMENTATION_STATUS.md) · [Tests exécutés](evidence/public/v2/).

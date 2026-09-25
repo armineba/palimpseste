@@ -49,6 +49,8 @@ internal static class BlueprintDoctor
             report["auth_mode"] = "runner_forced_chatgpt";
             var specFiles = new[] { "prompts/06_BLUEPRINT_V2.md", "prompts/07_V2_CRITIC.md", "prompts/08_V2_INTERPRETATION.md",
                 "prompts/09_V2_NUMERIC_RULES.md", "contracts/codex/model-b-v2.output-schema.json", "contracts/codex/model-j-v2.output-schema.json",
+                "prompts/10_UNITY_GOD_RUNTIME.md", "contracts/codex/model-b-unity-god-v2.output-schema.json",
+                "skills/unity-god/SKILL.md", "skills/unity-god/references/runtime.md", "skills/unity-god/references/methods.json",
                 "contracts/capability-catalog.json", "assets/sourced-vfx/catalogue.json", "assets/sourced-vfx/references.json" };
             var specHashes = new Dictionary<string, string>();
             foreach (var name in specFiles) {
@@ -90,13 +92,16 @@ internal static class BlueprintDoctor
             await ArtifactAsync("description.json", description);
             phase = "research"; await CheckpointAsync();
             var research = await new SpellReferenceResearchResolver(spec).ResolveAsync(description,
-                new ProviderReference(inputPaths["drawing"], inputs["drawing"]), ct);
+                new ProviderReference(inputPaths["drawing"], inputs["drawing"]), ct, includeUnityGod: true);
             await ArtifactAsync("research.json", Encoding.UTF8.GetBytes(research.Json));
             phase = "blueprint";
             var planned = await CallAsync("B", () => provider.PlanBlueprintV2Async(runId.ToString("N"), Guid.NewGuid().ToString("N"),
                 description, capabilities, research, null, null, "structural_core", ct));
             var plan = RequireStage(planned, "B", settings);
             await ArtifactAsync("plan.json", plan);
+            if (planned.UnityGodReceipt is null || UnityGodMethods.ValidateReceipt(plan, planned.UnityGodReceipt, research).Count != 0)
+                throw new DoctorFailure("unity_god_methods_invalid");
+            await ArtifactAsync("methods.json", planned.UnityGodReceipt);
             var planIssues = SpellCompiler.ValidatePlanJson(description, plan, new Dictionary<string, byte[]>(), new Dictionary<string, byte[]>(), null, research.Sha256);
             report["plan_validation_issues"] = planIssues.Select(i => i.ToString()).ToArray();
             if (planIssues.Count != 0) throw new DoctorFailure("blueprint_invalid");
@@ -109,7 +114,7 @@ internal static class BlueprintDoctor
                 Provenance = new SpellProvenance { mode = "fixture", capture_sha256 = inputs["drawing"],
                     model_a = mode == "drawing" ? settings.InterpreterModel : null, model_b = settings.Model,
                     prompt_a_version = mode == "drawing" ? LunaCodexProvider.InterpreterV2PromptVersion : "fixture.frozen-description",
-                    prompt_b_version = LunaCodexProvider.BlueprintV2PromptVersion }
+                    prompt_b_version = LunaCodexProvider.UnityGodV2PromptVersion }
             });
             report["compilation_issues"] = compiled.Issues.Select(i => i.ToString()).ToArray();
             if (!compiled.Success) throw new DoctorFailure("compile_rejected");
@@ -124,7 +129,7 @@ internal static class BlueprintDoctor
             await ArtifactAsync("blind.json", blind);
             phase = "structure_judgement";
             var structure = RequireStage(await CallAsync("J_structure", () => provider.JudgeBlueprintV2Async(runId.ToString("N"), Guid.NewGuid().ToString("N"),
-                "structure", description, plan, core.Frames.Take(5).ToArray(), Encoding.UTF8.GetString(blind), Encoding.UTF8.GetString(core.Manifest), ct)), "J", settings);
+                "structure", description, plan, core.Frames.Take(5).ToArray(), Encoding.UTF8.GetString(blind), Encoding.UTF8.GetString(core.Manifest), ct, planned.UnityGodReceipt)), "J", settings);
             await ArtifactAsync("structure.json", structure);
             var coreAccepted = JudgePass(structure, "A_structure", "B_continuity", "semantic_blind") && MeasuredPass(core.Manifest, "B_continuity");
             report["core_accepted"] = coreAccepted;
@@ -136,7 +141,7 @@ internal static class BlueprintDoctor
                 phase = "full_judgement";
                 var frames = new[] { core.Frames[0] }.Concat(full.Frames.Take(4)).ToArray();
                 var final = RequireStage(await CallAsync("J_full", () => provider.JudgeBlueprintV2Async(runId.ToString("N"), Guid.NewGuid().ToString("N"),
-                    "full", description, plan, frames, Encoding.UTF8.GetString(blind), Encoding.UTF8.GetString(full.Manifest), ct)), "J", settings);
+                    "full", description, plan, frames, Encoding.UTF8.GetString(blind), Encoding.UTF8.GetString(full.Manifest), ct, planned.UnityGodReceipt)), "J", settings);
                 await ArtifactAsync("full-review.json", final);
                 var passed = JudgePass(final, "C_rendering", "E_game_camera", "F_motion") && MeasuredPass(full.Manifest, "B_continuity") &&
                     MeasuredPass(full.Manifest, "D_impact") && MeasuredPass(full.Manifest, "performance") && full.MeasuredFps >= 30;

@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using Palimpseste.Contracts;
 using Palimpseste.Core;
 using Palimpseste.Provider;
+using Palimpseste.Storage;
 
 namespace Palimpseste.Worker;
 
@@ -18,12 +19,14 @@ public sealed partial class JobProcessor
         {
             await jobs.SetStateAsync(job, "resolving_geometry", null, "V2 · recherche des structures et ressources", false, ct);
             research = await new SpellReferenceResearchResolver(specRoot).ResolveAsync(description,
-                new(files.PathForKey(drawing.DrawingKey), drawing.DrawingSha), ct);
+                new(files.PathForKey(drawing.DrawingKey), drawing.DrawingSha), ct, includeUnityGod: true);
             await SaveV2BytesAsync(job, 0, "research", Encoding.UTF8.GetBytes(research.Json),
                 Sha256(description), null, true, ct);
         }
         else research = SpellReferenceResearch.Read(await ReadCheckedAsync(researchRecord.StorageKey, researchRecord.Sha256, ct),
             Sha256(description), drawing.DrawingSha);
+        var methodsEnabled = UnityGodMethods.IsEnabled(research);
+        var promptVersion = methodsEnabled ? LunaCodexProvider.UnityGodV2PromptVersion : LunaCodexProvider.BlueprintV2PromptVersion;
 
         var current = await jobs.GetPlanAsync(job, ct);
         byte[]? plan = current is null ? null : await ReadCheckedAsync(current.StorageKey, current.Sha256, ct);
@@ -44,14 +47,16 @@ public sealed partial class JobProcessor
                 await jobs.SetStateAsync(job, "planning", null,
                     revision == 0 ? "V2 · intention, structure et mouvement" : "V2 · correction de " + returnStage, false, ct);
                 var inputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + research.Sha256 +
-                    LunaCodexProvider.BlueprintV2PromptVersion + (plan is null ? "" : Sha256(plan)) + feedback));
+                    promptVersion + (plan is null ? "" : Sha256(plan)) + feedback));
                 var attempt = await jobs.BeginAttemptAsync(job, "B", settings.Model, settings.Effort, inputHash, ct);
                 var candidate = await provider.PlanBlueprintV2Async(job.Id.ToString("N"), attempt.ToString("N"),
                     description, capabilities, research, plan is null ? null : Encoding.UTF8.GetString(plan), feedback, returnStage, ct);
                 var issues = candidate.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, candidate.Utf8,
                     new Dictionary<string, byte[]>(), new Dictionary<string, byte[]>(), null, research.Sha256);
                 var changedLock = plan is not null && candidate.Utf8 is not null && !V2RevisionAllowed(plan, candidate.Utf8, returnStage);
-                if (candidate.Transport.Outcome != ProviderOutcome.Success || candidate.Utf8 is null || issues.Count != 0 || changedLock)
+                var methodsInvalid = methodsEnabled && (candidate.Utf8 is null || candidate.UnityGodReceipt is null ||
+                    UnityGodMethods.ValidateReceipt(candidate.Utf8, candidate.UnityGodReceipt, research).Count != 0);
+                if (candidate.Transport.Outcome != ProviderOutcome.Success || candidate.Utf8 is null || issues.Count != 0 || changedLock || methodsInvalid)
                 {
                     await jobs.CompleteAttemptAsync(job, attempt,
                         candidate.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid",
@@ -64,18 +69,31 @@ public sealed partial class JobProcessor
                     }
                     feedback = JsonSerializer.Serialize(new { stage = returnStage,
                         issues = issues.Select(i => i.ToString()).ToArray(), locked_stage_changed = changedLock,
+                        methods_invalid = methodsInvalid, method_issues = candidate.UnityGodIssues,
                         provider_error = candidate.Transport.ErrorCode });
                     await SaveV2BytesAsync(job, revision, "blueprint", Encoding.UTF8.GetBytes(feedback), inputHash, null, false, ct);
                     continue;
                 }
                 var artifact = await files.PutAsync(candidate.Utf8, "json", "application/json", ct);
+                StoredArtifact? methodsArtifact = candidate.UnityGodReceipt is null ? null :
+                    await files.PutAsync(candidate.UnityGodReceipt, "json", "application/json", ct);
                 await jobs.SavePlanAsync(job, attempt, artifact, Encoding.UTF8.GetString(candidate.Utf8),
-                    LunaCodexProvider.BlueprintV2PromptVersion, candidate.Transport, ct, revision);
+                    promptVersion, candidate.Transport, ct, revision, methodsArtifact);
                 plan = candidate.Utf8;
                 current = await jobs.GetPlanAsync(job, ct);
             }
             if (plan is null) throw new InvalidDataException("v2_missing_plan");
             var planHash = Sha256(plan);
+            byte[]? methodsReceipt = null;
+            if (methodsEnabled)
+            {
+                var receiptRecord = await jobs.GetV2PassAsync(job, revision, "methods", ct);
+                if (current?.PromptVersion != promptVersion || receiptRecord is null || !receiptRecord.Accepted ||
+                    receiptRecord.InputSha256 != planHash) throw new InvalidDataException("v2_methods_receipt_missing");
+                methodsReceipt = await ReadCheckedAsync(receiptRecord.StorageKey, receiptRecord.Sha256, ct);
+                if (UnityGodMethods.ValidateReceipt(plan, methodsReceipt, research).Count != 0)
+                    throw new InvalidDataException("v2_methods_receipt_changed");
+            }
             var coreHash = V2CoreHash(plan);
             await SaveV2BytesAsync(job, revision, "blueprint", plan, planHash, coreHash, true, ct);
             var input = new CompilationInput
@@ -89,7 +107,7 @@ public sealed partial class JobProcessor
                 Provenance = new SpellProvenance { mode = "drawing", capture_sha256 = drawing.ManifestSha,
                     reference_sha256 = drawing.ReferenceSha, model_a = await jobs.GetSuccessfulRequestedModelAsync(job, "A", ct),
                     model_b = await jobs.GetSuccessfulRequestedModelAsync(job, "B", ct),
-                    prompt_a_version = descriptionRecord?.PromptVersion, prompt_b_version = LunaCodexProvider.BlueprintV2PromptVersion }
+                    prompt_a_version = descriptionRecord?.PromptVersion, prompt_b_version = promptVersion }
             };
             var compiled = SpellCompiler.Compile(input);
             if (!compiled.Success) throw new InvalidDataException("v2_compile_rejected");
@@ -99,7 +117,7 @@ public sealed partial class JobProcessor
                 core.Frames.Take(1).ToArray(), null, null, ct);
             if (blind is null) return;
             var structure = await JudgeV2StoredAsync(job, revision, "structure", "structure", description, plan,
-                core.Frames.Take(5).ToArray(), blind, V2TelemetrySummary(core.Manifest), ct);
+                core.Frames.Take(5).ToArray(), blind, V2TelemetrySummary(core.Manifest), ct, methodsReceipt);
             if (structure is null) return;
             if (!V2JudgementPasses(structure, "A_structure", "B_continuity", "semantic_blind") ||
                 !V2MeasuredGatePasses(core.Manifest, "B_continuity"))
@@ -114,7 +132,7 @@ public sealed partial class JobProcessor
             var full = await CaptureV2StoredAsync(job, revision, "secondary", "full", compiled.PayloadUtf8, description, planHash, coreHash, renderer, ct);
             var fullFrames = new[] { core.Frames[0] }.Concat(full.Frames.Take(4)).ToArray();
             var review = await JudgeV2StoredAsync(job, revision, "validation", "full", description, plan,
-                fullFrames, blind, V2TelemetrySummary(full.Manifest), ct);
+                fullFrames, blind, V2TelemetrySummary(full.Manifest), ct, methodsReceipt);
             if (review is null) return;
             var impactPassed = V2MeasuredGatePasses(full.Manifest, "D_impact");
             var performancePassed = V2MeasuredGatePasses(full.Manifest, "performance") && full.MeasuredFps >= 30;
@@ -187,7 +205,8 @@ public sealed partial class JobProcessor
     }
 
     private async Task<string?> JudgeV2StoredAsync(ClaimedJob job, int revision, string pass, string mode,
-        byte[] description, byte[] plan, IReadOnlyList<RenderedSpellFrame> frames, string? blind, string? telemetry, CancellationToken ct)
+        byte[] description, byte[] plan, IReadOnlyList<RenderedSpellFrame> frames, string? blind, string? telemetry,
+        CancellationToken ct, byte[]? methodsReceipt = null)
     {
         var saved = await jobs.GetV2PassAsync(job, revision, pass, ct);
         if (saved is not null)
@@ -196,9 +215,10 @@ public sealed partial class JobProcessor
             return Encoding.UTF8.GetString(await ReadCheckedAsync(saved.StorageKey, saved.Sha256, ct));
         }
         var attempt = await jobs.BeginAttemptAsync(job, "J", settings.Model, settings.Effort,
-            Sha256(Encoding.UTF8.GetBytes(Sha256(plan) + mode + string.Concat(frames.Select(f => f.Sha256)))), ct);
+            Sha256(Encoding.UTF8.GetBytes(Sha256(plan) + mode + string.Concat(frames.Select(f => f.Sha256)) +
+                (mode == "blind" || methodsReceipt is null ? "" : Sha256(methodsReceipt)))), ct);
         var result = await provider.JudgeBlueprintV2Async(job.Id.ToString("N"), attempt.ToString("N"), mode,
-            description, plan, frames, blind, telemetry, ct);
+            description, plan, frames, blind, telemetry, ct, methodsReceipt);
         if (result.Transport.Outcome != ProviderOutcome.Success || result.Utf8 is null)
         {
             await jobs.CompleteAttemptAsync(job, attempt,

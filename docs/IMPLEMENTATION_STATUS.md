@@ -1,5 +1,13 @@
 # État de réalisation et point de reprise
 
+## D21 — Méthodes des bibliothèques dans la boucle V2
+
+**Backend D21 compilé et empaqueté, publication code 0.** Skill **UNITY GOD 1.0** créé et installé localement ; méthodes intégrées aux nouvelles recherches V2, constructeur B 2.1, validation serveur, reçu persistant et critique indépendante. **20 méthodes documentées, 22 fichiers sources vérifiés, sept adaptations sélectionnables**, treize fiches pour développements futurs. Les cinq bibliothèques sont considérées, quatre ont du code matériellement inspecté. Aucun réentraînement de modèle. [Architecture et portée](D21_UNITY_GOD.md) · [Preuves](../evidence/public/unity-god/).
+
+**14 contrôles de contrat réussis** ; skill validé structurellement et installé avec empreintes identiques au dépôt. Player 1.8.0 D20 réutilisé ; aucun nouveau test de gameplay, build Unity ou appel fournisseur. Aucun sort historique modifié. L'essai complet de la nouvelle sortie B et son rendu restent non exécutés.
+
+**Déploiement D21 en attente de la réponse Windows UAC déjà demandée.** D19 reste la dernière installation attestée. La livraison compilée, ses empreintes et ses limites sont suivies dans [la preuve D21](../evidence/public/backend/unity-god-d21.json). La qualité artistique n'est pas réputée acquise par un reçu de méthodes valide.
+
 ## D20 — Pipeline V2 construite, installation en attente
 
 **Backend D20 et Player 1.8.0 compilés et empaquetés**, Unity 6.3 / URP / IL2CPP, sorties 0, sans erreur de shader. [Livraison](../evidence/public/backend/blueprint-v2-d20.json) · [Architecture, diagramme, types et gates](D20_SPELL_PIPELINE_V2.md) · [Fichiers](V2_FILES_CHANGED.md).

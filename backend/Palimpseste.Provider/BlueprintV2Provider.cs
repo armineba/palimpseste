@@ -7,6 +7,7 @@ namespace Palimpseste.Provider;
 public sealed partial class LunaCodexProvider
 {
     public const string BlueprintV2PromptVersion = "sp.prompt.blueprint/2.0";
+    public const string UnityGodV2PromptVersion = "sp.prompt.blueprint/2.1";
     public const string CriticV2PromptVersion = "sp.prompt.v2-critic/2.0";
     public const string InterpreterV2PromptVersion = "sp.prompt.a-v2/1.0";
     public string InterpreterV2PromptSha256 => Digest(Encoding.UTF8.GetBytes(promptA + File.ReadAllText(
@@ -30,6 +31,15 @@ public sealed partial class LunaCodexProvider
         if (!prompt.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + BlueprintV2PromptVersion, StringComparison.Ordinal))
             throw new InvalidDataException("v2_prompt_version");
         prompt += "\n" + await File.ReadAllTextAsync(Path.Combine(visualReviewSpecRoot, "prompts", "09_V2_NUMERIC_RULES.md"), ct);
+        var methodsEnabled = UnityGodMethods.IsEnabled(research);
+        if (methodsEnabled)
+        {
+            var methodsPrompt = await File.ReadAllTextAsync(Path.Combine(visualReviewSpecRoot, "prompts", "10_UNITY_GOD_RUNTIME.md"), ct);
+            if (!methodsPrompt.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + UnityGodV2PromptVersion, StringComparison.Ordinal))
+                throw new InvalidDataException("unity_god_prompt_version");
+            prompt += "\n" + methodsPrompt;
+            prompt += "\nUNITY_GOD_FROZEN_METHODS\n" + UnityGodMethods.BuildContext(research);
+        }
         prompt += "\nDESCRIPTION_SHA256\n" + Digest(description) + "\nSPELL_DESCRIPTION\n" + Encoding.UTF8.GetString(description) +
             "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilities, description) +
             "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(description) +
@@ -37,14 +47,39 @@ public sealed partial class LunaCodexProvider
             "\nPREVIOUS_PLAN\n" + (previousPlan ?? "null") + "\nRETURN_STAGE\n" + returnStage +
             "\nVALIDATION_FEEDBACK_DATA\n" + (feedback ?? "null");
         var result = await runner.RunAsync(new(attemptId, "B", prompt,
-            Path.Combine(visualReviewSpecRoot, "contracts", "codex", "model-b-v2.output-schema.json"), [], jobId), ct);
-        return EnsureResearch(EnsureDescriptionHash(Parse(result, "sp.plan/1.0"), Digest(description)), research);
+            Path.Combine(visualReviewSpecRoot, "contracts", "codex", methodsEnabled
+                ? "model-b-unity-god-v2.output-schema.json" : "model-b-v2.output-schema.json"), [], jobId), ct);
+        if (!methodsEnabled)
+            return EnsureResearch(EnsureDescriptionHash(Parse(result, "sp.plan/1.0"), Digest(description)), research);
+        var envelope = Parse(result, "sp.unity-god-build/1.0");
+        if (envelope.Utf8 is null) return envelope;
+        try
+        {
+            using var json = JsonDocument.Parse(envelope.Utf8);
+            var root = json.RootElement;
+            if (root.EnumerateObject().Count() != 3) throw new InvalidDataException("unity_god_envelope");
+            var plan = Parse(result with { FinalJson = root.GetProperty("plan").GetRawText() }, "sp.plan/1.0");
+            plan = plan with { Transport = plan.Transport with { FinalJson = result.FinalJson } };
+            plan = EnsureResearch(EnsureDescriptionHash(plan, Digest(description)), research);
+            if (plan.Utf8 is null || plan.Transport.Outcome != ProviderOutcome.Success) return plan;
+            var design = Encoding.UTF8.GetBytes(root.GetProperty("method_design").GetRawText());
+            var issues = UnityGodMethods.ValidateDesign(plan.Utf8, design, research);
+            if (issues.Count != 0)
+                return new(result with { Outcome = ProviderOutcome.BusinessViolation,
+                    ErrorCode = "unity_god_design_invalid" }, null, null, UnityGodIssues: issues);
+            return plan with { UnityGodReceipt = UnityGodMethods.CreateReceipt(plan.Utf8, design, research) };
+        }
+        catch (Exception e) when (e is JsonException or InvalidOperationException or InvalidDataException or KeyNotFoundException or ArgumentException)
+        {
+            return new(result with { Outcome = ProviderOutcome.InvalidSchema,
+                ErrorCode = "unity_god_build_invalid" }, null, null);
+        }
     }
 
     // A blind call receives image bytes and hash identifiers only, never subject/description/plan text.
     public async Task<ProviderDocument> JudgeBlueprintV2Async(string jobId, string attemptId, string mode,
         byte[] description, byte[] plan, IReadOnlyList<RenderedSpellFrame> frames, string? blind,
-        string? telemetry, CancellationToken ct)
+        string? telemetry, CancellationToken ct, byte[]? unityGodReceipt = null)
     {
         if (mode is not ("blind" or "structure" or "full") || frames.Count is < 1 or > 5)
             throw new ArgumentException("v2_critic_inputs");
@@ -61,6 +96,13 @@ public sealed partial class LunaCodexProvider
             "\nBLUEPRINT_PLAN\n" + Encoding.UTF8.GetString(plan) + "\nBLIND_OBSERVATION\n" + (blind ?? "null") +
             "\nACTUAL_RENDERER_MEASUREMENTS\n" + (telemetry ?? "null") +
             "\nIMAGE_ORDER\n" + JsonSerializer.Serialize(selected.Select(f => f.Phase));
+        if (mode != "blind" && unityGodReceipt is not null)
+            prompt += "\nVERIFIED_UNITY_GOD_METHOD_RECEIPT\n" + Encoding.UTF8.GetString(unityGodReceipt) +
+                "\nThe receipt proves checked parameter bindings, not visual success. " +
+                (mode == "structure"
+                    ? "CORE_ONLY intentionally disables surfaces, particles and atmosphere. Judge only applicable structural and motion methods; do not reject the absence of intentionally disabled rendering layers. "
+                    : "Judge whether the rendered result actually realizes the selected construction methods and intended adaptation. ") +
+                "Report decorative masking, unrelated methods or weak execution in the responsible structural, motion or rendering gate.\n";
         var result = await runner.RunAsync(new(attemptId, "J", prompt,
             Path.Combine(visualReviewSpecRoot, "contracts", "codex", "model-j-v2.output-schema.json"),
             selected.Select(f => f.PngPath).ToArray(), jobId, reference, selected.Select(f => f.Sha256).ToArray(),

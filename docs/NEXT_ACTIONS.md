@@ -1,5 +1,13 @@
 # Point de reprise immédiat
 
+## D21 — UNITY GOD installé localement, backend à déployer
+
+**Backend D21 compilé et empaqueté, publication code 0.** Le skill **UNITY GOD 1.0** est créé, installé dans le dossier de skills Codex et intégré au code de la boucle V2. **20 méthodes issues de 22 fichiers inspectés**, dont sept adaptations disponibles dans le Player 1.8.0. Les cinq sources sont examinées ; Magic Effects FREE reste non acquis. [Fonctionnement et limites](D21_UNITY_GOD.md) · [Skill](../skills/unity-god/SKILL.md) · [Installation locale](../evidence/public/unity-god/skill-installation.json).
+
+B 2.1 doit lier les méthodes choisies aux paramètres réels du blueprint ; un reçu vérifié accompagne la même révision jusque dans la critique visuelle. V1 et les recherches V2 déjà figées restent inchangées. **14 contrôles de données réussis**, aucune génération, capture ou session de jeu supplémentaire exécutée. L'acceptation visuelle reste ouverte.
+
+**Le service n'utilise pas encore D21.** La précédente fenêtre UAC a été annulée ; une demande de validation Windows reste en attente. Employer le nouveau paquet backend D21 et le Player 1.8.0 D20 après cette réponse, avec migrations 012 puis 013. Ne pas arrêter les services ni rouvrir l'élévation annulée sans cette réponse. Ne pas confondre installation du skill local et déploiement serveur. [Livraison D21](../evidence/public/backend/unity-god-d21.json).
+
 ## D20 — Pipeline V2 construite, installation en attente
 
 **Backend D20 et Player 1.8.0 compilés et empaquetés**, Unity 6.3 / URP / IL2CPP, sorties 0, sans erreur de shader. [Livraison](../evidence/public/backend/blueprint-v2-d20.json) · [Architecture, diagramme, types et gates](D20_SPELL_PIPELINE_V2.md) · [Fichiers](V2_FILES_CHANGED.md).

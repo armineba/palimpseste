@@ -1,0 +1,4 @@
+interface:
+  display_name: "UNITY GOD"
+  short_description: "Construire les VFX depuis leurs méthodes sources"
+  default_prompt: "Utilise $unity-god pour étudier les méthodes des bibliothèques et construire ce sort Unity depuis son blueprint."

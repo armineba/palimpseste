@@ -1,0 +1,57 @@
+{
+  "schema_version": "sp.unity-god-integration-check/1.0",
+  "recorded_at_utc": "2026-09-25T07:53:06Z",
+  "checked_on_local_date": "2026-09-25",
+  "timezone": "Europe/Paris",
+  "workspace": "E:/Palimpseste/Palimpseste_GitHub",
+  "purpose": "Record the static checks already executed during the UNITY GOD integration; these checks were not rerun to create this record.",
+  "scope": [
+    "PowerShell syntax of ops/package-backend.ps1 and ops/deploy-lifecycle.ps1",
+    "Resolution of local JSON Schema references in contracts/codex/model-b-unity-god-v2.output-schema.json",
+    "Structural equality of the embedded plan and definitions with the existing V2 output schema"
+  ],
+  "powershell": {
+    "files": [
+      "ops/package-backend.ps1",
+      "ops/deploy-lifecycle.ps1"
+    ],
+    "parser": "System.Management.Automation.Language.Parser.ParseFile",
+    "syntax_valid": true,
+    "syntax_errors": 0,
+    "command_exit_code": 0,
+    "command": "$taskFiles = @('ops/package-backend.ps1','ops/deploy-lifecycle.ps1'); foreach ($taskFile in $taskFiles) { $taskTokens=$null; $taskErrors=$null; [void][Management.Automation.Language.Parser]::ParseFile((Join-Path (Get-Location) $taskFile), [ref]$taskTokens, [ref]$taskErrors); if ($taskErrors.Count -gt 0) { throw ($taskErrors | Out-String) }; Write-Output ($taskFile + ': syntax valid; not executed') }; git -c safe.directory=E:/Palimpseste/Palimpseste_GitHub -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check -- ops/package-backend.ps1 ops/deploy-lifecycle.ps1",
+    "observed_output": [
+      "ops/package-backend.ps1: syntax valid; not executed",
+      "ops/deploy-lifecycle.ps1: syntax valid; not executed"
+    ],
+    "diff_check_errors": 0,
+    "note": "Git also printed informational LF-to-CRLF working-copy warnings."
+  },
+  "schema": {
+    "file": "contracts/codex/model-b-unity-god-v2.output-schema.json",
+    "baseline": "contracts/codex/model-b-v2.output-schema.json",
+    "resolved_local_references": 45,
+    "unresolved_references": 0,
+    "embedded_plan_identical": true,
+    "definitions_identical": true,
+    "schema_edit_needed": false,
+    "command_exit_code": 0,
+    "comparison_note": "The baseline's $defs remain at the envelope root. Only the baseline metadata $schema, $id and title are excluded from the embedded-plan equality comparison.",
+    "command": "@'\nimport json\nfrom pathlib import Path\nroot=json.loads(Path('contracts/codex/model-b-unity-god-v2.output-schema.json').read_text(encoding='utf-8-sig'))\nbase=json.loads(Path('contracts/codex/model-b-v2.output-schema.json').read_text(encoding='utf-8-sig'))\nrefs=[]\ndef visit(node):\n if isinstance(node,dict):\n  if '$ref' in node:\n   ref=node['$ref']; assert ref.startswith('#/'),ref\n   value=root\n   for part in ref[2:].split('/'): value=value[part.replace('~1','/').replace('~0','~')]\n   refs.append(ref)\n  for value in node.values(): visit(value)\n elif isinstance(node,list):\n  for value in node: visit(value)\nvisit(root)\nassert root['$defs']==base.pop('$defs')\nfor key in ('$schema','$id','title'): base.pop(key,None)\nassert root['properties']['plan']==base\nprint(json.dumps({'schema':'model-b-unity-god-v2.output-schema.json','resolved_local_references':len(refs),'unresolved_references':0,'embedded_plan_and_definitions_identical_to_v2':True,'schema_edit_needed':False}))\n'@ | python -"
+  },
+  "operational_actions_by_this_check": {
+    "packaging_script_executed": false,
+    "deployment_script_executed": false,
+    "migrations_executed": false,
+    "elevation_requested": false,
+    "service_restarted": false,
+    "database_written": false,
+    "model_called": false,
+    "unity_built_or_run": false,
+    "visual_acceptance_asserted": false
+  },
+  "limitations": [
+    "Static syntax and schema-reference checks do not prove execution of a deployment, successful database migrations, model output acceptance, or visual quality.",
+    "No deployment-readiness or artistic-acceptance conclusion is claimed."
+  ]
+}

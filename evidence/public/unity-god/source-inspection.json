@@ -1,0 +1,148 @@
+{
+  "observed_utc": "2026-09-25T07:38:40.230938+00:00",
+  "skill_version": "1.0",
+  "sources_considered": 5,
+  "sources_with_materialized_code": 4,
+  "methods": 20,
+  "runtime_selectable": 7,
+  "files_inspected_and_hash_verified": 22,
+  "files": [
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Shaders/VFX/PlasmaShader.shadergraph",
+      "sha256": "ffda0166ffddde2dac622f310b28f63268a4183f0ffa9d196d9c9edabc7f1c14"
+    },
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Materials/VFX/PlasmaShader.mat",
+      "sha256": "e274e85865ecccb8d9374a58eaf7131a19b59a0e47f35d0f9333dfc565cc45e3"
+    },
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Textures/jellyPlasmaTexture.jpg",
+      "sha256": "e60137678e9caf011d113b42ae44aba05efb6393243005c1fa520c35d16554c5"
+    },
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Shaders/VFX/ForceFieldShader.shadergraph",
+      "sha256": "04cb9ff124063e162c8842363d29c18a46ded5042f37d365938b18e50705380a"
+    },
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Materials/VFX/ForceFieldShader.mat",
+      "sha256": "c6d65a73b27841909c26aad5cc1595dfebfab4adc55aee76969cfc4b978aba7c"
+    },
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Textures/Noise.png",
+      "sha256": "da338fcff419c98214a1723239a1f1234e9c4d57c795d1ac35e958e58cb3993e"
+    },
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Shaders/Environment/ToxicShader.shadergraph",
+      "sha256": "58cb3c73e18b0029d59b90fd6feb68ae6122d5af582cb2975410d3d435eddeb6"
+    },
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Shaders/_Includes/DepthFade.shadersubgraph",
+      "sha256": "9062b5b75e8346095486df7ed36b8ea0b41421d7a4f6a44dce85e3a614cbf560"
+    },
+    {
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "path": "Shaders/VFX/BubbleShader.shadergraph",
+      "sha256": "c0a91e2d9ddf211ddd0509300ba22c7d8f6f56937fec8615f9c61137a4adf1b2"
+    },
+    {
+      "repository": "https://github.com/keijiro/VfxGraphAssets",
+      "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+      "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Divergence Free Noise 3D.vfxoperator",
+      "sha256": "a9956b90aa18dc05e90fda5da5c000d7f46aa4ffda3701bd3957cff433fd8109"
+    },
+    {
+      "repository": "https://github.com/keijiro/VfxGraphAssets",
+      "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+      "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/DF Noise Turbulence.vfxblock",
+      "sha256": "1c38ee5dc0b4fddc3651d7bc477bba12c70fe98a375c3607204f8dae51a31da8"
+    },
+    {
+      "repository": "https://github.com/keijiro/VfxGraphAssets",
+      "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+      "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/DF Noise Field 3D.vfxoperator",
+      "sha256": "9e5a455358bd30d26c01afbd559c781654eaa2afaaf9404631d85209d0ef570e"
+    },
+    {
+      "repository": "https://github.com/keijiro/VfxGraphAssets",
+      "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+      "path": "Packages/jp.keijiro.vfxgraphassets/Shader/Textureless Strip.shadergraph",
+      "sha256": "a4b925868e86a165e305e9a01a2d634947eebae6aaef1044ab98e1d1a6483a4b"
+    },
+    {
+      "repository": "https://github.com/keijiro/VfxGraphAssets",
+      "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+      "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Rotate Axes.vfxblock",
+      "sha256": "ab69dd7de6ad277244a178929d31196373556daee6e4997043c8f8ce3ba8f5ad"
+    },
+    {
+      "repository": "https://github.com/keijiro/VfxGraphAssets",
+      "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+      "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Random Direction Per Strip.vfxoperator",
+      "sha256": "5ca2614949c2aac4343bbca013e2f912e27e148ffbe2fdb8a1a168f8c5fefa47"
+    },
+    {
+      "repository": "https://github.com/xtaja/VFX-Shader",
+      "commit": "aa4d626cbea273caed0507a7c3dc4b5795d0fcb6",
+      "path": "Assets/HLSL/VFXShader.shader",
+      "sha256": "1cdf5c7f5cfe5fc8599ca48d2e3102106f35e987eb822d7744864f16a9bbada5"
+    },
+    {
+      "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+      "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+      "path": "Assets/Samples/RibbonPack/RibbonPack.vfx",
+      "sha256": "136868a5f4cfaa2e8da91b2c02a0fafa1539c547949c94f4cedf99cf5468eae7"
+    },
+    {
+      "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+      "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+      "path": "Assets/Samples/Portal/Portal.vfx",
+      "sha256": "806754bd2276d2135a1015c40f2112176e20e81a23bbcabfe35dc7ae1445f5a5"
+    },
+    {
+      "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+      "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+      "path": "Assets/Samples/Bonfire/VFX/BonFire.vfx",
+      "sha256": "9153038043222a74bda539999f3c500a4c1bb39dede293a325934a77d963e05e"
+    },
+    {
+      "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+      "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+      "path": "Assets/Samples/MagicBook/VFX/JacobsLadder.vfx",
+      "sha256": "075e454c25b8d3ecffc6f9370c7dc71c31f282ec24d8502a8a45e63deaa6bbad"
+    },
+    {
+      "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+      "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+      "path": "Assets/Samples/SmokePortal/VFXGraphs/Point Attraction.vfxblock",
+      "sha256": "232fa9583e0181cb964729b05e9f7c7d924251337ef804b63eed20f6537d6094"
+    },
+    {
+      "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+      "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+      "path": "Assets/Samples/MagicBook/VFX/Trails.vfx",
+      "sha256": "c6039bde4065ce473fc268afbbc99e89068e2c42c450117a3a7295709192323e"
+    }
+  ],
+  "method_catalog_sha256": "359f79e7bc91ebb341acb66c889cbfacdb474b8a052ffb64fad5f6e778f6ae3a",
+  "model_training_performed": false,
+  "worker_code_execution_added": false,
+  "gameplay_tests": 0,
+  "provider_calls": 0
+}

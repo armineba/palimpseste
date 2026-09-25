@@ -1,0 +1,1451 @@
+{
+  "schema_version": "sp.unity-god-methods/1.0",
+  "skill_version": "1.0",
+  "observed_date": "2026-09-25",
+  "source_reviews": [
+    {
+      "source_id": "tinyplay_urp_shaders_collection",
+      "repository": "https://github.com/TinyPlay/URPShadersCollection",
+      "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+      "license": "MIT",
+      "source_status": "materialized_source_files_inspected",
+      "source_code_reuse_allowed": true,
+      "scope": "Partial MIT adaptation: preserve TinyPlay notices. Only the listed surface profiles and two RGB textures are integrated; original graph files, examples and prefabs are not runtime assets.",
+      "runtime_limit": "See each method runtime_scope; upstream availability is not Player availability."
+    },
+    {
+      "source_id": "xtaja_vfx_shader",
+      "repository": "https://github.com/xtaja/VFX-Shader",
+      "commit": "aa4d626cbea273caed0507a7c3dc4b5795d0fcb6",
+      "license": "Aucune licence explicite identifiée dans le README et la liste racine consultés",
+      "source_status": "materialized_source_files_inspected",
+      "source_code_reuse_allowed": false,
+      "scope": "Étude des principes documentés ; copie, import et redistribution du code ou des assets en attente d'une licence explicite.",
+      "runtime_limit": "See each method runtime_scope; upstream availability is not Player availability."
+    },
+    {
+      "source_id": "hovl_magic_effects_free",
+      "repository": "https://assetstore.unity.com/packages/vfx/particles/spells/magic-effects-free-247933",
+      "commit": null,
+      "license": "Standard Unity Asset Store EULA ; Extension Asset",
+      "source_status": "not_acquired_no_prefab_internals_inspected",
+      "source_code_reuse_allowed": false,
+      "scope": "Offre gratuite observée ; package non acquis et non importé. Fiche factuelle locale uniquement, sans contenu du package ni extrait de la boutique envoyé au modèle. Acquisition et droits d'utilisation du package à vérifier avant intégration de développement ; aucune redistribution brute présumée.",
+      "runtime_limit": "See each method runtime_scope; upstream availability is not Player availability."
+    },
+    {
+      "source_id": "unity_visual_effect_graph_samples",
+      "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+      "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+      "license": "Unity Companion License ; licences tierces distinctes dans LICENSE-3rdParty.md",
+      "source_status": "materialized_source_files_inspected",
+      "source_code_reuse_allowed": true,
+      "scope": "Sélection de composants pour projet Unity sous leur licence respective. Les contenus tiers, notamment Mixamo, demandent un examen séparé ; aucun contenu tiers n'est fourni au modèle ni importé ici.",
+      "runtime_limit": "See each method runtime_scope; upstream availability is not Player availability."
+    },
+    {
+      "source_id": "keijiro_vfx_graph_assets",
+      "repository": "https://github.com/keijiro/VfxGraphAssets",
+      "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+      "license": "Unlicense",
+      "source_status": "materialized_source_files_inspected",
+      "source_code_reuse_allowed": true,
+      "scope": "Partial Unlicense adaptation with retained source notices. The VFX Graph package, subgraphs and prefabs are not imported; only the reviewed HLSL and strip-coverage behavior are compiled into the renderer.",
+      "runtime_limit": "See each method runtime_scope; upstream availability is not Player availability."
+    }
+  ],
+  "methods": [
+    {
+      "id": "tinyplay.plasma_opposed_layers",
+      "title": "Opposed plasma flows with a separate rim",
+      "sources": [
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Shaders/VFX/PlasmaShader.shadergraph",
+          "sha256": "ffda0166ffddde2dac622f310b28f63268a4183f0ffa9d196d9c9edabc7f1c14",
+          "license": "MIT",
+          "local_source_present": true
+        },
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Materials/VFX/PlasmaShader.mat",
+          "sha256": "e274e85865ecccb8d9374a58eaf7131a19b59a0e47f35d0f9333dfc565cc45e3",
+          "license": "MIT",
+          "local_source_present": true
+        },
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Textures/jellyPlasmaTexture.jpg",
+          "sha256": "e60137678e9caf011d113b42ae44aba05efb6393243005c1fa520c35d16554c5",
+          "license": "MIT",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "The graph samples PatternTexture twice from Time*ScrollingSpeed and OneMinus-offset branches, adds the samples, tints them, and adds a powered Fresnel BorderColor. Other branches displace vertices along normals with SimpleNoise and distort Scene Color using Twirl/GradientNoise/NormalFromHeight. Material GUID resolves the actual jellyPlasmaTexture, unlike the graph default GUID.",
+      "construction_sequence": [
+        "Start from the canonical shape and coherent longitudinal/radial UVs.",
+        "Layer two differently moving samples of the same RGB pattern; reserve a separate border accent.",
+        "Attach palette/emission/opacity to spell phases; choose vertex deformation independently from UV motion.",
+        "If the target needs refraction, add it only through a reviewed opaque-scene URP implementation."
+      ],
+      "coordinate_time_model": "Upstream Time drives UV offsets and vertex noise. Adapt to spell age and explicit seamless phase; scrolling UV does not translate a projectile.",
+      "useful_archetypes": [
+        "plasma projectile",
+        "molten beam",
+        "energetic membrane"
+      ],
+      "core_kinds": [
+        "radial_volume",
+        "beam",
+        "swept_tube"
+      ],
+      "layering": {
+        "core": "canonical identity",
+        "secondary": "moving surface pattern and thin rim",
+        "atmosphere": "separate sparse particles"
+      },
+      "urp_6_3_adaptation": [
+        "MIT notice required.",
+        "Reuse shipped tinyplay_plasma texture through existing controlled plasma profile.",
+        "V2 has no upstream scene-color refraction or normal-noise vertex branch; those require developer renderer work."
+      ],
+      "failure_modes": [
+        "Opaque bright fill erases silhouette.",
+        "Treating UV scrolling as actual travel.",
+        "Copying unresolved default graph texture GUID.",
+        "Unbounded vertex noise destroys identity."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "partial_port_available",
+        "runtime_v2_details": "core_surface=plasma uses original RGB texture, two moving samples and common Fresnel term. V2 does not reproduce full upstream deformation/refraction.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "tinyplay_urp_shaders_collection",
+      "runtime_selectable": true,
+      "runtime_scope": "Partial licensed port: two animated RGB plasma samples and rim on the canonical core. No V2 scene refraction or upstream vertex-noise branch.",
+      "runtime_requirements": [
+        {
+          "path": "/blueprint_v2/rendering_layers/core_surface",
+          "op": "eq",
+          "value": "plasma"
+        }
+      ],
+      "allowed_applications": [
+        "reuse",
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "tinyplay.forcefield_rim_contact",
+      "title": "Hollow shield from Fresnel, pattern and depth contact",
+      "sources": [
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Shaders/VFX/ForceFieldShader.shadergraph",
+          "sha256": "04cb9ff124063e162c8842363d29c18a46ded5042f37d365938b18e50705380a",
+          "license": "MIT",
+          "local_source_present": true
+        },
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Materials/VFX/ForceFieldShader.mat",
+          "sha256": "c6d65a73b27841909c26aad5cc1595dfebfab4adc55aee76969cfc4b978aba7c",
+          "license": "MIT",
+          "local_source_present": true
+        },
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Textures/Noise.png",
+          "sha256": "da338fcff419c98214a1723239a1f1234e9c4d57c795d1ac35e958e58cb3993e",
+          "license": "MIT",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "SceneDepth minus a ScreenPosition.w/Offset branch passes through OneMinus and Smoothstep. That term combines with Fresnel; a scrolled PatternTexture modulates the result, Fill adds the interior contribution, and HDR Emission Color is separate. Material resolves Noise.png.",
+      "construction_sequence": [
+        "Establish a shell or planar barrier with an explicit empty interior.",
+        "Combine the silhouette rim with a restrained scrolling mask.",
+        "Use depth intersection only for contact accents; keep collision on the gameplay root.",
+        "Drive fill and emission through apparition, stable sustain and collapse."
+      ],
+      "coordinate_time_model": "Fresnel is view/normal dependent; depth contact is screen-space; noise scroll is time dependent. Keep all three separate from root world-space collision.",
+      "useful_archetypes": [
+        "shield",
+        "barrier",
+        "energy cage",
+        "portal membrane"
+      ],
+      "core_kinds": [
+        "radial_volume",
+        "planar_field",
+        "swept_tube"
+      ],
+      "layering": {
+        "core": "shell or boundary",
+        "secondary": "edge and contact glow",
+        "atmosphere": "optional escaping sparks"
+      },
+      "urp_6_3_adaptation": [
+        "MIT notice required.",
+        "Enable and correctly linearize URP depth only when implementing contact glow; handle orthographic and perspective separately.",
+        "V2 current forcefield offers Fresnel/noise but no SceneDepth sampling."
+      ],
+      "failure_modes": [
+        "Center opacity makes a solid ball.",
+        "Perspective-only depth formula breaks lab camera.",
+        "Adding decorative colliders.",
+        "Claiming depth contact from a Fresnel-only shader."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "partial_port_available",
+        "runtime_v2_details": "core_surface=forcefield provides a translucent Fresnel/noise shell. Depth-contact technique exists in legacy D19 shader, not current V2 shader.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "tinyplay_urp_shaders_collection",
+      "runtime_selectable": true,
+      "runtime_scope": "Partial licensed port: translucent Fresnel/noise shell only. Scene-depth contact/intersection is NOT available in V2; do not claim it.",
+      "runtime_requirements": [
+        {
+          "path": "/blueprint_v2/rendering_layers/core_surface",
+          "op": "eq",
+          "value": "forcefield"
+        }
+      ],
+      "allowed_applications": [
+        "reuse",
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "tinyplay.toxic_cellular_emission",
+      "title": "Cellular liquid with independent light and normal detail",
+      "sources": [
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Shaders/Environment/ToxicShader.shadergraph",
+          "sha256": "58cb3c73e18b0029d59b90fd6feb68ae6122d5af582cb2975410d3d435eddeb6",
+          "license": "MIT",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "Time*VoronoiSpeed drives Voronoi angle while a second Time*VoronoiTilingSpeed offsets UVs. Voronoi output feeds Power, then colored emission and smoothness. A separate scrolling GradientNoise -> Clamp -> Power -> NormalFromHeight branch supplies apparent relief. No poison gameplay is implied by this material graph.",
+      "construction_sequence": [
+        "Choose a continuous pool, stream or globule shape from the spell description.",
+        "Animate cell interiors and UV advection separately.",
+        "Concentrate emission in selected cells and keep broad body value readable.",
+        "Use a separate bounded normal-detail branch for boil; taper all layers with phases."
+      ],
+      "coordinate_time_model": "Texture-space Voronoi cell animation is independent from UV translation and physical transport. Use explicit spell time and deterministic loop mapping.",
+      "useful_archetypes": [
+        "alchemical pool",
+        "lava",
+        "acid stream",
+        "boiling magical fluid"
+      ],
+      "core_kinds": [
+        "planar_field",
+        "radial_volume",
+        "swept_tube"
+      ],
+      "layering": {
+        "core": "fluid volume or sheet",
+        "secondary": "cellular emission",
+        "atmosphere": "bubbles or vapor if implemented"
+      },
+      "urp_6_3_adaptation": [
+        "MIT notice required.",
+        "Upstream is transparent URP Lit; V2 is an unlit renderer and needs an intentional port for Voronoi/normal detail.",
+        "Do not imply green color or poison mechanics solely from technique selection."
+      ],
+      "failure_modes": [
+        "Uniform green opacity masquerades as cellular liquid.",
+        "Fast noise shimmer replaces readable boiling.",
+        "Demanding a Voronoi effect from the current V2 toxic profile."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "reference_only_for_full_method",
+        "runtime_v2_details": "V2 core_surface=toxic currently uses noise plus filaments, not upstream Voronoi or normal-from-height. Legacy D19 toxic does contain a Voronoi port.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "tinyplay_urp_shaders_collection",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "reuse",
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "tinyplay.depth_fade",
+      "title": "Soft intersections from signed eye-depth gap",
+      "sources": [
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Shaders/_Includes/DepthFade.shadersubgraph",
+          "sha256": "9062b5b75e8346095486df7ed36b8ea0b41421d7a4f6a44dce85e3a614cbf560",
+          "license": "MIT",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "The inspected graph subtracts ScreenPosition.w from SceneDepth, divides by exposed Distance, then saturates the result. The exposed Distance default is zero, so a safe adaptation must supply a positive width.",
+      "construction_sequence": [
+        "Obtain consistent eye-depth for the effect and opaque scene.",
+        "Normalize their depth gap by a positive soft-contact distance.",
+        "Clamp the mask and multiply decorative alpha.",
+        "Keep the core contact evidence and root physics independent from the fade."
+      ],
+      "coordinate_time_model": "Screen-space depth evaluated each frame; distance is a spatial softness width, not lifetime or impact timing.",
+      "useful_archetypes": [
+        "ground mist",
+        "impact dust",
+        "soft aura",
+        "intersecting membrane"
+      ],
+      "core_kinds": [
+        "planar_field",
+        "radial_volume",
+        "ribbon"
+      ],
+      "layering": {
+        "core": "retains silhouette",
+        "secondary": "softens only intersecting coverage",
+        "atmosphere": "dust or smoke"
+      },
+      "urp_6_3_adaptation": [
+        "MIT notice required.",
+        "URP camera depth required; depth units/projection must agree.",
+        "Clamp softness above zero."
+      ],
+      "failure_modes": [
+        "Division by zero from upstream default.",
+        "Using raw nonlinear depth.",
+        "Fading an entire core away near geometry.",
+        "Expecting this mask to detect gameplay hits."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "reference_only_for_v2",
+        "runtime_v2_details": "Current CanonicalSpellCoreV2 has no SceneDepth texture branch. This is a developer implementation recipe, not a player capability.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "tinyplay_urp_shaders_collection",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "reuse",
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "tinyplay.bubble_triplanar_membrane",
+      "title": "Animated thin membrane with triplanar noise",
+      "sources": [
+        {
+          "repository": "https://github.com/TinyPlay/URPShadersCollection",
+          "commit": "6e663fffccd00a4cce837644a29f6e8f82a6e372",
+          "path": "Shaders/VFX/BubbleShader.shadergraph",
+          "sha256": "c0a91e2d9ddf211ddd0509300ba22c7d8f6f56937fec8615f9c61137a4adf1b2",
+          "license": "MIT",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "Position is split into three plane UVs, each scrolls before GradientNoise. Absolute normal raised to BlendSharpness then normalized weights their contributions. A Fresnel/noise difference samples a gradient; reflection-probe color blends with that gradient. Alpha is bounded using a Fresnel/reflection-derived branch and AddAlpha.",
+      "construction_sequence": [
+        "Use one smooth continuous membrane, not many opaque spheres.",
+        "Generate three projection coordinates and blend noise by surface orientation.",
+        "Keep a thin Fresnel rim; let noise vary color/coverage across the surface.",
+        "Animate reveal and extinction separately from the reflection color."
+      ],
+      "coordinate_time_model": "Position-projected noise with normal weights avoids dependence on a single UV seam; Time scrolls all three domains. Reflection/Fresnel depend on view.",
+      "useful_archetypes": [
+        "bubble prison",
+        "ward",
+        "delicate arcane orb"
+      ],
+      "core_kinds": [
+        "radial_volume",
+        "swept_tube"
+      ],
+      "layering": {
+        "core": "single membrane",
+        "secondary": "iridescent variation and rim",
+        "atmosphere": "minimal"
+      },
+      "urp_6_3_adaptation": [
+        "MIT notice required.",
+        "Resolve projection space and reflection-probe availability explicitly when porting.",
+        "Keep original graph out of runtime model output."
+      ],
+      "failure_modes": [
+        "Thick opacity reads as plastic.",
+        "Moving projection in the wrong space causes texture swimming.",
+        "Assuming the current forcefield profile includes iridescence/triplanar reflection."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "reference_only_for_v2",
+        "runtime_v2_details": "No bubble/triplanar/reflection-probe profile exists in current V2; use as developer source methodology.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "tinyplay_urp_shaders_collection",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "reuse",
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "keijiro.divergence_free_domain",
+      "title": "Coherent organic flow from crossed noise gradients",
+      "sources": [
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Divergence Free Noise 3D.vfxoperator",
+          "sha256": "a9956b90aa18dc05e90fda5da5c000d7f46aa4ffda3701bd3957cff433fd8109",
+          "license": "Unlicense",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "Custom HLSL includes SimplexNoise3D.hlsl, evaluates SimplexNoiseGrad at Coordinate 1 and Coordinate 2, and returns the cross product of the two gradient vectors. The operator itself has no clock, carrier or particle emitter.",
+      "construction_sequence": [
+        "Choose two decorrelated spatial domains with a fixed seed/offset.",
+        "Evaluate their gradient cross-product to obtain a coherent vector field.",
+        "Use bounded domain deformation for surface detail or a separately integrated force for decorative particles.",
+        "Preserve primary trajectory, canonical identity and explicit angular motion."
+      ],
+      "coordinate_time_model": "Pure function of two 3D coordinates. A caller must animate the coordinates; use a periodic domain path for seamless loops.",
+      "useful_archetypes": [
+        "spectral veil",
+        "wind",
+        "smoke wake",
+        "magical current"
+      ],
+      "core_kinds": [
+        "ribbon",
+        "vortex_surface",
+        "swept_tube",
+        "controlled_swarm"
+      ],
+      "layering": {
+        "core": "invariant silhouette",
+        "secondary": "organic surface filaments",
+        "atmosphere": "optional particle advection if implemented"
+      },
+      "urp_6_3_adaptation": [
+        "Unlicense source; noise dependency has a separate MIT notice.",
+        "Reviewed HLSL function and existing SimplexNoise3D dependency are already in the Player.",
+        "V2 currently uses the field to phase-modulate filaments, not a fluid solver."
+      ],
+      "failure_modes": [
+        "Calling curl-like noise a simulated fluid.",
+        "Identical coordinates produce zero cross-product.",
+        "Noise replaces fast tornado rotation.",
+        "Unbounded displacement tears core identity."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "partial_port_available",
+        "runtime_v2_details": "V2 shader calls PalimpsesteDFNoise3D; output affects filament phase. It does not drive per-particle force or advect the root.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "keijiro_vfx_graph_assets",
+      "runtime_selectable": true,
+      "runtime_scope": "Licensed noise operator modulates surface filament phase. This does NOT provide particle force, advection or physical curl motion.",
+      "runtime_requirements": [
+        {
+          "path": "/blueprint_v2/rendering_layers/core_surface",
+          "op": "eq",
+          "value": "spectral"
+        },
+        {
+          "path": "/blueprint_v2/motion/secondary_motion_milli",
+          "op": "gte",
+          "value": 1
+        }
+      ],
+      "allowed_applications": [
+        "reuse",
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "keijiro.force_from_noise_field",
+      "title": "Convert a coherent field into decorative turbulence force",
+      "sources": [
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/DF Noise Turbulence.vfxblock",
+          "sha256": "1c38ee5dc0b4fddc3651d7bc477bba12c70fe98a375c3607204f8dae51a31da8",
+          "license": "Unlicense",
+          "local_source_present": true
+        },
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/DF Noise Field 3D.vfxoperator",
+          "sha256": "9e5a455358bd30d26c01afbd559c781654eaa2afaaf9404631d85209d0ef570e",
+          "license": "Unlicense",
+          "local_source_present": true
+        },
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Divergence Free Noise 3D.vfxoperator",
+          "sha256": "a9956b90aa18dc05e90fda5da5c000d7f46aa4ffda3701bd3957cff433fd8109",
+          "license": "Unlicense",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "The turbulence block reads particle position into DF Noise Field 3D. The subgraph reference GUID matches the local DF Noise Field 3D metadata. Frequency, Seed, Scroll and Amplitude are exposed; the Noise output connects to a block input named Force. This is a simulation-force construction, not merely a texture mask.",
+      "construction_sequence": [
+        "Establish emitter volume and root trajectory.",
+        "Read each decorative particle position in one declared simulation space.",
+        "Evaluate the field with spatial frequency, fixed seed, animated scroll and bounded amplitude.",
+        "Apply the result through a force update; keep lifetimes and drag controlled."
+      ],
+      "coordinate_time_model": "Position-based spatial field; Scroll is an explicit Vector3 input, not proof of an automatically advancing clock. Force integration requires time-step semantics from the target simulation.",
+      "useful_archetypes": [
+        "smoke",
+        "embers in wind",
+        "turbulent magical wake"
+      ],
+      "core_kinds": [
+        "ribbon",
+        "vortex_surface",
+        "controlled_swarm"
+      ],
+      "layering": {
+        "core": "unchanged canonical shape",
+        "secondary": "coherent wake",
+        "atmosphere": "force-driven particles"
+      },
+      "urp_6_3_adaptation": [
+        "Full upstream block needs VFX Graph and its package dependencies; current project does not import them.",
+        "A developer may port the force update to the fixed renderer with bounded parameters.",
+        "Worker must never load a .vfxblock path."
+      ],
+      "failure_modes": [
+        "Placing field output directly in position causes teleporting.",
+        "Using global instead of local position unintentionally.",
+        "Treating a surface shader call as actual particle-force integration."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "reference_only_for_full_method",
+        "runtime_v2_details": "V2 atmosphere uses explicit deterministic positions and zero ParticleSystem velocity. No DF-force integration is currently exposed.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "keijiro_vfx_graph_assets",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "keijiro.textureless_strip",
+      "title": "Smooth analytic ribbon coverage without painted alpha",
+      "sources": [
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "path": "Packages/jp.keijiro.vfxgraphassets/Shader/Textureless Strip.shadergraph",
+          "sha256": "a4b925868e86a165e305e9a01a2d634947eebae6aaef1044ab98e1d1a6483a4b",
+          "license": "Unlicense",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "The graph derives a shape from UV components using Power, Smoothstep, Add/Divide, a centered Remap and Length. Contrast remaps into Exponential; the distance branch becomes Saturate and is squared before multiplying Alpha. Color remains a separate input. UniversalTarget is transparent with SupportsVFX enabled.",
+      "construction_sequence": [
+        "Build a continuous ribbon with coherent longitudinal/across-width UVs.",
+        "Shape the head-to-tail width in UV space.",
+        "Use analytic falloff across the strip and a separately controlled color.",
+        "Fade the lifetime envelope while keeping the ribbon trajectory readable."
+      ],
+      "coordinate_time_model": "Coverage depends on UV and Contrast/Alpha, not time. Strip motion must be driven externally; UV.x needs consistent head-tail semantics.",
+      "useful_archetypes": [
+        "spectral ribbon",
+        "energy trail",
+        "comet wake",
+        "wind filament"
+      ],
+      "core_kinds": [
+        "ribbon",
+        "swept_tube",
+        "vortex_surface"
+      ],
+      "layering": {
+        "core": "continuous ribbon silhouette",
+        "secondary": "thin analytic glow",
+        "atmosphere": "separate optional flecks"
+      },
+      "urp_6_3_adaptation": [
+        "Unlicense; preserve source provenance.",
+        "Guard analytic divisions at the ribbon center and endpoints.",
+        "V2 canonical ribbon geometry exists, but its current alpha coverage is not this complete analytic graph."
+      ],
+      "failure_modes": [
+        "Rectangular ribbon planes become visible.",
+        "Wrong UV axis reverses taper.",
+        "Using a rigid 3D body under transparent strips.",
+        "Claiming this strip algorithm is active because the noise function is present."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "reference_only_for_full_v2_method",
+        "runtime_v2_details": "Legacy D19 spectral_flow ports this analytic coverage. V2 spectral core currently uses its own noise/filament coverage.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "keijiro_vfx_graph_assets",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "keijiro.rotate_particle_axes",
+      "title": "Separate local particle spin from orbit and translation",
+      "sources": [
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Rotate Axes.vfxblock",
+          "sha256": "ab69dd7de6ad277244a178929d31196373556daee6e4997043c8f8ce3ba8f5ad",
+          "license": "Unlicense",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "The block exposes Axis and Speed, reads axisX/axisY/axisZ attributes, and writes axisY and axisZ through connected vector operations. A built-in parameter participates in the speed branch. The graph changes orientation axes, not the particle position attribute.",
+      "construction_sequence": [
+        "Define orbital movement or carrier translation separately.",
+        "Choose a normalized local spin axis and explicit angular-speed unit.",
+        "Rotate particle basis coherently during update.",
+        "Keep spin, orbit speed and texture flow as distinct named behaviors."
+      ],
+      "coordinate_time_model": "Orientation-basis update; Axis is vector data and Speed is scalar. Verify the upstream speed unit before a literal port; the local V2 motion contract explicitly uses millidegrees per second.",
+      "useful_archetypes": [
+        "spinning shards",
+        "orbiting glyphs",
+        "debris",
+        "swarm elements"
+      ],
+      "core_kinds": [
+        "controlled_swarm",
+        "vortex_surface",
+        "radial_volume"
+      ],
+      "layering": {
+        "core": "independent travel/orbit",
+        "secondary": "local orientation",
+        "atmosphere": "optional spinning debris"
+      },
+      "urp_6_3_adaptation": [
+        "Unlicense.",
+        "Upstream block not imported.",
+        "V2 already supports canonical angular_speed_mdeg_s and deterministic rotations, but no independent per-particle axis-spin parameter."
+      ],
+      "failure_modes": [
+        "Confusing spin around self with orbit around a center.",
+        "Degrees/radians/normalized-age mismatch.",
+        "Rotating texture while geometry and atmosphere remain static."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "concept_mappable_existing_controls",
+        "runtime_v2_details": "Use existing explicit core angular motion where it matches intent; a separate particle spin capability still needs developer work.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "keijiro_vfx_graph_assets",
+      "runtime_selectable": true,
+      "runtime_scope": "Adapt the distinction between local spin and orbit using the existing canonical-core angular speed. Original per-particle-axis operator is not imported.",
+      "runtime_requirements": [
+        {
+          "path": "/blueprint_v2/motion/angular_speed_mdeg_s",
+          "op": "abs_gte",
+          "value": 1
+        }
+      ],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "keijiro.stable_strip_randomness",
+      "title": "Coherent variation at strip level",
+      "sources": [
+        {
+          "repository": "https://github.com/keijiro/VfxGraphAssets",
+          "commit": "5013c195305288fab61cd71f72a4628dbe9d0ea4",
+          "path": "Packages/jp.keijiro.vfxgraphassets/Subgraph/Random Direction Per Strip.vfxoperator",
+          "sha256": "5ca2614949c2aac4343bbca013e2f912e27e148ffbe2fdb8a1a168f8c5fefa47",
+          "license": "Unlicense",
+          "local_source_present": true
+        }
+      ],
+      "source_observation": "The operator exposes Seed and Direction, contains two random scalar nodes with constant=1 and independentSeed=0, and combines trigonometric/vector operations into a direction. It is a direction generator; no color, spawn, force, or lifetime is included.",
+      "construction_sequence": [
+        "Assign a stable identity/seed to each ribbon or entity.",
+        "Generate a direction once for that identity.",
+        "Keep all points in the same ribbon consistent with that direction.",
+        "Layer deterministic motion over this variation rather than re-randomizing every sample."
+      ],
+      "coordinate_time_model": "Seeded direction generation; caller must preserve seed/strip identity across time and captures. The exact upstream strip-context binding must be retained or intentionally reproduced.",
+      "useful_archetypes": [
+        "multi-ribbon burst",
+        "controlled swarm",
+        "magic filaments"
+      ],
+      "core_kinds": [
+        "ribbon",
+        "controlled_swarm",
+        "branched_surface"
+      ],
+      "layering": {
+        "core": "stable coherent entity",
+        "secondary": "variation between ribbons",
+        "atmosphere": "per-entity accent"
+      },
+      "urp_6_3_adaptation": [
+        "Unlicense.",
+        "Upstream operator not imported.",
+        "Map only to deterministic identities already available; do not promise a runtime random-direction operator."
+      ],
+      "failure_modes": [
+        "Per-vertex fresh random direction tears a ribbon.",
+        "Per-frame new seeds create flicker.",
+        "Randomness changes topology or identity across phases."
+      ],
+      "availability": {
+        "development_source": "locally_available_licensed",
+        "runtime_v2_status": "reference_only_for_operator",
+        "runtime_v2_details": "V2 uses deterministic canonical samples/particle indices, but has no exposed copy of this per-strip operator.",
+        "full_upstream_graph_imported": false
+      },
+      "authority": "Technique guidance only; all listed V2 mappings are existing controlled fields, never runtime code or graph paths.",
+      "source_id": "keijiro_vfx_graph_assets",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "xtaja_independent_clocks",
+      "title": "Separate normalized life from continuous material motion",
+      "source": {
+        "library_id": "xtaja_vfx_shader",
+        "repository": "https://github.com/xtaja/VFX-Shader",
+        "commit": "aa4d626cbea273caed0507a7c3dc4b5795d0fcb6",
+        "path": "Assets/HLSL/VFXShader.shader",
+        "sha256": "1cdf5c7f5cfe5fc8599ca48d2e3102106f35e987eb822d7744864f16a9bbada5",
+        "license": "No explicit repository license found at inspected commit",
+        "reuse_status": "technique_reference_only_no_code_or_asset_copy",
+        "materialized": true,
+        "available_in_player": false
+      },
+      "observed_mechanism": "GetTime chooses particle AgePercent from TEXCOORD0.z or global time. Main, distortion and mask UVs each scroll and rotate independently around UV center. Lifetime mode interprets rotation as total rotation across life; time mode provides continuous rotation.",
+      "evidence_symbols": [
+        "Attributes.uv_xyz.z",
+        "GetTime",
+        "ScrollUV",
+        "RotateUV",
+        "_USE_LIFETIME_ON"
+      ],
+      "construction_stages": [
+        "Choose one canonical moving core and a stable UV basis.",
+        "Use continuous time for sustained surface advection.",
+        "Use normalized life for appearance/extinction envelopes; preserve speed when duration changes."
+      ],
+      "motion_coordinates": "Object geometry transforms to world separately from UV motion. UV rotation does not rotate the physical core or create angular momentum.",
+      "useful_archetypes": [
+        "vortex",
+        "spectral projectile",
+        "beam",
+        "portal"
+      ],
+      "core_choices": [
+        "vortex_surface",
+        "ribbon",
+        "beam",
+        "planar_field"
+      ],
+      "adaptation": "Reimplement these generic controls using existing approved renderer operations; record cycles/s versus cycles/lifetime explicitly.",
+      "failure_modes": [
+        "Spinning UVs on a motionless tornado shell do not produce a physically rotating vortex.",
+        "AgePercent missing from vertex streams freezes lifetime animation.",
+        "Changing duration unintentionally changes apparent rotation speed."
+      ],
+      "runtime_use": "Method guidance only; no xtaja shader, custom inspector or vertex-stream contract is delivered.",
+      "source_id": "xtaja_vfx_shader",
+      "runtime_selectable": true,
+      "runtime_scope": "Concept adaptation using independently implemented spell-age UV motion and normalized phase envelopes. No xtaja source, shader or vertex stream has been copied.",
+      "runtime_requirements": [
+        {
+          "path": "/blueprint_v2/motion/duration_ms",
+          "op": "gte",
+          "value": 100
+        },
+        {
+          "path": "/blueprint_v2/phases/appearance_end_milli",
+          "op": "gte",
+          "value": 1
+        }
+      ],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "xtaja_independent_distortion_mask",
+      "title": "Distort content and silhouette masks separately",
+      "source": {
+        "library_id": "xtaja_vfx_shader",
+        "repository": "https://github.com/xtaja/VFX-Shader",
+        "commit": "aa4d626cbea273caed0507a7c3dc4b5795d0fcb6",
+        "path": "Assets/HLSL/VFXShader.shader",
+        "sha256": "1cdf5c7f5cfe5fc8599ca48d2e3102106f35e987eb822d7744864f16a9bbada5",
+        "license": "No explicit repository license found at inspected commit",
+        "reuse_status": "technique_reference_only_no_code_or_asset_copy",
+        "materialized": true,
+        "available_in_player": false
+      },
+      "observed_mechanism": "The fragment stage offsets main UVs and mask UVs through independent texture/noise controls. Texture distortion reads green, the mask reads red with a power adjustment, and the main RGB is remapped between two HDR colors. The sampled main alpha is multiplied by the mask.",
+      "evidence_symbols": [
+        "_DISTORTION_ON",
+        "_MASK_DISTORTION_ON",
+        "_Mask_Gamma",
+        "_Color_0",
+        "_Color_1"
+      ],
+      "construction_stages": [
+        "Establish the recognizable silhouette in the canonical core.",
+        "Select an approved flow/noise texture for material breakup.",
+        "Keep a second mask to preserve the perimeter and negative spaces.",
+        "Animate the two controls at deliberately different speeds."
+      ],
+      "motion_coordinates": "UV-space material deformation is separate from object-space shape deformation; changing UVs alone does not change contact geometry.",
+      "useful_archetypes": [
+        "spectral spirit",
+        "flame",
+        "poison cloud",
+        "energy veil"
+      ],
+      "core_choices": [
+        "ribbon",
+        "radial_volume",
+        "swept_tube"
+      ],
+      "adaptation": "Use only an existing material profile and approved texture resource IDs; do not transplant upstream shader text.",
+      "failure_modes": [
+        "Strong scalar UV displacement shifts both axes and can look like diagonal sliding.",
+        "Over-distorting the silhouette destroys identity.",
+        "Mask gamma and high emission can erase fine holes or produce a solid plastic body."
+      ],
+      "runtime_use": "Technique selection can guide existing spectral/plasma/toxic surfaces; it does not create a new resource capability.",
+      "source_id": "xtaja_vfx_shader",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "xtaja_lifetime_dissolve",
+      "title": "Continuous threshold dissolution for birth and disappearance",
+      "source": {
+        "library_id": "xtaja_vfx_shader",
+        "repository": "https://github.com/xtaja/VFX-Shader",
+        "commit": "aa4d626cbea273caed0507a7c3dc4b5795d0fcb6",
+        "path": "Assets/HLSL/VFXShader.shader",
+        "sha256": "1cdf5c7f5cfe5fc8599ca48d2e3102106f35e987eb822d7744864f16a9bbada5",
+        "license": "No explicit repository license found at inspected commit",
+        "reuse_status": "technique_reference_only_no_code_or_asset_copy",
+        "materialized": true,
+        "available_in_player": false
+      },
+      "observed_mechanism": "Blue-channel dissolve texture is power-remapped and clamped. A threshold based on a dissolve amount and optional normalized particle age drives a smooth transition of configurable width. An inversion switches the direction. The result multiplies final alpha.",
+      "evidence_symbols": [
+        "_Dissolve_Texture",
+        "_Dissolve_Gamma",
+        "_Dissolve_Over_Lifetime",
+        "_Invert_Dissolve",
+        "_Edge_Width"
+      ],
+      "construction_stages": [
+        "Choose an approved dissolution field bound to the canonical geometry.",
+        "Drive threshold from the explicit birth and death phases.",
+        "Continue internal motion while coverage shrinks.",
+        "End with alpha and particle emission both zero."
+      ],
+      "motion_coordinates": "The observed dissolve texture uses original UVs, independent of the main texture's scrolling UVs. The mask therefore need not swim with the internal flow.",
+      "useful_archetypes": [
+        "summoning",
+        "spectral projectile",
+        "shield",
+        "toxic field"
+      ],
+      "core_choices": [
+        "swept_tube",
+        "radial_volume",
+        "planar_field",
+        "branched_surface"
+      ],
+      "adaptation": "Implement the principle through approved lifecycle controls. A smooth threshold is not an emissive edge by itself; a glowing edge requires a separately supported layer.",
+      "failure_modes": [
+        "An alpha cutoff at lifetime end pops visibly.",
+        "Inversion with an unnormalized time value can reverse or overrun the dissolve.",
+        "Dissolution must not disintegrate the identity during the stable phase."
+      ],
+      "runtime_use": "Method reference; no claim the entire upstream dissolve feature set exists in the fixed renderer.",
+      "source_id": "xtaja_vfx_shader",
+      "runtime_selectable": true,
+      "runtime_scope": "Concept adaptation using the existing V2 longitudinal dissolution and opacity envelope. No arbitrary texture threshold edge or xtaja code is available.",
+      "runtime_requirements": [
+        {
+          "path": "/blueprint_v2/disappearance/mode",
+          "op": "eq",
+          "value": "dissolve"
+        }
+      ],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "xtaja_depth_view_alpha",
+      "title": "Combine depth intersection softness with a controlled view-angle mask",
+      "source": {
+        "library_id": "xtaja_vfx_shader",
+        "repository": "https://github.com/xtaja/VFX-Shader",
+        "commit": "aa4d626cbea273caed0507a7c3dc4b5795d0fcb6",
+        "path": "Assets/HLSL/VFXShader.shader",
+        "sha256": "1cdf5c7f5cfe5fc8599ca48d2e3102106f35e987eb822d7744864f16a9bbada5",
+        "license": "No explicit repository license found at inspected commit",
+        "reuse_status": "technique_reference_only_no_code_or_asset_copy",
+        "materialized": true,
+        "available_in_player": false
+      },
+      "observed_mechanism": "The shader samples URP scene depth, converts it to linear eye depth, subtracts fragment view depth, and attenuates alpha over a distance. A separate absolute normal/view dot term, power and smooth thresholds, optionally inverted, provides a view-dependent alpha mask. Both multiply texture, particle, mask and dissolve alpha.",
+      "evidence_symbols": [
+        "SampleSceneDepth",
+        "LinearEyeDepth",
+        "_Depth_Fade_Amount",
+        "_Fresnel_Power",
+        "_INVERT_FRESNEL_ON"
+      ],
+      "construction_stages": [
+        "Maintain real root collision and contact placement.",
+        "Soften decorative transparent intersections using depth.",
+        "Tune facing versus rim visibility without erasing the core.",
+        "Review in the actual lab camera at ground, wall and target contacts."
+      ],
+      "motion_coordinates": "Intersection attenuation is in camera eye-depth distance; the view-angle term uses world normals and the camera vector. Neither changes the physics shape.",
+      "useful_archetypes": [
+        "shield",
+        "mist",
+        "portal",
+        "ground aura"
+      ],
+      "core_choices": [
+        "planar_field",
+        "radial_volume",
+        "vortex_surface"
+      ],
+      "adaptation": "Use existing URP depth-enabled profiles and root physics. Preserve a readable structural layer before adding transparent boundary effects.",
+      "failure_modes": [
+        "Missing camera depth texture invalidates soft intersections.",
+        "Depth fade is not a collision detector.",
+        "Aggressive alpha multiplication makes the entire spell disappear at oblique angles.",
+        "Transparent ZWrite Off layers can incur overdraw and sorting defects."
+      ],
+      "runtime_use": "Technique reference only; render feature availability must come from the compiled Player capability catalog.",
+      "source_id": "xtaja_vfx_shader",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "unity_ribbon_head_history",
+      "title": "A moving head and bounded particle-strip history",
+      "source": {
+        "library_id": "unity_visual_effect_graph_samples",
+        "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+        "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+        "license": "Unity Companion License; file-level third-party exceptions apply",
+        "license_evidence": [
+          {
+            "path": "LICENSE.md",
+            "sha256": "cf54929fbeabb474897755774be57ceb8ed46c49672b4c77efe70d735536625c"
+          },
+          {
+            "path": "LICENSE-3rdParty.md",
+            "sha256": "af61a22eb0c5b8391aa2fc6cb393d38bbf914dd12bf0d3246e5e150e4010bdd5"
+          }
+        ],
+        "reuse_status": "inspected_graph_not_imported_urp_adaptation_required",
+        "materialized": true,
+        "available_in_player": false,
+        "path": "Assets/Samples/RibbonPack/RibbonPack.vfx",
+        "sha256": "136868a5f4cfaa2e8da91b2c02a0fafa1539c547949c94f4cedf99cf5468eae7"
+      },
+      "observed_mechanism": "The materialized graph separates Head and Trail groups, exposes Phase and Trail SpawnRate, and stores color/alpha/lifetime/position/scale/size. Its trail data has 3,200 strips with 240 particles per strip (768,000 capacity), demonstrating a distinct head-versus-history architecture rather than disconnected meshes.",
+      "evidence_symbols": [
+        "stickyNoteInfos: Head / Trail",
+        "m_ExposedName: Trail SpawnRate",
+        "m_ExposedName: Phase",
+        "stripCapacity: 3200",
+        "particlePerStripCount: 240"
+      ],
+      "construction_stages": [
+        "Define and animate a continuous canonical centerline or head.",
+        "Sample a bounded history behind the head.",
+        "Taper width and opacity by age/strip progress.",
+        "Stop new samples at impact while existing history dissipates."
+      ],
+      "motion_coordinates": "The graph contains local-space data and a bounded history. The proposed adaptation must explicitly choose whether the head leaves world-space history or a body-attached ribbon; that decision is not established by a shader alone.",
+      "useful_archetypes": [
+        "comet",
+        "energy whip",
+        "spectral dash",
+        "ribbon swarm"
+      ],
+      "core_choices": [
+        "ribbon",
+        "swept_tube",
+        "controlled_swarm"
+      ],
+      "adaptation": "Transfer the architectural method to the existing canonical core/secondary system. Do not copy the sample capacity into the Player budget; do not import the HDRP project.",
+      "failure_modes": [
+        "Attaching the entire history rigidly to the moving root produces a rigid stick.",
+        "Independent sample spheres look like beads.",
+        "Too few history samples cause corners; excessive counts cause memory/overdraw growth."
+      ],
+      "runtime_use": "Inspected reference; upstream VFX Graph and its 768,000-particle setup are not integrated assets.",
+      "source_id": "unity_visual_effect_graph_samples",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "unity_portal_populations",
+      "title": "Portal ring, travelling sparks and separate distortion",
+      "source": {
+        "library_id": "unity_visual_effect_graph_samples",
+        "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+        "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+        "license": "Unity Companion License; file-level third-party exceptions apply",
+        "license_evidence": [
+          {
+            "path": "LICENSE.md",
+            "sha256": "cf54929fbeabb474897755774be57ceb8ed46c49672b4c77efe70d735536625c"
+          },
+          {
+            "path": "LICENSE-3rdParty.md",
+            "sha256": "af61a22eb0c5b8391aa2fc6cb393d38bbf914dd12bf0d3246e5e150e4010bdd5"
+          }
+        ],
+        "reuse_status": "inspected_graph_not_imported_urp_adaptation_required",
+        "materialized": true,
+        "available_in_player": false,
+        "path": "Assets/Samples/Portal/Portal.vfx",
+        "sha256": "806754bd2276d2135a1015c40f2112176e20e81a23bbcabfe35dc7ae1445f5a5"
+      },
+      "observed_mechanism": "The graph has torus/arc-torus inputs, exposed circle center/direction and rotation speed, a distortion quad using PortalDistortion, and two spark populations. Its own explanatory note assigns a 0.05 probability to travelling sparks and extends their lifetime near the ground using a height mask.",
+      "evidence_symbols": [
+        "m_ExposedName: Circle center",
+        "m_ExposedName: Circle direction",
+        "m_ExposedName: Rotation Speed",
+        "stickyNoteInfos: Categorizing particles",
+        "m_ShaderName: Shader Graphs/PortalDistortion"
+      ],
+      "construction_stages": [
+        "Build one oriented canonical ring or opening.",
+        "Keep a dense short-lived rim population for edge readability.",
+        "Add a sparse longer-lived travelling population.",
+        "Add distortion as a separate supported surface layer.",
+        "Close the opening and stop emission before the residual sparks die."
+      ],
+      "motion_coordinates": "Circle center, direction and torus axes establish the plane; local/world spaces coexist in the graph. Adaptation must convert these to the blueprint placement basis and actual contact normal.",
+      "useful_archetypes": [
+        "portal",
+        "summoning circle",
+        "energy barrier",
+        "orbital aura"
+      ],
+      "core_choices": [
+        "planar_field",
+        "vortex_surface"
+      ],
+      "adaptation": "Reuse the composition method with approved particle IDs and URP surfaces. Keep the opening readable and the core alone recognizable. The sample's HDRP distortion material is not directly reusable as a Player resource.",
+      "failure_modes": [
+        "Placing a ring at the caster instead of a target ground plane violates intent.",
+        "One uniform particle population loses hierarchy.",
+        "Copying a 100,000-capacity sample system is not an acceptable default budget.",
+        "A bright full disc removes the negative-space portal opening."
+      ],
+      "runtime_use": "Reference graph inspected; no Portal prefab or HDRP scene integrated.",
+      "source_id": "unity_visual_effect_graph_samples",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "unity_bonfire_layers",
+      "title": "Separate flame body, embers and delayed smoke",
+      "source": {
+        "library_id": "unity_visual_effect_graph_samples",
+        "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+        "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+        "license": "Unity Companion License; file-level third-party exceptions apply",
+        "license_evidence": [
+          {
+            "path": "LICENSE.md",
+            "sha256": "cf54929fbeabb474897755774be57ceb8ed46c49672b4c77efe70d735536625c"
+          },
+          {
+            "path": "LICENSE-3rdParty.md",
+            "sha256": "af61a22eb0c5b8391aa2fc6cb393d38bbf914dd12bf0d3246e5e150e4010bdd5"
+          }
+        ],
+        "reuse_status": "inspected_graph_not_imported_urp_adaptation_required",
+        "materialized": true,
+        "available_in_player": false,
+        "path": "Assets/Samples/Bonfire/VFX/BonFire.vfx",
+        "sha256": "9153038043222a74bda539999f3c500a4c1bb39dede293a325934a77d963e05e"
+      },
+      "observed_mechanism": "The graph contains distinct Flame, Embers and Smoke groups and separate spawn flame/spawn smoke contexts. Flame shading exposes FireSpeed, BaseOffsetUV, DistortOffsetUV, DeformScale, DeformExponent and Feather. Smoke includes flipbook size/frame-rate controls; velocity, alpha and lifetime are independent attributes.",
+      "evidence_symbols": [
+        "m_Label: spawn flame",
+        "m_Label: spawn smoke",
+        "title: Flame / Embers / Smoke",
+        "name: FireSpeed",
+        "name: flipBookSize",
+        "name: DeformExponent"
+      ],
+      "construction_stages": [
+        "Give the flame a coherent canonical core and upward or trajectory-aligned flow.",
+        "Animate internal flame texture and edge deformation.",
+        "Emit sparse embers with their own lifetime.",
+        "Let smoke outlive the bright core during extinction.",
+        "Bind contact bursts to root impact events."
+      ],
+      "motion_coordinates": "Body deformation, particle velocity and texture offsets are separate controls. Upward buoyancy or trajectory-aligned flow is an adaptation decision from the intent; it must not be confused with UV scrolling.",
+      "useful_archetypes": [
+        "fireball",
+        "flamethrower",
+        "burning field",
+        "meteor impact"
+      ],
+      "core_choices": [
+        "radial_volume",
+        "swept_tube",
+        "beam",
+        "planar_field"
+      ],
+      "adaptation": "Choose approved fire/smoke textures and existing plasma surface; preserve separate alpha-blended smoke and luminous core. Review custom graph dependencies before any future development import.",
+      "failure_modes": [
+        "Smoke using the same timing as flame disappears unnaturally.",
+        "Fully additive smoke cannot create dark smoke mass.",
+        "A noisy surface without actual flow looks like a textured solid.",
+        "Do not claim SmokePortal six-way textures are available; several remain LFS pointers."
+      ],
+      "runtime_use": "BonFire graph bytes inspected; source project, flipbooks and custom materials are not imported.",
+      "source_id": "unity_visual_effect_graph_samples",
+      "runtime_selectable": true,
+      "runtime_scope": "Concept adaptation using a patterned plasma core with a separate deterministic smoke population. Original Bonfire graph, its flame simulation and separate spark population are not imported.",
+      "runtime_requirements": [
+        {
+          "path": "/blueprint_v2/rendering_layers/core_surface",
+          "op": "eq",
+          "value": "plasma"
+        },
+        {
+          "path": "/blueprint_v2/rendering_layers/atmosphere_kind",
+          "op": "eq",
+          "value": "smoke"
+        },
+        {
+          "path": "/blueprint_v2/rendering_layers/atmosphere_particles",
+          "op": "gte",
+          "value": 1
+        }
+      ],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "unity_jacobs_ladder_strips",
+      "title": "Coherent electrical arc with per-strip coordinates",
+      "source": {
+        "library_id": "unity_visual_effect_graph_samples",
+        "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+        "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+        "license": "Unity Companion License; file-level third-party exceptions apply",
+        "license_evidence": [
+          {
+            "path": "LICENSE.md",
+            "sha256": "cf54929fbeabb474897755774be57ceb8ed46c49672b4c77efe70d735536625c"
+          },
+          {
+            "path": "LICENSE-3rdParty.md",
+            "sha256": "af61a22eb0c5b8391aa2fc6cb393d38bbf914dd12bf0d3246e5e150e4010bdd5"
+          }
+        ],
+        "reuse_status": "inspected_graph_not_imported_urp_adaptation_required",
+        "materialized": true,
+        "available_in_player": false,
+        "path": "Assets/Samples/MagicBook/VFX/JacobsLadder.vfx",
+        "sha256": "075e454c25b8d3ecffc6f9370c7dc71c31f282ec24d8502a8a45e63deaa6bbad"
+      },
+      "observed_mechanism": "The graph labels an electric strip, stores InitPos and StripRatio custom attributes, reads particleIndexInStrip, and exposes line endpoints, a line sequencer, noise amplitude/frequency and ElectricDensity. Its particle data uses five strips of 100 points each. These are connected strips with position perturbation, not unrelated spark points.",
+      "evidence_symbols": [
+        "m_Label: electric strip",
+        "m_AttributeName: InitPos",
+        "m_AttributeName: StripRatio",
+        "attribute: particleIndexInStrip",
+        "particlePerStripCount: 100",
+        "stripCapacity: 5"
+      ],
+      "construction_stages": [
+        "Anchor the canonical arc to explicit endpoints.",
+        "Assign monotonically ordered strip coordinates.",
+        "Perturb the interior continuously while retaining endpoints and topology.",
+        "Control width, color and alpha separately from centerline motion.",
+        "Trigger a short contact flash and extinguish the strip."
+      ],
+      "motion_coordinates": "Line start/end and strip ratio define the arc basis. Noise is a bounded deviation of the centerline, not unconstrained teleportation of every point.",
+      "useful_archetypes": [
+        "lightning",
+        "chain lightning",
+        "electric tether",
+        "energy bridge"
+      ],
+      "core_choices": [
+        "beam",
+        "ribbon",
+        "swept_tube"
+      ],
+      "adaptation": "Use a continuous beam/ribbon with existing noise resources. Multiple branches require explicit controlled branches or nodes; ElectricDensity cannot silently change entity count.",
+      "failure_modes": [
+        "Random positions each frame create incoherent flicker.",
+        "Noise at endpoints disconnects the caster or target.",
+        "Very fine bright strips can alias or be smeared by temporal filtering.",
+        "Copying particle limits is not proof the local renderer supports the source graph."
+      ],
+      "runtime_use": "Graph structure inspected; MagicBook graph and HDRP/TAA settings are not imported.",
+      "source_id": "unity_visual_effect_graph_samples",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "unity_point_attraction_sink",
+      "title": "Attraction with a bounded field and explicit extinction radius",
+      "source": {
+        "library_id": "unity_visual_effect_graph_samples",
+        "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+        "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+        "license": "Unity Companion License; file-level third-party exceptions apply",
+        "license_evidence": [
+          {
+            "path": "LICENSE.md",
+            "sha256": "cf54929fbeabb474897755774be57ceb8ed46c49672b4c77efe70d735536625c"
+          },
+          {
+            "path": "LICENSE-3rdParty.md",
+            "sha256": "af61a22eb0c5b8391aa2fc6cb393d38bbf914dd12bf0d3246e5e150e4010bdd5"
+          }
+        ],
+        "reuse_status": "inspected_graph_not_imported_urp_adaptation_required",
+        "materialized": true,
+        "available_in_player": false,
+        "path": "Assets/Samples/SmokePortal/VFXGraphs/Point Attraction.vfxblock",
+        "sha256": "232fa9583e0181cb964729b05e9f7c7d924251337ef804b63eed20f6537d6094"
+      },
+      "observed_mechanism": "The materialized subgraph exposes attractor position, attraction radius and strength, falloff exponent/toggle, kill radius/overshoot/toggle. It reads velocity and time-step values and writes velocity and alive attributes. Attraction and termination are separate graph responsibilities.",
+      "evidence_symbols": [
+        "m_ExposedName: Attraction Radius",
+        "m_ExposedName: Attraction Strength",
+        "m_ExposedName: FallofExponent",
+        "m_ExposedName: Kill Radius Overshoot",
+        "attribute: velocity",
+        "attribute: alive"
+      ],
+      "construction_stages": [
+        "Define the attractor in the spell's placement coordinate frame.",
+        "Apply a bounded attraction field to secondary particles.",
+        "Optionally combine a separately specified tangential velocity for spiralling.",
+        "Terminate particles crossing the sink radius instead of allowing singular oscillation.",
+        "Fade the field and stop spawning at the end phase."
+      ],
+      "motion_coordinates": "The source operates on particle velocity; the adaptation must integrate with delta time and explicit world/local conversion. The presence of attraction does not imply a vortex: rotation needs a tangential component.",
+      "useful_archetypes": [
+        "black hole",
+        "soul drain",
+        "implosion",
+        "vortex intake"
+      ],
+      "core_choices": [
+        "radial_volume",
+        "vortex_surface",
+        "controlled_swarm"
+      ],
+      "adaptation": "The fixed renderer must advertise any attraction/sink behavior before a player blueprint can select it. Until then, this remains development method guidance only, with no invented runtime operator.",
+      "failure_modes": [
+        "Pure radial attraction does not swirl.",
+        "An unbounded inverse-distance force can explode near the center.",
+        "Particles without a kill radius jitter or shoot through the sink.",
+        "Particle attraction must not move gameplay targets unless the root effect contract explicitly does."
+      ],
+      "runtime_use": "Subgraph inspected but no import or new runtime attraction capability performed.",
+      "source_id": "unity_visual_effect_graph_samples",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    },
+    {
+      "id": "unity_magicbook_head_body",
+      "title": "Head/body timing and independent velocity for magical trails",
+      "source": {
+        "library_id": "unity_visual_effect_graph_samples",
+        "repository": "https://github.com/Unity-Technologies/VisualEffectGraph-Samples",
+        "commit": "bcd800405c1b019654a0af3b4b8bd68fec590b4b",
+        "license": "Unity Companion License; file-level third-party exceptions apply",
+        "license_evidence": [
+          {
+            "path": "LICENSE.md",
+            "sha256": "cf54929fbeabb474897755774be57ceb8ed46c49672b4c77efe70d735536625c"
+          },
+          {
+            "path": "LICENSE-3rdParty.md",
+            "sha256": "af61a22eb0c5b8391aa2fc6cb393d38bbf914dd12bf0d3246e5e150e4010bdd5"
+          }
+        ],
+        "reuse_status": "inspected_graph_not_imported_urp_adaptation_required",
+        "materialized": true,
+        "available_in_player": false,
+        "path": "Assets/Samples/MagicBook/VFX/Trails.vfx",
+        "sha256": "c6039bde4065ce473fc268afbbc99e89068e2c42c450117a3a7295709192323e"
+      },
+      "observed_mechanism": "The graph separates Trail head and Trail body, uses a constant-rate spawner and quad output, and exposes InitialDelay, StartVelocity and RotationAngle. Inputs include rotation axis/center/speed, delta time, lifetime, size and color. The source therefore treats emission timing, transport and visual size as separate concerns.",
+      "evidence_symbols": [
+        "m_Label: Trail head",
+        "m_Label: Trail body",
+        "m_Name: VFXSpawnerConstantRate",
+        "m_ExposedName: InitialDelay",
+        "m_ExposedName: StartVelocity",
+        "name: RotationAxis"
+      ],
+      "construction_stages": [
+        "Give the head the semantic identity and continuous trajectory.",
+        "Delay secondary body emission to make launch anticipation visible.",
+        "Advance trail particles with independent velocity and angular controls.",
+        "Taper the tail and allow follow-through after impact.",
+        "Preserve a single core topology while secondaries age out."
+      ],
+      "motion_coordinates": "Rotation requires a defined center and axis; motion is integrated through time. The actual spell builder must specify whether the trail follows the root or remains in world space.",
+      "useful_archetypes": [
+        "homing projectile",
+        "wisps",
+        "spell bolt",
+        "orbiting mote"
+      ],
+      "core_choices": [
+        "swept_tube",
+        "ribbon",
+        "controlled_swarm"
+      ],
+      "adaptation": "Map the architecture to existing anticipation/follow-through/secondary fields. Source names alone do not prove a requested event emitter exists in the Player.",
+      "failure_modes": [
+        "Identical head and body timing hides the launch.",
+        "All particles rigidly following the root look like a static mesh.",
+        "Undefined rotation center makes the entire spell orbit the wrong point."
+      ],
+      "runtime_use": "Graph inspected; no MagicBook textures, material or C# code integrated.",
+      "source_id": "unity_visual_effect_graph_samples",
+      "runtime_selectable": false,
+      "runtime_scope": "Development reference only: the full method is not exposed by the current V2 renderer. Inspect and implement it in development before enabling runtime selection.",
+      "runtime_requirements": [],
+      "allowed_applications": [
+        "adapt",
+        "combine"
+      ]
+    }
+  ],
+  "lfs_unavailable": [
+    "Assets/Samples/SmokePortal/6way_Textures/BonefireWind_E.tga",
+    "Assets/Samples/SmokePortal/6way_Textures/Bonefire_E.tga",
+    "Assets/Samples/SmokePortal/6way_Textures/Portal_B3-64_A.tga",
+    "Assets/Samples/SmokePortal/6way_Textures/Portal_B3-64_B.tga",
+    "Assets/Samples/SmokePortal/6way_Textures/TX_Pyro_SteamBall_A_N.tga",
+    "Assets/Samples/SmokePortal/6way_Textures/TX_Pyro_SteamBall_A_P.tga",
+    "Assets/Samples/Visual Effect Graph/17.0.3/VisualEffectGraph Additions/Textures/Explosion/Explosion0_01_5x5_motion.tga"
+  ],
+  "interpretation_boundary": "Construction methods extracted from pinned sources. These are source observations and adaptation guidance, not trained model weights. No unlicensed implementation text is redistributed."
+}

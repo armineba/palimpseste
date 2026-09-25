@@ -1,5 +1,7 @@
 # D20 — Spell Pipeline V2
 
+Extension de construction ultérieure : [D21 — UNITY GOD](D21_UNITY_GOD.md), méthodes sources vérifiées et reçus liés aux plans. Les preuves D20 ci-dessous restent celles de la livraison initiale.
+
 ## État de travail
 
 Code V2, backend D20 et Player 1.8.0 construits et empaquetés le 25 septembre 2026. **Installation en attente de validation Windows UAC** : le premier lancement opérateur a été annulé par Windows, sans appel modèle. Le runtime D19 et sa fenêtre existante sont conservés. [Preuve de livraison](../evidence/public/backend/blueprint-v2-d20.json) · [Liste des fichiers](V2_FILES_CHANGED.md).
