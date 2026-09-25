@@ -1,0 +1,23 @@
+{
+  "http_status": 202,
+  "resume_executed": true,
+  "job": {
+    "job_id": "5e763870284e41679c6b850b9b02ceff",
+    "parchment_id": "e051962f65874c038bf7d6a62fb6117a",
+    "state": "queued",
+    "resume_stage": "planning",
+    "spell_id": null,
+    "description_artifact_id": "a8edb7cf7513c43e0b8b93cae52db61f6",
+    "visual_reference_artifact_id": null,
+    "visual_reference_sha256": null,
+    "attempt_count": 5,
+    "message": "Reprise demandée",
+    "error_code": null,
+    "retryable": false,
+    "poll_after_ms": 2000,
+    "created_at": null,
+    "updated_at": null,
+    "elapsed_ms": null,
+    "stage_started_at": null
+  }
+}

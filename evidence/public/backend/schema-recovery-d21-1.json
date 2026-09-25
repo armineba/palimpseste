@@ -1,0 +1,49 @@
+{
+  "revision": "D21.1",
+  "client_version": "1.8.0",
+  "observed_at": "2026-09-25T08:52:36.891801+00:00",
+  "job_id": "5e763870-284e-4167-9c6b-850b9b02ceff",
+  "cause": {
+    "http_status": 400,
+    "provider_code": "invalid_json_schema",
+    "schema_field": "carrier",
+    "native_failures": 4,
+    "description_preserved": true,
+    "plan_created": false,
+    "visual_judgement_run": false
+  },
+  "backend": {
+    "publish_exit": 0,
+    "stage": "deliverables/.stage-backend/cad68d1333b0440bb5f66fd2fde17466",
+    "worker_sha256": "1ed522aeab3d520e11867906de5ce59e7decfe7b03ed4f2f975b7140d9490b26",
+    "api_sha256": "4362176dcc17e72847f98b165c6ea996971457bc550f10ae317524840a58a8e9",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "publish_log": "deliverables/schema-recovery-d21-1-publish.log",
+    "publication_zip_sha256": "f0de7f771aa4058862ecf7c65b30f7601522a0b633018b079ee804a07017bacc"
+  },
+  "schemas": {
+    "typed_singleton_values": {
+      "model-b-v2": 35,
+      "model-b-unity-god-v2": 36
+    },
+    "business_constraints_relaxed": false,
+    "provider_acceptance_observed": false,
+    "reference": "https://developers.openai.com/api/docs/guides/structured-outputs"
+  },
+  "unity_rebuilt": false,
+  "deployed": true,
+  "parchment_resumed": false,
+  "gameplay_tested": false,
+  "provider_diagnostic_calls": 0,
+  "human_acceptance": "pending",
+  "execution_review": {
+    "action": "combined_deploy_and_historical_pass_reclassification_then_resume",
+    "result": "blocked by policy",
+    "detailed_reason_provided": false,
+    "executed": false,
+    "safer_alternative": "ordinary deployment only; historical passes and job state untouched",
+    "alternative_completed": true
+  },
+  "installation": "evidence/public/backend/schema-recovery-d21-1-installation.json",
+  "installed_at": "2026-09-25T08:53:11.0786216+00:00"
+}

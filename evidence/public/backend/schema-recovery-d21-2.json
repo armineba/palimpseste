@@ -1,0 +1,39 @@
+{
+  "revision": "D21.2",
+  "client_version": "1.8.0",
+  "observed_at": "2026-09-25T09:01:31.041536+00:00",
+  "job_id": "5e763870284e41679c6b850b9b02ceff",
+  "backend": {
+    "publish_exit": 0,
+    "stage": "deliverables/.stage-backend/e4d0e7939b424a7db19dd871f04342b3",
+    "worker_sha256": "361fcfa3f59d086f8beef24fc60e3de9f69d33bfa501ac24d34d7f778da46e34",
+    "api_sha256": "0c359309a2f17d049056dbc337c1333629ae0cfbdb86753cf9f009a987ff9517",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "publish_log": "deliverables/schema-recovery-d21-2-publish.log",
+    "publication_zip_sha256": "4ecfd87e8787624fadd63a770f030992b1d9fe690331228974f5f8f5e8e240b2"
+  },
+  "recovery": {
+    "original_passes_rewritten": false,
+    "new_pass": "blueprint_recovery",
+    "strict_native_schema_error_proof_required": true,
+    "deployed_schema_change_required": true,
+    "same_owner_api_required": true,
+    "rendering_and_publication_gates_preserved": true
+  },
+  "unity_rebuilt": false,
+  "deployed": true,
+  "parchment_resumed": true,
+  "provider_acceptance_observed": false,
+  "gameplay_tested": false,
+  "provider_diagnostic_calls": 0,
+  "human_acceptance": "pending",
+  "installed_at": "2026-09-25T09:01:46.2236774+00:00",
+  "recovery_result": {
+    "attempt_count": 6,
+    "state": "needs_operator",
+    "error_code": "codex_output_schema_rejected",
+    "cause": "rendering_layers.resource_id enum contains null while declared type is string",
+    "technical_failure_repeated_once": true,
+    "artistic_revisions_consumed": 0
+  }
+}

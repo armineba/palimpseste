@@ -62,7 +62,9 @@ public sealed partial class JobRepository
         await using var tx = await conn.BeginTransactionAsync(ct);
         await using var cmd = new NpgsqlCommand("""
             UPDATE jobs SET state=$3,error_code=$4,message=$5,retryable=$6,
-                resume_stage=$7,updated_at=now(),
+                resume_stage=CASE WHEN $3='needs_operator' THEN
+                    CASE WHEN state NOT IN ('needs_operator','waiting_retry') THEN state ELSE resume_stage END
+                    ELSE $7 END,updated_at=now(),
                 lease_until=CASE WHEN $3 IN ('ready','needs_operator','waiting_retry') THEN NULL ELSE lease_until END,
                 leased_by=CASE WHEN $3 IN ('ready','needs_operator','waiting_retry') THEN NULL ELSE leased_by END
             WHERE id=$1 AND fence_token=$2
@@ -354,7 +356,9 @@ public sealed partial class JobRepository
         await using var tx = await conn.BeginTransactionAsync(ct);
         await using var gate = new NpgsqlCommand("""
             UPDATE jobs SET attempt_count=attempt_count+1,updated_at=now()
-            WHERE id=$1 AND fence_token=$2 AND attempt_count<10 RETURNING attempt_count
+            WHERE id=$1 AND fence_token=$2
+              AND attempt_count < CASE WHEN visual_pipeline_version=5 THEN 32 ELSE 10 END
+            RETURNING attempt_count
             """, conn, tx);
         gate.Parameters.AddWithValue(job.Id); gate.Parameters.AddWithValue(job.Fence);
         if (await gate.ExecuteScalarAsync(ct) is null) throw new InvalidOperationException("attempt_budget_or_fence_lost");

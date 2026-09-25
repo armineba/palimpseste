@@ -13,6 +13,8 @@ public sealed class ApiConfig
     public required string ReferencePath { get; init; }
     public required string ReferenceFreePath { get; init; }
     public required string CatalogPath { get; init; }
+    public string AttemptRoot { get; init; } = "";
+    public string SpecificationRoot { get; init; } = "";
     public string CatalogVersion { get; init; } = "sp.capabilities/1.0";
     public string RulesProfile { get; init; } = "lab_v1";
     public string MinimumClientVersion { get; init; } = "0.1.0";
@@ -40,6 +42,8 @@ public sealed class ApiConfig
         return new ApiConfig
         {
             ConnectionString = connection,
+            AttemptRoot = Environment.GetEnvironmentVariable("PALIMPSESTE_ATTEMPT_ROOT") ?? "",
+            SpecificationRoot = specificationRoot,
             ArtifactRoot = Environment.GetEnvironmentVariable("ARTIFACT_ROOT") ?? Path.Combine(repositoryRoot, ".local-artifacts"),
             ReferencePath = Environment.GetEnvironmentVariable("REFERENCE_PNG") ?? Path.Combine(specificationRoot, "reference", "reference_layout.png"),
             ReferenceFreePath = Environment.GetEnvironmentVariable("REFERENCE_FREE_PNG") ?? Path.Combine(specificationRoot, "reference", "reference_free_canvas.png"),

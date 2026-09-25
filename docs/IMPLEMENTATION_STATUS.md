@@ -1,5 +1,19 @@
 # État de réalisation et point de reprise
 
+## D21.3 — constructeur corrigé, parchemin du créateur repris
+
+**D21.3 installé le 25 septembre 2026 à 11:07:19 Paris.** Backend D21.2 réellement publié (code 0), réutilisé avec les schémas corrigés ; Player 1.8.0 inchangé. API et worker démarrés, `claims_paused=false`. [Installation](../evidence/public/backend/schema-recovery-d21-3-installation.json) · [Preuve de livraison](../evidence/public/backend/schema-recovery-d21-3.json).
+
+Cause réelle de « Tarière des strates » : quatre refus HTTP 400 `invalid_json_schema` sur des constantes sans type. La première reprise a révélé une seconde incohérence : `resource_id` énumérait `null` tout en imposant `string`. Les deux défauts sont corrigés, sans élargir l’ensemble des valeurs valides. [Erreurs natives initiales](../evidence/public/backend/schema-recovery-d21-1-cause.json) · [Seconde erreur exacte](../evidence/public/backend/schema-recovery-d21-2-cause.json) · [Contrôle structurel local](../evidence/public/backend/schema-recovery-d21-3-preflight.json).
+
+Le traitement distingue maintenant panne fournisseur et candidat artistique refusé, conserve l’étape de panne et permet une reprise propriétaire seulement après preuve native du défaut et modification du schéma déployé. Les quatre anciennes passes restent intactes ; les nouvelles constructions utilisent `blueprint_recovery`. Les gates de compilation, structure, mouvement, rendu et publication restent obligatoires. [Reprise sans réécriture](D21_2_APPEND_ONLY_RECOVERY.md).
+
+**Reprise réelle HTTP 202**, même job `5e763870284e41679c6b850b9b02ceff`, même dessin, description et recherche. Dernier état observé : **`planning`, tentative 7, sans code d’erreur**, début de construction à 11:07:38 Paris. [Réponse de reprise](../evidence/public/backend/schema-recovery-d21-3-resume.json). Le sort n’est pas encore publié ; attendre son résultat et le verdict du créateur. Dans le Player déjà ouvert, cliquer **Actualiser**. Ne pas relancer A ni créer un dessin de démonstration.
+
+La commande initiale regroupant installation et reclassement historique a été refusée par le contrôle automatique avant exécution, sans motif détaillé. L’installation seule puis la reprise par l’API, qui conserve les données initiales, ont été exécutées. Aucun ancien échec reclassé. Une première installation D21.3 s’est arrêtée après les migrations sans cause enregistrée ; la suivante est terminée et prouvée. Le déploiement enregistre désormais les exceptions pour éviter un arrêt silencieux.
+
+Aucun nouveau test de gameplay, capture de validation indépendante, diagnostic modèle ou build Unity exécuté. Les appels B sont les reprises de la demande du créateur. Player présent et réactif pendant l’intervention ; les paragraphes D21 ci-dessous sont historiques et précèdent son ouverture sur demande.
+
 ## D21 — Méthodes des bibliothèques dans la boucle V2
 
 **Backend D21 compilé et empaqueté, publication code 0.** Skill **UNITY GOD 1.0** créé et installé localement ; méthodes intégrées aux nouvelles recherches V2, constructeur B 2.1, validation serveur, reçu persistant et critique indépendante. **20 méthodes documentées, 22 fichiers sources vérifiés, sept adaptations sélectionnables**, treize fiches pour développements futurs. Les cinq bibliothèques sont considérées, quatre ont du code matériellement inspecté. Aucun réentraînement de modèle. [Architecture et portée](D21_UNITY_GOD.md) · [Preuves](../evidence/public/unity-god/).

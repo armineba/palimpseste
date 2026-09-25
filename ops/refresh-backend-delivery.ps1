@@ -1,7 +1,8 @@
-# Refresh documentation/evidence around already compiled binaries; no build or generation.
+﻿# Refresh documentation/evidence around already compiled binaries; no build or generation.
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$StageRoot,
-    [string]$ProofPath = 'evidence/public/backend/animation-sheet-d16.json')
+    [string]$ProofPath = 'evidence/public/backend/animation-sheet-d16.json',
+    [switch]$RefreshV2Schemas)
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $boundary = Join-Path $repo 'deliverables\.stage-backend'
@@ -28,6 +29,14 @@ foreach ($path in @($stage,$zip,$pending)) {
     }
 }
 $files = [ordered]@{}
+if ($RefreshV2Schemas) {
+    & python (Join-Path $PSScriptRoot 'validate-codex-schemas.py')
+    if ($LASTEXITCODE -ne 0) { throw 'Updated Codex schemas failed structural validation.' }
+    foreach ($relative in @('codex/model-b-v2.output-schema.json','codex/model-b-unity-god-v2.output-schema.json',
+        'spell-blueprint-v2.schema.json','spell-plan-v2.schema.json','compiled-spell-v2.schema.json')) {
+        $files['spec/contracts/' + $relative] = Join-Path $repo ('contracts/' + $relative)
+    }
+}
 $files['README.txt'] = Join-Path $stage 'README.txt'
 $files['spec/assets/sourced-vfx/catalogue.json'] = Join-Path $repo 'assets\sourced-vfx\catalogue.json'
 $files['IMPLEMENTATION_STATUS.md'] = Join-Path $repo 'docs\IMPLEMENTATION_STATUS.md'
@@ -38,13 +47,13 @@ foreach ($file in Get-ChildItem -LiteralPath (Join-Path $repo 'evidence\public\v
 foreach ($file in Get-ChildItem -LiteralPath (Join-Path $repo 'evidence\public\unity-god') -Recurse -File) {
     $files['evidence/unity-god/' + $file.FullName.Substring((Join-Path $repo 'evidence\public\unity-god').Length+1).Replace('\','/')] = $file.FullName
 }
-foreach ($name in @('D15_BEHAVIOR_AND_RESEARCH.md','D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPELL_PIPELINE_V2.md','D21_UNITY_GOD.md','V2_BLUEPRINT_CONTRACT.md','V2_UNITY_STRUCTURAL_RENDERER.md','V2_VALIDATION_ENGINE.md','UNITY_BEHAVIORS_D15.md','UNITY_ANIMATION_SHEET_D16.md','references-vfx-sources.md','BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt','NEXT_ACTIONS.md','TESTER_MAINTENANT.md')) {
+foreach ($name in @('D15_BEHAVIOR_AND_RESEARCH.md','D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPELL_PIPELINE_V2.md','D21_UNITY_GOD.md','D21_1_SCHEMA_RECOVERY.md','D21_2_APPEND_ONLY_RECOVERY.md','V2_BLUEPRINT_CONTRACT.md','V2_UNITY_STRUCTURAL_RENDERER.md','V2_VALIDATION_ENGINE.md','UNITY_BEHAVIORS_D15.md','UNITY_ANIMATION_SHEET_D16.md','references-vfx-sources.md','BIBLIOTHEQUES_VFX_OBLIGATOIRES.txt','NEXT_ACTIONS.md','TESTER_MAINTENANT.md')) {
     $files['docs/' + $name] = Join-Path $repo ('docs\' + $name)
 }
 foreach ($file in Get-ChildItem -LiteralPath (Join-Path $repo 'docs') -Filter 'D16*.md' -File) {
     $files['docs/' + $file.Name] = $file.FullName
 }
-foreach ($file in Get-ChildItem -LiteralPath $PSScriptRoot -File | Where-Object { $_.Name.EndsWith('.ps1') -or $_.Name.EndsWith('.env.example') -or $_.Name.EndsWith('.patch') -or $_.Name.EndsWith('.md') }) {
+foreach ($file in Get-ChildItem -LiteralPath $PSScriptRoot -File | Where-Object { $_.Name.EndsWith('.ps1') -or $_.Name.EndsWith('.env.example') -or $_.Name.EndsWith('.patch') -or $_.Name.EndsWith('.md') -or $_.Name -eq 'validate-codex-schemas.py' }) {
     $files['ops/' + $file.Name] = $file.FullName
 }
 foreach ($file in Get-ChildItem -LiteralPath $evidenceRoot -Recurse -File) {

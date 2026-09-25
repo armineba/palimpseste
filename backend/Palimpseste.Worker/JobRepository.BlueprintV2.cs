@@ -9,6 +9,49 @@ public sealed record V2PassDocument(string StorageKey, string Sha256, Guid Artif
 
 public sealed partial class JobRepository
 {
+    public async Task<bool> VerifyLatestV2SchemaFailureIfPresentAsync(ClaimedJob job,
+        string attemptRoot, string specificationRoot, CancellationToken ct)
+    {
+        await using var query = source.CreateCommand("""
+            SELECT a.id,a.status,a.output_sha256,a.error_code
+            FROM provider_attempts a JOIN jobs j ON j.id=a.job_id
+            WHERE j.id=$1 AND j.fence_token=$2 AND j.visual_pipeline_version=5 AND a.stage='B'
+            ORDER BY a.started_at DESC LIMIT 1
+            """);
+        query.Parameters.AddWithValue(job.Id); query.Parameters.AddWithValue(job.Fence);
+        await using var reader = await query.ExecuteReaderAsync(ct);
+        if (!await reader.ReadAsync(ct) || reader.IsDBNull(3) || reader.GetString(3) != "codex_output_schema_rejected") return true;
+        return await SchemaFailureEvidence.VerifyAsync(attemptRoot, specificationRoot, job.Id,
+            reader.GetGuid(0), reader.GetString(1), reader.IsDBNull(2) ? null : reader.GetString(2), reader.GetString(3), ct);
+    }
+
+    public async Task<bool> IsLegacyBlueprintSchemaFailureAsync(ClaimedJob job, int revision,
+        string attemptRoot, string specificationRoot, CancellationToken ct)
+    {
+        // The historical row did not retain provider_attempt_id. Match its frozen
+        // input and original timestamp; later successful retries may share that input.
+        var attempts = new List<(Guid Id, string Status, string? Output, string? Error)>();
+        await using (var query = source.CreateCommand("""
+            SELECT a.id,a.status,a.output_sha256,a.error_code
+            FROM spell_v2_passes p JOIN jobs j ON j.id=p.job_id
+            JOIN provider_attempts a ON a.job_id=j.id AND a.stage='B' AND a.input_sha256=p.input_sha256
+                AND a.finished_at<=p.created_at
+            WHERE j.id=$1 AND j.fence_token=$2 AND j.visual_pipeline_version=5
+              AND p.revision=$3 AND p.pass='blueprint' AND NOT p.accepted
+            """))
+        {
+            query.Parameters.AddWithValue(job.Id); query.Parameters.AddWithValue(job.Fence); query.Parameters.AddWithValue(revision);
+            await using var reader = await query.ExecuteReaderAsync(ct);
+            while (await reader.ReadAsync(ct)) attempts.Add((reader.GetGuid(0), reader.GetString(1),
+                reader.IsDBNull(2) ? null : reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetString(3)));
+        }
+        if (attempts.Count == 0) return false;
+        foreach (var attempt in attempts)
+            if (!await SchemaFailureEvidence.VerifyAsync(attemptRoot, specificationRoot, job.Id,
+                attempt.Id, attempt.Status, attempt.Output, attempt.Error, ct)) return false;
+        return true;
+    }
+
     public async Task<string> GetV2CreationTimeAsync(ClaimedJob job, CancellationToken ct)
     {
         await using var cmd = source.CreateCommand("SELECT created_at FROM jobs WHERE id=$1 AND fence_token=$2 AND visual_pipeline_version=5");

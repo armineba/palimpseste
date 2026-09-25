@@ -260,7 +260,13 @@ public sealed class CodexProcessRunner
                 var stdoutDiagnostic = SnapshotDiagnostic(outText);
                 var eventDiagnostic = SnapshotDiagnostic(events.Error);
                 var diagnosticCategory = ChooseDiagnosticCategory(errText, events.Error, outText);
-                var exitResult = Failure(Classify(errText + "\n" + events.Error + "\n" + outText), "codex_exit_nonzero", started,
+                var outcome = Classify(errText + "\n" + events.Error + "\n" + outText);
+                // Preserve a provider request-schema error as an operator diagnostic.
+                // It is not a malformed spell or a visual rejection by the model.
+                var exitCode = outcome == ProviderOutcome.ProcessFailure &&
+                    events.Error?.Contains("invalid_json_schema", StringComparison.Ordinal) == true
+                    ? "codex_output_schema_rejected" : "codex_exit_nonzero";
+                var exitResult = Failure(outcome, exitCode, started,
                     process.ExitCode, events.SessionId, events.UsageJson, directory, events.ReportedModel, events.ReportedEffort,
                     processStarted: processStarted, diagnosticStderr: diagnosticStderr,
                     diagnosticStdoutSha256: stdoutDiagnostic?.Sha256,

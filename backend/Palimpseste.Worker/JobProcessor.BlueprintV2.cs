@@ -34,11 +34,35 @@ public sealed partial class JobProcessor
         var returnStage = "structural_core";
         var renderer = new TrustedVisualCapture(settings);
         var descriptionRecord = await jobs.GetDescriptionAsync(job, ct);
+        if (!await jobs.VerifyLatestV2SchemaFailureIfPresentAsync(job, settings.AttemptRoot, specRoot, ct))
+        {
+            await StopV2Async(job, "v2_schema_recovery_unverified", "La reprise de construction n'a pas encore pu être vérifiée", ct);
+            return;
+        }
         for (var revision = current?.Revision ?? 0; revision <= 3; revision++)
         {
+            var blueprintPass = "blueprint";
+            var storedBlueprint = await jobs.GetV2PassAsync(job, revision, "blueprint", ct);
+            var recoveredBlueprint = await jobs.GetV2PassAsync(job, revision, "blueprint_recovery", ct);
+            if (storedBlueprint is { Accepted: false })
+            {
+                var rejectedBytes = await ReadCheckedAsync(storedBlueprint.StorageKey, storedBlueprint.Sha256, ct);
+                if (SchemaFailureEvidence.IsLegacyPlaceholder(rejectedBytes, storedBlueprint.Sha256) &&
+                    await jobs.IsLegacyBlueprintSchemaFailureAsync(job, revision, settings.AttemptRoot, specRoot, ct))
+                {
+                    // Preserve the original pass and bytes. Only proven request-schema
+                    // failures get a separate candidate slot at the same revision.
+                    blueprintPass = "blueprint_recovery";
+                    storedBlueprint = recoveredBlueprint;
+                }
+                else if (recoveredBlueprint is not null)
+                    throw new InvalidDataException("v2_schema_recovery_unverified");
+            }
+            else if (recoveredBlueprint is not null)
+                throw new InvalidDataException("v2_schema_recovery_without_legacy_failure");
             if (current is null || current.Revision != revision)
             {
-                var rejected = await jobs.GetV2PassAsync(job, revision, "blueprint", ct);
+                var rejected = storedBlueprint;
                 if (rejected is { Accepted: false })
                 {
                     feedback = Encoding.UTF8.GetString(await ReadCheckedAsync(rejected.StorageKey, rejected.Sha256, ct));
@@ -51,6 +75,25 @@ public sealed partial class JobProcessor
                 var attempt = await jobs.BeginAttemptAsync(job, "B", settings.Model, settings.Effort, inputHash, ct);
                 var candidate = await provider.PlanBlueprintV2Async(job.Id.ToString("N"), attempt.ToString("N"),
                     description, capabilities, research, plan is null ? null : Encoding.UTF8.GetString(plan), feedback, returnStage, ct);
+                // A failed provider process has produced no candidate to improve. Keep its
+                // exact error on the attempt, pause once and leave this blueprint revision
+                // unused so an explicit recovery can resume it. Never feed infrastructure
+                // failures to the artistic correction loop or retry uncertain/denied calls.
+                if (candidate.Transport.Outcome is not (ProviderOutcome.Success or
+                    ProviderOutcome.InvalidSchema or ProviderOutcome.BusinessViolation))
+                {
+                    var providerError = candidate.Transport.ErrorCode ??
+                        "v2_provider_" + candidate.Transport.Outcome.ToString().ToLowerInvariant();
+                    await jobs.CompleteAttemptAsync(job, attempt,
+                        candidate.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid",
+                        candidate.Sha256, candidate.Transport.CliVersion, candidate.Transport.SessionId,
+                        candidate.Transport.UsageJson, providerError, ct);
+                    var protectedFailure = candidate.Transport.Outcome is ProviderOutcome.TransportUncertain or
+                        ProviderOutcome.IsolationViolation or ProviderOutcome.Refusal;
+                    await StopV2Async(job, protectedFailure ? "v2_provider_unavailable" : providerError,
+                        "Construction V2 interrompue ; dessin et étapes conservés", ct);
+                    return;
+                }
                 var issues = candidate.Utf8 is null ? [] : SpellCompiler.ValidatePlanJson(description, candidate.Utf8,
                     new Dictionary<string, byte[]>(), new Dictionary<string, byte[]>(), null, research.Sha256);
                 var changedLock = plan is not null && candidate.Utf8 is not null && !V2RevisionAllowed(plan, candidate.Utf8, returnStage);
@@ -58,20 +101,17 @@ public sealed partial class JobProcessor
                     UnityGodMethods.ValidateReceipt(candidate.Utf8, candidate.UnityGodReceipt, research).Count != 0);
                 if (candidate.Transport.Outcome != ProviderOutcome.Success || candidate.Utf8 is null || issues.Count != 0 || changedLock || methodsInvalid)
                 {
+                    var rejectionError = candidate.Transport.ErrorCode ?? (changedLock ? "v2_locked_stage_changed" :
+                        methodsInvalid ? "v2_methods_invalid" : "v2_blueprint_invalid");
                     await jobs.CompleteAttemptAsync(job, attempt,
-                        candidate.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid",
+                        "invalid",
                         candidate.Sha256, candidate.Transport.CliVersion, candidate.Transport.SessionId,
-                        candidate.Transport.UsageJson, changedLock ? "v2_locked_stage_changed" : "v2_blueprint_invalid", ct);
-                    if (candidate.Transport.Outcome is ProviderOutcome.TransportUncertain or ProviderOutcome.IsolationViolation or ProviderOutcome.Refusal)
-                    {
-                        await StopV2Async(job, "v2_provider_unavailable", "Construction V2 interrompue ; dessin conservé", ct);
-                        return;
-                    }
-                    feedback = JsonSerializer.Serialize(new { stage = returnStage,
+                        candidate.Transport.UsageJson, rejectionError, ct);
+                    feedback = JsonSerializer.Serialize(new { stage = returnStage, failure_kind = "construction_contract",
                         issues = issues.Select(i => i.ToString()).ToArray(), locked_stage_changed = changedLock,
                         methods_invalid = methodsInvalid, method_issues = candidate.UnityGodIssues,
-                        provider_error = candidate.Transport.ErrorCode });
-                    await SaveV2BytesAsync(job, revision, "blueprint", Encoding.UTF8.GetBytes(feedback), inputHash, null, false, ct);
+                        provider_outcome = candidate.Transport.Outcome.ToString(), provider_error = candidate.Transport.ErrorCode });
+                    await SaveV2BytesAsync(job, revision, blueprintPass, Encoding.UTF8.GetBytes(feedback), inputHash, null, false, ct);
                     continue;
                 }
                 var artifact = await files.PutAsync(candidate.Utf8, "json", "application/json", ct);
@@ -95,7 +135,7 @@ public sealed partial class JobProcessor
                     throw new InvalidDataException("v2_methods_receipt_changed");
             }
             var coreHash = V2CoreHash(plan);
-            await SaveV2BytesAsync(job, revision, "blueprint", plan, planHash, coreHash, true, ct);
+            await SaveV2BytesAsync(job, revision, blueprintPass, plan, planHash, coreHash, true, ct);
             var input = new CompilationInput
             {
                 DescriptionJson = description, PlanJson = plan,
@@ -224,7 +264,7 @@ public sealed partial class JobProcessor
             await jobs.CompleteAttemptAsync(job, attempt,
                 result.Transport.Outcome == ProviderOutcome.TransportUncertain ? "transport_uncertain" : "invalid",
                 result.Sha256, result.Transport.CliVersion, result.Transport.SessionId, result.Transport.UsageJson,
-                "v2_review_unavailable", ct);
+                result.Transport.ErrorCode ?? "v2_review_unavailable", ct);
             await StopV2Async(job, "v2_review_unavailable", "Contrôle visuel V2 interrompu ; construction conservée", ct);
             return null;
         }

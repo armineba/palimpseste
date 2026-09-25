@@ -1,0 +1,73 @@
+{
+  "job_id": "5e763870284e41679c6b850b9b02ceff",
+  "attempts": [
+    {
+      "attempt_id": "f0d1c8a9584248b695c718165818eb5c",
+      "stage": "B",
+      "outcome": "ProcessFailure",
+      "native_error_code": "codex_exit_nonzero",
+      "http_status": 400,
+      "provider_error": {
+        "type": "invalid_request_error",
+        "code": "invalid_json_schema",
+        "message": "Invalid schema for response_format 'codex_output_schema': In context=('properties', 'carrier'), schema must have a 'type' key.",
+        "param": "text.format.schema"
+      },
+      "failed_schema_sha256": "84fb602628922db86d752ac8c7e17c32b30f03089f1a9cf3fefb39ae10f65758",
+      "elapsed_ms": 3987,
+      "metadata_sha256": "170c9aaef7fdc1a2a44944d0c10f73d613f5ba711fd7f823082959eab55bf841"
+    },
+    {
+      "attempt_id": "df37018a39b04741a3f7188572cab0c3",
+      "stage": "B",
+      "outcome": "ProcessFailure",
+      "native_error_code": "codex_exit_nonzero",
+      "http_status": 400,
+      "provider_error": {
+        "type": "invalid_request_error",
+        "code": "invalid_json_schema",
+        "message": "Invalid schema for response_format 'codex_output_schema': In context=('properties', 'carrier'), schema must have a 'type' key.",
+        "param": "text.format.schema"
+      },
+      "failed_schema_sha256": "84fb602628922db86d752ac8c7e17c32b30f03089f1a9cf3fefb39ae10f65758",
+      "elapsed_ms": 2337,
+      "metadata_sha256": "296fefa8038c1f0895e47f0b2b91d91e58ae49904913cefe0a52166f6699211c"
+    },
+    {
+      "attempt_id": "d1a1ae06b8b84f769692a75520469f86",
+      "stage": "B",
+      "outcome": "ProcessFailure",
+      "native_error_code": "codex_exit_nonzero",
+      "http_status": 400,
+      "provider_error": {
+        "type": "invalid_request_error",
+        "code": "invalid_json_schema",
+        "message": "Invalid schema for response_format 'codex_output_schema': In context=('properties', 'carrier'), schema must have a 'type' key.",
+        "param": "text.format.schema"
+      },
+      "failed_schema_sha256": "84fb602628922db86d752ac8c7e17c32b30f03089f1a9cf3fefb39ae10f65758",
+      "elapsed_ms": 3146,
+      "metadata_sha256": "153b285dfb379198f874b552ea7eeeed199c8e79873e13978560aece8f276731"
+    },
+    {
+      "attempt_id": "4136bd8738944857a21458d41ef9ac05",
+      "stage": "B",
+      "outcome": "ProcessFailure",
+      "native_error_code": "codex_exit_nonzero",
+      "http_status": 400,
+      "provider_error": {
+        "type": "invalid_request_error",
+        "code": "invalid_json_schema",
+        "message": "Invalid schema for response_format 'codex_output_schema': In context=('properties', 'carrier'), schema must have a 'type' key.",
+        "param": "text.format.schema"
+      },
+      "failed_schema_sha256": "84fb602628922db86d752ac8c7e17c32b30f03089f1a9cf3fefb39ae10f65758",
+      "elapsed_ms": 2562,
+      "metadata_sha256": "ec7242f42658a5a803e2e3182efb5279e5fce01c4359084790570d5d2fa70a82"
+    }
+  ],
+  "description_sha256": "2aca7bfb98fbd78d91b8f8a95ba324fc13f3fa61d6a372f83081845ec5878fc0",
+  "research_sha256": "ebcb47d062435b83905e038a9d6303b5cf5813f67a447e6cca0b36e666f36f12",
+  "database_state_observed": "needs_operator",
+  "original_artifacts_modified": false
+}

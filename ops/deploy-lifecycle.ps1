@@ -1,11 +1,11 @@
 <# Operator installation only. Does not generate a spell, run a diagnostic, or build software.
    Reuses the existing native Codex identity and observed D13 binary evidence unchanged.
    Gameplay and artistic acceptance remain pending the owner's own trial.
-   D21 applies migrations012 then013; migration011 is a prerequisite. Older Player updates apply011. #>
+   D21.3 applies012 then015 (which includes013/014); migration011 is a prerequisite. Older Player updates apply011. #>
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$StageRoot,
     [string]$PlayerRoot = '', [string]$RuntimeRoot = 'E:\PalimpsesteRuntime',
-    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D21',
+    [ValidatePattern('^D[0-9]+(?:\.[0-9]+)?$')][string]$BackendRevision = 'D21.3',
     [ValidateSet('1.6.0','1.7.0','1.8.0')][string]$ClientVersion = '1.8.0',
     [string]$PublicReportPath = '',
     [ValidateRange(-1,2147483647)][int]$JobConcurrency = -1,
@@ -100,7 +100,7 @@ foreach ($relative in @('worker\Palimpseste.Worker.exe','api\Palimpseste.Api.exe
 }
 $stageVfx = Join-Path $stage 'spec\assets\sourced-vfx'
 if ($ClientVersion -eq '1.8.0') {
-    foreach ($relative in @('migrations\012_blueprint_v2.sql','migrations\013_unity_god_methods.sql',
+    foreach ($relative in @('migrations\012_blueprint_v2.sql','migrations\013_unity_god_methods.sql','migrations\014_v2_provider_failures.sql','migrations\015_v2_schema_recovery.sql',
         'spec\prompts\06_BLUEPRINT_V2.md','spec\prompts\07_V2_CRITIC.md',
         'spec\prompts\08_V2_INTERPRETATION.md','spec\prompts\09_V2_NUMERIC_RULES.md','spec\prompts\10_UNITY_GOD_RUNTIME.md',
         'spec\contracts\spell-blueprint-v2.schema.json','spec\contracts\spell-plan-v2.schema.json',
@@ -121,7 +121,8 @@ if ($ClientVersion -eq '1.8.0') {
         }
     }
 }
-$migrationNames = if ($ClientVersion -eq '1.8.0') { @('012_blueprint_v2.sql','013_unity_god_methods.sql') } else { @('011_animation_sheet.sql') }
+# 015 includes013/014. Do not replay their narrower constraints over recovery rows.
+$migrationNames = if ($ClientVersion -eq '1.8.0') { @('012_blueprint_v2.sql','015_v2_schema_recovery.sql') } else { @('011_animation_sheet.sql') }
 $migrationInputs = @($migrationNames | ForEach-Object {
     $source = Join-Path $stage ('migrations\' + $_); Regular $source
     [ordered]@{file=$_;sha256=Digest $source}
@@ -339,6 +340,12 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'API startup failed.' }
     $record.phase='services_started'; $record.completed=$true; $record.completed_at=[DateTimeOffset]::UtcNow.ToString('o'); Save-Record
     Write-Output "$BackendRevision backend / Player $ClientVersion installed. Owner gameplay trial pending. Record: $logRoot\installation.json"
+} catch {
+    $record.failed_at_phase=$record.phase
+    $record.failure_type=$_.Exception.GetType().Name
+    [IO.File]::WriteAllText((Join-Path $logRoot 'failure.txt'), ($_ | Out-String), $utf8)
+    $record.phase='failed'; Save-Record
+    throw
 } finally {
     if ($claimPauseInstalled) {
         try { Set-ClaimPause $false; $record.claims_paused=$false; Save-Record }

@@ -5,17 +5,26 @@
   "type": "object",
   "properties": {
     "schema_version": {
-      "const": "sp.plan/1.0"
+      "type": "string",
+      "enum": [
+        "sp.plan/1.0"
+      ]
     },
     "description_sha256": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
     },
     "catalog_version": {
-      "const": "sp.capabilities/1.0"
+      "type": "string",
+      "enum": [
+        "sp.capabilities/1.0"
+      ]
     },
     "rules_profile": {
-      "const": "lab_v1"
+      "type": "string",
+      "enum": [
+        "lab_v1"
+      ]
     },
     "nodes": {
       "type": "array",
@@ -237,7 +246,10 @@
           "maxItems": 8
         },
         "carrier": {
-          "const": "projectile"
+          "type": "string",
+          "enum": [
+            "projectile"
+          ]
         },
         "activation": {
           "$ref": "#/$defs/activation"
@@ -251,7 +263,10 @@
           ]
         },
         "geometry_id": {
-          "const": "canonical.v2"
+          "type": "string",
+          "enum": [
+            "canonical.v2"
+          ]
         },
         "scale_cm": {
           "type": "integer",
@@ -577,7 +592,10 @@
           "maxItems": 8
         },
         "carrier": {
-          "const": "beam"
+          "type": "string",
+          "enum": [
+            "beam"
+          ]
         },
         "activation": {
           "$ref": "#/$defs/activation"
@@ -591,7 +609,10 @@
           ]
         },
         "geometry_id": {
-          "const": "canonical.v2"
+          "type": "string",
+          "enum": [
+            "canonical.v2"
+          ]
         },
         "scale_cm": {
           "type": "integer",
@@ -901,7 +922,10 @@
           "maxItems": 8
         },
         "carrier": {
-          "const": "field"
+          "type": "string",
+          "enum": [
+            "field"
+          ]
         },
         "activation": {
           "$ref": "#/$defs/activation"
@@ -915,7 +939,10 @@
           ]
         },
         "geometry_id": {
-          "const": "canonical.v2"
+          "type": "string",
+          "enum": [
+            "canonical.v2"
+          ]
         },
         "scale_cm": {
           "type": "integer",
@@ -1196,7 +1223,10 @@
           "maxItems": 8
         },
         "carrier": {
-          "const": "pulse"
+          "type": "string",
+          "enum": [
+            "pulse"
+          ]
         },
         "activation": {
           "$ref": "#/$defs/activation"
@@ -1210,7 +1240,10 @@
           ]
         },
         "geometry_id": {
-          "const": "canonical.v2"
+          "type": "string",
+          "enum": [
+            "canonical.v2"
+          ]
         },
         "scale_cm": {
           "type": "integer",
@@ -1491,7 +1524,10 @@
           "maxItems": 8
         },
         "carrier": {
-          "const": "barrier"
+          "type": "string",
+          "enum": [
+            "barrier"
+          ]
         },
         "activation": {
           "$ref": "#/$defs/activation"
@@ -1505,7 +1541,10 @@
           ]
         },
         "geometry_id": {
-          "const": "canonical.v2"
+          "type": "string",
+          "enum": [
+            "canonical.v2"
+          ]
         },
         "scale_cm": {
           "type": "integer",
@@ -1798,7 +1837,10 @@
           "maxItems": 8
         },
         "carrier": {
-          "const": "trap"
+          "type": "string",
+          "enum": [
+            "trap"
+          ]
         },
         "activation": {
           "$ref": "#/$defs/activation"
@@ -1812,7 +1854,10 @@
           ]
         },
         "geometry_id": {
-          "const": "canonical.v2"
+          "type": "string",
+          "enum": [
+            "canonical.v2"
+          ]
         },
         "scale_cm": {
           "type": "integer",
@@ -2601,7 +2646,10 @@
       "type": "object",
       "properties": {
         "schema_version": {
-          "const": "sp.blueprint/2.0"
+          "type": "string",
+          "enum": [
+            "sp.blueprint/2.0"
+          ]
         },
         "intent": {
           "type": "object",
@@ -2741,10 +2789,16 @@
               "maxItems": 4
             },
             "topology": {
-              "const": "fixed"
+              "type": "string",
+              "enum": [
+                "fixed"
+              ]
             },
             "coordinate_system": {
-              "const": "local_cm_y_up_z_forward"
+              "type": "string",
+              "enum": [
+                "local_cm_y_up_z_forward"
+              ]
             },
             "element_count": {
               "type": "integer",
@@ -3154,8 +3208,7 @@
                 "ksp_black_smoke_00",
                 "ksp_explosion_00",
                 "ksp_poison_puff_00",
-                "ksp_white_puff_00",
-                null
+                "ksp_white_puff_00"
               ]
             }
           },
@@ -3184,7 +3237,10 @@
               ]
             },
             "collision_owner": {
-              "const": "root"
+              "type": "string",
+              "enum": [
+                "root"
+              ]
             },
             "collision_response": {
               "type": "string",
@@ -3227,13 +3283,22 @@
               ]
             },
             "rigidbody_count": {
-              "const": 0
+              "type": "integer",
+              "enum": [
+                0
+              ]
             },
             "decorative_physics": {
-              "const": false
+              "type": "boolean",
+              "enum": [
+                false
+              ]
             },
             "independent_entities": {
-              "const": false
+              "type": "boolean",
+              "enum": [
+                false
+              ]
             }
           },
           "required": [
@@ -3358,22 +3423,40 @@
           "type": "object",
           "properties": {
             "root": {
-              "const": "Spell_ROOT"
+              "type": "string",
+              "enum": [
+                "Spell_ROOT"
+              ]
             },
             "core_renderer": {
-              "const": "canonical_mesh"
+              "type": "string",
+              "enum": [
+                "canonical_mesh"
+              ]
             },
             "deformation_system": {
-              "const": "canonical_motion_v2"
+              "type": "string",
+              "enum": [
+                "canonical_motion_v2"
+              ]
             },
             "motion_controller": {
-              "const": "spell_runtime"
+              "type": "string",
+              "enum": [
+                "spell_runtime"
+              ]
             },
             "collider_strategy": {
-              "const": "root_only"
+              "type": "string",
+              "enum": [
+                "root_only"
+              ]
             },
             "vfx_graph_systems": {
-              "const": 0
+              "type": "integer",
+              "enum": [
+                0
+              ]
             },
             "particle_systems": {
               "type": "integer",
@@ -3381,7 +3464,10 @@
               "maximum": 2
             },
             "shader": {
-              "const": "Palimpseste/CanonicalSpellV2"
+              "type": "string",
+              "enum": [
+                "Palimpseste/CanonicalSpellV2"
+              ]
             },
             "material_count": {
               "type": "integer",
@@ -3389,7 +3475,10 @@
               "maximum": 3
             },
             "trails": {
-              "const": "none"
+              "type": "string",
+              "enum": [
+                "none"
+              ]
             },
             "audio_hook": {
               "type": "string",
@@ -3399,10 +3488,16 @@
               ]
             },
             "impact_system": {
-              "const": "canonical_impact_v2"
+              "type": "string",
+              "enum": [
+                "canonical_impact_v2"
+              ]
             },
             "lifetime_controller": {
-              "const": "spell_runtime"
+              "type": "string",
+              "enum": [
+                "spell_runtime"
+              ]
             }
           },
           "required": [
@@ -3444,13 +3539,22 @@
               "maxItems": 8
             },
             "blind_semantic_check": {
-              "const": true
+              "type": "boolean",
+              "enum": [
+                true
+              ]
             },
             "reject_visible_primitives": {
-              "const": true
+              "type": "boolean",
+              "enum": [
+                true
+              ]
             },
             "require_fixed_topology": {
-              "const": true
+              "type": "boolean",
+              "enum": [
+                true
+              ]
             },
             "maximum_vertices": {
               "type": "integer",

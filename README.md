@@ -2,6 +2,10 @@
 
 Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. La nouvelle pipeline V2 est : **dessin → intention → blueprint canonique → mouvement continu → contrôles structure/physique/rendu → planche échantillonnée et sort jouable**. Les sorts sont des données validées, jamais du code produit par le joueur.
 
+## D21.3 — interruption du constructeur corrigée
+
+Deux incohérences du schéma Codex corrigées ; backend installé le 25 septembre à 11:07 Paris. Le parchemin interrompu a repris sa construction par l’API, avec le dessin et l’historique conservés. Publication finale du sort et acceptation visuelle encore attendues. [État actuel](docs/NEXT_ACTIONS.md) · [Preuves](evidence/public/backend/schema-recovery-d21-3.json).
+
 ## D21 — UNITY GOD, construire depuis les méthodes sources
 
 [UNITY GOD](skills/unity-god/SKILL.md) étudie la construction réelle des bibliothèques, puis impose une adaptation liée aux paramètres du sort : **20 méthodes documentées, sept disponibles dans le Player actuel**. La boucle V2 vérifie leur emploi et fournit le dossier à la critique visuelle. [Intégration et limites](docs/D21_UNITY_GOD.md) · [Preuves](evidence/public/unity-god/).

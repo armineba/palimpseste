@@ -1,0 +1,17 @@
+{
+  "attempt_id": "571b8b7cb38845a4a7faad255747bef5",
+  "job_id": "5e763870284e41679c6b850b9b02ceff",
+  "outcome": "ProcessFailure",
+  "native_error_code": "codex_output_schema_rejected",
+  "http_status": 400,
+  "provider_error": {
+    "type": "invalid_request_error",
+    "code": "invalid_json_schema",
+    "message": "Invalid schema for response_format 'codex_output_schema': context=('properties', 'rendering_layers', 'properties', 'resource_id'), enum value None does not validate against {'type': 'string'}.",
+    "param": "text.format.schema"
+  },
+  "schema_sha256": "bdcdc5a1678c923b248821b91f8c6a4a56f92b83d294b148b5b0a8d8ef2bd3b9",
+  "elapsed_ms": 3060,
+  "metadata_sha256": "51fa36282c066a09488c949d5b40a9f333e81eb5fe4d3b1cd59779b6c32df3de",
+  "artistic_pass_created": false
+}

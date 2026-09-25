@@ -1,0 +1,46 @@
+{
+  "check": "codex_v2_schema_structural_preflight",
+  "provider_acceptance_verified": false,
+  "depth_note": "Object nesting checked; array-inclusive depth reported separately.",
+  "results": [
+    {
+      "file": "model-b-v2.output-schema.json",
+      "valid": true,
+      "metrics": {
+        "properties": 409,
+        "enum_values": 788,
+        "identifier_characters": 10334,
+        "object_depth": 6,
+        "container_depth": 10,
+        "recursive_refs": false
+      },
+      "issues": []
+    },
+    {
+      "file": "model-b-unity-god-v2.output-schema.json",
+      "valid": true,
+      "metrics": {
+        "properties": 430,
+        "enum_values": 801,
+        "identifier_characters": 10757,
+        "object_depth": 7,
+        "container_depth": 11,
+        "recursive_refs": false
+      },
+      "issues": []
+    },
+    {
+      "file": "model-j-v2.output-schema.json",
+      "valid": true,
+      "metrics": {
+        "properties": 19,
+        "enum_values": 34,
+        "identifier_characters": 477,
+        "object_depth": 2,
+        "container_depth": 2,
+        "recursive_refs": false
+      },
+      "issues": []
+    }
+  ]
+}

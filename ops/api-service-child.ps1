@@ -31,6 +31,7 @@ function Read-Value([string]$Path, [string]$Name) {
 $databaseUrl = Read-Value $databaseEnv 'DATABASE_URL'
 $artifactRoot = [IO.Path]::GetFullPath((Read-Value $runtimeEnv 'ARTIFACT_ROOT'))
 $specRoot = [IO.Path]::GetFullPath((Read-Value $runtimeEnv 'PALIMPSESTE_SPEC_ROOT'))
+$attemptRoot = [IO.Path]::GetFullPath((Read-Value $runtimeEnv 'PALIMPSESTE_ATTEMPT_ROOT'))
 if (-not (Test-Path -LiteralPath $artifactRoot -PathType Container) -or
     -not (Test-Path -LiteralPath (Join-Path $specRoot 'reference\reference_layout.png') -PathType Leaf) -or
     -not (Test-Path -LiteralPath (Join-Path $specRoot 'reference\reference_free_canvas.png') -PathType Leaf) -or
@@ -42,6 +43,7 @@ if (-not (Test-Path -LiteralPath $artifactRoot -PathType Container) -or
 [Environment]::SetEnvironmentVariable('DATABASE_URL', $databaseUrl, 'Process')
 [Environment]::SetEnvironmentVariable('ARTIFACT_ROOT', $artifactRoot, 'Process')
 [Environment]::SetEnvironmentVariable('PALIMPSESTE_SPEC_ROOT', $specRoot, 'Process')
+[Environment]::SetEnvironmentVariable('PALIMPSESTE_ATTEMPT_ROOT', $attemptRoot, 'Process')
 [Environment]::SetEnvironmentVariable('ASPNETCORE_URLS', 'http://127.0.0.1:18080', 'Process')
 [Environment]::SetEnvironmentVariable('REFERENCE_PNG',
     (Join-Path $specRoot 'reference\reference_layout.png'), 'Process')

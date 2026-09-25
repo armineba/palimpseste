@@ -7,6 +7,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+# Check the exact V2 schemas before publishing. This is local structural
+# validation, not a live model/provider probe and consumes no account quota.
+& python (Join-Path $PSScriptRoot 'validate-codex-schemas.py')
+if ($LASTEXITCODE -ne 0) { throw 'Codex V2 output schema structural preflight failed.' }
 $deliverables = Join-Path $projectRoot 'deliverables'
 $stageRoot = Join-Path $deliverables '.stage-backend'
 $stage = Join-Path $stageRoot ([Guid]::NewGuid().ToString('N'))
@@ -96,7 +100,7 @@ Get-ChildItem -LiteralPath (Join-Path $projectRoot 'backend/migrations') -Filter
     ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path (Join-Path $stage 'migrations') $_.Name) }
 New-Item -ItemType Directory -Force -Path (Join-Path $stage 'ops') | Out-Null
 Get-ChildItem -LiteralPath (Join-Path $projectRoot 'ops') -File |
-    Where-Object { $_.Name.EndsWith('.ps1') -or $_.Name.EndsWith('.env.example') -or $_.Name.EndsWith('.patch') -or $_.Name.EndsWith('.md') } |
+    Where-Object { $_.Name.EndsWith('.ps1') -or $_.Name.EndsWith('.env.example') -or $_.Name.EndsWith('.patch') -or $_.Name.EndsWith('.md') -or $_.Name -eq 'validate-codex-schemas.py' } |
     ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path (Join-Path $stage 'ops') $_.Name) }
 
 if (-not [string]::IsNullOrWhiteSpace($CodexExecutable)) {
@@ -143,13 +147,13 @@ Set-ArchiveHashPin $archiveApiLauncher 'expectedChildSha256' $archiveApiChildHas
 
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/IMPLEMENTATION_STATUS.md') -Destination (Join-Path $stage 'IMPLEMENTATION_STATUS.md')
 New-Item -ItemType Directory -Path (Join-Path $stage 'docs') -Force | Out-Null
-foreach ($name in @('D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPELL_PIPELINE_V2.md','D21_UNITY_GOD.md','V2_BLUEPRINT_CONTRACT.md','V2_UNITY_STRUCTURAL_RENDERER.md','V2_VALIDATION_ENGINE.md','NEXT_ACTIONS.md')) {
+foreach ($name in @('D18_CONCURRENT_JOBS.md','D19_SOURCED_SURFACES.md','D20_SPELL_PIPELINE_V2.md','D21_UNITY_GOD.md','D21_1_SCHEMA_RECOVERY.md','D21_2_APPEND_ONLY_RECOVERY.md','V2_BLUEPRINT_CONTRACT.md','V2_UNITY_STRUCTURAL_RENDERER.md','V2_VALIDATION_ENGINE.md','NEXT_ACTIONS.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $name)) -Destination (Join-Path $stage ('docs/' + $name))
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'evidence/public/backend') -Destination (Join-Path $stage 'evidence') -Recurse
 
 @"
-Palimpseste backend Windows x64 — D21 UNITY GOD / Player 1.8.0 inchangé
+Palimpseste backend Windows x64 — D21.3 UNITY GOD / Player 1.8.0 inchangé
 
 Les exécutables API, worker et diagnostics sont autoportants. Nouveaux sorts : dessin -> description -> cinq bibliothèques -> SpellBlueprintV2 -> structure canonique et mouvement continu -> CORE_ONLY et critique aveugle -> VFX -> impacts réels et caméra gameplay -> verdict -> planche 3x7 et paquet Unity. Aucun candidat refusé par les gates obligatoires n'est publié. Quatre candidats maximum par admission ; étapes conservées et corrections ciblées.
 
@@ -163,7 +167,9 @@ PALIMPSESTE_MAX_PROVIDER_CONCURRENCY=0 conserve l'absence de plafond applicatif 
 
 Ressources intégrées : textures CC0 sélectionnées, portages TinyPlay MIT / Keijiro Unlicense. Les cinq bibliothèques sont consultées ; xtaja sans licence, Magic Effects non acquis et exemples Unity HDRP/LFS restent des références à disponibilité explicite. Toutes les bibliothèques ne sont pas embarquées. Conserver les notices du Player.
 
-Installation : lire IMPLEMENTATION_STATUS.md, docs/D20_SPELL_PIPELINE_V2.md et docs/D21_UNITY_GOD.md. Pour ce paquet Player 1.8, deploy-lifecycle.ps1 vérifie les données UNITY GOD et les migrations avant l'arrêt des services, puis applique 012 et 013 dans cet ordre après drainage et vérification de 011. Les mises à jour 1.6/1.7 conservent leur chemin 011. Ne pas rejouer 009 ou 010 sur une base plus récente. Pour une base neuve, appliquer 001..013 dans l'ordre. Chaque migration exécutée et son SHA sont consignés. L'archive ne contient aucun auth.json, jeton joueur, secret DB ou clé API. Installer un renderer Player 1.8 protégé avec manifeste SHA complet.
+D21.2 inclut la correction du schéma B et ajoute la reprise propriétaire des refus de schéma confirmés, sans réécrire les anciennes passes. Voir docs/D21_1_SCHEMA_RECOVERY.md et docs/D21_2_APPEND_ONLY_RECOVERY.md.
+
+Installation : lire IMPLEMENTATION_STATUS.md, docs/D20_SPELL_PIPELINE_V2.md et docs/D21_UNITY_GOD.md. Pour ce paquet Player 1.8, deploy-lifecycle.ps1 vérifie les données UNITY GOD et les migrations avant l'arrêt des services, puis applique 012 et 015 dans cet ordre (015 inclut 013/014) après drainage et vérification de 011. Les mises à jour 1.6/1.7 conservent leur chemin 011. Ne pas rejouer 009 ou 010 sur une base plus récente. Pour une base neuve, appliquer 001..015 dans l'ordre. Chaque migration exécutée et son SHA sont consignés. L'archive ne contient aucun auth.json, jeton joueur, secret DB ou clé API. Installer un renderer Player 1.8 protégé avec manifeste SHA complet.
 
 L'API exige DATABASE_URL, ARTIFACT_ROOT et PALIMPSESTE_SPEC_ROOT. Le worker exige son compte dédié, CODEX_HOME isolé, les preuves natives et les pins du renderer. Le binaire et l'identité Codex existants sont conservés. Le service local est 127.0.0.1 ; cette archive ne configure ni HTTPS public ni identités distantes.
 

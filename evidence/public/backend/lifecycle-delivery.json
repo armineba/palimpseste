@@ -1,15 +1,15 @@
 {
     "version":  "1.8.0",
-    "updated_at":  "2026-09-25T07:55:26.5650797+00:00",
+    "updated_at":  "2026-09-25T09:08:59.6386758+00:00",
     "build_exit":  0,
-    "binary_stage":  "deliverables/.stage-backend/3e8e8a20d685494f834f3fbef14a75b2",
+    "binary_stage":  "deliverables/.stage-backend/13e0bad276aa4ddeab4a41d6cf42b140",
     "documentation_refreshed":  true,
     "zip":  "deliverables/Palimpseste-Backend-Windows-x64.zip",
-    "bytes":  282494269,
-    "sha256":  "e4d66c3ee214a633ff3c32fb09e313cb3420e6d5013061de3f427864c91b52bc",
-    "worker_sha256":  "bca99af4bd9f843e8c639778df943e2bcbd9b0ebc59bd7e31621d85aff2e6f79",
-    "api_sha256":  "410b1be5e578b122dfc3be7977f0c615f00d3d271e2beef3971171af1cfaa236",
+    "bytes":  282589868,
+    "sha256":  "5a07245e634f7d83e58887875b3a936763ba2bdb396f13a3592779f95822add8",
+    "worker_sha256":  "361fcfa3f59d086f8beef24fc60e3de9f69d33bfa501ac24d34d7f778da46e34",
+    "api_sha256":  "0c359309a2f17d049056dbc337c1333629ae0cfbdb86753cf9f009a987ff9517",
     "tests_executed_by_refresh":  false,
     "gameplay_acceptance":  "pending_owner",
-    "evidence":  "evidence/public/backend/unity-god-d21.json"
+    "evidence":  "evidence/public/backend/schema-recovery-d21-3.json"
 }
