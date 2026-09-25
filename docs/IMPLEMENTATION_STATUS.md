@@ -6,9 +6,11 @@
 
 **14 contrôles de contrat réussis** ; skill validé structurellement et installé avec empreintes identiques au dépôt. Player 1.8.0 D20 réutilisé ; aucun nouveau test de gameplay, build Unity ou appel fournisseur. Aucun sort historique modifié. L'essai complet de la nouvelle sortie B et son rendu restent non exécutés.
 
-**Déploiement D21 en attente de la réponse Windows UAC déjà demandée.** D19 reste la dernière installation attestée. La livraison compilée, ses empreintes et ses limites sont suivies dans [la preuve D21](../evidence/public/backend/unity-god-d21.json). La qualité artistique n'est pas réputée acquise par un reçu de méthodes valide.
+**Backend D21 installé le 25 septembre 2026 à 10:13:20 Paris (08:13:20 UTC)** : `completed=true`, phase `services_started`, migrations 012 et 013 appliquées, pause des prises de jobs retirée (`claims_paused=false`), concurrence applicative `0`. L'autorisation « déploie » a levé l'attente UAC précédente. [Preuve d'installation](../evidence/public/backend/unity-god-d21-installation.json). À 10:15 Paris, `GET /health/ready` a répondu HTTP 200 `ready` ; aucun diagnostic Codex ni essai de jeu n'a accompagné ce constat.
 
-## D20 — Pipeline V2 construite, installation en attente
+**Player 1.8.0 non rouvert par l'agent** : la commande groupant ouverture, mise à jour du raccourci et preuve d'ouverture a été refusée avant exécution par le contrôle automatique (`blocked by policy`, sans motif détaillé). Aucune de ces actions effectuée, aucun contournement. Le créateur peut ouvrir directement `E:/Palimpseste/Palimpseste_GitHub/game/Build/WindowsBlueprintV2Playable/Palimpseste.exe`. Le parcours réel et la qualité artistique restent à juger. Le ZIP conserve l'instantané de publication avant déploiement ; [la preuve de livraison](../evidence/public/backend/unity-god-d21.json) actualisée et [la preuve de disponibilité](../evidence/public/backend/unity-god-d21-availability.json) se trouvent séparément dans le dépôt.
+
+## Historique — D20, Pipeline V2 construite
 
 **Backend D20 et Player 1.8.0 compilés et empaquetés**, Unity 6.3 / URP / IL2CPP, sorties 0, sans erreur de shader. [Livraison](../evidence/public/backend/blueprint-v2-d20.json) · [Architecture, diagramme, types et gates](D20_SPELL_PIPELINE_V2.md) · [Fichiers](V2_FILES_CHANGED.md).
 
@@ -16,7 +18,7 @@
 
 **Qualité artistique de la fixture refusée par la critique indépendante**, acceptation humaine absente. Les mesures GPU et d'overdraw sont inconnues.
 
-**D20 non installé et nouveau parcours Codex non exécuté** : Windows a annulé la première élévation opérateur. Une question demandant d'accepter la prochaine fenêtre UAC est en attente. L'ancien service D19, son Player et la bibliothèque restent conservés. Nouveau Player séparé dans `game/Build/WindowsBlueprintV2Playable`. Voir la reprise détaillée D20 pour le diagnostic isolé puis le déploiement 012 ; ne pas prétendre que le jeu ouvert utilise déjà V2.
+**À la publication D20**, Windows avait annulé la première élévation opérateur ; D19 était resté installé. Le déploiement D21 décrit en tête remplace cet état : migrations 012 et 013 appliquées, Player 1.8.0 réutilisé depuis `game/Build/WindowsBlueprintV2Playable`. Aucun nouveau diagnostic Codex V2 exécuté ; l'ouverture de ce Player reste au créateur.
 
 ## Historique — D19 / Player 1.7.0 installé et ouvert
 

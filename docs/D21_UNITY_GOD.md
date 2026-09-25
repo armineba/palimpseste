@@ -69,11 +69,15 @@ Skill installé dans `C:/Users/Utilisateur/.codex/skills/unity-god`, cinq fichie
 - V1 conserve son parcours. Aucun asset, shader, prefab ou sort historique n'est modifié par D21.
 - Un dossier V2 déjà figé sans `unity_god` conserve B 2.0.
 - Les nouvelles recherches V2 utilisent le skill 1.0 et B 2.1.
-- Migration 013 ajoute la passe `methods`, sans mettre à jour les jobs existants. Le déploiement V2 applique 012 puis 013 avant le redémarrage.
+- Migration 013 ajoute la passe `methods`, sans mettre à jour les jobs existants. Le déploiement V2 a appliqué 012 puis 013 avant le redémarrage.
 - Le backend distribue seulement les trois fichiers de données nécessaires du skill ; aucun clone de bibliothèque ou outil de développement n'entre dans le worker.
 - Player 1.8.0 D20 réutilisé, sans nouveau build Unity.
 
-**Déploiement non exécuté** : le précédent lancement opérateur a été annulé par Windows UAC. La réponse à la demande de validation est toujours attendue ; D19 reste le dernier service dont l'installation est attestée. L'installation locale du skill de développement ne bascule pas le service.
+**Backend D21 installé le 25 septembre 2026 à 10:13:20 Paris (08:13:20 UTC)** après la demande « déploie » : `completed=true`, `services_started`, migrations 012 et 013 appliquées, `claims_paused=false`, concurrence applicative `0` (aucun plafond de jobs). L'attente de validation Windows précédente est levée. [Installation réelle](../evidence/public/backend/unity-god-d21-installation.json).
+
+À 10:15 Paris, `GET /health/ready` a répondu **HTTP 200 `ready`**. Les processus API `13976` et worker `18000` étaient vivants à 10:16:14 Paris. L'ouverture du Player, la mise à jour du raccourci et la création d'une preuve d'ouverture étaient regroupées dans une commande refusée avant exécution par le contrôle automatique (`blocked by policy`, sans motif détaillé). Aucune de ces actions effectuée ; aucun contournement. Le créateur peut ouvrir directement `E:/Palimpseste/Palimpseste_GitHub/game/Build/WindowsBlueprintV2Playable/Palimpseste.exe`. [Disponibilité observée](../evidence/public/backend/unity-god-d21-availability.json).
+
+Le ZIP backend reste l'instantané de publication avant déploiement ; il n'a pas été reconditionné pour ajouter cette preuve. L'état installé est attesté par le rapport séparé dans le dépôt.
 
 ## Vérifications et limites
 
@@ -81,11 +85,11 @@ Quatorze contrôles déterministes vérifient bindings, droits d'adaptation, ré
 
 La validation de structure du skill et une lecture indépendante de sa méthode complètent ces contrôles. La lecture indépendante reste une proposition sur documents, pas un résultat de génération joueur. Les preuves finales d'installation locale et de publication sont regroupées dans [la livraison D21](../evidence/public/backend/unity-god-d21.json).
 
-Pour D21 : aucun appel fournisseur, aucune génération joueur, aucun test de gameplay, aucune capture Unity et aucune migration de base exécutés. L'essai complet de B 2.1 et l'acceptation artistique restent ouverts. Les résultats Unity D20 sont historiques et distincts ; sa fixture n'a pas été acceptée artistiquement.
+Pour ce déploiement D21 : migrations 012 et 013 et contrôle de santé HTTP réellement exécutés ; aucun appel fournisseur de diagnostic, aucune génération joueur, aucun test de gameplay et aucune capture Unity lancés par l'agent. L'essai complet de B 2.1 et l'acceptation artistique restent ouverts. Les résultats Unity D20 sont historiques et distincts ; sa fixture n'a pas été acceptée artistiquement.
 
 ## Point de reprise
 
-1. Après réponse à la demande Windows en attente, employer le paquet D21 et le Player 1.8.0 séparé. Ne pas relancer l'ancien paquet D20 par erreur.
-2. Préserver les jobs actifs et leurs dossiers figés pendant la bascule ; exécuter les migrations avec le script livré.
-3. Consigner l'installation réellement observée avant de dire que la nouvelle boucle est active.
-4. Laisser le créateur essayer un nouveau parchemin, puis utiliser sa critique pour enrichir le moteur et les fiches sans modifier les sorts historiques.
+1. Le backend D21 est installé ; ne pas rejouer les migrations pour commencer l'essai.
+2. Le créateur ouvre directement le Player 1.8.0 ci-dessus, puisque l'ouverture et la mise à jour du raccourci n'ont pas été exécutées.
+3. Laisser le créateur essayer un nouveau parchemin, puis utiliser sa critique pour enrichir le moteur et les fiches sans modifier les sorts historiques.
+4. Consigner séparément la connexion réelle du Player, le parcours complet de B 2.1 et l'acceptation artistique ; la santé API n'en est pas une preuve.

@@ -21,8 +21,11 @@ au blueprint et transmet ce dossier au critique non aveugle.
 20 méthodes décrites, sept adaptations exécutables dans le Player V2 actuel.
 Une fiche étudiée ne rend pas sa technique automatiquement disponible.
 Le catalogue n'est pas une liste exhaustive des contrôles du blueprint.
-Installation du skill local attestée ; déploiement backend D21 en attente
-Windows UAC. Aucun nouveau rendu accepté. Voir docs/D21_UNITY_GOD.md.
+Skill local installé ; backend D21 et renderer 1.8.0 déployés le 25 septembre
+2026 à 10:13 Paris. API disponible, worker actif. Ouverture du Player et mise
+à jour du raccourci refusées par le contrôle automatique ; ouvrir directement
+game/Build/WindowsBlueprintV2Playable/Palimpseste.exe pour essayer.
+Aucun nouveau rendu accepté. Voir docs/D21_UNITY_GOD.md.
 
 RÈGLE POUR CHAQUE FUTUR SORT ET CHAQUE AMÉLIORATION VFX
 

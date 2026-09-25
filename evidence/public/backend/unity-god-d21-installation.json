@@ -1,0 +1,57 @@
+{
+    "version":  "1.8.0",
+    "backend_revision":  "D21",
+    "delivery_name":  "D21 backend / Player 1.8.0",
+    "started_at":  "2026-09-25T08:13:06.4579576+00:00",
+    "phase":  "services_started",
+    "completed":  true,
+    "spell_generations":  0,
+    "diagnostics_executed":  false,
+    "gameplay_tested":  false,
+    "visual_acceptance":  "pending_owner",
+    "native_sha256":  "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "migrations_planned":  [
+                               {
+                                   "file":  "012_blueprint_v2.sql",
+                                   "sha256":  "8302237fad8ecc9af541530207f6eeefc12e1ccaa61c55ba89f65bbdbe4fa4e7"
+                               },
+                               {
+                                   "file":  "013_unity_god_methods.sql",
+                                   "sha256":  "53937d6a98c6f84f846724e3dcfd207eeb4772100b6b66191b4a49a5c35a50f0"
+                               }
+                           ],
+    "migrations_applied":  [
+                               {
+                                   "file":  "012_blueprint_v2.sql",
+                                   "sha256":  "8302237fad8ecc9af541530207f6eeefc12e1ccaa61c55ba89f65bbdbe4fa4e7",
+                                   "applied_at":  "2026-09-25T08:13:09.5533486+00:00"
+                               },
+                               {
+                                   "file":  "013_unity_god_methods.sql",
+                                   "sha256":  "53937d6a98c6f84f846724e3dcfd207eeb4772100b6b66191b4a49a5c35a50f0",
+                                   "applied_at":  "2026-09-25T08:13:09.6356451+00:00"
+                               }
+                           ],
+    "renderer_manifest_sha256":  "5cf8388e6ed1db76c9682513dadffebed6b54a53472a6bb8b363f3d1da72ed9f",
+    "renderer":  "E:\\PalimpsesteRuntime\\render-animation-sheet-20260925-081306-3d8fa62f\\Palimpseste.exe",
+    "migration_010_prerequisite_present":  true,
+    "migration_011_prerequisite_present":  true,
+    "claims_paused":  false,
+    "claim_pause_identity":  {
+                                 "schema":  "public",
+                                 "table":  "jobs",
+                                 "name":  "palimpseste_deployment_pause_claims",
+                                 "trigger_oid":  "19087",
+                                 "function_oid":  "19086"
+                             },
+    "pending_jobs":  0,
+    "migration_applied":  "013_unity_god_methods.sql",
+    "migration_sha256":  "53937d6a98c6f84f846724e3dcfd207eeb4772100b6b66191b4a49a5c35a50f0",
+    "max_concurrent_jobs":  0,
+    "concurrency_policy":  "no_application_job_count_ceiling",
+    "gpu_capture_slots":  1,
+    "worker_sha256":  "bca99af4bd9f843e8c639778df943e2bcbd9b0ebc59bd7e31621d85aff2e6f79",
+    "api_sha256":  "410b1be5e578b122dfc3be7977f0c615f00d3d271e2beef3971171af1cfaa236",
+    "launcher_directory":  "E:\\PalimpsesteRuntime\\evidence\\pending\\animation-sheet-install-20260925-081306-3d8fa62f\\launch",
+    "completed_at":  "2026-09-25T08:13:20.0462940+00:00"
+}

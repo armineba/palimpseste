@@ -6,13 +6,15 @@ Projet **Unity 6.3 / URP**, backend .NET/PostgreSQL et worker Codex isolé. La n
 
 [UNITY GOD](skills/unity-god/SKILL.md) étudie la construction réelle des bibliothèques, puis impose une adaptation liée aux paramètres du sort : **20 méthodes documentées, sept disponibles dans le Player actuel**. La boucle V2 vérifie leur emploi et fournit le dossier à la critique visuelle. [Intégration et limites](docs/D21_UNITY_GOD.md) · [Preuves](evidence/public/unity-god/).
 
-Skill installé localement et backend D21 compilé/empaqueté ; **à déployer après la validation Windows en attente**. Player 1.8.0 réutilisé. Les anciens sorts restent inchangés ; aucun rendu nouveau n'est présenté comme accepté.
+**Backend D21 installé le 25 septembre 2026 à 10:13 Paris**, migrations 012 et 013 appliquées, API et worker redémarrés. La santé API a répondu HTTP 200 `ready` à 10:15 Paris. Player 1.8.0 réutilisé. [Installation réelle](evidence/public/backend/unity-god-d21-installation.json) · [Disponibilité et ouverture non exécutée](evidence/public/backend/unity-god-d21-availability.json).
 
-## D20 / Player 1.8.0 — Pipeline V2 construite
+L'ouverture automatique du Player et la mise à jour du raccourci ont été refusées avant exécution par le contrôle automatique (`blocked by policy`, sans motif détaillé) ; aucun contournement effectué. Ouvrir directement [Palimpseste.exe](game/Build/WindowsBlueprintV2Playable/Palimpseste.exe), puis essayer un nouveau parchemin. Aucun nouveau sort ou test de gameplay lancé par l'agent. Les anciens sorts restent inchangés ; le rendu attend votre verdict. Le ZIP reste l'instantané de publication avant déploiement ; la preuve d'installation ci-dessus décrit l'état actuel.
+
+## Historique — D20 / Player 1.8.0, Pipeline V2 construite
 
 Refonte dédiée aux nouveaux sorts, huit représentations structurelles et gates A à F. Les anciens sorts conservent leurs données, assets et parcours V1. [Architecture et différences V1/V2](docs/D20_SPELL_PIPELINE_V2.md) · [État réel et limites](docs/IMPLEMENTATION_STATUS.md) · [Tests exécutés](evidence/public/v2/).
 
-Backend et Player construits et empaquetés ; **installation en attente de validation Windows UAC**. Les 27 contrôles V2 et la fixture Unity ont été exécutés, mais aucun nouveau parcours Codex V2 complet. La fixture n'est pas acceptée artistiquement. Le service D19 reste installé.
+Backend et Player construits et empaquetés ; la première tentative d'installation D20 avait été annulée dans Windows UAC. **Le déploiement D21 ci-dessus installe désormais la pipeline V2 avec ce Player 1.8.0.** Les 27 contrôles V2 et la fixture Unity ont été exécutés, mais aucun nouveau parcours Codex V2 complet. La fixture n'est pas acceptée artistiquement.
 
 ## Historique — backend D19 / Player 1.7.0
 

@@ -1,14 +1,18 @@
 # Point de reprise immédiat
 
-## D21 — UNITY GOD installé localement, backend à déployer
+## D21 — Backend installé, essai du créateur à faire
 
 **Backend D21 compilé et empaqueté, publication code 0.** Le skill **UNITY GOD 1.0** est créé, installé dans le dossier de skills Codex et intégré au code de la boucle V2. **20 méthodes issues de 22 fichiers inspectés**, dont sept adaptations disponibles dans le Player 1.8.0. Les cinq sources sont examinées ; Magic Effects FREE reste non acquis. [Fonctionnement et limites](D21_UNITY_GOD.md) · [Skill](../skills/unity-god/SKILL.md) · [Installation locale](../evidence/public/unity-god/skill-installation.json).
 
 B 2.1 doit lier les méthodes choisies aux paramètres réels du blueprint ; un reçu vérifié accompagne la même révision jusque dans la critique visuelle. V1 et les recherches V2 déjà figées restent inchangées. **14 contrôles de données réussis**, aucune génération, capture ou session de jeu supplémentaire exécutée. L'acceptation visuelle reste ouverte.
 
-**Le service n'utilise pas encore D21.** La précédente fenêtre UAC a été annulée ; une demande de validation Windows reste en attente. Employer le nouveau paquet backend D21 et le Player 1.8.0 D20 après cette réponse, avec migrations 012 puis 013. Ne pas arrêter les services ni rouvrir l'élévation annulée sans cette réponse. Ne pas confondre installation du skill local et déploiement serveur. [Livraison D21](../evidence/public/backend/unity-god-d21.json).
+**Installation D21 terminée le 25 septembre 2026 à 10:13:20 Paris (08:13:20 UTC)** : `completed=true`, `services_started`, migrations 012 et 013 appliquées, `claims_paused=false`, concurrence applicative `0` (aucun plafond de jobs). La demande « déploie » a autorisé cette installation ; l'attente UAC précédente est levée. [Installation réelle](../evidence/public/backend/unity-god-d21-installation.json) · [Publication antérieure](../evidence/public/backend/unity-god-d21.json).
 
-## D20 — Pipeline V2 construite, installation en attente
+À 10:15 Paris, seul `GET /health/ready` a été exécuté et a répondu **HTTP 200 `ready`**. Les processus API `13976` et worker `18000` étaient vivants à 10:16:14 Paris. Aucun diagnostic fournisseur, nouveau sort, capture ou test de gameplay lancé. La commande groupant ouverture du Player, mise à jour du raccourci et preuve d'ouverture a été refusée avant exécution par le contrôle automatique (`blocked by policy`, sans motif détaillé) ; aucune de ces actions n'a été exécutée et le refus n'a pas été contourné. [Disponibilité observée](../evidence/public/backend/unity-god-d21-availability.json).
+
+**Prochaine action :** le créateur peut ouvrir directement `E:/Palimpseste/Palimpseste_GitHub/game/Build/WindowsBlueprintV2Playable/Palimpseste.exe`, puis essayer un nouveau parchemin. Le raccourci Bureau n'a pas été actualisé pour cette bascule. L'état de connexion du Player et la qualité du nouveau parcours restent à constater par le créateur. Le ZIP livré reste l'instantané de publication avant déploiement ; l'installation actuelle est prouvée séparément dans le dépôt.
+
+## Historique — D20, Pipeline V2 construite
 
 **Backend D20 et Player 1.8.0 compilés et empaquetés**, Unity 6.3 / URP / IL2CPP, sorties 0, sans erreur de shader. [Livraison](../evidence/public/backend/blueprint-v2-d20.json) · [Architecture, diagramme, types et gates](D20_SPELL_PIPELINE_V2.md) · [Fichiers](V2_FILES_CHANGED.md).
 
@@ -16,9 +20,9 @@ B 2.1 doit lier les méthodes choisies aux paramètres réels du blueprint ; un 
 
 **Qualité artistique de la fixture refusée par la critique indépendante**, acceptation humaine absente. Les mesures GPU et d'overdraw sont inconnues.
 
-**D20 non installé et nouveau parcours Codex non exécuté** : Windows a annulé la première élévation opérateur. Une question demandant d'accepter la prochaine fenêtre UAC est en attente. L'ancien service D19, son Player et la bibliothèque restent conservés. Nouveau Player séparé dans `game/Build/WindowsBlueprintV2Playable`. Voir la reprise détaillée D20 pour le diagnostic isolé puis le déploiement 012 ; ne pas prétendre que le jeu ouvert utilise déjà V2.
+**À la publication D20**, Windows avait annulé la première élévation opérateur ; D19 était resté installé. Cette situation historique est remplacée par le déploiement D21 décrit en tête, qui applique 012 et 013 et réutilise le Player séparé dans `game/Build/WindowsBlueprintV2Playable`. Le diagnostic Codex V2 n'a pas été lancé et l'ouverture de ce Player reste à faire par le créateur.
 
-## D19 installé et jeu rouvert — laisser le créateur essayer
+## Historique — D19 installé et jeu rouvert
 
 Le créateur rejette encore le rendu et demande si les bibliothèques ont réellement servi. D17 ne livrait que leur recherche, sans nouveau programme de surface dans Unity. La correction D19 ajoute des profils par partie issus des graphes TinyPlay MIT et de l'opérateur de flux Keijiro Unlicense : `plasma`, `force_field`, `toxic`, `spectral_flow`. Leur choix doit être présent dans la recherche figée du job et le paquet doit exiger le Player 1.7.0. Les textures sources doivent être échantillonnées en couleur/luminance, pas seulement comme masque alpha.
 

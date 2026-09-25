@@ -38,11 +38,14 @@
                   },
     "tests":  "evidence/public/unity-god/contract-tests.json",
     "independent_document_review":  "evidence/public/unity-god/independent-skill-review.md",
-    "deployed":  false,
-    "deployment_status":  "waiting_windows_elevation_confirmation",
+    "deployed":  true,
+    "deployment_status":  "services_started",
+    "deployed_at":  "2026-09-25T08:13:20.0462940+00:00",
+    "installation_report":  "evidence/public/backend/unity-god-d21-installation.json",
+    "availability_report":  "evidence/public/backend/unity-god-d21-availability.json",
     "model_calls_executed":  0,
     "gameplay_tests_executed":  0,
-    "database_migrations_executed":  0,
+    "database_migrations_executed":  2,
     "human_acceptance":  "pending",
     "new_visual_result_claimed":  false
 }

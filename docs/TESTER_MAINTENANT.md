@@ -1,15 +1,17 @@
 # Tester le lecteur actuel
 
-## Pipeline V2 — après installation D21 / Player 1.8.0
+## Pipeline V2 — D21 installé / Player 1.8.0
 
-Consulter [l'état réel](NEXT_ACTIONS.md) avant l'essai : le backend D21 avec UNITY GOD est compilé mais pas encore installé. La réponse à la demande Windows UAC reste attendue ; le service attesté est D19. L'installation locale du skill ne suffit pas à mettre à jour le jeu.
+**Backend D21 avec UNITY GOD installé le 25 septembre 2026 à 10:13 Paris**, migrations 012 et 013 appliquées, API et worker démarrés. La santé API répondait HTTP 200 `ready` à 10:15 Paris. [Installation réelle](../evidence/public/backend/unity-god-d21-installation.json) · [Disponibilité observée](../evidence/public/backend/unity-god-d21-availability.json) · [État et limites](NEXT_ACTIONS.md).
 
-1. Ouvrir **Palimpseste Spell Lab** après la bascule du service.
+1. Ouvrir directement **[Palimpseste.exe](../game/Build/WindowsBlueprintV2Playable/Palimpseste.exe)**, situé dans `E:/Palimpseste/Palimpseste_GitHub/game/Build/WindowsBlueprintV2Playable`. Le raccourci Bureau n'a pas été mis à jour pour cette version.
 2. Dessiner un **nouveau parchemin**, puis cliquer **Dessin terminé**.
 3. Lire l'interprétation. Le système sélectionne et adapte les méthodes des bibliothèques, construit la forme et le mouvement, contrôle la silhouette sans décorations, puis les impacts et le rendu.
 4. Ouvrir le sort disponible dans le laboratoire et le lancer. Comparer sujet, mouvement, contact et disparition au texte et à la planche.
 
 La planche 3 × 7 échantillonne le même sort continu. Les anciens parchemins restent en V1. Un candidat refusé n'est pas publié comme terminé ; dessin et étapes restent conservés. La fixture de développement est séparée de votre bibliothèque. Les tests techniques ne remplacent pas votre verdict.
+
+L'ouverture automatique du Player, la mise à jour du raccourci et la preuve d'ouverture ont été refusées avant exécution par le contrôle automatique (`blocked by policy`, sans motif détaillé), sans contournement. Aucun nouveau sort, appel diagnostic, capture ou test de gameplay lancé par l'agent. Le message **« Laboratoire prêt. Votre dessin peut commencer. »** dans le Player confirme la connexion du client ; la réponse de santé API seule ne l'atteste pas.
 
 ## Historique des essais précédents
 

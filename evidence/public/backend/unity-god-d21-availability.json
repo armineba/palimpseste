@@ -1,0 +1,21 @@
+{
+  "observed_at": "2026-09-25T08:15:00.7787672+00:00",
+  "backend_revision": "D21",
+  "client_version": "1.8.0",
+  "endpoint": "http://127.0.0.1:18080/health/ready",
+  "http_status": 200,
+  "status": "ready",
+  "process_observed_at": "2026-09-25T08:16:14.7397719+00:00",
+  "api_pid": 13976,
+  "worker_pid": 18000,
+  "installation_report": "evidence/public/backend/unity-god-d21-installation.json",
+  "player_path": "game/Build/WindowsBlueprintV2Playable/Palimpseste.exe",
+  "player_opened_by_agent": false,
+  "desktop_shortcut_updated": false,
+  "opening_command_status": "blocked_by_policy",
+  "opening_command_reason": "Automatic execution review rejected the grouped readiness, Player verification, shortcut update and launch command without a detailed reason. None of that command executed. A separate read-only readiness request succeeded; opening and shortcut updates were not retried.",
+  "gameplay_tested": false,
+  "provider_diagnostic_calls": 0,
+  "human_visual_acceptance": "pending",
+  "limits": "Readiness verifies database and reference availability, not Codex authentication, Player connection or the quality of a generated spell."
+}
