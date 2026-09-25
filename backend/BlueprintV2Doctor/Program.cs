@@ -80,9 +80,13 @@ internal static class BlueprintDoctor
             byte[] description;
             if (mode == "drawing") {
                 phase = "interpretation";
+                var interpretationCompatibility = SpellBlueprintV2Validator.BuildCompatibilityContext();
+                report["interpreter_prompt_version"] = LunaCodexProvider.InterpreterV2PromptVersion;
+                report["interpreter_prompt_sha256"] = provider.InterpreterV2PromptSha256;
+                report["interpreter_compatibility_sha256"] = Hash(Encoding.UTF8.GetBytes(interpretationCompatibility));
                 var document = await CallAsync("A", () => provider.InterpretBlueprintV2Async(runId.ToString("N"), Guid.NewGuid().ToString("N"),
                     inputPaths["reference"], inputPaths["drawing"],
-                    "{\"canvas_width\":1024,\"canvas_height\":1024,\"reference_purpose\":\"identify_printed_guides_only\",\"semantic_regions\":false}", capabilities, ct));
+                    "{\"canvas_width\":1024,\"canvas_height\":1024,\"reference_purpose\":\"identify_printed_guides_only\",\"semantic_regions\":false}", capabilities, interpretationCompatibility, ct));
                 description = RequireStage(document, "A", settings);
             }
             else description = await ReadBoundedAsync(inputPaths["description"], 8 * 1024 * 1024, ct);
@@ -96,7 +100,8 @@ internal static class BlueprintDoctor
             await ArtifactAsync("research.json", Encoding.UTF8.GetBytes(research.Json));
             phase = "blueprint";
             var planned = await CallAsync("B", () => provider.PlanBlueprintV2Async(runId.ToString("N"), Guid.NewGuid().ToString("N"),
-                description, capabilities, research, null, null, "structural_core", ct));
+                description, capabilities, research, null, null, "structural_core", ct,
+                compatibilityContext: SpellBlueprintV2Validator.BuildCompatibilityContext()));
             var plan = RequireStage(planned, "B", settings);
             await ArtifactAsync("plan.json", plan);
             if (planned.UnityGodReceipt is null || UnityGodMethods.ValidateReceipt(plan, planned.UnityGodReceipt, research).Count != 0)

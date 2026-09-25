@@ -170,6 +170,8 @@ public static partial class ApiHandlers
         await using var connection = await db.OpenConnectionAsync(ct);
         var schemaRecovery = await CanOwnerResumeV2SchemaFailureAsync(jobId, principal.Id,
             connection, null, config, store, ct);
+        var constructionRecoveryBase = await OwnerV2ConstructionRecoveryBaseAsync(jobId, principal.Id,
+            connection, null, ct);
         await using var command = new NpgsqlCommand("""
             SELECT j.parchment_id,j.state,j.resume_stage,j.spell_id,j.attempt_count,j.message,j.error_code,j.retryable,
                    da.id,j.kind,
@@ -217,15 +219,18 @@ public static partial class ApiHandlers
         if (!await reader.ReadAsync(ct)) return ApiProblem.Result(context, 404, "not_found", "Tâche introuvable.");
         var state = reader.GetString(1);
         Guid? descriptionArtifactId = reader.IsDBNull(8) ? null : reader.GetGuid(8);
-        var attemptBudget = reader.GetInt32(20) == 5 ? 32 : 10;
+        var attemptBudget = reader.GetInt32(20) == 5 ? V2ConstructionPolicy.AttemptBudget : 10;
         var retryable = reader.GetInt32(4) < attemptBudget && (reader.GetBoolean(7) ||
-            schemaRecovery && state == "needs_operator" || CanOwnerResumePlanningFailure(
+            (schemaRecovery || constructionRecoveryBase.HasValue) && state == "needs_operator" || CanOwnerResumePlanningFailure(
             state, reader.IsDBNull(6) ? null : reader.GetString(6), reader.GetString(9),
             descriptionArtifactId, reader.GetInt64(10), reader.GetBoolean(11), reader.GetBoolean(12), reader.GetInt32(4), attemptBudget) ||
             CanOwnerResumeVisualCaptureFailure(state, reader.IsDBNull(6) ? null : reader.GetString(6), reader.GetString(9),
                 descriptionArtifactId, reader.GetBoolean(11), reader.GetBoolean(12), reader.GetInt32(4), attemptBudget) ||
             CanOwnerResumeAnimationSheetFailure(state, reader.IsDBNull(6) ? null : reader.GetString(6), reader.GetString(9),
                 descriptionArtifactId, reader.GetBoolean(19), reader.GetBoolean(11), reader.GetBoolean(12), reader.GetInt32(4), attemptBudget));
+        if (reader.GetInt32(20) == 5 && reader.GetBoolean(11) && state == "needs_operator" &&
+            !reader.IsDBNull(6) && reader.GetString(6) == "v2_validation_rejected")
+            retryable = constructionRecoveryBase.HasValue;
         return Results.Json(Job(jobId, reader.IsDBNull(0) ? null : reader.GetGuid(0), state, reader.IsDBNull(2) ? null : reader.GetString(2), reader.IsDBNull(3) ? null : reader.GetGuid(3), reader.GetInt32(4), reader.GetString(5), reader.IsDBNull(6) ? null : reader.GetString(6), retryable, state == "waiting_retry" ? 10000 : 2000, descriptionArtifactId,
             reader.GetDateTime(13), reader.GetDateTime(14), reader.GetInt64(15), reader.IsDBNull(16) ? null : reader.GetDateTime(16),
             reader.IsDBNull(17) ? null : reader.GetGuid(17), reader.IsDBNull(18) ? null : reader.GetString(18)));
@@ -249,7 +254,7 @@ public static partial class ApiHandlers
         Guid? descriptionArtifactId;
         string state, message, kind;
         string? errorCode, resumeStage;
-        int attempts, attemptBudget;
+        int attempts, attemptBudget, pipelineVersion;
         long bAttempts;
         bool hasPlan, hasUncertainAttempt, hasCoherentAtlas;
         bool retryable;
@@ -300,12 +305,16 @@ public static partial class ApiHandlers
             hasUncertainAttempt = reader.GetBoolean(11);
             resumeStage = reader.IsDBNull(12) ? null : reader.GetString(12);
             hasCoherentAtlas = reader.GetBoolean(13);
-            attemptBudget = reader.GetInt32(14) == 5 ? 32 : 10;
+            pipelineVersion = reader.GetInt32(14);
+            attemptBudget = pipelineVersion == 5 ? V2ConstructionPolicy.AttemptBudget : 10;
         }
         if (state != "ready")
         {
             var ownerSchemaRetry = await CanOwnerResumeV2SchemaFailureAsync(jobId, principal.Id,
                 connection, transaction, config, store, ct);
+            var constructionRecoveryBase = await OwnerV2ConstructionRecoveryBaseAsync(jobId, principal.Id,
+                connection, transaction, ct);
+            var ownerConstructionRetry = constructionRecoveryBase.HasValue;
             var ownerPlanningRetry = CanOwnerResumePlanningFailure(state, errorCode, kind,
                 descriptionArtifactId, bAttempts, hasPlan, hasUncertainAttempt, attempts, attemptBudget);
             var ownerVisualRetry = CanOwnerResumeVisualCaptureFailure(state, errorCode, kind,
@@ -313,14 +322,29 @@ public static partial class ApiHandlers
             var ownerSheetRetry = CanOwnerResumeAnimationSheetFailure(state, errorCode, kind,
                 descriptionArtifactId, hasCoherentAtlas, hasPlan, hasUncertainAttempt, attempts, attemptBudget);
             if (state is not ("waiting_retry" or "needs_operator") ||
-                (!ownerSchemaRetry && !ownerPlanningRetry && !ownerVisualRetry && !ownerSheetRetry &&
+                (pipelineVersion == 5 && hasPlan && errorCode == "v2_validation_rejected" && !ownerConstructionRetry) ||
+                (!ownerSchemaRetry && !ownerConstructionRetry && !ownerPlanningRetry && !ownerVisualRetry && !ownerSheetRetry &&
                  (!retryable || attempts >= attemptBudget || (state == "needs_operator" && principal.Role != "creator"))))
                 return ApiProblem.Result(context, 409, "resume_not_allowed", "Cette tâche ne peut pas être reprise par ce compte.");
-            await using var update = new NpgsqlCommand("UPDATE jobs SET state='queued',resume_stage=CASE WHEN @owner_schema_retry THEN 'planning' WHEN @owner_sheet_retry THEN 'generating_visual_reference' WHEN @owner_visual_retry THEN 'refining_visuals' WHEN @owner_planning_retry THEN 'B' ELSE resume_stage END,next_attempt_at=NULL,lease_until=NULL,leased_by=NULL,error_code=NULL,retryable=false,message='Reprise demandée',updated_at=now() WHERE id=@id AND owner_id=@owner", connection, transaction);
+            await using var update = new NpgsqlCommand("""
+                UPDATE jobs SET state='queued',
+                    resume_stage=CASE WHEN @owner_schema_retry OR @owner_construction_retry THEN 'planning'
+                        WHEN @owner_sheet_retry THEN 'generating_visual_reference'
+                        WHEN @owner_visual_retry THEN 'refining_visuals'
+                        WHEN @owner_planning_retry THEN 'B' ELSE resume_stage END,
+                    v2_revision_base=CASE WHEN @owner_construction_retry THEN @revision_base ELSE v2_revision_base END,
+                    v2_builder_version=CASE WHEN @owner_construction_retry THEN @builder_version ELSE v2_builder_version END,
+                    next_attempt_at=NULL,lease_until=NULL,leased_by=NULL,error_code=NULL,retryable=false,
+                    message='Reprise demandée',updated_at=now()
+                WHERE id=@id AND owner_id=@owner
+                """, connection, transaction);
             update.Parameters.AddWithValue("id", jobId);
             update.Parameters.AddWithValue("owner", principal.Id);
             update.Parameters.AddWithValue("owner_planning_retry", ownerPlanningRetry);
             update.Parameters.AddWithValue("owner_schema_retry", ownerSchemaRetry);
+            update.Parameters.AddWithValue("owner_construction_retry", ownerConstructionRetry);
+            update.Parameters.AddWithValue("revision_base", constructionRecoveryBase ?? 0);
+            update.Parameters.AddWithValue("builder_version", V2ConstructionPolicy.Version);
             update.Parameters.AddWithValue("owner_visual_retry", ownerVisualRetry);
             update.Parameters.AddWithValue("owner_sheet_retry", ownerSheetRetry);
             await update.ExecuteNonQueryAsync(ct);
@@ -331,7 +355,7 @@ public static partial class ApiHandlers
                 parchment.Parameters.AddWithValue("owner", principal.Id);
                 await parchment.ExecuteNonQueryAsync(ct);
             }
-            resumeStage = ownerSchemaRetry ? "planning" : ownerSheetRetry ? "generating_visual_reference" : ownerVisualRetry ? "refining_visuals" : ownerPlanningRetry ? "B" : resumeStage;
+            resumeStage = ownerSchemaRetry || ownerConstructionRetry ? "planning" : ownerSheetRetry ? "generating_visual_reference" : ownerVisualRetry ? "refining_visuals" : ownerPlanningRetry ? "B" : resumeStage;
             state = "queued"; message = "Reprise demandée"; retryable = false;
         }
         var json = Json(Job(jobId, parchmentId, state, resumeStage, spellId, attempts, message, null, retryable, descriptionArtifactId: descriptionArtifactId));

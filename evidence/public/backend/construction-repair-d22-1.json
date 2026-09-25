@@ -1,0 +1,31 @@
+{
+  "revision": "D22.1",
+  "client_version": "1.8.0",
+  "recorded_at": "2026-09-25T09:51:10.773958+00:00",
+  "backend_compiled": true,
+  "construction_policy": "sp.construction-policy/2.0",
+  "interpreter_prompt_version": "sp.prompt.a-v2/1.1",
+  "fixes": [
+    "restore stored rendering measurements before selecting recovery stage",
+    "same physics/performance routing on normal loop and recovery",
+    "all eight implemented core kinds and motion limits described to constructor",
+    "future V2 interpretations and repair_A receive exact compiler capability context"
+  ],
+  "unity_rebuilt": false,
+  "independent_provider_calls": 0,
+  "gameplay_tests_executed": false,
+  "deployed": false,
+  "status": "waiting_for_existing_generation_before_installation",
+  "first_windows_elevation_cancelled": true,
+  "second_windows_elevation_authorized_by_owner": true,
+  "human_acceptance": "pending",
+  "existing_descriptions_changed": false,
+  "backend": {
+    "publish_exit": 0,
+    "stage": "deliverables/.stage-backend/83270da7980f43558f0d8ba50b76a22e",
+    "worker_sha256": "7e1757bfa6d3b90b2c77dc7ddb87ef4b06d04042e337449afc3630b29b05ee56",
+    "api_sha256": "5142d672c696a86cb784442ab84cfef333f774c6f582090acc28d8e06c77512e",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "publish_log": "deliverables/construction-repair-d22-1-publish.log"
+  }
+}

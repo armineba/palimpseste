@@ -9,6 +9,24 @@ public sealed record V2PassDocument(string StorageKey, string Sha256, Guid Artif
 
 public sealed partial class JobRepository
 {
+    public async Task<int> GetV2ConstructionBaseAsync(ClaimedJob job, CancellationToken ct)
+    {
+        await using var query = source.CreateCommand("""
+            UPDATE jobs SET v2_builder_version=COALESCE(v2_builder_version,$3)
+            WHERE id=$1 AND fence_token=$2 AND visual_pipeline_version=5
+            RETURNING v2_revision_base,v2_builder_version
+            """);
+        query.Parameters.AddWithValue(job.Id); query.Parameters.AddWithValue(job.Fence);
+        query.Parameters.AddWithValue(V2ConstructionPolicy.Version);
+        await using var reader = await query.ExecuteReaderAsync(ct);
+        if (!await reader.ReadAsync(ct) || reader.GetString(1) != V2ConstructionPolicy.Version)
+            throw new InvalidOperationException("v2_policy_upgrade_requires_explicit_resume");
+        var first = reader.GetInt32(0);
+        if (first < 0 || first > V2ConstructionPolicy.MaxRevision - V2ConstructionPolicy.RevisionsPerWindow + 1)
+            throw new InvalidDataException("v2_revision_window_invalid");
+        return first;
+    }
+
     public async Task<bool> VerifyLatestV2SchemaFailureIfPresentAsync(ClaimedJob job,
         string attemptRoot, string specificationRoot, CancellationToken ct)
     {
@@ -106,7 +124,7 @@ public sealed partial class JobRepository
         string inputHash, string? lockedCoreHash, bool accepted, CancellationToken ct,
         Guid? attemptId = null, CodexResult? transport = null)
     {
-        if (job.VisualPipelineVersion != 5 || revision is < 0 or > 3) throw new InvalidOperationException("v2_pass_version");
+        if (job.VisualPipelineVersion != 5 || revision is < 0 or > V2ConstructionPolicy.MaxRevision) throw new InvalidOperationException("v2_pass_version");
         await using var conn = await source.OpenConnectionAsync(ct);
         await using var tx = await conn.BeginTransactionAsync(ct);
         await InsertArtifactAsync(conn, tx, job, artifact, "v2_" + pass, ct);

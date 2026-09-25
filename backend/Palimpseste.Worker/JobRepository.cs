@@ -470,7 +470,8 @@ public sealed partial class JobRepository
         string planJson, string promptVersion, CodexResult transport, CancellationToken ct, int revision = 0,
         StoredArtifact? methodsArtifact = null)
     {
-        if (revision < 0 || revision > 3 || revision > 0 && (job.VisualPipelineVersion < 2 || job.Kind != "production"))
+        if (revision < 0 || revision > (job.VisualPipelineVersion == 5 ? V2ConstructionPolicy.MaxRevision : 3) ||
+            revision > 0 && (job.VisualPipelineVersion < 2 || job.Kind != "production"))
             throw new ArgumentOutOfRangeException(nameof(revision));
         var methodsRequired = promptVersion == LunaCodexProvider.UnityGodV2PromptVersion;
         if (methodsRequired != (methodsArtifact is not null) || methodsRequired && job.VisualPipelineVersion != 5)
@@ -531,7 +532,7 @@ public sealed partial class JobRepository
                 JOIN spell_plans p ON p.job_id=v.job_id AND p.revision=v.revision AND p.plan_sha256=v.input_sha256
                 JOIN artifacts pa ON pa.id=p.plan_artifact_id AND pa.owner_id=j.owner_id AND pa.kind='plan' AND pa.sha256=p.plan_sha256
                 WHERE v.job_id=j.id AND v.pass='validation' AND v.accepted=true AND p.validation_errors IS NULL
-                  AND (p.prompt_version<>'sp.prompt.blueprint/2.1' OR EXISTS (
+                  AND (p.prompt_version NOT IN ('sp.prompt.blueprint/2.1','sp.prompt.blueprint/2.3') OR EXISTS (
                     SELECT 1 FROM spell_v2_passes m JOIN artifacts ma ON ma.id=m.artifact_id
                     WHERE m.job_id=p.job_id AND m.revision=p.revision AND m.pass='methods' AND m.accepted=true
                       AND m.input_sha256=p.plan_sha256 AND m.provider_attempt_id=p.provider_attempt_id

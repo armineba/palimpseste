@@ -1,5 +1,23 @@
 # État de réalisation et point de reprise
 
+## D22.1 — compilé ; installation autorisée, attend la génération active
+
+Backend publié avec code 0 ; Player 1.8.0 conservé. Le complément restaure les mesures lors d’une reprise et documente les huit géométries exécutables. Les futures descriptions A 1.1 et leurs réparations reçoivent les mêmes capacités que le constructeur, pour éviter de demander une forme absente du moteur. [Preuve de compilation](../evidence/public/backend/construction-repair-d22-1.json) · [Détail](D22_CONSTRUCTION_REPAIR.md).
+
+Windows a annulé la première demande administrateur. Le créateur a explicitement demandé de la réafficher et accepté la suivante. Installation lancée le 25 septembre à 11:50:25 Paris ; elle attend le job `5e763870284e41679c6b850b9b02ceff`, sans annuler son appel en cours. Les nouvelles prises de jobs sont temporairement suspendues pendant cette installation. [État du déploiement](../evidence/public/backend/construction-repair-d22-1-installation.json).
+
+Le second job `c05961d1e0a74377a8567664f37f64c6` a réellement échoué sur sa structure : trois copies entières ne construisent pas un serpent unique en trois tronçons. Il n’est ni relancé ni annoncé jouable. Les deux descriptions existantes restent intactes. Aucun essai de jeu, diagnostic fournisseur ou génération de démonstration ajouté. Suivre le résultat du job actif et la fin du déploiement avant d’annoncer la livraison prête.
+
+## D22 — installé ; même parchemin repris, résultat du rendu attendu
+
+**Backend publié, code 0**, Player 1.8.0 réutilisé. Les appels natifs de D21.3 avaient abouti, mais la silhouette réellement rendue a été refusée puis deux corrections ont échoué sur une matrice non expliquée au constructeur. Le brouillon refusé et la critique visuelle n’étaient pas conservés ensemble. [Causes réelles](../evidence/public/backend/construction-repair-d22-cause.json) · [Correction générale](D22_CONSTRUCTION_REPAIR.md) · [Publication](../evidence/public/backend/construction-repair-d22.json).
+
+D22 transmet les capacités exactes depuis le validateur, autorise `area/ribbon` déjà supporté dans le Player, conserve le brouillon et le verdict dans chaque correction et ajoute une fenêtre de révisions uniquement après changement de politique. Aucune ancienne passe, plan ou tentative n’est remplacé. Les contrôles de compilation et de rendu restent obligatoires.
+
+**Installation terminée le 25 septembre à 11:36:03 Paris**, après la fin du job qui était actif. API et worker redémarrés, pause de prises de jobs retirée. [Installation réelle](../evidence/public/backend/construction-repair-d22-installation.json).
+
+**Reprise propriétaire exécutée, HTTP 202**, même job `5e763870284e41679c6b850b9b02ceff`, nouvelle fenêtre 4..7, compteur historique conservé à 12 avant reprise. [Réponse réelle](../evidence/public/backend/construction-repair-d22-resume.json). Suivre jusqu’au résultat complet ; ne pas annoncer le sort prêt sur la seule preuve d’une relance. Aucun nouveau dessin de démonstration, test de gameplay ou diagnostic fournisseur indépendant exécuté. Publication et verdict humain encore attendus.
+
 ## D21.3 — constructeur corrigé, parchemin du créateur repris
 
 **D21.3 installé le 25 septembre 2026 à 11:07:19 Paris.** Backend D21.2 réellement publié (code 0), réutilisé avec les schémas corrigés ; Player 1.8.0 inchangé. API et worker démarrés, `claims_paused=false`. [Installation](../evidence/public/backend/schema-recovery-d21-3-installation.json) · [Preuve de livraison](../evidence/public/backend/schema-recovery-d21-3.json).

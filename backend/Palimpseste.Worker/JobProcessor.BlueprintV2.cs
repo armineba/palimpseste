@@ -31,7 +31,40 @@ public sealed partial class JobProcessor
         var current = await jobs.GetPlanAsync(job, ct);
         byte[]? plan = current is null ? null : await ReadCheckedAsync(current.StorageKey, current.Sha256, ct);
         string? feedback = null;
+        string? visualFeedback = null;
+        string? rejectedCandidate = null;
         var returnStage = "structural_core";
+        var compatibilityContext = SpellBlueprintV2Validator.BuildCompatibilityContext();
+        var revisionBase = await jobs.GetV2ConstructionBaseAsync(job, ct);
+        if (current is not null && current.Revision < revisionBase)
+        {
+            // An explicit policy-upgrade recovery appends a new window. Restore
+            // the old verdict and its measurements as data; never render or
+            // relabel its old revision or infer a structural failure from "none".
+            var fullReview = await jobs.GetV2PassAsync(job, current.Revision, "validation", ct);
+            var review = fullReview
+                ?? await jobs.GetV2PassAsync(job, current.Revision, "structure", ct);
+            if (review is not null)
+            {
+                var priorCoreHash = V2CoreHash(plan!);
+                if (review.InputSha256 != current.Sha256 || review.LockedCoreSha256 != priorCoreHash)
+                    throw new InvalidDataException("v2_review_input_changed");
+                var captureRecord = await jobs.GetV2PassAsync(job, current.Revision,
+                    fullReview is null ? "core" : "secondary", ct)
+                    ?? throw new InvalidDataException("v2_recovery_measurements_missing");
+                if (captureRecord.InputSha256 != current.Sha256 || captureRecord.LockedCoreSha256 != priorCoreHash)
+                    throw new InvalidDataException("v2_capture_input_changed");
+                var capture = JsonSerializer.Deserialize<V2CaptureOutput>(
+                    await ReadCheckedAsync(captureRecord.StorageKey, captureRecord.Sha256, ct))
+                    ?? throw new InvalidDataException("v2_capture_cache");
+                var judgement = Encoding.UTF8.GetString(await ReadCheckedAsync(review.StorageKey, review.Sha256, ct));
+                visualFeedback = judgement + "\nMEASUREMENTS\n" + V2TelemetrySummary(capture.Manifest);
+                returnStage = fullReview is null
+                    ? V2ReturnStage(judgement, review.Accepted ? "rendering" : "structural_core")
+                    : V2FullReturnStage(judgement, capture);
+                feedback = visualFeedback;
+            }
+        }
         var renderer = new TrustedVisualCapture(settings);
         var descriptionRecord = await jobs.GetDescriptionAsync(job, ct);
         if (!await jobs.VerifyLatestV2SchemaFailureIfPresentAsync(job, settings.AttemptRoot, specRoot, ct))
@@ -39,7 +72,8 @@ public sealed partial class JobProcessor
             await StopV2Async(job, "v2_schema_recovery_unverified", "La reprise de construction n'a pas encore pu être vérifiée", ct);
             return;
         }
-        for (var revision = current?.Revision ?? 0; revision <= 3; revision++)
+        for (var revision = Math.Max(revisionBase, current?.Revision ?? revisionBase);
+            revision < revisionBase + V2ConstructionPolicy.RevisionsPerWindow; revision++)
         {
             var blueprintPass = "blueprint";
             var storedBlueprint = await jobs.GetV2PassAsync(job, revision, "blueprint", ct);
@@ -66,15 +100,18 @@ public sealed partial class JobProcessor
                 if (rejected is { Accepted: false })
                 {
                     feedback = Encoding.UTF8.GetString(await ReadCheckedAsync(rejected.StorageKey, rejected.Sha256, ct));
+                    RestoreV2RepairFeedback(feedback, ref rejectedCandidate, ref visualFeedback, ref returnStage);
                     continue;
                 }
                 await jobs.SetStateAsync(job, "planning", null,
                     revision == 0 ? "V2 · intention, structure et mouvement" : "V2 · correction de " + returnStage, false, ct);
                 var inputHash = Sha256(Encoding.UTF8.GetBytes(Sha256(description) + research.Sha256 +
-                    promptVersion + (plan is null ? "" : Sha256(plan)) + feedback));
+                    promptVersion + V2ConstructionPolicy.Version + compatibilityContext +
+                    (plan is null ? "" : Sha256(plan)) + feedback + rejectedCandidate));
                 var attempt = await jobs.BeginAttemptAsync(job, "B", settings.Model, settings.Effort, inputHash, ct);
                 var candidate = await provider.PlanBlueprintV2Async(job.Id.ToString("N"), attempt.ToString("N"),
-                    description, capabilities, research, plan is null ? null : Encoding.UTF8.GetString(plan), feedback, returnStage, ct);
+                    description, capabilities, research, plan is null ? null : Encoding.UTF8.GetString(plan), V2PromptFeedback(feedback), returnStage, ct,
+                    rejectedCandidate, compatibilityContext);
                 // A failed provider process has produced no candidate to improve. Keep its
                 // exact error on the attempt, pause once and leave this blueprint revision
                 // unused so an explicit recovery can resume it. Never feed infrastructure
@@ -107,10 +144,13 @@ public sealed partial class JobProcessor
                         "invalid",
                         candidate.Sha256, candidate.Transport.CliVersion, candidate.Transport.SessionId,
                         candidate.Transport.UsageJson, rejectionError, ct);
+                    rejectedCandidate = V2RepairCandidate(candidate);
                     feedback = JsonSerializer.Serialize(new { stage = returnStage, failure_kind = "construction_contract",
                         issues = issues.Select(i => i.ToString()).ToArray(), locked_stage_changed = changedLock,
                         methods_invalid = methodsInvalid, method_issues = candidate.UnityGodIssues,
-                        provider_outcome = candidate.Transport.Outcome.ToString(), provider_error = candidate.Transport.ErrorCode });
+                        provider_outcome = candidate.Transport.Outcome.ToString(), provider_error = candidate.Transport.ErrorCode,
+                        visual_feedback = visualFeedback, rejected_candidate_json = rejectedCandidate,
+                        rejected_candidate_sha256 = rejectedCandidate is null ? null : Sha256(Encoding.UTF8.GetBytes(rejectedCandidate)) });
                     await SaveV2BytesAsync(job, revision, blueprintPass, Encoding.UTF8.GetBytes(feedback), inputHash, null, false, ct);
                     continue;
                 }
@@ -120,6 +160,7 @@ public sealed partial class JobProcessor
                 await jobs.SavePlanAsync(job, attempt, artifact, Encoding.UTF8.GetString(candidate.Utf8),
                     promptVersion, candidate.Transport, ct, revision, methodsArtifact);
                 plan = candidate.Utf8;
+                rejectedCandidate = null;
                 current = await jobs.GetPlanAsync(job, ct);
             }
             if (plan is null) throw new InvalidDataException("v2_missing_plan");
@@ -128,7 +169,8 @@ public sealed partial class JobProcessor
             if (methodsEnabled)
             {
                 var receiptRecord = await jobs.GetV2PassAsync(job, revision, "methods", ct);
-                if (current?.PromptVersion != promptVersion || receiptRecord is null || !receiptRecord.Accepted ||
+                if (current?.PromptVersion is not ("sp.prompt.blueprint/2.1" or LunaCodexProvider.UnityGodV2PromptVersion) ||
+                    receiptRecord is null || !receiptRecord.Accepted ||
                     receiptRecord.InputSha256 != planHash) throw new InvalidDataException("v2_methods_receipt_missing");
                 methodsReceipt = await ReadCheckedAsync(receiptRecord.StorageKey, receiptRecord.Sha256, ct);
                 if (UnityGodMethods.ValidateReceipt(plan, methodsReceipt, research).Count != 0)
@@ -147,7 +189,7 @@ public sealed partial class JobProcessor
                 Provenance = new SpellProvenance { mode = "drawing", capture_sha256 = drawing.ManifestSha,
                     reference_sha256 = drawing.ReferenceSha, model_a = await jobs.GetSuccessfulRequestedModelAsync(job, "A", ct),
                     model_b = await jobs.GetSuccessfulRequestedModelAsync(job, "B", ct),
-                    prompt_a_version = descriptionRecord?.PromptVersion, prompt_b_version = promptVersion }
+                    prompt_a_version = descriptionRecord?.PromptVersion, prompt_b_version = current?.PromptVersion ?? promptVersion }
             };
             var compiled = SpellCompiler.Compile(input);
             if (!compiled.Success) throw new InvalidDataException("v2_compile_rejected");
@@ -163,6 +205,7 @@ public sealed partial class JobProcessor
                 !V2MeasuredGatePasses(core.Manifest, "B_continuity"))
             {
                 feedback = structure + "\nMEASUREMENTS\n" + V2TelemetrySummary(core.Manifest);
+                visualFeedback = feedback;
                 returnStage = V2ReturnStage(structure, "structural_core");
                 continue;
             }
@@ -181,7 +224,8 @@ public sealed partial class JobProcessor
                 !impactPassed || !performancePassed || !V2MeasuredGatePasses(full.Manifest, "B_continuity"))
             {
                 feedback = review + "\nMEASUREMENTS\n" + V2TelemetrySummary(full.Manifest);
-                returnStage = !impactPassed ? "physics" : !performancePassed ? "optimization" : V2ReturnStage(review, "rendering");
+                visualFeedback = feedback;
+                returnStage = V2FullReturnStage(review, full);
                 continue;
             }
             // No hidden geometry edits during polish/optimization: both snapshot the exact accepted plan.
@@ -209,6 +253,47 @@ public sealed partial class JobProcessor
             return;
         }
         await StopV2Async(job, "v2_validation_rejected", "Le sort ne satisfait pas encore les contrôles V2 ; dessin et étapes conservés", ct);
+    }
+
+    private static string? V2RepairCandidate(ProviderDocument candidate)
+    {
+        var json = candidate.Transport.FinalJson ?? (candidate.Utf8 is null ? null : Encoding.UTF8.GetString(candidate.Utf8));
+        if (json is null || json.Length > 100_000) return null;
+        try { return JObject.Parse(json).ToString(Newtonsoft.Json.Formatting.None); }
+        catch (Newtonsoft.Json.JsonException) { return null; }
+    }
+
+    private static string? V2PromptFeedback(string? feedback)
+    {
+        if (feedback is null) return null;
+        try
+        {
+            var data = JObject.Parse(feedback);
+            // The persisted record includes the draft for restart. It is sent
+            // exactly once in REJECTED_CANDIDATE_DATA, not duplicated in context.
+            data.Remove("rejected_candidate_json"); data.Remove("rejected_candidate_sha256");
+            return data.ToString(Newtonsoft.Json.Formatting.None);
+        }
+        catch (Newtonsoft.Json.JsonException) { return feedback; }
+    }
+
+    private static void RestoreV2RepairFeedback(string feedback, ref string? candidate,
+        ref string? visualFeedback, ref string stage)
+    {
+        using var parsed = JsonDocument.Parse(feedback);
+        var root = parsed.RootElement;
+        if (root.TryGetProperty("stage", out var recordedStage) && recordedStage.GetString() is
+            "structural_core" or "motion" or "physics" or "rendering" or "optimization") stage = recordedStage.GetString()!;
+        if (root.TryGetProperty("visual_feedback", out var visual) && visual.ValueKind == JsonValueKind.String)
+            visualFeedback = visual.GetString();
+        candidate = null;
+        if (root.TryGetProperty("rejected_candidate_json", out var draft) && draft.ValueKind == JsonValueKind.String &&
+            root.TryGetProperty("rejected_candidate_sha256", out var hash))
+        {
+            var value = draft.GetString()!;
+            if (Sha256(Encoding.UTF8.GetBytes(value)) != hash.GetString()) throw new InvalidDataException("v2_repair_draft_hash");
+            candidate = value;
+        }
     }
 
     private async Task SaveV2BytesAsync(ClaimedJob job, int revision, string pass, byte[] bytes,
@@ -313,6 +398,15 @@ public sealed partial class JobProcessor
     {
         using var json = JsonDocument.Parse(judgement);
         return json.RootElement.GetProperty("return_stage").GetString() is { } s && s != "none" ? s : fallback;
+    }
+
+    private static string V2FullReturnStage(string judgement, V2CaptureOutput capture)
+    {
+        if (!V2MeasuredGatePasses(capture.Manifest, "D_impact")) return "physics";
+        if (!V2MeasuredGatePasses(capture.Manifest, "performance") || !(capture.MeasuredFps >= 30)) return "optimization";
+        // A full critique may explicitly request structure. An absent request
+        // defaults to rendering; missing measurements never unlock a core.
+        return V2ReturnStage(judgement, "rendering");
     }
 
     public static string V2CoreHash(byte[] plan)

@@ -14,7 +14,9 @@ namespace Palimpseste.Core
             ["beam"] = new[] { "beam", "ribbon" },
             ["ribbon"] = new[] { "ribbon", "swept_tube" },
             ["orbital"] = new[] { "controlled_swarm", "ribbon", "planar_field" },
-            ["area"] = new[] { "planar_field", "radial_volume", "vortex_surface" },
+            // The field carrier owns collision independently of the continuous
+            // visual support. A stationary ribbon is also implemented by Unity.
+            ["area"] = new[] { "planar_field", "radial_volume", "vortex_surface", "ribbon" },
             ["explosion"] = new[] { "radial_volume", "controlled_swarm" },
             ["summon"] = new[] { "branched_surface", "swept_tube", "radial_volume", "controlled_swarm" },
             ["shield"] = new[] { "planar_field", "radial_volume" },
@@ -27,6 +29,84 @@ namespace Palimpseste.Core
         public static bool IsCompatible(string archetype, string core) =>
             archetype != null && Compatible.TryGetValue(archetype, out var allowed) && allowed.Contains(core);
 
+        // This is the same table used by validation, exposed to the constructor
+        // so a rejected combination can be corrected without guessing.
+        public static string BuildCompatibilityContext() =>
+            "Only archetype[0] selects the allowed structural_core.kind values. " +
+            "A secondary archetype does not extend that set. Choose the primary " +
+            "structural family and its core together; preserve the description and gameplay.\n" +
+            string.Join("\n", Compatible.Select(entry => entry.Key + " -> " + string.Join(", ", entry.Value))) +
+            "\nstructural_core.inner_radius_milli must equal 0 for every kind except planar_field. " +
+            "A primary portal requires planar_field with inner_radius_milli > 0.\n" +
+            "IMPLEMENTED GEOMETRY (CanonicalCoreGeometryV2; these are executable limits, not names of arbitrary meshes):\n" +
+            "All geometry is created once in local centimetres with fixed topology. For path-based sweeps, " +
+            "control_points.position_cm defines the full XYZ Catmull-Rom centreline; adjacent radius/width profiles " +
+            "are interpolated smoothly. Point spacing does not allocate proportional time or arc-length samples. " +
+            "Sections use a transported frame, not authored per-section rotations. A textual selection_reason, " +
+            "landmark or identity invariant does not add geometry or an animation control.\n" +
+            "swept_tube: one connected tube along the complete path, circular sections with radius_cm and flat end caps. " +
+            "width_cm does not flatten this tube. size_cm does not rescale its mesh; author positions/radii to the " +
+            "intended size. Changing radial_segments changes tessellation, not cross-section design or material. " +
+            "A tapered or bent body needs that taper/path in its numerical controls; it is not inferred from its subject.\n" +
+            "beam: the same capped circular sweep as swept_tube, not a separate beam shader or an automatic branching " +
+            "lightning generator. Its own geometry uses positions/radius_cm, not width_cm or size_cm as mesh scale. " +
+            "When the gameplay beam supplies a beam path, the renderer maps longitudinal U along that path and keeps " +
+            "the authored X/Y section offsets; do not encode a second independent trajectory in the core.\n" +
+            "radial_volume: one closed swept mass along the complete XYZ path, with ellipse section radii " +
+            "width_cm/2 and radius_cm in its transported frame. Only the terminal sections taper to closure. " +
+            "It is not an automatic sphere, Y-axis lathe, arbitrary polyhedron or voxel field. size_cm does not " +
+            "scale its mesh; offsets and profiles define its shape. This can make a continuous flattened volume, " +
+            "but not independently oriented plates, disconnected pieces or hard creases specified only in prose.\n" +
+            "vortex_surface: a continuous full-circumference surface of revolution, " +
+            "not an open helical strip. Its radius_cm profile controls full sections; size_cm.y controls uniform " +
+            "height, control-point X/Z displace the axis, and control-point Y and width_cm do not shape its sections. " +
+            "size_cm.z/size_cm.x controls the Z-to-X section ratio; an existing small three-lobed spiral modulation " +
+            "does not cut the surface open. Narrowing sections creates waists, not gaps between disconnected slabs " +
+            "or helical turns. Angular motion rotates this existing surface; it cannot change its connectivity.\n" +
+            "ribbon: a connected double-sided open band following the full XYZ Catmull-Rom control path; " +
+            "width_cm controls the band width. An explicitly helical path can provide spacing between turns " +
+            "when its pitch and width permit it. The ribbon has no thickness and its orientation is transported " +
+            "along the path; radius_cm, size_cm and radial_segments do not shape this mesh. Separate slab tilt, " +
+            "individual pieces and arbitrary cross sections are not controls. This is an authored moving band, " +
+            "not world-space trail history recorded behind a moving head.\n" +
+            "planar_field: one zero-thickness elliptical disk or annulus centred on the root. The smallest size_cm " +
+            "component selects its normal (Y first on ties, otherwise Z before X); the other two dimensions are " +
+            "the full outer diameters. inner_radius_milli is the inner-to-outer ratio. control_points, their radius_cm " +
+            "and width_cm do not sculpt this mesh. It cannot become an extruded wall, non-elliptical outline, dome " +
+            "or multiple separate rings by describing those forms.\n" +
+            "controlled_swarm: entity_count duplicates the ENTIRE SAME capped circular sweep at evenly spaced " +
+            "angular offsets. It does not split the control path into entity_count segments or build a chain of " +
+            "different body parts. Each copy has the same path, radius profile and initial orientation; width_cm " +
+            "does not shape it. For angle a = 2*pi*entityIndex/entity_count, its centre offset in cm is " +
+            "(0.5*size_cm.x*cos(a), 0.2*size_cm.y*sin(2*a), 0.5*size_cm.z*sin(a)). " +
+            "There is no per-copy geometry, scale, layout, phase or independent collision parameter. Choose this " +
+            "only for an intentional group of complete repeated forms; keep identity.element_count equal to " +
+            "entity_count and preserve the declared separate connected components.\n" +
+            "branched_surface: one fused smooth distance-field surface, formed from circular-radius segments along " +
+            "the main path and attached branch paths. Each branch joins its parent path at parent_t_milli; its " +
+            "points are in the same root coordinate system, not offsets from the attachment. It is not a set of " +
+            "separate tube renderers, a skeletal rig or an arbitrary imported mesh. width_cm and size_cm do not " +
+            "sculpt this surface. Extraction uses a fixed 30-cell grid per axis over all path bounds and smooth " +
+            "unions; radial_segments/longitudinal_segments do not refine it. Small isolated details can disappear " +
+            "at that resolution, close branches can merge, and sharp planar facets are not an exposed control.\n" +
+            "There is no additional mesh, skinned_mesh, custom graph or arbitrary asset core kind. All non-swarm " +
+            "cores require one connected entity. size_cm remains a declared gameplay footprint for field/trap " +
+            "carriers even where it does not scale geometry; keep this footprint consistent with the authored core.\n" +
+            "IMPLEMENTED CONTINUOUS MOTION (CanonicalSpellVisualV2): geometry stays attached to its gameplay root; " +
+            "motion.path_cm/trajectory describe carrier movement, not a second visual translation. Non-swarm " +
+            "angular motion rotates around local Y. A swarm rotates its centre offsets around Y and adds per-copy " +
+            "vertical sinusoidal motion at the declared amplitude/frequency; this is orbit, not per-copy local spin. " +
+            "deformation=vortex also applies the whole-core Y rotation and a height-dependent twist/wobble, so on " +
+            "a swarm it is an additional deformation after centre-orbit motion, not an independent spin control. " +
+            "undulate offsets X, flutter offsets Y, twist oscillates around local Z, pulse scales around mesh " +
+            "bounds centre, and expand grows the same existing geometry. These deformation equations do not " +
+            "create joints, split/merge entities, change section orientation independently, or add anatomical parts. " +
+            "The current introduction scales the existing core from 8% to full size and reveals its surface; " +
+            "contact deforms the same vertices and retirement fades, dissolves, contracts or disperses that same " +
+            "topology. A demanded motion or representation absent from these controls requires development; " +
+            "do not claim it is supplied by a description, source-method title or shader decoration. " +
+            "All existing contract, structural, motion and visual acceptance gates still apply.";
+
         public static IReadOnlyList<ValidationIssue> Validate(SpellBlueprintV2 blueprint)
         {
             var issues = new List<ValidationIssue>();
@@ -37,7 +117,11 @@ namespace Palimpseste.Core
             var b = blueprint; var core = b.structural_core; var identity = b.identity;
             void Error(string code, string path, string text) => issues.Add(new ValidationIssue(code, path, text));
             if (!IsCompatible(b.archetype[0], core.kind))
-                Error("v2_archetype_core", "$.structural_core.kind", "The primary archetype requires a compatible structural representation");
+                Error("v2_archetype_core", "$.structural_core.kind",
+                    "Primary archetype '" + b.archetype[0] + "' does not permit core '" + core.kind +
+                    "'. Allowed structural_core.kind values: " +
+                    (Compatible.TryGetValue(b.archetype[0], out var allowedCores) ? string.Join(", ", allowedCores) : "none") +
+                    ". Only archetype[0] selects compatibility; secondary archetypes do not extend it.");
             if (b.archetype.Distinct().Count() != b.archetype.Count)
                 Error("v2_archetype_duplicate", "$.archetype", "Archetypes must be distinct");
             if (identity.element_count != core.entity_count || (core.kind != "controlled_swarm" && core.entity_count != 1))
@@ -52,7 +136,9 @@ namespace Palimpseste.Core
             if (core.kind == "branched_surface" ? core.branches.Count == 0 : core.branches.Count != 0)
                 Error("v2_core_branches", "$.structural_core.branches", "Only a branched surface declares branches, and it must have at least one");
             if (core.kind != "planar_field" && core.inner_radius_milli != 0)
-                Error("v2_core_aperture", "$.structural_core.inner_radius_milli", "Only a planar field supports an aperture");
+                Error("v2_core_aperture", "$.structural_core.inner_radius_milli",
+                    "Core '" + core.kind + "' requires inner_radius_milli = 0; received " + core.inner_radius_milli +
+                    ". Only planar_field supports a nonzero aperture.");
             if (b.archetype[0] == "portal" && core.inner_radius_milli == 0)
                 Error("v2_portal_aperture", "$.structural_core.inner_radius_milli", "A portal must preserve its open center");
             CheckPath(core.control_points, "$.structural_core.control_points", Error);

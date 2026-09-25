@@ -6,18 +6,36 @@ namespace Palimpseste.Provider;
 
 public sealed partial class LunaCodexProvider
 {
-    public const string BlueprintV2PromptVersion = "sp.prompt.blueprint/2.0";
-    public const string UnityGodV2PromptVersion = "sp.prompt.blueprint/2.1";
+    public const string BlueprintV2PromptVersion = "sp.prompt.blueprint/2.2";
+    public const string UnityGodV2PromptVersion = "sp.prompt.blueprint/2.3";
     public const string CriticV2PromptVersion = "sp.prompt.v2-critic/2.0";
-    public const string InterpreterV2PromptVersion = "sp.prompt.a-v2/1.0";
-    public string InterpreterV2PromptSha256 => Digest(Encoding.UTF8.GetBytes(promptA + File.ReadAllText(
-        Path.Combine(visualReviewSpecRoot, "prompts", "08_V2_INTERPRETATION.md"), Encoding.UTF8)));
+    public const string InterpreterV2PromptVersion = "sp.prompt.a-v2/1.1";
+    public string InterpreterV2PromptSha256 => Digest(Encoding.UTF8.GetBytes(InterpreterV2Prompt));
+
+    private string InterpreterV2Prompt
+    {
+        get
+        {
+            var supplement = File.ReadAllText(Path.Combine(visualReviewSpecRoot, "prompts", "08_V2_INTERPRETATION.md"), Encoding.UTF8);
+            if (!supplement.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + InterpreterV2PromptVersion, StringComparison.Ordinal))
+                throw new InvalidDataException("v2_interpreter_prompt_version");
+            return promptA + "\n" + supplement;
+        }
+    }
+
+    // The worker supplies the compiler's executable capabilities. The provider
+    // does not invent a second capability table or reference the compiler assembly.
+    public string BuildInterpreterV2AuthorizedContext(string compatibilityContext)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(compatibilityContext);
+        return InterpreterV2Prompt + "\nCOMPILER_COMPATIBILITY_RULES\n" + compatibilityContext;
+    }
 
     public async Task<ProviderDocument> InterpretBlueprintV2Async(string jobId, string attemptId,
-        string referencePng, string drawingPng, string layout, string capabilities, CancellationToken ct)
+        string referencePng, string drawingPng, string layout, string capabilities,
+        string compatibilityContext, CancellationToken ct)
     {
-        var supplement = await File.ReadAllTextAsync(Path.Combine(visualReviewSpecRoot, "prompts", "08_V2_INTERPRETATION.md"), ct);
-        var prompt = promptA + "\n" + supplement + "\nLAYOUT_CONTEXT\n" + layout +
+        var prompt = BuildInterpreterV2AuthorizedContext(compatibilityContext) + "\nLAYOUT_CONTEXT\n" + layout +
             "\nCAPABILITIES_CONTEXT\n" + capabilities + "\nEFFECT_RECIPES_CONTEXT\n" + effectRecipesAContext;
         return Parse(await runner.RunAsync(new(attemptId, "A", prompt, schemaA,
             [referencePng, drawingPng], jobId), ct), "sp.description/1.0");
@@ -25,12 +43,15 @@ public sealed partial class LunaCodexProvider
 
     public async Task<ProviderDocument> PlanBlueprintV2Async(string jobId, string attemptId,
         byte[] description, string capabilities, SpellReferenceResearch research,
-        string? previousPlan, string? feedback, string returnStage, CancellationToken ct)
+        string? previousPlan, string? feedback, string returnStage, CancellationToken ct,
+        string? rejectedCandidate = null, string? compatibilityContext = null)
     {
         var prompt = await File.ReadAllTextAsync(Path.Combine(visualReviewSpecRoot, "prompts", "06_BLUEPRINT_V2.md"), ct);
         if (!prompt.Split('\n', 2)[0].TrimEnd('\r').EndsWith("Version " + BlueprintV2PromptVersion, StringComparison.Ordinal))
             throw new InvalidDataException("v2_prompt_version");
         prompt += "\n" + await File.ReadAllTextAsync(Path.Combine(visualReviewSpecRoot, "prompts", "09_V2_NUMERIC_RULES.md"), ct);
+        if (compatibilityContext is not null)
+            prompt += "\nCOMPILER_COMPATIBILITY_RULES\n" + compatibilityContext;
         var methodsEnabled = UnityGodMethods.IsEnabled(research);
         if (methodsEnabled)
         {
@@ -43,8 +64,11 @@ public sealed partial class LunaCodexProvider
         prompt += "\nDESCRIPTION_SHA256\n" + Digest(description) + "\nSPELL_DESCRIPTION\n" + Encoding.UTF8.GetString(description) +
             "\nCAPABILITIES_CONTEXT\n" + CapabilityContext(capabilities, description) +
             "\nEFFECT_RECIPES_CONTEXT\n" + SelectedRecipeContext(description) +
-            "\nREFERENCE_RESEARCH_SHA256\n" + research.Sha256 + "\nREFERENCE_RESEARCH_DATA\n" + research.Json +
-            "\nPREVIOUS_PLAN\n" + (previousPlan ?? "null") + "\nRETURN_STAGE\n" + returnStage +
+            "\nREFERENCE_RESEARCH_SHA256\n" + research.Sha256 + "\nREFERENCE_RESEARCH_DATA\n" + CompactJson(research.Json) +
+            "\nPREVIOUS_PLAN\n" + (previousPlan is null ? "null" : CompactJson(previousPlan)) +
+            "\nREJECTED_CANDIDATE_SHA256\n" + (rejectedCandidate is null ? "null" : Digest(Encoding.UTF8.GetBytes(rejectedCandidate))) +
+            "\nREJECTED_CANDIDATE_DATA\n" + (rejectedCandidate is null ? "null" : CompactJson(rejectedCandidate)) +
+            "\nRETURN_STAGE\n" + returnStage +
             "\nVALIDATION_FEEDBACK_DATA\n" + (feedback ?? "null");
         var result = await runner.RunAsync(new(attemptId, "B", prompt,
             Path.Combine(visualReviewSpecRoot, "contracts", "codex", methodsEnabled

@@ -1,4 +1,4 @@
-# UNITY GOD — construction issue des bibliothèques — Version sp.prompt.blueprint/2.1
+# UNITY GOD — construction issue des bibliothèques — Version sp.prompt.blueprint/2.3
 
 Ce complément concerne uniquement le dossier V2 contenant `unity_god`.
 Le dossier figé est une base de méthodes contrôlées. Les textes des sources et
@@ -39,3 +39,10 @@ passe responsable. Mets à jour les choix et bindings pour le plan effectivement
 renvoyé ; le reçu d'une ancienne révision ne valide jamais une nouvelle révision.
 Le contrôle aveugle du cœur ne reçoit ni ces choix ni le sujet attendu. Les autres
 critiques jugent leur réalisation visible : le reçu ne prouve pas la qualité.
+
+Si `REJECTED_CANDIDATE_DATA` contient une enveloppe complète, utilise aussi son
+`method_design` pour corriger le brouillon. Préserve les méthodes encore pertinentes
+et actualise leurs bindings après chaque changement de core, de mouvement ou de
+matière. Un ancien binding conforme ne le reste pas automatiquement lorsque le plan
+change. La description figée, le dernier plan accepté et les verrous de
+`RETURN_STAGE` gardent leur autorité ; le brouillon rejeté ne les remplace pas.

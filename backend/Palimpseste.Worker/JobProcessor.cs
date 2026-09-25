@@ -85,7 +85,8 @@ public sealed partial class JobProcessor
         var capabilities = await File.ReadAllTextAsync(capabilitiesPath, ct);
         var interpretationPromptVersion = job.VisualPipelineVersion == 5 ? LunaCodexProvider.InterpreterV2PromptVersion : legacyInterpretation ? LunaCodexProvider.LegacyPromptAVersion : LunaCodexProvider.PromptAVersion;
         var interpretationPromptHash = job.VisualPipelineVersion == 5 ? provider.InterpreterV2PromptSha256 : legacyInterpretation ? provider.LegacyPromptASha256 : provider.PromptASha256;
-        var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + interpretationPromptHash + provider.EffectRecipesPromptSha256));
+        var interpretationCompatibility = job.VisualPipelineVersion == 5 ? SpellBlueprintV2Validator.BuildCompatibilityContext() : "";
+        var inputHash = Sha256(Encoding.UTF8.GetBytes(capture.ManifestSha + capture.DrawingSha + capture.ReferenceSha + layout + capabilities + interpretationPromptHash + provider.EffectRecipesPromptSha256 + interpretationCompatibility));
 
         var descriptionRecord = await jobs.GetDescriptionAsync(job, ct);
         byte[] description;
@@ -95,7 +96,7 @@ public sealed partial class JobProcessor
             var attempt = await jobs.BeginAttemptAsync(job, "A", settings.InterpreterModel, settings.InterpreterEffort, inputHash, ct);
             var result = job.VisualPipelineVersion == 5
                 ? await provider.InterpretBlueprintV2Async(job.Id.ToString("N"), attempt.ToString("N"),
-                    files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, ct)
+                    files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, interpretationCompatibility, ct)
                 : legacyInterpretation
                 ? await provider.InterpretLegacyAsync(job.Id.ToString("N"), attempt.ToString("N"),
                     files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout, capabilities, ct)
@@ -110,7 +111,8 @@ public sealed partial class JobProcessor
                 attempt = await jobs.BeginAttemptAsync(job, "repair_A", settings.InterpreterModel, settings.InterpreterEffort,
                     inputHash, ct);
                 result = await provider.RepairAsync(new RepairAttempt(
-                    job.Id.ToString("N"), attempt.ToString("N"), "A", layout,
+                    job.Id.ToString("N"), attempt.ToString("N"), "A", job.VisualPipelineVersion == 5
+                        ? provider.BuildInterpreterV2AuthorizedContext(interpretationCompatibility) + "\nLAYOUT_CONTEXT\n" + layout : layout,
                     result.Transport.FinalJson!, RepairErrors(result, issues), repairNumber,
                     files.PathForKey(capture.ReferenceKey), files.PathForKey(capture.DrawingKey), layout,
                     null, capabilities, LegacyInterpretation: legacyInterpretation), ct);

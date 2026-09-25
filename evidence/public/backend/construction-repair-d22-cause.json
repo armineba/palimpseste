@@ -1,0 +1,70 @@
+{
+  "job_id": "5e763870-284e-4167-9c6b-850b9b02ceff",
+  "observed_attempt_count": 12,
+  "state": "needs_operator",
+  "error_code": "v2_validation_rejected",
+  "native_schemas_previously_accepted": true,
+  "revision1_compiled_and_captured": true,
+  "revision1_structure": {
+    "semantic_match": false,
+    "score_milli": 5600,
+    "gates": {
+      "A_structure": "fail",
+      "B_continuity": "fail",
+      "C_rendering": "not_evaluated",
+      "D_impact": "not_evaluated",
+      "E_game_camera": "not_evaluated",
+      "F_motion": "not_evaluated",
+      "semantic_blind": "fail",
+      "performance": "not_evaluated"
+    },
+    "return_stage": "structural_core"
+  },
+  "compiler_failures": {
+    "0": {
+      "stage": "structural_core",
+      "failure_kind": "construction_contract",
+      "issues": [
+        "v2_core_aperture n0.structural_core.inner_radius_milli: Only a planar field supports an aperture"
+      ],
+      "locked_stage_changed": false,
+      "methods_invalid": false,
+      "method_issues": null,
+      "provider_outcome": "Success",
+      "provider_error": null
+    },
+    "2": {
+      "stage": "structural_core",
+      "failure_kind": "construction_contract",
+      "issues": [
+        "v2_archetype_core n0.structural_core.kind: The primary archetype requires a compatible structural representation"
+      ],
+      "locked_stage_changed": false,
+      "methods_invalid": false,
+      "method_issues": null,
+      "provider_outcome": "Success",
+      "provider_error": null
+    },
+    "3": {
+      "stage": "structural_core",
+      "failure_kind": "construction_contract",
+      "issues": [
+        "v2_archetype_core n0.structural_core.kind: The primary archetype requires a compatible structural representation"
+      ],
+      "locked_stage_changed": false,
+      "methods_invalid": false,
+      "method_issues": null,
+      "provider_outcome": "Success",
+      "provider_error": null
+    }
+  },
+  "rejected_revision2_core": "area/ribbon",
+  "rejected_revision3_core": "orbital/vortex_surface",
+  "original_passes_modified": false,
+  "root_causes": [
+    "allowed area ribbon missing despite runtime support",
+    "compiler errors lacked actual/allowed mappings",
+    "rejected candidate lost from next revision",
+    "visual critique lost after compiler rejection"
+  ]
+}

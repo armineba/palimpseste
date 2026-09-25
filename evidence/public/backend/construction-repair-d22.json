@@ -1,0 +1,32 @@
+{
+  "revision": "D22",
+  "client_version": "1.8.0",
+  "recorded_at": "2026-09-25T09:34:12.722141+00:00",
+  "job_id": "5e763870284e41679c6b850b9b02ceff",
+  "backend": {
+    "publish_exit": 0,
+    "stage": "deliverables/.stage-backend/c6f419c3a5bd4d379f4c7fe4ee9653ba",
+    "worker_sha256": "255a0ebc8e5ae9fd469ed5b5c688bd5522c0b38620652097d93c03d5f7f0e500",
+    "api_sha256": "d3179a6f2aacc076f270b8827eb62688b88c1ae7293299cd18f5c8f28fa6acce",
+    "native_sha256": "0a38e51ceca23710d2ced5ed06c6822584aa8a8e418defe116a994ce384d3a4f",
+    "publish_log": "deliverables/construction-repair-d22-publish.log"
+  },
+  "construction_policy": "sp.construction-policy/2.0",
+  "fixes": [
+    "rejected draft preserved separately from accepted plan",
+    "visual critique preserved through compiler repair",
+    "compatibility guidance from authoritative validator",
+    "area ribbon supported by existing player",
+    "additive revision window after deployed policy change"
+  ],
+  "backend_compiled": true,
+  "unity_rebuilt": false,
+  "independent_provider_calls": 0,
+  "gameplay_tests_executed": false,
+  "deployed": true,
+  "parchment_resumed": true,
+  "spell_published": false,
+  "human_acceptance": "pending",
+  "installed_at": "2026-09-25T09:36:03.9927431+00:00",
+  "status": "awaiting_real_construction_and_rendering"
+}
